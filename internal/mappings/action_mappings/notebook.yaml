@@ -1,0 +1,101 @@
+mappings:
+  - id: "actions.notebook.cell.edit"
+    description: "Edit Cell"
+    vscode:
+      command: "notebook.cell.edit"
+      when: "notebookCellListFocused && !editorHoverFocused && !inputFocus && !notebookOutputInputFocused"
+    intellij:
+      action: "NotebookEnterCell"
+    zed:
+      notSupported: true
+      notSupportedReason: "zed do not support jupyter notebook yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+  - id: "actions.notebook.cell.execute"
+    description: "Execute Cell"
+    vscode:
+      command: "notebook.cell.execute"
+      when: "notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
+    intellij:
+      action: "NotebookRunCell"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.cell.executeAndInsertBelow"
+    description: "Execute Cell and Insert Below"
+    vscode:
+      command: "notebook.cell.executeAndInsertBelow"
+      when: "notebookCellListFocused && notebookCellType == 'markup' || notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
+    intellij:
+      action: "RunCellAndInsertBelowAction"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.cell.executeAndSelectBelow"
+    description: "Execute Cell and Select Below"
+    vscode:
+      command: "notebook.cell.executeAndSelectBelow"
+      when: "notebookCellListFocused && !interactiveEditorFocused && notebookCellType == 'code' || editorTextFocus && inputFocus && notebookEditorFocused && !interactiveEditorFocused"
+    intellij:
+      action: "NotebookRunCellAndSelectBelow"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.cell.insertCodeCellAbove"
+    description: "Insert Code Cell Above"
+    vscode:
+      command: "notebook.cell.insertCodeCellAbove"
+      when: "notebookCellListFocused && !inputFocus"
+    intellij:
+      action: "NotebookInsertCodeCellAbove"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.cell.insertCodeCellBelow"
+    description: "Insert Code Cell Below"
+    vscode:
+      command: "notebook.cell.insertCodeCellBelow"
+      when: "notebookCellListFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
+    intellij:
+      action: "NotebookInsertCodeCellBelow"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.cell.moveDown"
+    description: "Move Cell Down"
+    vscode:
+      command: "notebook.cell.moveDown"
+      when: "notebookEditorFocused && !inputFocus"
+    intellij:
+      action: "MoveStatementDown"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.cell.moveUp"
+    description: "Move Cell Up"
+    vscode:
+      command: "notebook.cell.moveUp"
+      when: "notebookEditorFocused && !inputFocus"
+    intellij:
+      action: "MoveStatementUp"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.cell.quitEdit"
+    description: "Stop Editing Cell"
+    vscode:
+      command: "notebook.cell.quitEdit"
+      when: "notebookEditorFocused && notebookOutputFocused"
+    intellij:
+      action: "NotebookExitEditMode"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.focusBottom"
+    description: "Focus Bottom"
+    vscode:
+      command: "notebook.focusBottom"
+      when: "notebookEditorFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
+    intellij:
+      action: "NotebookSelectLastCell"
+    zed:
+      notSupported: true
+  - id: "actions.notebook.focusTop"
+    description: "Focus Top"
+    vscode:
+      command: "notebook.focusTop"
+      when: "notebookEditorFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
+    intellij:
+      action: "NotebookSelectFirstCell"
+    zed:
+      notSupported: true

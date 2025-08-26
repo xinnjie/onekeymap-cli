@@ -1,0 +1,285 @@
+package intellij
+
+import (
+	"bytes"
+	"context"
+	"encoding/xml"
+	"log/slog"
+	"os"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+)
+
+func TestExportIntelliJKeymap(t *testing.T) {
+	mappingConfig, err := mappings.NewTestMappingConfig()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name           string
+		setting        *keymapv1.KeymapSetting
+		existingConfig string
+		validateFunc   func(t *testing.T, out KeymapXML)
+	}{
+		// Basic destructive export tests
+		{
+			name: "basic single-chord export ($Copy)",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				},
+			},
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				assert.Equal(t, "Onekeymap", out.Name)
+				assert.Equal(t, "1", out.Version)
+				assert.Equal(t, true, out.DisableMnemonics)
+				assert.Equal(t, "$default", out.Parent)
+				// find $Copy action
+				var found *ActionXML
+				for i := range out.Actions {
+					if out.Actions[i].ID == "$Copy" {
+						found = &out.Actions[i]
+						break
+					}
+				}
+				if assert.NotNil(t, found, "expected $Copy action in exported XML") {
+					if assert.Len(t, found.KeyboardShortcuts, 1) {
+						ks := found.KeyboardShortcuts[0]
+						assert.Equal(t, "meta C", ks.First)
+						assert.Equal(t, "", ks.Second)
+					}
+				}
+			},
+		},
+		{
+			name: "multi entries and multi-chord export (command1)",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					// single chord ctrl+alt+s
+					keymap.NewBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+					// two-chord ctrl+k ctrl+c
+					keymap.NewBinding("actions.test.mutipleActions", "ctrl+k ctrl+c"),
+				},
+			},
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				var cmd1 *ActionXML
+				for i := range out.Actions {
+					if out.Actions[i].ID == "command1" {
+						cmd1 = &out.Actions[i]
+						break
+					}
+				}
+				if assert.NotNil(t, cmd1, "expected command1 action in exported XML") {
+					assert.Len(t, cmd1.KeyboardShortcuts, 2)
+					// Order preserved based on input order
+					assert.Equal(t, "control alt S", cmd1.KeyboardShortcuts[0].First)
+					assert.Equal(t, "", cmd1.KeyboardShortcuts[0].Second)
+					assert.Equal(t, "control K", cmd1.KeyboardShortcuts[1].First)
+					assert.Equal(t, "control C", cmd1.KeyboardShortcuts[1].Second)
+				}
+			},
+		},
+		{
+			name: "unmapped actions skipped",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.unknown", "meta+x"),
+				},
+			},
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				// No actions should be exported
+				assert.Len(t, out.Actions, 0)
+			},
+		},
+		{
+			name: "dedup identical shortcuts for an action",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+					keymap.NewBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+				},
+			},
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				var cmd1 *ActionXML
+				for i := range out.Actions {
+					if out.Actions[i].ID == "command1" {
+						cmd1 = &out.Actions[i]
+						break
+					}
+				}
+				if assert.NotNil(t, cmd1, "expected command1 action in exported XML") {
+					// Should only have one shortcut after dedup
+					assert.Len(t, cmd1.KeyboardShortcuts, 1)
+					assert.Equal(t, "control alt S", cmd1.KeyboardShortcuts[0].First)
+					assert.Equal(t, "", cmd1.KeyboardShortcuts[0].Second)
+				}
+			},
+		},
+		{
+			name: "special keys are formatted correctly",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.test.mutipleActions", "f5"),
+					keymap.NewBinding("actions.test.mutipleActions", "ctrl+numpad3"),
+					keymap.NewBinding("actions.test.mutipleActions", "ctrl+shift+["),
+				},
+			},
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				var cmd1 *ActionXML
+				for i := range out.Actions {
+					if out.Actions[i].ID == "command1" {
+						cmd1 = &out.Actions[i]
+						break
+					}
+				}
+				if assert.NotNil(t, cmd1, "expected command1 action in exported XML") {
+					assert.Len(t, cmd1.KeyboardShortcuts, 3)
+					// Entries may appear in the order provided
+					assert.Equal(t, "F5", cmd1.KeyboardShortcuts[0].First)
+					assert.Equal(t, "control NUMPAD3", cmd1.KeyboardShortcuts[1].First)
+					assert.Equal(t, "control shift OPEN_BRACKET", cmd1.KeyboardShortcuts[2].First)
+				}
+			},
+		},
+		// Non-destructive export tests
+		{
+			name: "non-destructive export preserves user actions",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				},
+			},
+			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
+<keymap version="1" name="Onekeymap" parent="$default" disable-mnemonics="true">
+  <action id="CustomUserAction">
+    <keyboard-shortcut first-keystroke="meta X" />
+  </action>
+</keymap>`,
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				assert.Len(t, out.Actions, 2)
+
+				// Check managed action ($Copy)
+				var copyAction *ActionXML
+				var customAction *ActionXML
+				for i := range out.Actions {
+					switch out.Actions[i].ID {
+					case "$Copy":
+						copyAction = &out.Actions[i]
+					case "CustomUserAction":
+						customAction = &out.Actions[i]
+					}
+				}
+
+				assert.NotNil(t, copyAction, "expected $Copy action")
+				assert.NotNil(t, customAction, "expected CustomUserAction to be preserved")
+
+				if copyAction != nil {
+					assert.Len(t, copyAction.KeyboardShortcuts, 1)
+					assert.Equal(t, "meta C", copyAction.KeyboardShortcuts[0].First)
+				}
+				if customAction != nil {
+					assert.Len(t, customAction.KeyboardShortcuts, 1)
+					assert.Equal(t, "meta X", customAction.KeyboardShortcuts[0].First)
+				}
+			},
+		},
+		{
+			name: "managed action takes priority over conflicting user action",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				},
+			},
+			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
+<keymap version="1" name="Onekeymap" parent="$default" disable-mnemonics="true">
+  <action id="$Copy">
+    <keyboard-shortcut first-keystroke="meta V" />
+  </action>
+  <action id="CustomUserAction">
+    <keyboard-shortcut first-keystroke="meta X" />
+  </action>
+</keymap>`,
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				assert.Len(t, out.Actions, 2)
+
+				var copyAction *ActionXML
+				var customAction *ActionXML
+				for i := range out.Actions {
+					switch out.Actions[i].ID {
+					case "$Copy":
+						copyAction = &out.Actions[i]
+					case "CustomUserAction":
+						customAction = &out.Actions[i]
+					}
+				}
+
+				assert.NotNil(t, copyAction, "expected $Copy action")
+				assert.NotNil(t, customAction, "expected CustomUserAction to be preserved")
+
+				// Managed action should override user's conflicting action
+				if copyAction != nil {
+					assert.Len(t, copyAction.KeyboardShortcuts, 1)
+					assert.Equal(t, "meta C", copyAction.KeyboardShortcuts[0].First, "managed action should take priority")
+				}
+			},
+		},
+		{
+			name: "empty existing config behaves as destructive export",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				},
+			},
+			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
+<keymap version="1" name="Onekeymap" parent="$default" disable-mnemonics="true">
+</keymap>`,
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				assert.Len(t, out.Actions, 1)
+
+				var copyAction *ActionXML
+				for i := range out.Actions {
+					if out.Actions[i].ID == "$Copy" {
+						copyAction = &out.Actions[i]
+						break
+					}
+				}
+
+				assert.NotNil(t, copyAction, "expected $Copy action")
+				if copyAction != nil {
+					assert.Len(t, copyAction.KeyboardShortcuts, 1)
+					assert.Equal(t, "meta C", copyAction.KeyboardShortcuts[0].First)
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			plugin := New(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)))
+			exporter, err := plugin.Exporter()
+			require.NoError(t, err)
+
+			buf := &bytes.Buffer{}
+			opts := pluginapi.PluginExportOption{}
+
+			if tt.existingConfig != "" {
+				opts.ExistingConfig = strings.NewReader(tt.existingConfig)
+			}
+
+			report, err := exporter.Export(context.TODO(), buf, tt.setting, opts)
+			require.NoError(t, err)
+			require.NotNil(t, report)
+
+			var out KeymapXML
+			require.NoError(t, xml.Unmarshal(buf.Bytes(), &out))
+
+			tt.validateFunc(t, out)
+		})
+	}
+}

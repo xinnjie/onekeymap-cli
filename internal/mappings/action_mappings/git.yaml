@@ -1,0 +1,81 @@
+mappings:
+  - id: "actions.git.commitAll"
+    description: "Commit All"
+    vscode:
+      command: "git.commitAll"
+      when: "git.state == 'initialized' && git.hasChangesToCommit"
+    intellij:
+      action: "CheckinProject"
+    zed:
+      action: "git::Commit"
+      context: "Editor"
+  - id: "actions.git.openChanges"
+    description: "Open all git changed files"
+    vscode:
+      command: "git.openChange"
+      when: "git.state == 'initialized' && scmProvider == 'git' && resourceScheme == 'file'"
+    intellij:
+      action: "Diff.ShowDiff"
+    zed:
+      action: "git::OpenModifiedFiles"
+      context: "Editor"
+  - id: "actions.git.unstage"
+    description: "Unstage Changes"
+    vscode:
+      command: "git.unstageSelectedRanges"
+      when: "editorTextFocus && isInDiffEditor && isInDiffRightEditor && !operationInProgress && resourceScheme == 'git'"
+    intellij:
+      action: "ChangesView.Revert"
+    zed:
+      action: "git::UnstageAndNext"
+      context: "Editor && !agent_diff"
+  - id: "actions.git.revert"
+    description: "Revert Changes"
+    vscode:
+      command: "git.revertSelectedRanges"
+      when: "editorTextFocus && !operationInProgress && resourceScheme == 'file'"
+    intellij:
+      action: "Vcs.RollbackChangedLines"
+    zed:
+      action: "git::Restore"
+      context: "Editor"
+  - id: "actions.git.stage"
+    description: "Stage Changes"
+    vscode:
+      command: "git.stageSelectedRanges"
+      when: "editorTextFocus && !operationInProgress && resourceScheme == 'file'"
+    intellij:
+      action: "ChangesView.Add"
+    zed:
+      action: "git::StageAndNext"
+      context: "Editor && !agent_diff"
+  - id: "actions.git.push"
+    description: "Push Changes"
+    vscode:
+      command: "git.pushTo"
+      when: "git.state == 'initialized' && git.remotes.length > 0"
+    intellij:
+      action: "Git.Commit.And.Push.Executor"
+    zed:
+      action: "git::Push"
+      context: "Editor"
+  - id: "actions.git.sync"
+    description: "Sync (Pull, Push)"
+    vscode:
+      command: "git.sync"
+      when: "git.state == 'initialized' && git.remotes.length > 0"
+    intellij:
+      action: "Vcs.UpdateProject"
+    zed:
+      action: "git::Pull"
+      context: "Editor"
+  - id: "actions.git.toggleBlame"
+    description: "Toggle Blame"
+    vscode:
+      notSupported: true
+    # intellij can only toggle blame in actions
+    intellij:
+      notSupported: true
+    zed:
+      action: "git::blame"
+      context: "Editor"

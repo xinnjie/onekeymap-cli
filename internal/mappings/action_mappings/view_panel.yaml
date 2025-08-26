@@ -1,0 +1,113 @@
+mappings:
+  - id: "actions.view.toggleExplorer"
+    description: "Toggle Explorer view"
+    vscode:
+      - command: "workbench.view.explorer"
+        when: "viewContainer.workbench.view.explorer.enabled"
+        forImport: true
+      - command: "workbench.action.toggleSidebarVisibility"
+        when: "explorerViewletFocus"
+        forImport: false
+    zed:
+      action: "project_panel::ToggleFocus"
+      context: "Workspace"
+    intellij:
+      action: "ActivateProjectToolWindow"
+    helix:
+      command: "file_explorer"
+      mode: "insert"
+  - id: "actions.view.toggleSearch"
+    description: "Toggle Search view"
+    vscode:
+      - command: "workbench.view.search"
+        when: "workbench.view.search.active && neverMatch =~ /doesNotMatch/"
+        forImport: true
+      - command: "workbench.action.toggleSidebarVisibility"
+        when: "searchViewletVisible"
+        forImport: false
+    zed:
+      action: "project_search::ToggleFocus"
+      context: "Workspace"
+    intellij:
+      action: "SearchEverywhere"
+    helix:
+      command: "global_search"
+      mode: "insert"
+  - id: "actions.view.toggleSourceControl"
+    description: "Toggle Source Control view"
+    vscode:
+      - command: "workbench.view.scm"
+        when: "workbench.scm.active"
+        forImport: true
+      - command: "workbench.action.toggleSidebarVisibility"
+        when: "activeViewlet == 'workbench.view.scm'"
+        forImport: false
+    zed:
+      action: "git_panel::ToggleFocus"
+      context: "Workspace"
+    intellij:
+      action: "ActivateVersionControlToolWindow"
+    helix:
+      command: "changed_file_picker"
+      mode: "insert"
+  - id: "actions.view.showExtensions"
+    description: "Show Extensions view"
+    vscode:
+      command: "workbench.view.extensions"
+      when: "viewContainer.workbench.view.extensions.enabled"
+    zed:
+      action: "zed::Extensions"
+      context: "Workspace"
+    intellij:
+      notSupported: true
+    helix:
+      notSupported: true
+  - id: "actions.view.showTesting"
+    description: "Show Testing view"
+    vscode:
+      command: "workbench.view.testing"
+      when: ""
+    zed:
+      notSupported: true
+    intellij:
+      action: "ActivateUnitTestsToolWindow"
+    helix:
+      notSupported: true
+  - id: "actions.view.toggleProblems"
+    description: "Toggle Problems view"
+    vscode:
+      command: "workbench.actions.view.problems"
+      when: ""
+    zed:
+      # TODO(xinnjie): can not close problems view yet
+      action: "diagnostics::Deploy"
+      context: "Workspace"
+    intellij:
+      action: "ActivateProblemsViewToolWindow"
+    helix:
+      command: "workspace_diagnostics_picker"
+      mode: "insert"
+  - id: "actions.view.toggleOutput"
+    description: "Toggle Output view"
+    vscode:
+      command: "workbench.action.output.toggleOutput"
+      when: "workbench.panel.output.active"
+    # zed do not have output view
+    zed:
+      notSupported: true
+    intellij:
+      action: "ActivateRunToolWindow"
+    helix:
+      notSupported: true
+  - id: "actions.view.toggleTerminal"
+    description: "Toggle Terminal view"
+    vscode:
+      command: "workbench.action.terminal.toggleTerminal"
+      when: "terminal.active"
+    zed:
+      action: "terminal_panel::ToggleFocus"
+      context: "Workspace"
+    intellij:
+      action: "ActivateTerminalToolWindow"
+    helix:
+      notSupported: true

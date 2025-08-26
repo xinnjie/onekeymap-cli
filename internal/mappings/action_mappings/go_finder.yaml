@@ -1,0 +1,32 @@
+mappings:
+  - id: "actions.go.fileFinder"
+    description: "Go to File"
+    vscode:
+      command: "workbench.action.quickOpen"
+      when: ""
+    zed:
+      action: "file_finder::Toggle"
+      context: "Workspace"
+    intellij:
+      action: "GotoFile"
+  - id: "actions.go.symbolFinder"
+    description: "Go to Symbol in Workspace"
+    vscode:
+      command: "workbench.action.showAllSymbols"
+      when: ""
+    zed:
+      action: "project_symbols::Toggle"
+      context: "Workspace"
+    intellij:
+      action: "GotoClass"
+  - id: "actions.go.symbolFinderInEditor"
+    description: "Go to Symbol in Editor"
+    vscode:
+      # breadcrumbsFocusAndSelect is very like workbench.action.gotoSymbol
+      command: "workbench.action.gotoSymbol"
+      when: "!accessibilityHelpIsShown && !accessibleViewIsShown"
+    zed:
+      action: "outline::Toggle"
+      context: "Editor"
+    intellij:
+      action: "FileStructurePopup"

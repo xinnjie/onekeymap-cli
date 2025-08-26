@@ -1,0 +1,23 @@
+mappings:
+  # TODO(xinnjie): Unify new operation. When in terminal view, create a new terminal; When in editor view, create a new file
+  - id: "actions.terminal.new"
+    description: "Create a new terminal"
+    vscode:
+      command: "workbench.action.terminal.new"
+      when: "terminalProcessSupported || terminalWebExtensionContributedProfile"
+    zed:
+      action: "workspace::NewTerminal"
+      context: "Workspace"
+    intellij:
+      action: "Terminal.NewTab"
+  # TODO(xinnjie): Unify split operation.
+  - id: "actions.terminal.split"
+    description: "Split the active terminal"
+    vscode:
+      command: "workbench.action.terminal.split"
+      when: "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
+    zed:
+      action: "pane::SplitDown"
+      context: "Terminal"
+    intellij:
+      action: "OpenInRightSplit"

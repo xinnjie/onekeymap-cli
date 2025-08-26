@@ -1,0 +1,28 @@
+mappings:
+  - id: "actions.go.back"
+    description: "Go to previous cursor location"
+    vscode:
+      command: "workbench.action.navigateBack"
+      when: "canNavigateBack"
+    zed:
+      action: "pane::GoBack"
+    intellij:
+      action: "Back"
+  - id: "actions.go.forward"
+    description: "Go to next cursor location"
+    vscode:
+      command: "workbench.action.navigateForward"
+      when: "canNavigateForward"
+    zed:
+      action: "pane::GoForward"
+    intellij:
+      action: "Forward"
+  - id: "actions.go.lastEditLocation"
+    description: "Go to last edit location"
+    vscode:
+      command: "workbench.action.navigateToLastEditLocation"
+      when: ""
+    zed:
+      notSupported: true
+    intellij:
+      action: "JumpToLastChange"

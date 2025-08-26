@@ -1,0 +1,39 @@
+mappings:
+  - id: "actions.edit.undo"
+    description: "Undo last action"
+    vscode:
+      command: "undo"
+      when: ""
+    zed:
+      action: "editor::Undo"
+      context: "Editor"
+    intellij:
+      action: "$Undo"
+    helix:
+      command: "undo"
+      mode: "insert"
+  - id: "actions.edit.cursorUndo"
+    description: "Undo last cursor operation"
+    vscode:
+      command: "cursorUndo"
+      when: "textInputFocus"
+    intellij:
+      action: "UnselectPreviousOccurrence"
+    zed:
+      action: "editor::UndoSelection"
+      context: "Editor"
+    helix:
+      notSupported: true
+  - id: "actions.edit.redo"
+    description: "Redo last undone action"
+    vscode:
+      command: "redo"
+      when: "textInputFocus"
+    zed:
+      action: "editor::Redo"
+      context: "Editor"
+    intellij:
+      action: "$Redo"
+    helix:
+      command: "redo"
+      mode: "insert"

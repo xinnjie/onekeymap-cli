@@ -1,0 +1,65 @@
+mappings:
+  - id: "actions.run.stepOver"
+    description: "Step Over"
+    vscode:
+      command: "workbench.action.debug.stepOver"
+      when: "debugState == 'stopped'"
+    zed:
+      action: "debugger::StepOver"
+      context: "Workspace"
+    intellij:
+      action: "StepOver"
+    helix:
+      command: "dap_next"
+      mode: "insert"
+  - id: "actions.run.stepInto"
+    description: "Step Into"
+    vscode:
+      command: "workbench.action.debug.stepInto"
+      when: "debugState != 'inactive'"
+    zed:
+      action: "debugger::StepInto"
+      context: "Workspace"
+    intellij:
+      action: "StepInto"
+    helix:
+      command: "dap_step_in"
+      mode: "insert"
+  - id: "actions.run.stepOut"
+    description: "Step Out"
+    vscode:
+      command: "workbench.action.debug.stepOut"
+      when: "debugState == 'stopped'"
+    zed:
+      action: "debugger::StepOut"
+      context: "Workspace"
+    intellij:
+      action: "StepOut"
+    helix:
+      command: "dap_step_out"
+      mode: "insert"
+  - id: "actions.run.continue"
+    description: "Continue"
+    vscode:
+      command: "workbench.action.debug.continue"
+      when: "debugState == 'stopped'"
+    zed:
+      action: "debugger::Continue"
+      context: "Workspace"
+    intellij:
+      action: "Resume"
+    helix:
+      command: "dap_continue"
+      mode: "insert"
+  - id: "actions.run.runToCursor"
+    description: "Run to Cursor"
+    vscode:
+      command: "editor.debug.action.runToCursor"
+      when: "inDebugMode && debugState == 'stopped'"
+    intellij:
+      action: "RunToCursor"
+    zed:
+      action: "debugger::RunToCursor"
+      context: "Workspace"
+    helix:
+      notSupported: true

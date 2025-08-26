@@ -1,0 +1,98 @@
+mappings:
+  - id: "actions.go.goToDeclaration"
+    description: "Go to Declaration or Usages"
+    vscode:
+      command: "editor.action.goToDeclaration"
+      when: "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !peekViewVisible"
+    intellij:
+      action: "GotoDeclaration"
+    zed:
+      action: "editor::GoToDeclaration"
+      context: "Editor"
+  - id: "actions.go.peekDeclaration"
+    description: "Peek Declaration"
+    vscode:
+      command: "editor.action.previewDeclaration"
+      when: "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !peekViewVisible"
+    intellij:
+      action: "QuickImplementations"
+    zed:
+      action: "editor::GoToDefinitionSplit"
+      context: "Editor"
+  - id: "actions.go.implementations"
+    description: "Go to Implementations"
+    vscode:
+      command: "editor.action.goToImplementation"
+      when: "editorHasImplementationProvider && editorTextFocus"
+    zed:
+      action: "editor::GoToImplementation"
+      context: "Editor"
+    intellij:
+      action: "GotoImplementation"
+  - id: "actions.go.goToTest"
+    description: "Go to Test"
+    vscode:
+      command: "java.test.goToTest"
+      when: "editorTextFocus && java:testRunnerActivated"
+    intellij:
+      action: "GotoTest"
+    zed:
+      notSupported: true
+  - id: "actions.go.goToSuper"
+    description: "Go to Super Class/Super Method"
+    vscode:
+      command: "dart.goToSuper"
+      when: "editorTextFocus && dart.isTestFile != true && dart.isTestFile != true"
+    zed:
+      notSupported: true
+    intellij:
+      action: "GotoSuperMethod"
+  - id: "actions.go.typeDefinition"
+    description: "Go to Type Definition"
+    vscode:
+      command: "editor.action.goToTypeDefinition"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::GoToTypeDefinition"
+      context: "Editor"
+    intellij:
+      action: "GotoTypeDeclaration"
+  - id: "actions.go.references"
+    description: "Go to References"
+    vscode:
+      command: "references-view.findReferences"
+      when: "editorHasReferenceProvider"
+    zed:
+      action: "editor::FindAllReferences"
+      context: "Editor"
+    intellij:
+      action: "FindUsages"
+  - id: "actions.go.referencePeek"
+    description: "Show Usages / Reference Search"
+    vscode:
+      command: "editor.action.referenceSearch.trigger"
+      when: "editorHasReferenceProvider && editorTextFocus && !inReferenceSearchEditor"
+    intellij:
+      action: "ShowUsages"
+    # zed do not have reference peek
+    zed:
+      notSupported: true
+  - id: "actions.go.callHierarchy"
+    description: "Show Call Hierarchy"
+    vscode:
+      command: "references-view.showCallHierarchy"
+      when: "editorHasCallHierarchyProvider && editorTextFocus"
+    intellij:
+      action: "CallHierarchy"
+    # Zed do not support yet
+    zed:
+      notSupported: true
+  - id: "actions.go.typeHierarchy"
+    description: "Show Type Hierarchy"
+    vscode:
+      command: "java.action.showTypeHierarchy"
+      when: "editorLangId == java && javaLSReady && editorTextFocus"
+    intellij:
+      action: "TypeHierarchy"
+    zed:
+      notSupported: true

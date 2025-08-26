@@ -1,0 +1,27 @@
+mappings:
+  - id: "actions.edit.formatDocument"
+    description: "Format Document"
+    vscode:
+      - command: "editor.action.formatDocument"
+        when: "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+        forImport: true
+      - command: "notebook.format"
+        when: "notebookEditable && !editorTextFocus && activeEditor == 'workbench.editor.notebook'"
+    zed:
+      action: "editor::Format"
+      context: "Editor"
+    intellij:
+      action: "ShowReformatFileDialog"
+  - id: "actions.edit.formatSelection"
+    description: "Format Selection"
+    vscode:
+      - command: "editor.action.formatSelection"
+        when: "editorHasDocumentSelectionFormattingProvider && editorTextFocus && !editorReadonly"
+        forImport: true
+      - command: "notebook.formatCell"
+        when: "editorHasDocumentFormattingProvider && editorTextFocus && inCompositeEditor && notebookEditable && !editorReadonly && activeEditor == 'workbench.editor.notebook'"
+    zed:
+      action: "editor::FormatSelections"
+      context: "Editor"
+    intellij:
+      action: "ReformatCode"

@@ -1,0 +1,53 @@
+mappings:
+  - id: "actions.edit.deleteWordRight"
+    description: "Delete to the end of the next word"
+    vscode:
+      command: "deleteWordRight"
+      when: "textInputFocus && !editorReadonly"
+    zed:
+      action: "editor::DeleteToNextWordEnd"
+      context: "Editor"
+    intellij:
+      action: "EditorDeleteToWordEnd"
+  - id: "actions.edit.deleteLines"
+    description: "Delete line"
+    vscode:
+      command: "editor.action.deleteLines"
+      when: "textInputFocus && !editorReadonly"
+    intellij:
+      action: "EditorDeleteLine"
+    zed:
+      action: "editor::DeleteLine"
+      context: "Editor"
+  - id: "actions.edit.deleteWordPartRight"
+    description: "Delete to the end of the next subword (hump)"
+    vscode:
+      command: "deleteWordPartRight"
+      when: "textInputFocus && !editorReadonly"
+    zed:
+      action: "editor::DeleteToNextSubwordEnd"
+      context: "Editor"
+    # intellij need to turn on `CamelHumps` setting
+    intellij:
+      notSupported: true
+  - id: "actions.edit.deleteWordLeft"
+    description: "Delete to the start of the previous word"
+    vscode:
+      command: "deleteWordLeft"
+      when: "textInputFocus && !editorReadonly"
+    zed:
+      action: "editor::DeleteToPreviousWordStart"
+      context: "Editor"
+    intellij:
+      action: "EditorDeleteToWordStart"
+  - id: "actions.edit.deleteWordPartLeft"
+    description: "Delete to the start of the previous subword (hump)"
+    vscode:
+      command: "deleteWordPartLeft"
+      when: "textInputFocus && !editorReadonly"
+    zed:
+      action: "editor::DeleteToPreviousSubwordStart"
+      context: "Editor"
+    # intellij need to turn on `CamelHumps` setting
+    intellij:
+      notSupported: true

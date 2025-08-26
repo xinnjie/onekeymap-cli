@@ -1,0 +1,27 @@
+mappings:
+  - id: "actions.file.closeEditor"
+    description: "Close the active editor"
+    vscode:
+      command: "workbench.action.closeActiveEditor"
+      when: ""
+    zed:
+      action: "pane::CloseActiveItem"
+      context: "Editor"
+    intellij:
+      action: "CloseContent"
+    helix:
+      command: ":buffer-close"
+      mode: "insert"
+  - id: "actions.file.closeWindow"
+    description: "Close the current window"
+    vscode:
+      command: "workbench.action.closeWindow"
+      when: "!editorIsOpen && !multipleEditorGroups"
+    zed:
+      action: "workspace::CloseWindow"
+      context: "Workspace"
+    intellij:
+      action: "HideActiveWindow"
+    helix:
+      command: ":quit-all"
+      mode: "insert"

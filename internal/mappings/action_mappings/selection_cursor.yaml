@@ -1,0 +1,77 @@
+mappings:
+  - id: "actions.selection.addCursorAbove"
+    description: "Add cursor above current line"
+    vscode:
+      command: "editor.action.insertCursorAbove"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::AddSelectionAbove"
+      context: "Editor"
+    intellij:
+      action: "EditorCloneCaretAbove"
+    helix:
+      command: "copy_selection_on_prev_line"
+      mode: "insert"
+  - id: "actions.selection.addCursorBelow"
+    description: "Add cursor below current line"
+    vscode:
+      command: "editor.action.insertCursorBelow"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::AddSelectionBelow"
+      context: "Editor"
+    intellij:
+      action: "EditorCloneCaretBelow"
+    helix:
+      command: "copy_selection_on_next_line"
+      mode: "insert"
+  - id: "actions.selection.addCursorsToLineEnds"
+    description: "Add cursors to the end of selected lines"
+    vscode:
+      command: "editor.action.insertCursorAtEndOfEachLineSelected"
+      when: "editorTextFocus"
+    # zed do not support yet
+    zed:
+      notSupported: true
+    intellij:
+      action: "EditorAddCaretPerSelectedLine"
+    helix:
+      notSupported: true
+  - id: "actions.selection.addNextOccurrence"
+    description: "Add next occurrence of selection to multicursor"
+    vscode:
+      command: "editor.action.addSelectionToNextFindMatch"
+      when: "editorFocus"
+    zed:
+      action: "editor::SelectNext"
+      context: "Editor"
+    intellij:
+      action: "SelectNextOccurrence"
+    helix:
+      command: "extend_search_next"
+      mode: "insert"
+  - id: "actions.selection.addPreviousOccurrence"
+    description: "Add previous occurrence of selection to multicursor"
+    vscode:
+      command: "editor.action.addSelectionToPreviousFindMatch"
+      when: "editorFocus"
+    zed:
+      action: "editor::SelectPrevious"
+      context: "Editor"
+    intellij:
+      action: "SelectPreviousOccurrence"
+    helix:
+      command: "extend_search_prev"
+      mode: "insert"
+  - id: "actions.selection.selectAllOccurrences"
+    description: "Select all occurrences of current selection"
+    vscode:
+      command: "editor.action.selectHighlights"
+      when: "editorFocus"
+    zed:
+      action: "editor::SelectAllMatches"
+      context: "Editor"
+    intellij:
+      action: "SelectAllOccurrences"
+    helix:
+      notSupported: true

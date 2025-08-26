@@ -1,0 +1,39 @@
+mappings:
+  - id: "actions.file.save"
+    description: "Save current file"
+    vscode:
+      command: "workbench.action.files.save"
+      when: ""
+    zed:
+      action: "workspace::Save"
+      context: "Workspace"
+    intellij:
+      action: "SaveDocument"
+    helix:
+      command: ":write"
+      mode: "insert"
+  - id: "actions.file.saveAs"
+    description: "Save current file with a new name"
+    vscode:
+      command: "workbench.action.files.saveAs"
+      when: ""
+    zed:
+      action: "workspace::SaveAs"
+      context: "Workspace"
+    intellij:
+      notSupported: true
+    helix:
+      notSupported: true
+  - id: "actions.file.saveAll"
+    description: "Save all open files"
+    vscode:
+      command: "workbench.action.files.saveAll"
+      when: ""
+    zed:
+      action: "workspace::SaveAll"
+      context: "Workspace"
+    intellij:
+      action: "SaveAll"
+    helix:
+      command: ":write-all"
+      mode: "insert"

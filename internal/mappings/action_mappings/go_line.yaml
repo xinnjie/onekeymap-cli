@@ -1,0 +1,21 @@
+mappings:
+  - id: "actions.go.line"
+    description: "Go to Line/Column"
+    vscode:
+      command: "workbench.action.gotoLine"
+      when: ""
+    zed:
+      action: "go_to_line::Toggle"
+      context: "Editor"
+    intellij:
+      action: "GotoLine"
+  - id: "actions.go.bracket"
+    description: "Go to Bracket"
+    vscode:
+      command: "editor.action.jumpToBracket"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::MoveToEnclosingBracket"
+      context: "Editor"
+    intellij:
+      action: "EditorMatchBrace"

@@ -1,0 +1,12 @@
+mappings:
+  - id: "actions.view.toggleWordWrap"
+    description: "Toggle word wrap in the editor"
+    vscode:
+      command: "editor.action.toggleWordWrap"
+      when: ""
+    zed:
+      action: "editor::ToggleSoftWrap"
+      context: "Editor"
+    # intellij need configure in settings
+    intellij:
+      notSupported: true

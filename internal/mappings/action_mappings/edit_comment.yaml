@@ -1,0 +1,28 @@
+mappings:
+  - id: "actions.edit.toggleLineComment"
+    description: "Toggle line comment"
+    vscode:
+      command: "editor.action.commentLine"
+      when: "editorTextFocus && !editorReadonly"
+    zed:
+      action: "editor::ToggleComments"
+      context: "Editor"
+    intellij:
+      action: "CommentByLineComment"
+    helix:
+      command: "toggle_line_comments"
+      mode: "insert"
+  - id: "actions.edit.toggleBlockComment"
+    description: "Toggle block comment"
+    vscode:
+      command: "editor.action.blockComment"
+      when: "editorTextFocus && !editorReadonly"
+    # zed do not support block comment yet
+    # https://github.com/zed-industries/zed/issues/4751
+    zed:
+      notSupported: true
+    intellij:
+      action: "CommentByBlockComment"
+    helix:
+      command: "toggle_block_comments"
+      mode: "insert"

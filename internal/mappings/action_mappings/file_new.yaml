@@ -1,0 +1,21 @@
+mappings:
+  - id: "actions.file.newFile"
+    description: "Create a new file"
+    vscode:
+      command: "workbench.action.files.newUntitledFile"
+      when: ""
+    zed:
+      action: "workspace::NewFile"
+      context: "Workspace"
+    intellij:
+      action: "NewScratchFile"
+  - id: "actions.file.newWindow"
+    description: "Open a new window"
+    vscode:
+      command: "workbench.action.newWindow"
+      when: ""
+    zed:
+      action: "workspace::NewWindow"
+      context: "Workspace"
+    intellij:
+      notSupported: true

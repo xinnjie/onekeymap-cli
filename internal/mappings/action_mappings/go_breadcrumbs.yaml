@@ -1,0 +1,11 @@
+mappings:
+  - id: "actions.go.breadcrumbsFocus"
+    description: "Jump to Navigation Bar"
+    vscode:
+      command: "breadcrumbs.focus"
+      when: "breadcrumbsPossible && breadcrumbsVisible"
+    intellij:
+      action: "ShowNavBar"
+    # zed only support search symbol
+    zed:
+      notSupported: true

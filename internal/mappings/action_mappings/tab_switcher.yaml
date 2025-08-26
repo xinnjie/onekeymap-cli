@@ -1,0 +1,35 @@
+mappings:
+  - id: "actions.tabSwitcher.next"
+    description: "Switch to next tab"
+    vscode:
+      - command: "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
+        when: "editorFocus"
+        forImport: true
+      - command: "workbench.action.quickOpenNavigateNextInEditorPicker"
+        when: "inEditorsPicker && inQuickOpen"
+      - command: "workbench.action.quickOpenNavigateNext"
+        when: "inQuickOpen"
+      - command: "workbench.action.terminal.focusNext"
+        when: "terminalFocus"
+    zed:
+      action: "tab_switcher::Toggle"
+      context: "Workspace"
+    intellij:
+      action: "NextTab"
+  - id: "actions.tabSwitcher.previous"
+    description: "Switch to previous tab"
+    vscode:
+      - command: "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup"
+        when: "editorFocus"
+        forImport: true
+      - command: "workbench.action.quickOpenNavigatePreviousInEditorPicker"
+        when: "inEditorsPicker && inQuickOpen"
+      - command: "workbench.action.terminal.focusPrevious"
+        when: "terminalFocus"
+    zed:
+      action: "tab_switcher::Toggle"
+      context: "Workspace"
+      args:
+        select_last: true
+    intellij:
+      action: "PreviousTab"

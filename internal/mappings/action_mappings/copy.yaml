@@ -1,0 +1,88 @@
+mappings:
+  - id: "actions.cut"
+    description: "Cut selected text/file"
+    vscode:
+      - command: "editor.action.clipboardCutAction"
+        when: "editorTextFocus"
+        forImport: true
+      # cut in file explorer
+      - command: "filesExplorer.cut"
+        when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+      # underlying cut
+      - command: "execCut"
+    zed:
+      - action: "editor::Cut"
+        context: "Editor"
+      - action: "project_panel::Cut"
+        context: "ProjectPanel"
+    intellij:
+      action: "$Cut"
+    helix:
+      command: "delete_selection"
+      mode: "insert"
+  - id: "actions.copy"
+    description: "Copy selected text/file"
+    vscode:
+      - command: "editor.action.clipboardCopyAction"
+        when: "editorTextFocus"
+        forImport: true
+      # copy in file explorer
+      - command: "filesExplorer.copy"
+        when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !inputFocus"
+      # copy in problem view
+      - command: "problems.action.copy"
+        when: "problemsVisibility && !relatedInformationFocus && focusedView == 'workbench.panel.markers.view'"
+      # underlying copy
+      - command: "execCopy"
+    zed:
+      - action: "editor::Copy"
+        context: "Editor"
+      # copy in terminal
+      - action: "terminal::Copy"
+        context: "Terminal"
+      # copy in markdown
+      - action: "markdown::Copy"
+        context: "Markdown"
+      - action: "project_panel::Copy"
+        context: "ProjectPanel"
+    intellij:
+      action: "$Copy"
+    helix:
+      command: "yank_to_clipboard"
+      mode: "insert"
+  - id: "actions.paste"
+    description: "Paste text/file"
+    vscode:
+      - command: "editor.action.clipboardPasteAction"
+        when: "editorTextFocus && !editorReadonly"
+        forImport: true
+      # paste in file explorer
+      - command: "filesExplorer.paste"
+        when: "filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+      # underlying paste
+      - command: "execPaste"
+    zed:
+      - action: "editor::Paste"
+        context: "Editor"
+      # paste in terminal
+      - action: "terminal::Paste"
+        context: "Terminal"
+      - action: "project_panel::Paste"
+        context: "ProjectPanel"
+    intellij:
+      action: "$Paste"
+    helix:
+      command: "paste_clipboard_after"
+      mode: "insert"
+  - id: "actions.edit.copyFilePath"
+    description: "Copy file path"
+    vscode:
+      command: "copyFilePath"
+      when: "filesExplorerFocus"
+    zed:
+      action: "workspace::CopyPath"
+      context: ""
+    intellij:
+      action: "CopyPaths"
+    helix:
+      notSupported: true

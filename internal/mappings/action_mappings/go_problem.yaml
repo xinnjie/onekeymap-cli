@@ -1,0 +1,23 @@
+mappings:
+  - id: "actions.go.nextProblem"
+    description: "Go to Next Problem (Error, Warning, Info)"
+    vscode:
+      command: "editor.action.marker.next"
+      when: "editorFocus"
+    zed:
+      action: "editor::GoToDiagnostic"
+      args: {"severity": {"min": "hint", "max": "error"}}
+      context: "Editor"
+    intellij:
+      action: "GotoNextError"
+  - id: "actions.go.previousProblem"
+    description: "Go to Previous Problem (Error, Warning, Info)"
+    vscode:
+      command: "editor.action.marker.prev"
+      when: "editorFocus"
+    zed:
+      action: "editor::GoToPreviousDiagnostic"
+      args: {"severity": {"min": "hint", "max": "error"}}
+      context: "Editor"
+    intellij:
+      action: "GotoPreviousError"

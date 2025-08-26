@@ -1,0 +1,103 @@
+mappings:
+  - id: "actions.cursor.moveToTop"
+    description: "Move caret to text start"
+    vscode:
+      command: "cursorTop"
+      when: "textInputFocus"
+    intellij:
+      action: "EditorTextStart"
+    zed:
+      action: "editor::MoveToBeginning"
+      context: "Editor"
+    helix:
+      command: "goto_file_start"
+      mode: "insert"
+  - id: "actions.cursor.moveToBottom"
+    description: "Move caret to text end"
+    vscode:
+      command: "cursorBottom"
+      when: "textInputFocus"
+    intellij:
+      action: "EditorTextEnd"
+    zed:
+      action: "editor::MoveToEnd"
+      context: "Editor"
+    helix:
+      command: "goto_file_end"
+      mode: "insert"
+  - id: "actions.cursor.moveToTopSelect"
+    description: "Select from cursor to text start"
+    vscode:
+      command: "cursorTopSelect"
+      when: "textInputFocus"
+    intellij:
+      action: "EditorMoveToPageTopWithSelection"
+    zed:
+      action: "editor::SelectToBeginning"
+      context: "Editor"
+    helix:
+      command: "extend_to_file_start"
+      mode: "insert"
+  - id: "actions.cursor.moveToBottomSelect"
+    description: "Select from cursor to text end"
+    vscode:
+      command: "cursorBottomSelect"
+      when: "textInputFocus"
+    intellij:
+      action: "EditorMoveToPageBottomWithSelection"
+    zed:
+      action: "editor::SelectToEnd"
+      context: "Editor"
+    helix:
+      command: "extend_to_file_end"
+      mode: "insert"
+  - id: "actions.cursor.pageDown"
+    description: "Move cursor down by one page"
+    vscode:
+      command: "cursorPageDown"
+      when: "textInputFocus"
+    intellij:
+      action: "EditorPageDown"
+    zed:
+      action: "editor::PageDown"
+      context: "Editor"
+    helix:
+      command: "page_down"
+      mode: "insert"
+  - id: "actions.cursor.pageDownSelect"
+    description: "Select down by one page"
+    vscode:
+      command: "cursorPageDownSelect"
+      when: "textInputFocus"
+    intellij:
+      action: "EditorPageDownWithSelection"
+    zed:
+      action: "editor::SelectPageDown"
+      context: "Editor"
+    helix:
+      notSupported: true
+  - id: "actions.cursor.pageUp"
+    description: "Move cursor up by one page"
+    vscode:
+      command: "cursorPageUp"
+      when: "textInputFocus"
+    intellij:
+      action: "EditorPageUp"
+    zed:
+      action: "editor::PageUp"
+      context: "Editor"
+    helix:
+      command: "page_up"
+      mode: "insert"
+  - id: "actions.cursor.pageUpSelect"
+    description: "Select up by one page"
+    vscode:
+      command: "cursorPageUpSelect"
+      when: "textInputFocus"
+    intellij:
+      action: "EditorPageUpWithSelection"
+    zed:
+      action: "editor::SelectPageUp"
+      context: "Editor"
+    helix:
+      notSupported: true

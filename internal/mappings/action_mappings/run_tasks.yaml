@@ -1,0 +1,39 @@
+mappings:
+  - id: "actions.run.runTask"
+    description: "Run Task"
+    vscode:
+      command: "workbench.action.tasks.runTask"
+      when: ""
+    intellij:
+      action: "ChooseRunConfiguration"
+    zed:
+      action: "task::Run"
+      context: "Workspace"
+  - id: "actions.run.reRunTask"
+    description: "Re-run last Task"
+    vscode:
+      command: "workbench.action.tasks.reRunTask"
+      when: ""
+    intellij:
+      action: "Run"
+    zed:
+      action: "task::Rerun"
+      context: "Workspace"
+  - id: "actions.run.configureTaskRunner"
+    description: "Configure Task Runner"
+    vscode:
+      command: "workbench.action.tasks.configureTaskRunner"
+      when: ""
+    intellij:
+      action: "ShowProjectStructureSettings"
+    zed:
+      action: "zed::OpenTasks"
+  - id: "actions.terminal.runBuildTask"
+    description: "Run the default build task"
+    vscode:
+      command: "workbench.action.tasks.build"
+      when: "taskCommandsRegistered"
+    zed:
+      notSupported: true
+    intellij:
+      action: "CompileDirty"

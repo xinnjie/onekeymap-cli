@@ -1,0 +1,21 @@
+mappings:
+  - id: "actions.go.nextChange"
+    description: "Go to Next Change"
+    vscode:
+      command: "editor.action.dirtydiff.next"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::GoToNextChange"
+      context: "Editor"
+    intellij:
+      action: "VcsShowNextChangeMarker"
+  - id: "actions.go.previousChange"
+    description: "Go to Previous Change"
+    vscode:
+      command: "editor.action.dirtydiff.previous"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::GoToPreviousChange"
+      context: "Editor"
+    intellij:
+      action: "VcsShowPrevChangeMarker"

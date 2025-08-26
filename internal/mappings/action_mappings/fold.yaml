@@ -1,0 +1,71 @@
+mappings:
+  - id: "actions.fold.fold"
+    description: "Collapse the current code block"
+    vscode:
+      command: "editor.fold"
+      when: "editorTextFocus && foldingEnabled"
+    zed:
+      action: "editor::Fold"
+      context: "Editor"
+    intellij:
+      action: "CollapseRegion"
+  - id: "actions.fold.unfold"
+    description: "Expand the current code block"
+    vscode:
+      command: "editor.unfold"
+      when: "editorTextFocus && foldingEnabled"
+    zed:
+      action: "editor::UnfoldLines"
+      context: "Editor"
+    intellij:
+      action: "ExpandRegion"
+  - id: "actions.fold.foldRecursively"
+    description: "Collapse the current code block and its children recursively"
+    vscode:
+      command: "editor.foldRecursively"
+      when: "editorTextFocus && foldingEnabled"
+    zed:
+      action: "editor::FoldRecursive"
+      context: "Editor"
+    intellij:
+      action: "CollapseRegionRecursively"
+  - id: "actions.fold.unfoldRecursively"
+    description: "Expand the current code block and its children recursively"
+    vscode:
+      command: "editor.unfoldRecursively"
+      when: "editorTextFocus && foldingEnabled"
+    zed:
+      action: "editor::UnfoldRecursive"
+      context: "Editor"
+    intellij:
+      action: "ExpandRegionRecursively"
+  - id: "actions.fold.toggleFold"
+    description: "Toggle Fold"
+    vscode:
+      command: "editor.toggleFold"
+      when: "editorTextFocus && foldingEnabled"
+    zed:
+      action: "editor::ToggleFold"
+      context: "Editor"
+    intellij:
+      action: "ExpandCollapseToggleAction"
+  - id: "actions.fold.foldAll"
+    description: "Collapse all code blocks in the editor"
+    vscode:
+      command: "editor.foldAll"
+      when: "editorTextFocus && foldingEnabled"
+    zed:
+      action: "editor::FoldAll"
+      context: "Editor"
+    intellij:
+      action: "CollapseAllRegions"
+  - id: "actions.fold.unfoldAll"
+    description: "Expand all code blocks in the editor"
+    vscode:
+      command: "editor.unfoldAll"
+      when: "editorTextFocus && foldingEnabled"
+    zed:
+      action: "editor::UnfoldAll"
+      context: "Editor"
+    intellij:
+      action: "ExpandAllRegions"

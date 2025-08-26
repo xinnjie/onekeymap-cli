@@ -1,0 +1,43 @@
+mappings:
+  - id: "actions.edit.rename"
+    description: "Rename"
+    vscode:
+      - command: "editor.action.rename"
+        when: "editorHasRenameProvider && editorTextFocus && !editorReadonly"
+        forImport: true
+      - command: "editor.action.changeAll"
+        when: "editorTextFocus && !editorReadonly"
+      - command: "renameFile"
+        when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    intellij:
+      action: "RenameElement"
+    zed:
+      action: "editor::Rename"
+      context: "Editor"
+    helix:
+      command: "rename_symbol"
+      mode: "insert"
+  - id: "actions.edit.refactor"
+    description: "Refactor This..."
+    vscode:
+      command: "editor.action.refactor"
+      when: "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
+    intellij:
+      action: "Refactorings.QuickListPopupAction"
+    zed:
+      notSupported: true
+    helix:
+      command: "code_action"
+      mode: "insert"
+  - id: "actions.refactor.organizeImports"
+    description: "Organize Imports"
+    vscode:
+      command: "editor.action.organizeImports"
+      when: "textInputFocus && !editorReadonly && supportedCodeAction =~ /(\\s|^)source\\.organizeImports\\b/"
+    intellij:
+      action: "OptimizeImports"
+    zed:
+      action: "editor::OrganizeImports"
+      context: "Editor"
+    helix:
+      notSupported: true

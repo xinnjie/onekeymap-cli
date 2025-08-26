@@ -1,0 +1,15 @@
+mappings:
+  - id: "actions.view.showCommandPalette"
+    description: "Show Command Palette"
+    vscode:
+      command: "workbench.action.showCommands"
+      when: ""
+    zed:
+      action: "command_palette::Toggle"
+      # Empty context means global
+      context: ""
+    intellij:
+      action: "GotoAction"
+    helix:
+      command: "command_palette"
+      mode: "insert"

@@ -1,0 +1,14 @@
+mappings:
+  - id: "actions.view.toggleStatusBar"
+    description: "Toggle Status Bar visibility"
+    vscode:
+      command: "workbench.action.toggleStatusbarVisibility"
+      when: ""
+    # zed can not hide status bar
+    zed:
+      notSupported: true
+    # intellij need configure in settings
+    intellij:
+      notSupported: true
+    helix:
+      notSupported: true

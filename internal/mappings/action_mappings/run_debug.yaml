@@ -1,0 +1,38 @@
+mappings:
+  - id: "actions.run.startDebugging"
+    description: "Start Debugging"
+    vscode:
+      command: "workbench.action.debug.run"
+      when: "debuggersAvailable && debugState == 'inactive'"
+    zed:
+      action: "debugger::Start"
+    intellij:
+      action: "Debug"
+    helix:
+      command: "dap_launch"
+      mode: "insert"
+  - id: "actions.run.stopDebugging"
+    description: "Stop Debugging"
+    vscode:
+      command: "workbench.action.debug.stop"
+      when: "inDebugMode && !focusedSessionIsAttach"
+    zed:
+      action: "debugger::Stop"
+    intellij:
+      action: "Stop"
+    helix:
+      command: "dap_terminate"
+      mode: "insert"
+  - id: "actions.run.restartDebugging"
+    description: "Restart Debugging"
+    vscode:
+      command: "workbench.action.debug.restart"
+      when: "inDebugMode"
+    zed:
+      action: "debugger::RerunSession"
+      context: ""
+    intellij:
+      action: "Rerun"
+    helix:
+      command: "dap_restart"
+      mode: "insert"

@@ -1,0 +1,13 @@
+mappings:
+  - id: "actions.run.selectionToRepl"
+    description: "Send selection to REPL"
+    vscode:
+      command: "editor.debug.action.selectionToRepl"
+      when: "debuggersAvailable && editorTextFocus && editorHasSelection"
+    intellij:
+      action: "EvaluateExpression"
+    zed:
+      action: "debugger::EvaluateSelectedText"
+      context: "Workspace"
+    helix:
+      notSupported: true

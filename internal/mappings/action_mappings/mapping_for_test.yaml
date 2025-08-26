@@ -1,0 +1,45 @@
+# This file is used for testing
+mappings:
+  # Simplest mapping
+  - id: "actions.edit.copy"
+    description: "Copy selected text"
+    vscode:
+      command: "editor.action.clipboardCopyAction"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::Copy"
+      context: "Editor"
+    intellij:
+      action: "$Copy"
+    helix:
+      command: "yank"
+      mode: "insert"
+  ## Mapping with multiple actions
+  - id: "actions.test.mutipleActions"
+    description: "Test multiple actions"
+    vscode:
+      - command: "command1"
+        when: "condition1"
+      - command: "command2"
+        when: "condition2"
+    zed:
+      - action: "command1"
+        context: "context1"
+      - action: "command2"
+        context: "context2"
+    intellij:
+      action: "command1"
+  # Mapping with args
+  - id: "actions.test.withArgs"
+    description: "Test action with arguments"
+    vscode:
+      command: "cursorEnd"
+      args:
+        "sticky": false
+    zed:
+      action: "test::ActionWithArgs"
+      args:
+        "test_param": true
+      context: "Editor"
+    intellij:
+      action: "TestAction"

@@ -1,0 +1,53 @@
+mappings:
+  - id: "actions.selection.copyLineUp"
+    description: "Copy current line up"
+    vscode:
+      command: "editor.action.copyLinesUpAction"
+      when: "editorTextFocus && !editorReadonly"
+    zed:
+      action: "editor::DuplicateLineUp"
+      context: "Editor"
+    # intellij only support duplicate line down
+    intellij:
+      notSupported: true
+    helix:
+      command: "copy_selection_on_prev_line"
+      mode: "insert"
+  - id: "actions.selection.copyLineDown"
+    description: "Copy current line down"
+    vscode:
+      command: "editor.action.copyLinesDownAction"
+      when: "editorTextFocus && !editorReadonly"
+    zed:
+      action: "editor::DuplicateLineDown"
+      context: "Editor"
+    intellij:
+      action: "EditorDuplicate"
+    helix:
+      command: "copy_selection_on_next_line"
+      mode: "insert"
+  - id: "actions.selection.moveLineUp"
+    description: "Move current line up"
+    vscode:
+      command: "editor.action.moveLinesUpAction"
+      when: "editorTextFocus && !editorReadonly"
+    zed:
+      action: "editor::MoveLineUp"
+      context: "Editor"
+    intellij:
+      action: "MoveLineUp"
+    helix:
+      command: "move_line_up"
+      mode: "insert"
+  - id: "actions.selection.moveLineDown"
+    description: "Move current line down"
+    vscode:
+      command: "editor.action.moveLinesDownAction"
+      when: "editorTextFocus && !editorReadonly"
+    zed:
+      action: "editor::MoveLineDown"
+      context: "Editor"
+    intellij:
+      action: "MoveLineDown"
+    helix:
+      notSupported: true

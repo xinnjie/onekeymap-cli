@@ -1,0 +1,26 @@
+mappings:
+  - id: "actions.view.openGlobalSettings"
+    description: "Open Global Settings"
+    vscode:
+      command: "workbench.action.openGlobalSettings"
+      when: ""
+    intellij:
+      action: "ShowSettingsAndFindPlugin"
+    zed:
+      action: "zed::OpenSettings"
+    helix:
+      command: ":config-open"
+      mode: "insert"
+  - id: "actions.view.selectTheme"
+    description: "Select Theme"
+    vscode:
+      command: "workbench.action.selectTheme"
+      when: ""
+    intellij:
+      action: "QuickChangeScheme"
+    zed:
+      action: "theme_selector::Toggle"
+      context: "Workspace"
+    helix:
+      command: ":theme"
+      mode: "insert"

@@ -1,0 +1,40 @@
+mappings:
+  - id: "actions.selection.selectAll"
+    description: "Select all text in the editor"
+    vscode:
+      command: "editor.action.selectAll"
+      when: "textInputFocus"
+    zed:
+      action: "editor::SelectAll"
+      context: "Editor"
+    intellij:
+      action: "SelectAll"
+    helix:
+      command: "select_all"
+      mode: "insert"
+  - id: "actions.selection.expand"
+    description: "Expand selection"
+    vscode:
+      command: "editor.action.smartSelect.expand"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::SelectLargerSyntaxNode"
+      context: "Editor"
+    intellij:
+      action: "EditorSelectWord"
+    helix:
+      command: "expand_selection"
+      mode: "insert"
+  - id: "actions.selection.shrink"
+    description: "Shrink selection"
+    vscode:
+      command: "editor.action.smartSelect.shrink"
+      when: "editorTextFocus"
+    zed:
+      action: "editor::SelectSmallerSyntaxNode"
+      context: "Editor"
+    intellij:
+      action: "EditorUnSelectWord"
+    helix:
+      command: "shrink_selection"
+      mode: "insert"

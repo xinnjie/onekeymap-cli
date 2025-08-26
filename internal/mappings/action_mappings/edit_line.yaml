@@ -1,0 +1,41 @@
+mappings:
+  - id: "actions.edit.insertLineBefore"
+    description: "Insert a new line before the current line"
+    vscode:
+      command: "editor.action.insertLineBefore"
+      when: "editorTextFocus && !editorReadonly"
+    zed:
+      action: "editor::NewlineAbove"
+      context: "Editor"
+    intellij:
+      action: "EditorStartNewLineBefore"
+  - id: "actions.edit.joinLines"
+    description: "Join lines"
+    vscode:
+      command: "editor.action.joinLines"
+      when: "editorTextFocus && !editorReadonly"
+    intellij:
+      action: "EditorJoinLines"
+    zed:
+      action: "editor::JoinLines"
+      context: "Editor"
+  - id: "actions.edit.lineBreakInsert"
+    description: "Insert line break"
+    vscode:
+      command: "lineBreakInsert"
+      when: "textInputFocus && !editorReadonly"
+    intellij:
+      action: "EditorSplitLine"
+    zed:
+      action: "editor::Newline"
+      context: "Editor"
+  - id: "actions.edit.insertLineAfter"
+    description: "Insert a new line after the current line"
+    vscode:
+      command: "editor.action.insertLineAfter"
+      when: "editorTextFocus && !editorReadonly"
+    zed:
+      action: "editor::NewlineBelow"
+      context: "Editor"
+    intellij:
+      action: "EditorStartNewLine"

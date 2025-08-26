@@ -1,0 +1,40 @@
+mappings:
+  - id: "actions.file.openFile"
+    description: "Open file dialog"
+    vscode:
+      command: "workbench.action.files.openFile"
+      when: "false"
+    zed:
+      action: "editor::OpenFile"
+    intellij:
+      action: "OpenFile"
+    helix:
+      command: "file_picker"
+      mode: "insert"
+  - id: "actions.file.showOpenedFileInNewWindow"
+    description: "Show opened file in new window"
+    vscode:
+      command: "workbench.action.files.showOpenedFileInNewWindow"
+      when: "emptyWorkspaceSupport"
+    intellij:
+      action: "EditSourceInNewWindow"
+    # zed do not support
+    zed:
+      notSupported: true
+    helix:
+      notSupported: true
+  - id: "actions.file.openRecent"
+    description: "Open Recent"
+    vscode:
+      - command: "workbench.action.openRecent"
+        when: "!inQuickOpen"
+      - command: "workbench.action.openPreviousEditorFromHistory"
+        when: "inQuickOpen"
+    intellij:
+      action: "RecentFiles"
+    zed:
+      action: "projects::OpenRecent"
+      context: "Workspace"
+    helix:
+      command: "buffer_picker"
+      mode: "insert"

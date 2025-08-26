@@ -1,0 +1,23 @@
+mappings:
+  - id: "actions.view.maximizeEditor"
+    description: "Maximize editor (hide other windows)"
+    vscode:
+      command: "workbench.action.maximizeEditor"
+      when: ""
+    intellij:
+      action: "HideAllWindows"
+    zed:
+      notSupported: true
+    helix:
+      notSupported: true
+  - id: "actions.view.toggleFullScreen"
+    description: "Toggle full screen"
+    vscode:
+      command: "workbench.action.toggleFullScreen"
+      when: ""
+    intellij:
+      action: "ToggleFullScreen"
+    zed:
+      action: "zed::ToggleFullScreen"
+    helix:
+      notSupported: true

@@ -1,0 +1,28 @@
+mappings:
+  - id: "actions.view.focusNextSplit"
+    description: "Focus next editor split"
+    vscode:
+      command: "workbench.action.focusNextGroup"
+      when: "editorFocus"
+    intellij:
+      action: "NextSplitter"
+    zed:
+      action: "workspace::ActivateNextPane"
+      context: "Editor"
+    helix:
+      command: "rotate_view"
+      mode: "insert"
+  - id: "actions.view.focusPreviousSplit"
+    description: "Focus previous editor split"
+    vscode:
+      command: "workbench.action.focusPreviousGroup"
+      when: "editorFocus"
+    intellij:
+      action: "PrevSplitter"
+    zed:
+      action: "workspace::ActivatePreviousPane"
+      context: "Editor"
+    helix:
+      command: "rotate_view_reverse"
+      mode: "insert"
+# TODO split right

@@ -1,0 +1,31 @@
+mappings:
+  - id: "actions.view.toggleRightSideBar"
+    description: "Toggle Right Side Bar visibility"
+    vscode:
+      command: "workbench.action.toggleAuxiliaryBar"
+    zed:
+      action: "workspace::ToggleRightDock"
+      context: "Workspace"
+    intellij:
+      notSupported: true
+  #   # TODO(xinnjie): vscode conflict with toggleSidebarVisibility in other action like toggleExplorer
+  # - id: "actions.view.toggleLeftPrimarySideBar"
+  #   description: "Toggle Left Primary Side Bar visibility"
+  #   vscode:
+  #     command: "workbench.action.toggleSidebarVisibility"
+  #     when: ""
+  #   zed:
+  #     action: "workspace::ToggleLeftDock"
+  #     context: "Workspace"
+  #   intellij:
+  #     action: "HideSideWindows"
+  - id: "actions.view.toggleBottomDock"
+    description: "Toggle Bottom Dock visibility"
+    vscode:
+      command: "workbench.action.togglePanel"
+      when: ""
+    zed:
+      action: "workspace::ToggleBottomDock"
+      context: "Workspace"
+    intellij:
+      notSupported: true

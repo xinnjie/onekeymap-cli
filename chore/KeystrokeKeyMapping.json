@@ -1,0 +1,234 @@
+[
+    {
+        "intellij": " ",
+        "vscode": "+"
+    },
+    {
+        "intellij": "back_quote",
+        "vscode": "`"
+    },
+    {
+        "intellij": "minus",
+        "vscode": "-"
+    },
+    {
+        "intellij": "equals",
+        "vscode": "="
+    },
+    {
+        "intellij": "open_bracket",
+        "vscode": "["
+    },
+    {
+        "intellij": "close_bracket",
+        "vscode": "]"
+    },
+    {
+        "intellij": "back_slash",
+        "vscode": "\\"
+    },
+    {
+        "intellij": "semicolon",
+        "vscode": ";"
+    },
+    {
+        "intellij": "quotedbl",
+        "vscode": "\""
+    },
+    {
+        "intellij": "quote",
+        "vscode": "'"
+    },
+    {
+        "intellij": "comma",
+        "vscode": ","
+    },
+    {
+        "intellij": "period",
+        "vscode": "."
+    },
+    {
+        "intellij": "slash",
+        "vscode": "/"
+    },
+    {
+        "intellij": "left_parenthesis",
+        "vscode": "("
+    },
+    {
+        "intellij": "right_parenthesis",
+        "vscode": ")"
+    },
+    {
+        "intellij": "page_up",
+        "vscode": "pageup"
+    },
+    {
+        "intellij": "page_down",
+        "vscode": "pagedown"
+    },
+    {
+        "intellij": "left",
+        "vscode": "left"
+    },
+    {
+        "intellij": "up",
+        "vscode": "up"
+    },
+    {
+        "intellij": "right",
+        "vscode": "right"
+    },
+    {
+        "intellij": "down",
+        "vscode": "down"
+    },
+    {
+        "intellij": "end",
+        "vscode": "end"
+    },
+    {
+        "intellij": "home",
+        "vscode": "home"
+    },
+    {
+        "intellij": "tab",
+        "vscode": "tab"
+    },
+    {
+        "intellij": "enter",
+        "vscode": "enter"
+    },
+    {
+        "intellij": "escape",
+        "vscode": "escape"
+    },
+    {
+        "intellij": "back_space",
+        "vscode": "backspace"
+    },
+    {
+        "intellij": "space",
+        "vscode": "space"
+    },
+    {
+        "intellij": "delete",
+        "vscode": "delete"
+    },
+    {
+        "intellij": "pause",
+        "vscode": "pause"
+    },
+    {
+        "intellij": "caps_lock",
+        "vscode": "capslock"
+    },
+    {
+        "intellij": "insert",
+        "vscode": "insert"
+    },
+    {
+        "intellij": "exclamation_mark",
+        "vscode": "!"
+    },
+    {
+        "intellij": "number_sign",
+        "vscode": "#"
+    },
+    {
+        "intellij": "dollar",
+        "vscode": "$"
+    },
+    {
+        "intellij": "circumflex",
+        "vscode": "^"
+    },
+    {
+        "intellij": "ampersand",
+        "vscode": "&"
+    },
+    {
+        "intellij": "asterisk",
+        "vscode": "*"
+    },
+    {
+        "intellij": "underscore",
+        "vscode": "_"
+    },
+    {
+        "intellij": "plus",
+        "vscode": "\\+"
+    },
+    {
+        "intellij": "colon",
+        "vscode": "."
+    },
+    {
+        "intellij": "less",
+        "vscode": "<"
+    },
+    {
+        "intellij": "greater",
+        "vscode": ">"
+    },
+    {
+        "intellij": "numpad0",
+        "vscode": "numpad0"
+    },
+    {
+        "intellij": "numpad1",
+        "vscode": "numpad1"
+    },
+    {
+        "intellij": "numpad2",
+        "vscode": "numpad2"
+    },
+    {
+        "intellij": "numpad3",
+        "vscode": "numpad3"
+    },
+    {
+        "intellij": "numpad4",
+        "vscode": "numpad4"
+    },
+    {
+        "intellij": "numpad5",
+        "vscode": "numpad5"
+    },
+    {
+        "intellij": "numpad6",
+        "vscode": "numpad6"
+    },
+    {
+        "intellij": "numpad7",
+        "vscode": "numpad7"
+    },
+    {
+        "intellij": "numpad8",
+        "vscode": "numpad8"
+    },
+    {
+        "intellij": "numpad9",
+        "vscode": "numpad9"
+    },
+    {
+        "intellij": "multiply",
+        "vscode": "numpad_multiply"
+    },
+    {
+        "intellij": "add",
+        "vscode": "numpad_add"
+    },
+    {
+        "intellij": "subtract",
+        "vscode": "numpad_subtract"
+    },
+    {
+        "intellij": "decimal",
+        "vscode": "numpad_decimal"
+    },
+    {
+        "intellij": "divide",
+        "vscode": "numpad_divide"
+    }
+]

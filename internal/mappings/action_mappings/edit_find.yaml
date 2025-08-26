@@ -1,0 +1,79 @@
+mappings:
+  - id: "actions.edit.find"
+    description: "Find in current file"
+    vscode:
+      command: "actions.find"
+      when: "editorFocus || editorIsOpen"
+    zed:
+      action: "buffer_search::Deploy"
+      context: "Editor"
+    intellij:
+      action: "Find"
+    helix:
+      command: "search"
+      mode: "insert"
+  - id: "actions.edit.nextMatchFindAction"
+    description: "Find Next"
+    vscode:
+      command: "editor.action.nextMatchFindAction"
+      when: "editorFocus && findInputFocussed"
+    intellij:
+      action: "FindNext"
+    zed:
+      action: "search::SelectNextMatch"
+      context: "Editor"
+    helix:
+      command: "search_next"
+      mode: "insert"
+  - id: "actions.edit.previousMatchFindAction"
+    description: "Find Previous"
+    vscode:
+      command: "editor.action.previousMatchFindAction"
+      when: "editorFocus && findInputFocussed"
+    intellij:
+      action: "FindPrevious"
+    zed:
+      action: "search::SelectPreviousMatch"
+      context: "Editor"
+    helix:
+      command: "search_prev"
+      mode: "insert"
+  - id: "actions.edit.replace"
+    description: "Replace in current file"
+    vscode:
+      command: "editor.action.startFindReplaceAction"
+      when: "editorFocus || editorIsOpen"
+    zed:
+      action: "buffer_search::DeployReplace"
+      context: "Editor"
+    intellij:
+      action: "Replace"
+    helix:
+      notSupported: true
+  - id: "actions.edit.findInFiles"
+    description: "Find in all files in the project"
+    vscode:
+      command: "workbench.action.findInFiles"
+      when: "!explorerResourceIsFolder || !filesExplorerFocus"
+    zed:
+      action: "pane::DeploySearch"
+      context: "Workspace"
+    intellij:
+      action: "FindInPath"
+    helix:
+      command: "global_search"
+      mode: "insert"
+  - id: "actions.edit.replaceInFiles"
+    description: "Replace in all files in the project"
+    vscode:
+      command: "workbench.action.replaceInFiles"
+      when: ""
+    zed:
+      action: "pane::DeploySearch"
+      args:
+        "replace_enabled": true
+      context: "Workspace"
+    intellij:
+      action: "ReplaceInPath"
+    helix:
+      notSupported: true
