@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keycode"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
@@ -18,54 +19,6 @@ var modifierMap = map[string]keymapv1.KeyModifier{
 	"meta": keymapv1.KeyModifier_KEY_MODIFIER_META,
 	"cmd":  keymapv1.KeyModifier_KEY_MODIFIER_META,
 	"win":  keymapv1.KeyModifier_KEY_MODIFIER_META,
-}
-
-// keys except a-z, A-Z, 0-9
-// see https://github.com/microsoft/vscode/blob/7ca850c73f7fa37e1fc80090f14268b0b6b504bb/src/vs/base/common/keyCodes.ts#L493
-var keys = map[string]struct{}{
-	"enter":           {},
-	"tab":             {},
-	"space":           {},
-	"backspace":       {},
-	"delete":          {},
-	"insert":          {},
-	"home":            {},
-	"end":             {},
-	"pageup":          {},
-	"pagedown":        {},
-	"escape":          {},
-	"f1":              {},
-	"f2":              {},
-	"f3":              {},
-	"f4":              {},
-	"f5":              {},
-	"f6":              {},
-	"f7":              {},
-	"f8":              {},
-	"f9":              {},
-	"f10":             {},
-	"f11":             {},
-	"f12":             {},
-	"up":              {},
-	"down":            {},
-	"left":            {},
-	"right":           {},
-	"numpad0":         {},
-	"numpad1":         {},
-	"numpad2":         {},
-	"numpad3":         {},
-	"numpad4":         {},
-	"numpad5":         {},
-	"numpad6":         {},
-	"numpad7":         {},
-	"numpad8":         {},
-	"numpad9":         {},
-	"numpad_add":      {},
-	"numpad_subtract": {},
-	"numpad_multiply": {},
-	"numpad_divide":   {},
-	"numpad_enter":    {},
-	"numpad_decimal":  {},
 }
 
 type KeyChord struct {
@@ -95,7 +48,11 @@ func Parse(keybind string, modifierSeparator string) (*KeyChord, error) {
 	// Handle cases like "ctrl+alt++" where the key is the separator.
 	// In this case, Split results in an empty string at the end.
 	if lastKey == "" && strings.HasSuffix(lowerKeybind, modifierSeparator) {
-		chord.KeyCode = modifierSeparator
+		if kc, ok := keycode.FromString(modifierSeparator); ok {
+			chord.KeyCode = kc
+		} else {
+			return nil, fmt.Errorf("invalid key code: '%s'", modifierSeparator)
+		}
 	} else {
 		// Check if the last part is a modifier.
 		if modifier, ok := modifierMap[lastKey]; ok {
@@ -103,7 +60,11 @@ func Parse(keybind string, modifierSeparator string) (*KeyChord, error) {
 			chord.Modifiers = append(chord.Modifiers, modifier)
 		} else {
 			// It's a key code.
-			chord.KeyCode = lastKey
+			if kc, ok := keycode.FromString(lastKey); ok {
+				chord.KeyCode = kc
+			} else {
+				return nil, fmt.Errorf("invalid key code: '%s'", lastKey)
+			}
 		}
 	}
 
@@ -119,19 +80,13 @@ func Parse(keybind string, modifierSeparator string) (*KeyChord, error) {
 			// If it's not a modifier, it must be a key code.
 			// But we already found a key code (or decided the last part was a modifier).
 			// So this is an invalid sequence.
-			return nil, fmt.Errorf("invalid key chord string: multiple key codes found ('%s' and '%s')", part, chord.KeyCode)
+			keyStr, _ := keycode.ToString(chord.KeyCode)
+			return nil, fmt.Errorf("invalid key chord string: multiple key codes found ('%s' and '%s')", part, keyStr)
 		}
 	}
 
 	// Final validation
-	if chord.KeyCode != "" {
-		// Validate the key code.
-		if len(chord.KeyCode) > 1 {
-			if _, ok := keys[chord.KeyCode]; !ok {
-				return nil, fmt.Errorf("invalid key code: '%s'", chord.KeyCode)
-			}
-		}
-	} else { // KeyCode is empty
+	if chord.KeyCode == keymapv1.KeyCode_KEY_CODE_UNSPECIFIED {
 		// Allow exactly one modifier without a key code, e.g. "shift" or "ctrl".
 		// Disallow zero or multiple modifiers without a key code.
 		if len(chord.Modifiers) != 1 {
@@ -171,9 +126,13 @@ func (kc *KeyChord) Format(p platform.Platform) ([]string, error) {
 		parts = append(parts, "alt")
 	}
 
-	if kc.KeyCode != "" {
-		parts = append(parts, kc.KeyCode)
-		return parts, nil
+	if kc.KeyCode != keymapv1.KeyCode_KEY_CODE_UNSPECIFIED {
+		if keyStr, ok := keycode.ToString(kc.KeyCode); ok {
+			parts = append(parts, keyStr)
+			return parts, nil
+		} else {
+			return nil, fmt.Errorf("invalid key code: %v", kc.KeyCode)
+		}
 	}
 
 	// Allow exactly one modifier without a key code (e.g., ["shift"]).

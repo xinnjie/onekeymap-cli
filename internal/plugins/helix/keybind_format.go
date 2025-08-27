@@ -5,14 +5,15 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/bimap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keycode"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
 // see https://github.com/helix-editor/helix/blob/22a3b10dd8ab907367ae1fe57d9703e22b30d391/book/src/remapping.md?plain=1#L92
-var helixWellKnownKeyStroke = internal.NewBiMapFromMap(map[string]string{
+var helixWellKnownKeyStroke = bimap.NewBiMapFromMap(map[string]string{
 	// Special keys from Helix docs
 	"backspace": "backspace",
 	"space":     "space",
@@ -52,7 +53,11 @@ var helixWellKnownKeyStroke = internal.NewBiMapFromMap(map[string]string{
 func formatKeybinding(kb *keymap.KeyBinding) (string, error) {
 	// helix do not recognize numpad keys, numpad1 is recognized as "1"
 	hasNumpadStroke := slices.ContainsFunc(kb.GetKeyChords().GetChords(), func(chord *keymapv1.KeyChord) bool {
-		return strings.Contains(chord.KeyCode, "numpad")
+		keyStr, ok := keycode.ToString(chord.KeyCode)
+		if !ok {
+			return false
+		}
+		return strings.Contains(keyStr, "numpad")
 	})
 	if hasNumpadStroke {
 		return "", ErrNotSupportKeyChords

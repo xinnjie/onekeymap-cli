@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/bimap"
 )
 
 // Shared well-known key name mappings between IntelliJ naming and our normalized names.
@@ -14,7 +14,7 @@ import (
 // Our normalized side uses lower-case names or single-character symbols.
 // Source: https://github.com/kasecato/vscode-intellij-idea-keybindings/blob/master/resource/KeystrokeKeyMapping.json
 var (
-	strokeMapping = internal.NewBiMapFromMap(map[string]string{
+	strokeMapping = bimap.NewBiMapFromMap(map[string]string{
 		// Alphanumeric and punctuation
 		"BACK_QUOTE":        "`",
 		"MINUS":             "-",

@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keycode"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 	"google.golang.org/protobuf/proto"
@@ -22,7 +23,7 @@ func TestParseKeyBinding(t *testing.T) {
 			input: "ctrl+s",
 			expected: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
-					{KeyCode: "s", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
+					{KeyCode: keycode.MustKeyCode("s"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
 				},
 			},
 		},
@@ -31,8 +32,8 @@ func TestParseKeyBinding(t *testing.T) {
 			input: "ctrl+k ctrl+s",
 			expected: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
-					{KeyCode: "k", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
-					{KeyCode: "s", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
+					{KeyCode: keycode.MustKeyCode("k"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
+					{KeyCode: keycode.MustKeyCode("s"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
 				},
 			},
 		},
@@ -41,8 +42,8 @@ func TestParseKeyBinding(t *testing.T) {
 			input: "shift shift",
 			expected: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
-					{KeyCode: "", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
-					{KeyCode: "", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
+					{KeyCode: keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
+					{KeyCode: keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
 				},
 			},
 		},
@@ -83,7 +84,7 @@ func TestKeyBinding_Format(t *testing.T) {
 			name: "Single chord(cmd+s)",
 			input: NewKeyBinding(&keymapv1.KeyBinding{KeyChords: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
-					{KeyCode: "s", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META}},
+					{KeyCode: keycode.MustKeyCode("s"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META}},
 				},
 			}}),
 			separator: "+",
@@ -93,8 +94,8 @@ func TestKeyBinding_Format(t *testing.T) {
 			name: "Multi-chord(shift shift)",
 			input: NewKeyBinding(&keymapv1.KeyBinding{KeyChords: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
-					{KeyCode: "", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
-					{KeyCode: "", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
+					{KeyCode: keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
+					{KeyCode: keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
 				},
 			}}),
 			separator: "-",
@@ -104,8 +105,8 @@ func TestKeyBinding_Format(t *testing.T) {
 			name: "Multi-chord(ctrl+k ctrl+s)",
 			input: NewKeyBinding(&keymapv1.KeyBinding{KeyChords: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
-					{KeyCode: "k", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
-					{KeyCode: "s", Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
+					{KeyCode: keycode.MustKeyCode("k"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
+					{KeyCode: keycode.MustKeyCode("s"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
 				},
 			}}),
 			separator: "-",

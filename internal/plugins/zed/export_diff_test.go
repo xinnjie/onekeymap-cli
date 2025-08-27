@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/diff"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keycode"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
@@ -23,7 +24,7 @@ func testSettingCopy() *keymapv1.KeymapSetting {
 				KeyChords: &keymapv1.KeyChordSequence{
 					Chords: []*keymapv1.KeyChord{
 						{
-							KeyCode:   "c",
+							KeyCode:   keycode.MustKeyCode("c"),
 							Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META},
 						},
 					},

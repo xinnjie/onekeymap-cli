@@ -1,4 +1,4 @@
-package internal
+package bimap
 
 type BiMap[K comparable, V comparable] struct {
 	forward map[K]V

@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keycode"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 	"google.golang.org/protobuf/testing/protocmp"
@@ -23,7 +24,7 @@ func TestParse(t *testing.T) {
 			name:  "Simple key",
 			input: "a",
 			expected: &keymapv1.KeyChord{
-				KeyCode: "a",
+				KeyCode: keycode.MustKeyCode("a"),
 			},
 			expectError: false,
 		},
@@ -31,7 +32,7 @@ func TestParse(t *testing.T) {
 			name:  "Single modifier",
 			input: "ctrl+c",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "c",
+				KeyCode:   keycode.MustKeyCode("c"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
 			},
 			expectError: false,
@@ -40,7 +41,7 @@ func TestParse(t *testing.T) {
 			name:  "Multiple modifiers",
 			input: "ctrl+shift+f",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "f",
+				KeyCode:   keycode.MustKeyCode("f"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_SHIFT},
 			},
 			expectError: false,
@@ -49,7 +50,7 @@ func TestParse(t *testing.T) {
 			name:  "All modifiers",
 			input: "ctrl+alt+shift+meta+enter",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "enter",
+				KeyCode:   keycode.MustKeyCode("enter"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_ALT, keymapv1.KeyModifier_KEY_MODIFIER_SHIFT, keymapv1.KeyModifier_KEY_MODIFIER_META},
 			},
 			expectError: false,
@@ -58,7 +59,7 @@ func TestParse(t *testing.T) {
 			name:  "Meta modifier",
 			input: "meta+s",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "s",
+				KeyCode:   keycode.MustKeyCode("s"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META},
 			},
 			expectError: false,
@@ -67,7 +68,7 @@ func TestParse(t *testing.T) {
 			name:  "Cmd modifier",
 			input: "cmd+s",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "s",
+				KeyCode:   keycode.MustKeyCode("s"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META},
 			},
 			expectError: false,
@@ -76,7 +77,7 @@ func TestParse(t *testing.T) {
 			name:  "Win modifier",
 			input: "win+r",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "r",
+				KeyCode:   keycode.MustKeyCode("r"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META},
 			},
 			expectError: false,
@@ -85,7 +86,7 @@ func TestParse(t *testing.T) {
 			name:  "ctrl+alt++",
 			input: "ctrl+alt++",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "+",
+				KeyCode:   keycode.MustKeyCode("+"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_ALT},
 			},
 			expectError: false,
@@ -112,7 +113,7 @@ func TestParse(t *testing.T) {
 			name:  "single modifier without key code(shift)",
 			input: "shift",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "",
+				KeyCode:   keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT},
 			},
 			expectError: false,
@@ -121,7 +122,7 @@ func TestParse(t *testing.T) {
 			name:  "single modifier without key code(ctrl)",
 			input: "ctrl",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "",
+				KeyCode:   keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
 			},
 			expectError: false,
@@ -158,7 +159,7 @@ func TestParseMinus(t *testing.T) {
 			name:  "ctrl-alt-+",
 			input: "ctrl-alt-+",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "+",
+				KeyCode:   keycode.MustKeyCode("+"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_ALT},
 			},
 			expectError: false,
@@ -168,7 +169,7 @@ func TestParseMinus(t *testing.T) {
 			name:  "ctrl-alt--",
 			input: "ctrl-alt--",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   "-",
+				KeyCode:   keycode.MustKeyCode("-"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_ALT},
 			},
 			expectError: false,
@@ -203,21 +204,21 @@ func TestFormat(t *testing.T) {
 		{
 			name: "Simple key(a)",
 			input: &keymapv1.KeyChord{
-				KeyCode: "a",
+				KeyCode: keycode.MustKeyCode("a"),
 			},
 			expected: []string{"a"},
 		},
 		{
 			name: "Simple key([)",
 			input: &keymapv1.KeyChord{
-				KeyCode: "[",
+				KeyCode: keycode.MustKeyCode("["),
 			},
 			expected: []string{"["},
 		},
 		{
 			name: "Single modifier",
 			input: &keymapv1.KeyChord{
-				KeyCode:   "c",
+				KeyCode:   keycode.MustKeyCode("c"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
 			},
 			expected: []string{"ctrl", "c"},
@@ -225,7 +226,7 @@ func TestFormat(t *testing.T) {
 		{
 			name: "Multiple modifiers unordered",
 			input: &keymapv1.KeyChord{
-				KeyCode:   "f",
+				KeyCode:   keycode.MustKeyCode("f"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT, keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
 			},
 			expected: []string{"ctrl", "shift", "f"}, // Should be formatted in canonical order: meta, ctrl, shift, alt
@@ -233,7 +234,7 @@ func TestFormat(t *testing.T) {
 		{
 			name: "All modifiers",
 			input: &keymapv1.KeyChord{
-				KeyCode:   "x",
+				KeyCode:   keycode.MustKeyCode("x"),
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META, keymapv1.KeyModifier_KEY_MODIFIER_ALT, keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_SHIFT},
 			},
 			expected: []string{"cmd", "ctrl", "shift", "alt", "x"},
@@ -253,7 +254,7 @@ func TestFormat(t *testing.T) {
 		{
 			name: "Single modifier(shift)",
 			input: &keymapv1.KeyChord{
-				KeyCode:   "",
+				KeyCode:   keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT},
 			},
 			expected: []string{"shift"},
@@ -261,7 +262,7 @@ func TestFormat(t *testing.T) {
 		{
 			name: "Single modifier(ctrl)",
 			input: &keymapv1.KeyChord{
-				KeyCode:   "",
+				KeyCode:   keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
 				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
 			},
 			expected: []string{"ctrl"},
