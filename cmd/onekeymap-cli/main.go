@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/cmd/onekeymap-cli/cmd"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/cmd"
 )
 
 func main() {

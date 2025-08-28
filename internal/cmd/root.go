@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/cli"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/cliconfig"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins/helix"
@@ -146,7 +146,7 @@ func init() {
 
 	// Init viper config
 	var err error
-	_, err = cli.NewConfig()
+	_, err = cliconfig.NewConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error initializing configuration: %v\n", err)
 		os.Exit(1)
