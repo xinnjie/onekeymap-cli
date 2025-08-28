@@ -29,6 +29,14 @@ func NewBinding(action, keyChords string) *keymapv1.KeyBinding {
 	}
 }
 
+func NewBindingWithComment(action, keyChords, comment string) *keymapv1.KeyBinding {
+	return &keymapv1.KeyBinding{
+		Id:        action,
+		KeyChords: MustParseKeyBinding(keyChords).KeyChords,
+		Comment:   comment,
+	}
+}
+
 // ParseKeyBinding parse from vscode-like keybind into `KeyBinding` struct e.g. ctrl+c
 // separator between key chords can be customized.
 func ParseKeyBinding(keybind string, modifierSeparator string) (*KeyBinding, error) {

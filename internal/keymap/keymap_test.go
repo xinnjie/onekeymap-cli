@@ -2,6 +2,7 @@ package keymap
 
 import (
 	"bytes"
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -11,29 +12,94 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestSaveLoadRoundTrip(t *testing.T) {
-	// 1. Define the initial KeymapSetting proto object.
-	originalSetting := &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
-			NewBinding("actions.copy", "ctrl+c"),
-			NewBinding("actions.find", "ctrl+shift+f"),
-			NewBinding("actions.noop", "f12"),
+func TestSave(t *testing.T) {
+	testCases := []struct {
+		name               string
+		input              *keymapv1.KeymapSetting
+		expectedKeymaps    []OneKeymapConfig
+		expectedNumKeymaps int
+	}{
+		{
+			name: "Single keybinding",
+			input: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					NewBinding("actions.copy", "ctrl+c"),
+				},
+			},
+			expectedKeymaps: []OneKeymapConfig{
+				{Id: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}},
+			},
+			expectedNumKeymaps: 1,
+		},
+		{
+			name: "Single keybinding with comment",
+			input: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					NewBindingWithComment("actions.find", "shift+f", "with comment"),
+				},
+			},
+			expectedKeymaps: []OneKeymapConfig{
+				{Id: "actions.find", Keybinding: KeybindingStrings{"shift+f"}, Comment: "with comment"},
+			},
+			expectedNumKeymaps: 1,
+		},
+		{
+			name: "Multiple keybindings for the same action",
+			input: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					NewBinding("actions.find", "ctrl+f"),
+					NewBinding("actions.find", "cmd+f"),
+				},
+			},
+			expectedKeymaps: []OneKeymapConfig{
+				{Id: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
+			},
+			expectedNumKeymaps: 1,
+		},
+		{
+			name: "Multiple keybindings for different actions",
+			input: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					NewBinding("actions.copy", "ctrl+c"),
+					NewBinding("actions.find", "ctrl+f"),
+					NewBinding("actions.find", "cmd+f"),
+					NewBindingWithComment("actions.find", "shift+f", "with comment"),
+				},
+			},
+			expectedKeymaps: []OneKeymapConfig{
+				{Id: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}},
+				{Id: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
+				{Id: "actions.find", Keybinding: KeybindingStrings{"shift+f"}, Comment: "with comment"},
+			},
+			expectedNumKeymaps: 3,
 		},
 	}
 
-	// 2. Save the setting to an in-memory buffer.
-	var buf bytes.Buffer
-	err := Save(&buf, originalSetting)
-	assert.NoError(t, err, "Save should not produce an error")
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			err := Save(&buf, tc.input)
+			assert.NoError(t, err)
 
-	// 3. Load the setting back from the buffer.
-	loadedSetting, err := Load(&buf)
-	assert.NoError(t, err, "Load should not produce an error")
+			var result OneKeymapSetting
+			err = json.Unmarshal(buf.Bytes(), &result)
+			assert.NoError(t, err)
 
-	// 4. Compare the original and loaded settings.
-	// Using protocmp is the correct way to compare protobuf messages.
-	diff := cmp.Diff(originalSetting, loadedSetting, protocmp.Transform())
-	assert.Empty(t, diff, "The loaded setting should be identical to the original")
+			assert.Len(t, result.Keymaps, tc.expectedNumKeymaps)
+
+			for _, expectedMap := range tc.expectedKeymaps {
+				found := false
+				for _, actualMap := range result.Keymaps {
+					if actualMap.Id == expectedMap.Id && actualMap.Comment == expectedMap.Comment {
+						assert.ElementsMatch(t, expectedMap.Keybinding, actualMap.Keybinding)
+						found = true
+						break
+					}
+				}
+				assert.True(t, found, "Expected keymap not found: %+v", expectedMap)
+			}
+		})
+	}
 }
 
 func TestLoad(t *testing.T) {
@@ -63,12 +129,29 @@ func TestLoad(t *testing.T) {
 `,
 			expected: &keymapv1.KeymapSetting{
 				Keybindings: []*keymapv1.KeyBinding{
-					func() *keymapv1.KeyBinding {
-						binding := NewBinding("actions.copy", "ctrl+c")
-						binding.Comment = "Standard copy command"
-						return binding
-					}(),
+					NewBindingWithComment("actions.copy", "ctrl+c", "Standard copy command"),
 					NewBinding("actions.find", "ctrl+shift+f"),
+				},
+			},
+			expectErr: false,
+		},
+		{
+			name: "Valid configuration with multiple keybindings",
+			jsonInput: `
+{
+  "keymaps": [
+    {
+      "id": "actions.copy",
+      "keybinding": ["Ctrl+C", "Cmd+C"],
+      "comment": "Standard copy command"
+    }
+  ]
+}
+`,
+			expected: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					NewBindingWithComment("actions.copy", "ctrl+c", "Standard copy command"),
+					NewBindingWithComment("actions.copy", "cmd+c", "Standard copy command"),
 				},
 			},
 			expectErr: false,
