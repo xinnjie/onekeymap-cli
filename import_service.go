@@ -61,7 +61,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	// Sort by action for determinism
 	if setting != nil && len(setting.Keybindings) > 0 {
 		sort.Slice(setting.Keybindings, func(i, j int) bool {
-			return setting.Keybindings[i].Action < setting.Keybindings[j].Action
+			return setting.Keybindings[i].Id < setting.Keybindings[j].Id
 		})
 	}
 
@@ -125,14 +125,14 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 		if kb == nil {
 			continue
 		}
-		baseByAction[kb.GetAction()] = append(baseByAction[kb.GetAction()], kb)
+		baseByAction[kb.GetId()] = append(baseByAction[kb.GetId()], kb)
 		basePair[pairKey(kb)] = kb
 	}
 	for _, kb := range setting.GetKeybindings() {
 		if kb == nil {
 			continue
 		}
-		newByAction[kb.GetAction()] = append(newByAction[kb.GetAction()], kb)
+		newByAction[kb.GetId()] = append(newByAction[kb.GetId()], kb)
 		newPair[pairKey(kb)] = kb
 	}
 
@@ -175,14 +175,14 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 		for _, v := range adds {
 			changes.Add = append(changes.Add, v)
 		}
-		sort.Slice(changes.Add, func(i, j int) bool { return changes.Add[i].Action < changes.Add[j].Action })
+		sort.Slice(changes.Add, func(i, j int) bool { return changes.Add[i].Id < changes.Add[j].Id })
 	}
 	if len(removes) > 0 {
 		changes.Remove = make([]*keymapv1.KeyBinding, 0, len(removes))
 		for _, v := range removes {
 			changes.Remove = append(changes.Remove, v)
 		}
-		sort.Slice(changes.Remove, func(i, j int) bool { return changes.Remove[i].Action < changes.Remove[j].Action })
+		sort.Slice(changes.Remove, func(i, j int) bool { return changes.Remove[i].Id < changes.Remove[j].Id })
 	}
 	return changes, nil
 }

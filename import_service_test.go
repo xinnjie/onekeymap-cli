@@ -135,7 +135,7 @@ func TestImportService_Import_SortsByAction(t *testing.T) {
 
 	actualActions := make([]string, len(res.Setting.Keybindings))
 	for i, keymap := range res.Setting.Keybindings {
-		actualActions[i] = keymap.Action
+		actualActions[i] = keymap.Id
 	}
 
 	assert.Equal(t, expectedActions, actualActions, "Keymaps should be sorted by action")

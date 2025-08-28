@@ -39,7 +39,7 @@ func (r *DuplicateMappingRule) Validate(ctx context.Context, validationContext *
 			warning := &keymapv1.ValidationIssue{
 				Issue: &keymapv1.ValidationIssue_DuplicateMapping{
 					DuplicateMapping: &keymapv1.DuplicateMapping{
-						Action:     binding.Action,
+						Action:     binding.Id,
 						Keybinding: kb.String(),
 						Message:    "This keymap is defined multiple times in the source configuration.",
 					},

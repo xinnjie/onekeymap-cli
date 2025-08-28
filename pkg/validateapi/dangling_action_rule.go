@@ -31,11 +31,11 @@ func (r *DanglingActionRule) Validate(ctx context.Context, validationContext *Va
 		}
 
 		// Check if the action exists in the mapping configuration
-		if _, exists := r.mappingConfig.Mappings[kb.Action]; !exists {
+		if _, exists := r.mappingConfig.Mappings[kb.Id]; !exists {
 			// Create a dangling action issue
 			danglingAction := &keymapv1.DanglingAction{
-				Action:     kb.Action,
-				Keybinding: kb.Action, // Use action as placeholder for keybinding
+				Action:     kb.Id,
+				Keybinding: kb.Id, // Use action as placeholder for keybinding
 				Suggestion: "Check if the action ID is correct or if it needs to be added to action mappings",
 			}
 

@@ -35,7 +35,7 @@ func (r *UnsupportedActionRule) Validate(ctx context.Context, validationContext 
 		}
 
 		// Check if this action has a mapping for the target editor
-		actionMapping, exists := r.mappingConfig.Mappings[binding.Action]
+		actionMapping, exists := r.mappingConfig.Mappings[binding.Id]
 		if !exists {
 			// This would be caught by DanglingActionRule, skip here
 			continue
@@ -69,7 +69,7 @@ func (r *UnsupportedActionRule) Validate(ctx context.Context, validationContext 
 			issue := &keymapv1.ValidationIssue{
 				Issue: &keymapv1.ValidationIssue_UnsupportedAction{
 					UnsupportedAction: &keymapv1.UnsupportedAction{
-						Action:       binding.Action,
+						Action:       binding.Id,
 						Keybinding:   formattedKeys,
 						TargetEditor: string(r.targetEditor),
 					},

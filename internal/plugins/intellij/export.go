@@ -108,16 +108,16 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.KeymapSettin
 		if km == nil || km.KeyChords == nil || len(km.KeyChords.Chords) == 0 {
 			continue
 		}
-		mapping := e.mappingConfig.FindByUniversalAction(km.Action)
+		mapping := e.mappingConfig.FindByUniversalAction(km.Id)
 		if mapping == nil || mapping.IntelliJ.Action == "" {
-			e.logger.Info("no mapping found for action", "action", km.Action)
+			e.logger.Info("no mapping found for action", "action", km.Id)
 			continue
 		}
 		actionID := mapping.IntelliJ.Action
 
 		shortcutXML, err := formatKeybinding(keymap.NewKeyBinding(km))
 		if err != nil {
-			e.logger.Warn("failed to format keybinding", "action", km.Action, "error", err)
+			e.logger.Warn("failed to format keybinding", "action", km.Id, "error", err)
 			continue
 		}
 

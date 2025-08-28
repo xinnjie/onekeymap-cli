@@ -56,12 +56,12 @@ func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *V
 			var actions []*keymapv1.KeybindConflict_Action
 			for _, kb := range keybindings {
 				action := &keymapv1.KeybindConflict_Action{
-					Action: kb.Action,
+					Action: kb.Id,
 				}
 
 				// Try to get editor command from mapping config
 				if mappingConfig != nil {
-					if mapping := mappingConfig.FindByUniversalAction(kb.Action); mapping != nil {
+					if mapping := mappingConfig.FindByUniversalAction(kb.Id); mapping != nil {
 						// Get editor command based on source editor from report
 						editorCommand := getEditorCommand(mapping, validationContext.Report.SourceEditor)
 						action.EditorCommand = editorCommand

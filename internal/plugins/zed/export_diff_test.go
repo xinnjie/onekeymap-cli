@@ -20,7 +20,7 @@ func testSettingCopy() *keymapv1.KeymapSetting {
 	return &keymapv1.KeymapSetting{
 		Keybindings: []*keymapv1.KeyBinding{
 			{
-				Action: "actions.edit.copy",
+				Id: "actions.edit.copy",
 				KeyChords: &keymapv1.KeyChordSequence{
 					Chords: []*keymapv1.KeyChord{
 						{

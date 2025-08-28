@@ -48,8 +48,8 @@ func TestDedupKeyBindings_DifferentActionsOrChordsNotDedup(t *testing.T) {
 }
 
 func TestDedupKeyBindings_NilVsEmptyChordsConsideredEqual(t *testing.T) {
-	kb1 := &keymapv1.KeyBinding{Action: "actions.nochord", KeyChords: nil}
-	kb2 := &keymapv1.KeyBinding{Action: "actions.nochord", KeyChords: &keymapv1.KeyChordSequence{}}
+	kb1 := &keymapv1.KeyBinding{Id: "actions.nochord", KeyChords: nil}
+	kb2 := &keymapv1.KeyBinding{Id: "actions.nochord", KeyChords: &keymapv1.KeyChordSequence{}}
 
 	in := []*keymapv1.KeyBinding{kb1, kb2}
 	out := dedupKeyBindings(in)

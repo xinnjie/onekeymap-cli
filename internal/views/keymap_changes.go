@@ -38,17 +38,17 @@ func NewKeymapChangesModel(changes *importapi.KeymapChanges, confirm *bool) tea.
 	var rows []table.Row
 	if changes != nil {
 		for _, kb := range changes.Remove {
-			rows = append(rows, table.Row{"Remove", redMinus(kb.GetAction()), redMinus(formatKeyBinding(kb)), ""})
+			rows = append(rows, table.Row{"Remove", redMinus(kb.GetId()), redMinus(formatKeyBinding(kb)), ""})
 		}
 		for _, kb := range changes.Add {
-			rows = append(rows, table.Row{"Add", greenPlus(kb.GetAction()), "", greenPlus(formatKeyBinding(kb))})
+			rows = append(rows, table.Row{"Add", greenPlus(kb.GetId()), "", greenPlus(formatKeyBinding(kb))})
 		}
 		for _, diff := range changes.Update {
 			action := ""
 			if diff.Before != nil {
-				action = diff.Before.GetAction()
+				action = diff.Before.GetId()
 			} else if diff.After != nil {
-				action = diff.After.GetAction()
+				action = diff.After.GetId()
 			}
 			rows = append(rows, table.Row{"Update", action, redMinus(formatKeyBinding(diff.Before)), greenPlus(formatKeyBinding(diff.After))})
 		}

@@ -24,7 +24,7 @@ func NewKeyBinding(protoKeyBinding *keymapv1.KeyBinding) *KeyBinding {
 
 func NewBinding(action, keyChords string) *keymapv1.KeyBinding {
 	return &keymapv1.KeyBinding{
-		Action:    action,
+		Id:        action,
 		KeyChords: MustParseKeyBinding(keyChords).KeyChords,
 	}
 }
@@ -41,7 +41,7 @@ func ParseKeyBinding(keybind string, modifierSeparator string) (*KeyBinding, err
 		}
 		chords = append(chords, kc.KeyChord)
 	}
-	return NewKeyBinding(&keymapv1.KeyBinding{Action: "", KeyChords: &keymapv1.KeyChordSequence{Chords: chords}}), nil
+	return NewKeyBinding(&keymapv1.KeyBinding{Id: "", KeyChords: &keymapv1.KeyChordSequence{Chords: chords}}), nil
 }
 
 func MustParseKeyBinding(keybind string) *KeyBinding {
@@ -77,7 +77,7 @@ func (kb *KeyBinding) String() string {
 		// Fallback to empty string if formatting fails
 		formattedKeys = ""
 	}
-	return kb.Action + "|" + formattedKeys
+	return kb.Id + "|" + formattedKeys
 }
 
 func MustFormatKeyBinding(kb *KeyBinding, p platform.Platform) string {

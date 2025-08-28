@@ -74,7 +74,7 @@ func (p *zedImporter) Import(ctx context.Context, source io.Reader, opts plugina
 				continue
 			}
 			keymapEntry := &keymapv1.KeyBinding{
-				Action:    actionID,
+				Id:        actionID,
 				KeyChords: kb.KeyChords,
 			}
 

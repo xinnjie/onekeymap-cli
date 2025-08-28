@@ -83,8 +83,8 @@ func TestImportService_Diff_AddRemove(t *testing.T) {
 	require.NotNil(t, res.Changes)
 	require.Len(t, res.Changes.Add, 1)
 	require.Len(t, res.Changes.Remove, 1)
-	assert.Equal(t, "actions.file.save", res.Changes.Add[0].Action)
-	assert.Equal(t, "actions.editor.copy", res.Changes.Remove[0].Action)
+	assert.Equal(t, "actions.file.save", res.Changes.Add[0].Id)
+	assert.Equal(t, "actions.editor.copy", res.Changes.Remove[0].Id)
 	assert.Empty(t, res.Changes.Update)
 }
 
@@ -130,8 +130,8 @@ func TestImportService_Diff_MultiPerAction_NoUpdate(t *testing.T) {
 	// Adds contains the new binding; removes contain both baseline bindings
 	require.Len(t, res.Changes.Add, 1)
 	require.Len(t, res.Changes.Remove, 2)
-	assert.Equal(t, "actions.editor.build", res.Changes.Add[0].Action)
+	assert.Equal(t, "actions.editor.build", res.Changes.Add[0].Id)
 	for _, r := range res.Changes.Remove {
-		assert.Equal(t, "actions.editor.build", r.Action)
+		assert.Equal(t, "actions.editor.build", r.Id)
 	}
 }

@@ -50,13 +50,13 @@ func TestLoad(t *testing.T) {
 {
   "keymaps": [
     {
-      "action": "actions.copy",
-      "keys": "Ctrl+C",
+      "id": "actions.copy",
+      "keybinding": "Ctrl+C",
       "comment": "Standard copy command"
     },
     {
-      "action": "actions.find",
-      "keys": "Ctrl+Shift+F"
+      "id": "actions.find",
+      "keybinding": "Ctrl+Shift+F"
     }
   ]
 }
@@ -90,8 +90,8 @@ func TestLoad(t *testing.T) {
 {
   "keymaps": [
     {
-      "action": "actions.bad",
-      "keys": "Ctrl+Alt+Oops"
+      "id": "actions.bad",
+      "keybinding": "Ctrl+Alt+Oops"
     }
   ]
 }

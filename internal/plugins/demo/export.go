@@ -34,10 +34,10 @@ func (e *demoExporter) Export(ctx context.Context, destination io.Writer, settin
 		binding := keymap.NewKeyBinding(km)
 		keys, err := binding.Format(platform.PlatformMacOS, "+")
 		if err != nil {
-			e.logger.Warn("Skipping un-formattable keybinding", "action", km.GetAction(), "error", err)
+			e.logger.Warn("Skipping un-formattable keybinding", "action", km.GetId(), "error", err)
 			continue
 		}
-		out = append(out, demoBinding{Keys: keys, Action: km.GetAction()})
+		out = append(out, demoBinding{Keys: keys, Action: km.GetId()})
 	}
 
 	data, err := json.MarshalIndent(out, "", "  ")

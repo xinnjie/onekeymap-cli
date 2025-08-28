@@ -10,9 +10,9 @@ import (
 
 // OneKeymapConfig is a struct that matches the user config file format.
 type OneKeymapConfig struct {
-	Action  string `json:"action"`
-	Keys    string `json:"keys"`
-	Comment string `json:"comment,omitempty"`
+	Id         string `json:"id"`
+	Keybinding string `json:"keybinding"`
+	Comment    string `json:"comment,omitempty"`
 }
 
 // OneKeymapSetting is the root struct for the user config file.
@@ -33,13 +33,13 @@ func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
 
 	setting := &keymapv1.KeymapSetting{}
 	for _, fk := range friendlyData.Keymaps {
-		kb, err := ParseKeyBinding(fk.Keys, "+")
+		kb, err := ParseKeyBinding(fk.Keybinding, "+")
 		if err != nil {
 			// Potentially wrap this error for more context
 			return nil, err
 		}
 		setting.Keybindings = append(setting.Keybindings, &keymapv1.KeyBinding{
-			Action:    fk.Action,
+			Id:        fk.Id,
 			KeyChords: kb.KeyChords,
 			Comment:   fk.Comment,
 		})
@@ -60,9 +60,9 @@ func Save(writer io.Writer, setting *keymapv1.KeymapSetting) error {
 			return err
 		}
 		friendlyData.Keymaps = append(friendlyData.Keymaps, OneKeymapConfig{
-			Action:  k.Action,
-			Keys:    keys,
-			Comment: k.Comment,
+			Id:         k.Id,
+			Keybinding: keys,
+			Comment:    k.Comment,
 		})
 	}
 

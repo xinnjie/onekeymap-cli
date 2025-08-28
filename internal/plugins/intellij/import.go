@@ -56,7 +56,7 @@ func (p *intellijImporter) Import(ctx context.Context, source io.Reader, opts pl
 				continue
 			}
 			newBinding := &keymapv1.KeyBinding{
-				Action:    actionID,
+				Id:        actionID,
 				KeyChords: kb.KeyChords,
 			}
 			setting.Keybindings = append(setting.Keybindings, newBinding)

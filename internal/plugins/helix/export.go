@@ -150,7 +150,7 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 	keysByMode := helixKeys{}
 
 	for _, km := range setting.Keybindings {
-		mapping := e.mappingConfig.FindByUniversalAction(km.Action)
+		mapping := e.mappingConfig.FindByUniversalAction(km.Id)
 		if mapping == nil || len(mapping.Helix) == 0 {
 			continue
 		}
@@ -196,7 +196,7 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 				}
 				dest = &keysByMode.Select
 			default:
-				e.logger.Warn("Unsupported Helix mode; skipping", "mode", string(m), "action", km.Action)
+				e.logger.Warn("Unsupported Helix mode; skipping", "mode", string(m), "action", km.Id)
 				continue
 			}
 			(*dest)[keyStr] = hconf.Command
