@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -9,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
@@ -95,8 +93,7 @@ var exportCmd = &cobra.Command{
 
 		// Confirm before writing only when interactive
 		if *interactive {
-			confirmed := confirm()
-			if !confirmed {
+			if !confirm(*exportOutput) {
 				fmt.Println("Export canceled; no changes were written.")
 				return nil
 			}
@@ -130,14 +127,6 @@ var exportCmd = &cobra.Command{
 		logger.Info("Successfully exported keymap", "to", *toFlag, "output", *exportOutput)
 		return nil
 	},
-}
-
-func confirm() bool {
-	fmt.Printf("Write exported config to %s? [y/N]: ", *exportOutput)
-	reader := bufio.NewReader(os.Stdin)
-	answer, _ := reader.ReadString('\n')
-	answer = strings.ToLower(strings.TrimSpace(answer))
-	return answer == "y" || answer == "yes"
 }
 
 func prepareExportInputFlags(cmd *cobra.Command, onekeymapPlaceholder string) error {
@@ -179,49 +168,6 @@ func prepareExportInputFlags(cmd *cobra.Command, onekeymapPlaceholder string) er
 		}
 	}
 	return nil
-}
-
-func backupIfExists(path string) (string, error) {
-	info, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return "", nil
-		}
-		return "", err
-	}
-	if !info.Mode().IsRegular() {
-		// Only back up regular files
-		return "", nil
-	}
-
-	dir := filepath.Dir(path)
-	base := filepath.Base(path)
-	ts := time.Now().Format("20060102-150405")
-	backup := filepath.Join(dir, base+".bak-"+ts)
-	// Ensure uniqueness if a backup with the same timestamp exists
-	for i := 1; ; i++ {
-		if _, err := os.Stat(backup); os.IsNotExist(err) {
-			break
-		}
-		backup = filepath.Join(dir, fmt.Sprintf("%s.bak-%s-%d", base, ts, i))
-	}
-
-	in, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer func() { _ = in.Close() }()
-
-	out, err := os.OpenFile(backup, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0o644)
-	if err != nil {
-		return "", err
-	}
-	defer func() { _ = out.Close() }()
-
-	if _, err := io.Copy(out, in); err != nil {
-		return "", err
-	}
-	return backup, nil
 }
 
 func runExportForm(pluginRegistry *plugins.Registry, to, input, output *string, onekeymapConfigPlaceHolder string,

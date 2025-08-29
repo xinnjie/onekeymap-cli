@@ -18,9 +18,9 @@ import (
 )
 
 var (
-	from   *string
-	input  *string
-	output *string
+	importFrom   *string
+	importInput  *string
+	importOutput *string
 )
 
 var importCmd = &cobra.Command{
@@ -34,20 +34,20 @@ var importCmd = &cobra.Command{
 		}
 
 		var f *os.File
-		if *input != "" {
-			f, err = os.Open(*input)
+		if *importInput != "" {
+			f, err = os.Open(*importInput)
 			if err != nil {
-				logger.Error("Failed to open input file", "path", *input, "error", err)
+				logger.Error("Failed to open input file", "path", *importInput, "error", err)
 				return err
 			}
 			defer func() { _ = f.Close() }()
 		}
 
 		baseConfig := func() *keymapv1.KeymapSetting {
-			if *output != "" {
-				baseConfigFile, err := os.Open(*output)
+			if *importOutput != "" {
+				baseConfigFile, err := os.Open(*importOutput)
 				if err != nil {
-					logger.Debug("Base config file not found, skip loading base config", "path", *output)
+					logger.Debug("Base config file not found, skip loading base config", "path", *importOutput)
 					return nil
 				}
 				defer func() { _ = baseConfigFile.Close() }()
@@ -62,7 +62,7 @@ var importCmd = &cobra.Command{
 		}()
 
 		opts := importapi.ImportOptions{
-			EditorType:  pluginapi.EditorType(*from),
+			EditorType:  pluginapi.EditorType(*importFrom),
 			InputStream: f,
 			Base:        baseConfig,
 		}
@@ -97,11 +97,11 @@ var importCmd = &cobra.Command{
 		}
 
 		// Ensure parent directory exists, then create/truncate output file
-		if err := os.MkdirAll(filepath.Dir(*output), 0o755); err != nil {
-			logger.Error("Failed to create output directory", "dir", filepath.Dir(*output), "error", err)
+		if err := os.MkdirAll(filepath.Dir(*importOutput), 0o755); err != nil {
+			logger.Error("Failed to create output directory", "dir", filepath.Dir(*importOutput), "error", err)
 			return err
 		}
-		file, err := os.OpenFile(*output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+		file, err := os.OpenFile(*importOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
 		if err != nil {
 			logger.Error("Failed to create output file", "error", err)
 			return err
@@ -120,7 +120,7 @@ var importCmd = &cobra.Command{
 			return err
 		}
 
-		logger.Info("Successfully imported keymap", "output", *output)
+		logger.Info("Successfully imported keymap", "output", *importOutput)
 		if result != nil && result.Report != nil {
 			logger.Debug("Import report", "report", result.Report)
 		}
@@ -130,37 +130,37 @@ var importCmd = &cobra.Command{
 
 func prepareImportInputFlags(cmd *cobra.Command, onekeymapConfig string) error {
 	if *interactive {
-		needSelectEditor := !cmd.Flags().Changed("from") || *from == ""
-		needInput := !cmd.Flags().Changed("input") || *input == ""
-		needOutput := !cmd.Flags().Changed("output") || *output == ""
+		needSelectEditor := !cmd.Flags().Changed("from") || *importFrom == ""
+		needInput := !cmd.Flags().Changed("input") || *importInput == ""
+		needOutput := !cmd.Flags().Changed("output") || *importOutput == ""
 
 		if needSelectEditor || needInput || needOutput {
-			if err := runImportForm(pluginRegistry, from, input, output, onekeymapConfig, needSelectEditor, needInput, needOutput); err != nil {
+			if err := runImportForm(pluginRegistry, importFrom, importInput, importOutput, onekeymapConfig, needSelectEditor, needInput, needOutput); err != nil {
 				return err
 			}
 		}
 	} else {
-		if *from == "" {
+		if *importFrom == "" {
 			return fmt.Errorf("flag --from is required")
 		}
 		if onekeymapConfig != "" {
-			*output = onekeymapConfig
+			*importOutput = onekeymapConfig
 		}
 	}
 
-	p, ok := pluginRegistry.Get(pluginapi.EditorType(*from))
+	p, ok := pluginRegistry.Get(pluginapi.EditorType(*importFrom))
 	if !ok {
-		logger.Error("Editor not found", "editor", *from)
-		return fmt.Errorf("editor %s not found", *from)
+		logger.Error("Editor not found", "editor", *importFrom)
+		return fmt.Errorf("editor %s not found", *importFrom)
 	}
 
-	if *input == "" {
+	if *importInput == "" {
 		v, err := p.DefaultConfigPath()
 		if err != nil {
 			logger.Error("Failed to get default config path", "error", err)
 			return err
 		}
-		*input = v[0]
+		*importInput = v[0]
 	}
 	return nil
 }
@@ -202,9 +202,9 @@ func runValidationReportPreview(report *keymapv1.ValidationReport) error {
 
 func init() {
 	rootCmd.AddCommand(importCmd)
-	from = importCmd.Flags().String("from", "", "Source editor to import from (e.g., vscode, zed)")
-	output = importCmd.Flags().String("output", "", "Path to save the generated onekeymap.json file")
-	input = importCmd.Flags().String("input", "", "Optional: Path to the source editor's config file (overrides env vars)")
+	importFrom = importCmd.Flags().String("from", "", "Source editor to import from (e.g., vscode, zed)")
+	importOutput = importCmd.Flags().String("output", "", "Path to save the generated onekeymap.json file")
+	importInput = importCmd.Flags().String("input", "", "Optional: Path to the source editor's config file (overrides env vars)")
 
 	// Add completion for 'from' flag
 	_ = importCmd.RegisterFlagCompletionFunc("from", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
