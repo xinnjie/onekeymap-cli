@@ -15,7 +15,21 @@ type Config struct {
 	Quiet                    bool   `mapstructure:"quiet"`
 	OneKeyMap                string `mapstructure:"onekeymap"`
 	OtelExporterOtlpEndpoint string `mapstructure:"otel.exporter.otlp.endpoint"`
+	ServerListen             string `mapstructure:"server.listen"`
 }
+
+// Environment variables mapping
+//
+// Viper is configured with:
+// - Prefix: ONEKEYMAP
+// - Key replacer: '.' -> '_'
+//
+// Therefore, the following environment variables map to config keys:
+// - ONEKEYMAP_VERBOSE -> verbose (bool)
+// - ONEKEYMAP_QUIET -> quiet (bool)
+// - ONEKEYMAP_ONEKEYMAP -> onekeymap (string, file path)
+// - ONEKEYMAP_OTEL_EXPORTER_OTLP_ENDPOINT -> otel.exporter.otlp.endpoint (string)
+// - ONEKEYMAP_SERVER_LISTEN -> server.listen (string, e.g. "tcp://127.0.0.1:50051" or "unix:///tmp/onekeymap.sock")
 
 // NewConfig initializes and returns a new Config object.
 // It sets defaults, binds environment variables, reads config files, and unmarshals the result.
@@ -29,6 +43,7 @@ func NewConfig() (*Config, error) {
 	}
 	viper.SetDefault("onekeymap", filepath.Join(homeDir, ".config", "onekeymap", "onekeymap.json"))
 	viper.SetDefault("otel.exporter.otlp.endpoint", "")
+	viper.SetDefault("server.listen", "")
 
 	// Set configuration file name and paths
 	viper.SetConfigName("onekeymap")
