@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"strings"
@@ -45,7 +44,7 @@ var serveCmd = &cobra.Command{
 			}
 			lis, err = net.Listen("unix", socketPath)
 			if err != nil {
-				logger.Error("failed to listen on unix socket %s: %v", socketPath, err)
+				logger.Error("failed to listen on unix socket", "path", socketPath, "err", err.Error())
 				os.Exit(1)
 			}
 			// Best-effort restrict permissions
@@ -68,17 +67,18 @@ var serveCmd = &cobra.Command{
 
 			lis, err = net.Listen("tcp", addr)
 			if err != nil {
-				logger.Error("failed to listen on tcp %s: %v", addr, err)
+				logger.Error("failed to listen on tcp", "address", addr, "err", err.Error())
 				os.Exit(1)
 			}
 			logger.Info("server listening", "address", "tcp://"+lis.Addr().String())
 		}
 
 		s := grpc.NewServer()
-		keymapv1.RegisterOnekeymapServiceServer(s, service.NewServer(pluginRegistry, importService, exportService))
+		keymapv1.RegisterOnekeymapServiceServer(s, service.NewServer(pluginRegistry, importService, exportService, mappingConfig))
 
 		if err := s.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
+			logger.Error("failed to serve", "err", err.Error())
+			os.Exit(1)
 		}
 	},
 }

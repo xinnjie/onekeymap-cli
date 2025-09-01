@@ -5,6 +5,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
@@ -86,4 +87,50 @@ func (s *Server) DefaultConfigPath(ctx context.Context, req *keymapv1.DefaultCon
 	default:
 		return nil, status.Errorf(codes.Unimplemented, "platform %s not supported yet", req.GetPlatform().String())
 	}
+}
+
+func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest) (*keymapv1.LoadKeymapResponse, error) {
+	km, err := keymap.Load(strings.NewReader(req.Config))
+	if err != nil {
+		// If the config is empty, we can still proceed if return_all is true.
+		if req.ReturnAll {
+			km = &keymapv1.KeymapSetting{}
+		} else {
+			return nil, status.Errorf(codes.InvalidArgument, "failed to parse keymap config: %v", err)
+		}
+	}
+
+	if req.ReturnAll {
+		// Create a map for quick lookup of existing bindings.
+		existingBindings := make(map[string]*keymapv1.KeyBinding)
+		for _, binding := range km.Keybindings {
+			existingBindings[binding.Id] = binding
+		}
+
+		// Iterate through all available mappings and add them if they don't exist.
+		for id, mapping := range s.mappingConfig.Mappings {
+			if binding, exists := existingBindings[id]; exists {
+				binding.Description = mapping.Description
+			} else {
+				km.Keybindings = append(km.Keybindings, &keymapv1.KeyBinding{
+					Id:          id,
+					Description: mapping.Description,
+				})
+			}
+		}
+	}
+
+	return &keymapv1.LoadKeymapResponse{Keymap: km}, nil
+}
+
+func (s *Server) SaveKeymap(ctx context.Context, req *keymapv1.SaveKeymapRequest) (*keymapv1.SaveKeymapResponse, error) {
+	var buf bytes.Buffer
+	err := keymap.Save(&buf, req.Keymap)
+	if err != nil {
+		return nil, err
+	}
+
+	return &keymapv1.SaveKeymapResponse{
+		Config: buf.String(),
+	}, nil
 }
