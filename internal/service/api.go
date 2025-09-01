@@ -9,6 +9,8 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -65,4 +67,23 @@ func toProtoKeymapDiff(diffs []importapi.KeymapDiff) []*keymapv1.KeymapDiff {
 		})
 	}
 	return result
+}
+
+func (s *Server) DefaultConfigPath(ctx context.Context, req *keymapv1.DefaultConfigPathRequest) (*keymapv1.DefaultConfigPathResponse, error) {
+	// For now, plugins resolve path by runtime.GOOS. We only support macOS requests on this server currently.
+	switch req.GetPlatform() {
+	case keymapv1.Platform_MACOS:
+		et := pluginapi.EditorType(strings.ToLower(req.GetEditorType().String()))
+		plugin, ok := s.registry.Get(et)
+		if !ok {
+			return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
+		}
+		v, err := plugin.DefaultConfigPath()
+		if err != nil || len(v) == 0 {
+			return nil, status.Errorf(codes.NotFound, "no default config paths found for editor: %s", et)
+		}
+		return &keymapv1.DefaultConfigPathResponse{Paths: v}, nil
+	default:
+		return nil, status.Errorf(codes.Unimplemented, "platform %s not supported yet", req.GetPlatform().String())
+	}
 }

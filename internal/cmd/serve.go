@@ -60,6 +60,12 @@ var serveCmd = &cobra.Command{
 			if after, ok := strings.CutPrefix(addr, "tcp://"); ok {
 				addr = after
 			}
+
+			if addr == "" {
+				logger.Error("empty listen address")
+				os.Exit(1)
+			}
+
 			lis, err = net.Listen("tcp", addr)
 			if err != nil {
 				logger.Error("failed to listen on tcp %s: %v", addr, err)
@@ -69,7 +75,7 @@ var serveCmd = &cobra.Command{
 		}
 
 		s := grpc.NewServer()
-		keymapv1.RegisterOnekeymapServiceServer(s, service.NewServer(importService, exportService))
+		keymapv1.RegisterOnekeymapServiceServer(s, service.NewServer(pluginRegistry, importService, exportService))
 
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
