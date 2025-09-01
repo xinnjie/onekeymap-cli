@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.merge.acceptCurrent"
+    short_description: "Accept current"
     description: "Accept current change (keep left side)"
     vscode:
       command: "merge-conflict.accept.current"
@@ -9,6 +10,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.merge.acceptIncoming"
+    short_description: "Accept incoming"
     description: "Accept incoming change (take right side)"
     vscode:
       command: "merge-conflict.accept.incoming"

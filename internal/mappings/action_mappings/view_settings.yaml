@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.view.openGlobalSettings"
+    short_description: "Open global settings"
     description: "Open Global Settings"
     vscode:
       command: "workbench.action.openGlobalSettings"
@@ -12,6 +13,7 @@ mappings:
       command: ":config-open"
       mode: "insert"
   - id: "actions.view.selectTheme"
+    short_description: "Select theme"
     description: "Select Theme"
     vscode:
       command: "workbench.action.selectTheme"

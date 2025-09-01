@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.edit.suggest.show"
+    short_description: "Show suggestions"
     description: "Trigger Suggest"
     vscode:
       command: "editor.action.triggerSuggest"
@@ -10,6 +11,7 @@ mappings:
       action: "editor::ShowCompletions"
       context: "Editor"
   - id: "actions.edit.inlineSuggest.show"
+    short_description: "Show inline suggestion"
     description: "Show inline suggestion"
     vscode:
       command: "editor.action.inlineSuggest.trigger"
@@ -20,6 +22,7 @@ mappings:
     intellij:
       action: "CallInlineCompletionAction"
   - id: "actions.edit.inlineSuggest.previous"
+    short_description: "Previous suggestion"
     description: "Show previous inline suggestion"
     vscode:
       command: "editor.action.inlineSuggest.showPrevious"
@@ -30,6 +33,7 @@ mappings:
     intellij:
       action: "PrevInlineCompletionSuggestionAction"
   - id: "actions.edit.inlineSuggest.next"
+    short_description: "Next suggestion"
     description: "Show next inline suggestion"
     vscode:
       command: "editor.action.inlineSuggest.showNext"

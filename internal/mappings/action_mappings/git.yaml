@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.git.commitAll"
+    short_description: "Commit all"
     description: "Commit All"
     vscode:
       command: "git.commitAll"
@@ -10,6 +11,7 @@ mappings:
       action: "git::Commit"
       context: "Editor"
   - id: "actions.git.openChanges"
+    short_description: "Open changes"
     description: "Open all git changed files"
     vscode:
       command: "git.openChange"
@@ -20,6 +22,7 @@ mappings:
       action: "git::OpenModifiedFiles"
       context: "Editor"
   - id: "actions.git.unstage"
+    short_description: "Unstage changes"
     description: "Unstage Changes"
     vscode:
       command: "git.unstageSelectedRanges"
@@ -30,6 +33,7 @@ mappings:
       action: "git::UnstageAndNext"
       context: "Editor && !agent_diff"
   - id: "actions.git.revert"
+    short_description: "Revert changes"
     description: "Revert Changes"
     vscode:
       command: "git.revertSelectedRanges"
@@ -40,6 +44,7 @@ mappings:
       action: "git::Restore"
       context: "Editor"
   - id: "actions.git.stage"
+    short_description: "Stage changes"
     description: "Stage Changes"
     vscode:
       command: "git.stageSelectedRanges"
@@ -50,6 +55,7 @@ mappings:
       action: "git::StageAndNext"
       context: "Editor && !agent_diff"
   - id: "actions.git.push"
+    short_description: "Push changes"
     description: "Push Changes"
     vscode:
       command: "git.pushTo"
@@ -60,6 +66,7 @@ mappings:
       action: "git::Push"
       context: "Editor"
   - id: "actions.git.sync"
+    short_description: "Sync changes"
     description: "Sync (Pull, Push)"
     vscode:
       command: "git.sync"
@@ -70,6 +77,7 @@ mappings:
       action: "git::Pull"
       context: "Editor"
   - id: "actions.git.toggleBlame"
+    short_description: "Toggle blame"
     description: "Toggle Blame"
     vscode:
       notSupported: true

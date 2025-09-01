@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.run.startDebugging"
+    short_description: "Start debugging"
     description: "Start Debugging"
     vscode:
       command: "workbench.action.debug.run"
@@ -12,6 +13,7 @@ mappings:
       command: "dap_launch"
       mode: "insert"
   - id: "actions.run.stopDebugging"
+    short_description: "Stop debugging"
     description: "Stop Debugging"
     vscode:
       command: "workbench.action.debug.stop"
@@ -24,6 +26,7 @@ mappings:
       command: "dap_terminate"
       mode: "insert"
   - id: "actions.run.restartDebugging"
+    short_description: "Restart debugging"
     description: "Restart Debugging"
     vscode:
       command: "workbench.action.debug.restart"

@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.view.toggleExplorer"
+    short_description: "Toggle explorer"
     description: "Toggle Explorer view"
     vscode:
       - command: "workbench.view.explorer"
@@ -17,6 +18,7 @@ mappings:
       command: "file_explorer"
       mode: "insert"
   - id: "actions.view.toggleSearch"
+    short_description: "Toggle search"
     description: "Toggle Search view"
     vscode:
       - command: "workbench.view.search"
@@ -34,6 +36,7 @@ mappings:
       command: "global_search"
       mode: "insert"
   - id: "actions.view.toggleSourceControl"
+    short_description: "Toggle source control"
     description: "Toggle Source Control view"
     vscode:
       - command: "workbench.view.scm"
@@ -51,6 +54,7 @@ mappings:
       command: "changed_file_picker"
       mode: "insert"
   - id: "actions.view.showExtensions"
+    short_description: "Show extensions"
     description: "Show Extensions view"
     vscode:
       command: "workbench.view.extensions"
@@ -63,6 +67,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.showTesting"
+    short_description: "Show testing"
     description: "Show Testing view"
     vscode:
       command: "workbench.view.testing"
@@ -74,6 +79,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.toggleProblems"
+    short_description: "Toggle problems"
     description: "Toggle Problems view"
     vscode:
       command: "workbench.actions.view.problems"
@@ -88,6 +94,7 @@ mappings:
       command: "workspace_diagnostics_picker"
       mode: "insert"
   - id: "actions.view.toggleOutput"
+    short_description: "Toggle output"
     description: "Toggle Output view"
     vscode:
       command: "workbench.action.output.toggleOutput"
@@ -100,6 +107,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.toggleTerminal"
+    short_description: "Toggle terminal"
     description: "Toggle Terminal view"
     vscode:
       command: "workbench.action.terminal.toggleTerminal"

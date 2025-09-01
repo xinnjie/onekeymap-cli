@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.file.openFile"
+    short_description: "Open file"
     description: "Open file dialog"
     vscode:
       command: "workbench.action.files.openFile"
@@ -12,6 +13,7 @@ mappings:
       command: "file_picker"
       mode: "insert"
   - id: "actions.file.showOpenedFileInNewWindow"
+    short_description: "Show in new window"
     description: "Show opened file in new window"
     vscode:
       command: "workbench.action.files.showOpenedFileInNewWindow"
@@ -24,6 +26,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.file.openRecent"
+    short_description: "Open recent"
     description: "Open Recent"
     vscode:
       - command: "workbench.action.openRecent"

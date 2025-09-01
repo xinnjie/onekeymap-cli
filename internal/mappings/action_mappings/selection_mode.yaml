@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.selection.toggleColumnSelectionMode"
+    short_description: "Toggle column mode"
     description: "Toggle column selection mode"
     # vscode could also presee `option` to cloumn select
     vscode:

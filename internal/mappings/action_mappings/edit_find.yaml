@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.edit.find"
+    short_description: "Find in file"
     description: "Find in current file"
     vscode:
       command: "actions.find"
@@ -13,6 +14,7 @@ mappings:
       command: "search"
       mode: "insert"
   - id: "actions.edit.nextMatchFindAction"
+    short_description: "Find next"
     description: "Find Next"
     vscode:
       command: "editor.action.nextMatchFindAction"
@@ -26,6 +28,7 @@ mappings:
       command: "search_next"
       mode: "insert"
   - id: "actions.edit.previousMatchFindAction"
+    short_description: "Find previous"
     description: "Find Previous"
     vscode:
       command: "editor.action.previousMatchFindAction"
@@ -39,6 +42,7 @@ mappings:
       command: "search_prev"
       mode: "insert"
   - id: "actions.edit.replace"
+    short_description: "Replace in file"
     description: "Replace in current file"
     vscode:
       command: "editor.action.startFindReplaceAction"
@@ -51,6 +55,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.edit.findInFiles"
+    short_description: "Find in project"
     description: "Find in all files in the project"
     vscode:
       command: "workbench.action.findInFiles"
@@ -64,6 +69,7 @@ mappings:
       command: "global_search"
       mode: "insert"
   - id: "actions.edit.replaceInFiles"
+    short_description: "Replace in project"
     description: "Replace in all files in the project"
     vscode:
       command: "workbench.action.replaceInFiles"

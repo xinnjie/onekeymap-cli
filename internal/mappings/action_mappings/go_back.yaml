@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.go.back"
+    short_description: "Go back"
     description: "Go to previous cursor location"
     vscode:
       command: "workbench.action.navigateBack"
@@ -9,6 +10,7 @@ mappings:
     intellij:
       action: "Back"
   - id: "actions.go.forward"
+    short_description: "Go forward"
     description: "Go to next cursor location"
     vscode:
       command: "workbench.action.navigateForward"
@@ -18,6 +20,7 @@ mappings:
     intellij:
       action: "Forward"
   - id: "actions.go.lastEditLocation"
+    short_description: "Last edit"
     description: "Go to last edit location"
     vscode:
       command: "workbench.action.navigateToLastEditLocation"

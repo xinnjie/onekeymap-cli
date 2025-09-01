@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.view.toggleDebugPanel"
+    short_description: "Toggle debug panel"
     description: "Toggle Debug Panel"
     vscode:
       - command: "workbench.view.debug"
@@ -16,6 +17,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.showDebugOutputConsole"
+    short_description: "Show debug console"
     description: "Show Debug Output Console view"
     vscode:
       command: "workbench.debug.action.toggleRepl"

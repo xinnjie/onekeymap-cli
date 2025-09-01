@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.cursor.wordRight"
+    short_description: "Next word"
     description: "Move cursor to the end of the next word"
     vscode:
       command: "cursorWordRight"
@@ -13,6 +14,7 @@ mappings:
       command: "move_next_word_end"
       mode: "insert"
   - id: "actions.cursor.wordPartRight"
+    short_description: "Next subword"
     description: "Move cursor to the end of the next subword (hump)"
     vscode:
       command: "cursorWordPartRight"
@@ -27,6 +29,7 @@ mappings:
       command: "move_next_sub_word_start"
       mode: "insert"
   - id: "actions.cursor.wordLeft"
+    short_description: "Previous word"
     description: "Move cursor to the start of the previous word"
     vscode:
       command: "cursorWordLeft"
@@ -40,6 +43,7 @@ mappings:
       command: "move_prev_word_start"
       mode: "insert"
   - id: "actions.cursor.wordPartLeft"
+    short_description: "Previous subword"
     description: "Move cursor to the start of the previous subword (hump)"
     vscode:
       command: "cursorWordPartStartLeft"
@@ -54,6 +58,7 @@ mappings:
       command: "move_prev_sub_word_start"
       mode: "insert"
   - id: "actions.cursor.wordRightSelect"
+    short_description: "Select next word"
     description: "Select to the end of the next word"
     vscode:
       command: "cursorWordRightSelect"
@@ -67,6 +72,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.cursor.wordPartRightSelect"
+    short_description: "Select next subword"
     description: "Select to the end of the next subword (hump)"
     vscode:
       command: "cursorWordPartRightSelect"
@@ -79,6 +85,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.cursor.wordLeftSelect"
+    short_description: "Select previous word"
     description: "Select to the start of the previous word"
     vscode:
       command: "cursorWordLeftSelect"
@@ -92,6 +99,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.cursor.wordPartLeftSelect"
+    short_description: "Select previous subword"
     description: "Select to the start of the previous subword (hump)"
     vscode:
       command: "cursorWordPartStartLeftSelect"

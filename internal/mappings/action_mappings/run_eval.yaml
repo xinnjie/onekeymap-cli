@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.run.selectionToRepl"
+    short_description: "Send to REPL"
     description: "Send selection to REPL"
     vscode:
       command: "editor.debug.action.selectionToRepl"

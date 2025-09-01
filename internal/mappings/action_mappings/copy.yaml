@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.cut"
+    short_description: "Cut text"
     description: "Cut selected text/file"
     vscode:
       - command: "editor.action.clipboardCutAction"
@@ -21,6 +22,7 @@ mappings:
       command: "delete_selection"
       mode: "insert"
   - id: "actions.copy"
+    short_description: "Copy text"
     description: "Copy selected text/file"
     vscode:
       - command: "editor.action.clipboardCopyAction"
@@ -51,6 +53,7 @@ mappings:
       command: "yank_to_clipboard"
       mode: "insert"
   - id: "actions.paste"
+    short_description: "Paste text"
     description: "Paste text/file"
     vscode:
       - command: "editor.action.clipboardPasteAction"
@@ -75,6 +78,7 @@ mappings:
       command: "paste_clipboard_after"
       mode: "insert"
   - id: "actions.edit.copyFilePath"
+    short_description: "Copy file path"
     description: "Copy file path"
     vscode:
       command: "copyFilePath"

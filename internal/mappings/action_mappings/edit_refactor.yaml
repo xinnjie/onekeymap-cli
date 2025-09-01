@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.edit.rename"
+    short_description: "Rename symbol"
     description: "Rename"
     vscode:
       - command: "editor.action.rename"
@@ -18,6 +19,7 @@ mappings:
       command: "rename_symbol"
       mode: "insert"
   - id: "actions.edit.refactor"
+    short_description: "Refactor code"
     description: "Refactor This..."
     vscode:
       command: "editor.action.refactor"
@@ -30,6 +32,7 @@ mappings:
       command: "code_action"
       mode: "insert"
   - id: "actions.refactor.organizeImports"
+    short_description: "Organize imports"
     description: "Organize Imports"
     vscode:
       command: "editor.action.organizeImports"

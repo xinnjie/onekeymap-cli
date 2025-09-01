@@ -111,10 +111,12 @@ func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest
 		for id, mapping := range s.mappingConfig.Mappings {
 			if binding, exists := existingBindings[id]; exists {
 				binding.Description = mapping.Description
+				binding.ShortDescription = mapping.ShortDescription
 			} else {
 				km.Keybindings = append(km.Keybindings, &keymapv1.KeyBinding{
-					Id:          id,
-					Description: mapping.Description,
+					Id:               id,
+					Description:      mapping.Description,
+					ShortDescription: mapping.ShortDescription,
 				})
 			}
 		}

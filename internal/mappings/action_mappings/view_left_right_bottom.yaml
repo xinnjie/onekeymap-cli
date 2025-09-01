@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.view.toggleRightSideBar"
+    short_description: "Toggle right sidebar"
     description: "Toggle Right Side Bar visibility"
     vscode:
       command: "workbench.action.toggleAuxiliaryBar"
@@ -20,6 +21,7 @@ mappings:
   #   intellij:
   #     action: "HideSideWindows"
   - id: "actions.view.toggleBottomDock"
+    short_description: "Toggle bottom dock"
     description: "Toggle Bottom Dock visibility"
     vscode:
       command: "workbench.action.togglePanel"

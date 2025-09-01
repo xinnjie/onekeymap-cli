@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.run.stepOver"
+    short_description: "Step over"
     description: "Step Over"
     vscode:
       command: "workbench.action.debug.stepOver"
@@ -13,6 +14,7 @@ mappings:
       command: "dap_next"
       mode: "insert"
   - id: "actions.run.stepInto"
+    short_description: "Step into"
     description: "Step Into"
     vscode:
       command: "workbench.action.debug.stepInto"
@@ -26,6 +28,7 @@ mappings:
       command: "dap_step_in"
       mode: "insert"
   - id: "actions.run.stepOut"
+    short_description: "Step out"
     description: "Step Out"
     vscode:
       command: "workbench.action.debug.stepOut"
@@ -39,6 +42,7 @@ mappings:
       command: "dap_step_out"
       mode: "insert"
   - id: "actions.run.continue"
+    short_description: "Continue"
     description: "Continue"
     vscode:
       command: "workbench.action.debug.continue"
@@ -52,6 +56,7 @@ mappings:
       command: "dap_continue"
       mode: "insert"
   - id: "actions.run.runToCursor"
+    short_description: "Run to cursor"
     description: "Run to Cursor"
     vscode:
       command: "editor.debug.action.runToCursor"

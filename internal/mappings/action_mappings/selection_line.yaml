@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.selection.copyLineUp"
+    short_description: "Copy line up"
     description: "Copy current line up"
     vscode:
       command: "editor.action.copyLinesUpAction"
@@ -14,6 +15,7 @@ mappings:
       command: "copy_selection_on_prev_line"
       mode: "insert"
   - id: "actions.selection.copyLineDown"
+    short_description: "Copy line down"
     description: "Copy current line down"
     vscode:
       command: "editor.action.copyLinesDownAction"
@@ -27,6 +29,7 @@ mappings:
       command: "copy_selection_on_next_line"
       mode: "insert"
   - id: "actions.selection.moveLineUp"
+    short_description: "Move line up"
     description: "Move current line up"
     vscode:
       command: "editor.action.moveLinesUpAction"
@@ -40,6 +43,7 @@ mappings:
       command: "move_line_up"
       mode: "insert"
   - id: "actions.selection.moveLineDown"
+    short_description: "Move line down"
     description: "Move current line down"
     vscode:
       command: "editor.action.moveLinesDownAction"

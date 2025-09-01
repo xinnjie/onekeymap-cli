@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.view.toggleStatusBar"
+    short_description: "Toggle status bar"
     description: "Toggle Status Bar visibility"
     vscode:
       command: "workbench.action.toggleStatusbarVisibility"

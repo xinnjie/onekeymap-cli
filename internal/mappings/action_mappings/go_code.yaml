@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.go.goToDeclaration"
+    short_description: "Go to declaration"
     description: "Go to Declaration or Usages"
     vscode:
       command: "editor.action.goToDeclaration"
@@ -10,6 +11,7 @@ mappings:
       action: "editor::GoToDeclaration"
       context: "Editor"
   - id: "actions.go.peekDeclaration"
+    short_description: "Peek declaration"
     description: "Peek Declaration"
     vscode:
       command: "editor.action.previewDeclaration"
@@ -20,6 +22,7 @@ mappings:
       action: "editor::GoToDefinitionSplit"
       context: "Editor"
   - id: "actions.go.implementations"
+    short_description: "Go to implementations"
     description: "Go to Implementations"
     vscode:
       command: "editor.action.goToImplementation"
@@ -30,6 +33,7 @@ mappings:
     intellij:
       action: "GotoImplementation"
   - id: "actions.go.goToTest"
+    short_description: "Go to test"
     description: "Go to Test"
     vscode:
       command: "java.test.goToTest"
@@ -39,6 +43,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.go.goToSuper"
+    short_description: "Go to super"
     description: "Go to Super Class/Super Method"
     vscode:
       command: "dart.goToSuper"
@@ -48,6 +53,7 @@ mappings:
     intellij:
       action: "GotoSuperMethod"
   - id: "actions.go.typeDefinition"
+    short_description: "Go to type definition"
     description: "Go to Type Definition"
     vscode:
       command: "editor.action.goToTypeDefinition"
@@ -58,6 +64,7 @@ mappings:
     intellij:
       action: "GotoTypeDeclaration"
   - id: "actions.go.references"
+    short_description: "Go to references"
     description: "Go to References"
     vscode:
       command: "references-view.findReferences"
@@ -68,6 +75,7 @@ mappings:
     intellij:
       action: "FindUsages"
   - id: "actions.go.referencePeek"
+    short_description: "Reference peek"
     description: "Show Usages / Reference Search"
     vscode:
       command: "editor.action.referenceSearch.trigger"
@@ -78,6 +86,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.go.callHierarchy"
+    short_description: "Call hierarchy"
     description: "Show Call Hierarchy"
     vscode:
       command: "references-view.showCallHierarchy"
@@ -88,6 +97,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.go.typeHierarchy"
+    short_description: "Type hierarchy"
     description: "Show Type Hierarchy"
     vscode:
       command: "java.action.showTypeHierarchy"

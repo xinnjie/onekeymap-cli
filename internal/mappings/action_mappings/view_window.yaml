@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.view.maximizeEditor"
+    short_description: "Maximize editor"
     description: "Maximize editor (hide other windows)"
     vscode:
       command: "workbench.action.maximizeEditor"
@@ -11,6 +12,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.toggleFullScreen"
+    short_description: "Toggle full screen"
     description: "Toggle full screen"
     vscode:
       command: "workbench.action.toggleFullScreen"

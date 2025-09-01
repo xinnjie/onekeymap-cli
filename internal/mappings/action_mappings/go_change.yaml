@@ -1,5 +1,6 @@
 mappings:
   - id: "actions.go.nextChange"
+    short_description: "Next change"
     description: "Go to Next Change"
     vscode:
       command: "editor.action.dirtydiff.next"
@@ -10,6 +11,7 @@ mappings:
     intellij:
       action: "VcsShowNextChangeMarker"
   - id: "actions.go.previousChange"
+    short_description: "Previous change"
     description: "Go to Previous Change"
     vscode:
       command: "editor.action.dirtydiff.previous"
