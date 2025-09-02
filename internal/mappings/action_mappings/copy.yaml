@@ -2,6 +2,7 @@ mappings:
   - id: "actions.cut"
     short_description: "Cut text"
     description: "Cut selected text/file"
+    category: "Editor"
     vscode:
       - command: "editor.action.clipboardCutAction"
         when: "editorTextFocus"
@@ -24,6 +25,7 @@ mappings:
   - id: "actions.copy"
     short_description: "Copy text"
     description: "Copy selected text/file"
+    category: "Editor"
     vscode:
       - command: "editor.action.clipboardCopyAction"
         when: "editorTextFocus"
@@ -55,6 +57,7 @@ mappings:
   - id: "actions.paste"
     short_description: "Paste text"
     description: "Paste text/file"
+    category: "Editor"
     vscode:
       - command: "editor.action.clipboardPasteAction"
         when: "editorTextFocus && !editorReadonly"
@@ -80,6 +83,7 @@ mappings:
   - id: "actions.edit.copyFilePath"
     short_description: "Copy file path"
     description: "Copy file path"
+    category: "Editor"
     vscode:
       command: "copyFilePath"
       when: "filesExplorerFocus"

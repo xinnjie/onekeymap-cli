@@ -2,6 +2,7 @@ mappings:
   - id: "actions.diff.compareTwoFiles"
     short_description: "Compare files"
     description: "Compare two files"
+    category: "View Management"
     vscode:
       command: "compareSelected"
       when: "explorerViewletFocus"
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.diff.nextChange"
     short_description: "Next change"
     description: "Go to next change in compare editor"
+    category: "Navigation"
     vscode:
       command: "workbench.action.compareEditor.nextChange"
       when: "textCompareEditorVisible"
@@ -24,6 +26,7 @@ mappings:
   - id: "actions.diff.previousChange"
     short_description: "Previous change"
     description: "Go to previous change in compare editor"
+    category: "Navigation"
     vscode:
       command: "workbench.action.compareEditor.previousChange"
       when: "textCompareEditorVisible"

@@ -2,6 +2,7 @@ mappings:
   - id: "actions.run.toggleBreakpoint"
     short_description: "Toggle breakpoint"
     description: "Toggle Breakpoint"
+    category: "Debug"
     vscode:
       command: "editor.debug.action.toggleBreakpoint"
       when: "debuggersAvailable && disassemblyViewFocus || debuggersAvailable && editorTextFocus"

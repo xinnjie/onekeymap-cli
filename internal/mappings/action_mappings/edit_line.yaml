@@ -2,6 +2,7 @@ mappings:
   - id: "actions.edit.insertLineBefore"
     short_description: "Insert line before"
     description: "Insert a new line before the current line"
+    category: "Editor"
     vscode:
       command: "editor.action.insertLineBefore"
       when: "editorTextFocus && !editorReadonly"
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.edit.joinLines"
     short_description: "Join lines"
     description: "Join lines"
+    category: "Editor"
     vscode:
       command: "editor.action.joinLines"
       when: "editorTextFocus && !editorReadonly"
@@ -24,6 +26,7 @@ mappings:
   - id: "actions.edit.lineBreakInsert"
     short_description: "Insert line break"
     description: "Insert line break"
+    category: "Editor"
     vscode:
       command: "lineBreakInsert"
       when: "textInputFocus && !editorReadonly"
@@ -35,6 +38,7 @@ mappings:
   - id: "actions.edit.insertLineAfter"
     short_description: "Insert line after"
     description: "Insert a new line after the current line"
+    category: "Editor"
     vscode:
       command: "editor.action.insertLineAfter"
       when: "editorTextFocus && !editorReadonly"

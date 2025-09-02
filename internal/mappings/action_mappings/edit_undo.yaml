@@ -2,6 +2,7 @@ mappings:
   - id: "actions.edit.undo"
     short_description: "Undo action"
     description: "Undo last action"
+    category: "Editor"
     vscode:
       command: "undo"
       when: ""
@@ -16,6 +17,7 @@ mappings:
   - id: "actions.edit.cursorUndo"
     short_description: "Undo cursor"
     description: "Undo last cursor operation"
+    category: "Editor"
     vscode:
       command: "cursorUndo"
       when: "textInputFocus"
@@ -29,6 +31,7 @@ mappings:
   - id: "actions.edit.redo"
     short_description: "Redo action"
     description: "Redo last undone action"
+    category: "Editor"
     vscode:
       command: "redo"
       when: "textInputFocus"

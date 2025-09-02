@@ -2,6 +2,7 @@ mappings:
   - id: "actions.notebook.cell.edit"
     short_description: "Edit cell"
     description: "Edit Cell"
+    category: "Editor"
     vscode:
       command: "notebook.cell.edit"
       when: "notebookCellListFocused && !editorHoverFocused && !inputFocus && !notebookOutputInputFocused"
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.notebook.cell.execute"
     short_description: "Execute cell"
     description: "Execute Cell"
+    category: "Editor"
     vscode:
       command: "notebook.cell.execute"
       when: "notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
@@ -23,6 +25,7 @@ mappings:
   - id: "actions.notebook.cell.executeAndInsertBelow"
     short_description: "Execute and insert"
     description: "Execute Cell and Insert Below"
+    category: "Editor"
     vscode:
       command: "notebook.cell.executeAndInsertBelow"
       when: "notebookCellListFocused && notebookCellType == 'markup' || notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
@@ -33,6 +36,7 @@ mappings:
   - id: "actions.notebook.cell.executeAndSelectBelow"
     short_description: "Execute and select"
     description: "Execute Cell and Select Below"
+    category: "Editor"
     vscode:
       command: "notebook.cell.executeAndSelectBelow"
       when: "notebookCellListFocused && !interactiveEditorFocused && notebookCellType == 'code' || editorTextFocus && inputFocus && notebookEditorFocused && !interactiveEditorFocused"
@@ -43,6 +47,7 @@ mappings:
   - id: "actions.notebook.cell.insertCodeCellAbove"
     short_description: "Insert above"
     description: "Insert Code Cell Above"
+    category: "Editor"
     vscode:
       command: "notebook.cell.insertCodeCellAbove"
       when: "notebookCellListFocused && !inputFocus"
@@ -53,6 +58,7 @@ mappings:
   - id: "actions.notebook.cell.insertCodeCellBelow"
     short_description: "Insert below"
     description: "Insert Code Cell Below"
+    category: "Editor"
     vscode:
       command: "notebook.cell.insertCodeCellBelow"
       when: "notebookCellListFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
@@ -63,6 +69,7 @@ mappings:
   - id: "actions.notebook.cell.moveDown"
     short_description: "Move down"
     description: "Move Cell Down"
+    category: "Editor"
     vscode:
       command: "notebook.cell.moveDown"
       when: "notebookEditorFocused && !inputFocus"
@@ -73,6 +80,7 @@ mappings:
   - id: "actions.notebook.cell.moveUp"
     short_description: "Move up"
     description: "Move Cell Up"
+    category: "Editor"
     vscode:
       command: "notebook.cell.moveUp"
       when: "notebookEditorFocused && !inputFocus"
@@ -83,6 +91,7 @@ mappings:
   - id: "actions.notebook.cell.quitEdit"
     short_description: "Quit edit"
     description: "Stop Editing Cell"
+    category: "Editor"
     vscode:
       command: "notebook.cell.quitEdit"
       when: "notebookEditorFocused && notebookOutputFocused"
@@ -93,6 +102,7 @@ mappings:
   - id: "actions.notebook.focusBottom"
     short_description: "Focus bottom"
     description: "Focus Bottom"
+    category: "Editor"
     vscode:
       command: "notebook.focusBottom"
       when: "notebookEditorFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
@@ -103,6 +113,7 @@ mappings:
   - id: "actions.notebook.focusTop"
     short_description: "Focus top"
     description: "Focus Top"
+    category: "Editor"
     vscode:
       command: "notebook.focusTop"
       when: "notebookEditorFocused && !inputFocus && notebookChatOuterFocusPosition == ''"

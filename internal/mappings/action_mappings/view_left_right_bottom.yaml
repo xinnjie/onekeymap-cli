@@ -2,6 +2,7 @@ mappings:
   - id: "actions.view.toggleRightSideBar"
     short_description: "Toggle right sidebar"
     description: "Toggle Right Side Bar visibility"
+    category: "View Management"
     vscode:
       command: "workbench.action.toggleAuxiliaryBar"
     zed:
@@ -23,6 +24,7 @@ mappings:
   - id: "actions.view.toggleBottomDock"
     short_description: "Toggle bottom dock"
     description: "Toggle Bottom Dock visibility"
+    category: "View Management"
     vscode:
       command: "workbench.action.togglePanel"
       when: ""

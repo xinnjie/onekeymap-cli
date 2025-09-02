@@ -2,6 +2,7 @@ mappings:
   - id: "actions.selection.addCursorAbove"
     short_description: "Add cursor above"
     description: "Add cursor above current line"
+    category: "Editor"
     vscode:
       command: "editor.action.insertCursorAbove"
       when: "editorTextFocus"
@@ -16,6 +17,7 @@ mappings:
   - id: "actions.selection.addCursorBelow"
     short_description: "Add cursor below"
     description: "Add cursor below current line"
+    category: "Editor"
     vscode:
       command: "editor.action.insertCursorBelow"
       when: "editorTextFocus"
@@ -30,6 +32,7 @@ mappings:
   - id: "actions.selection.addCursorsToLineEnds"
     short_description: "Add cursors to ends"
     description: "Add cursors to the end of selected lines"
+    category: "Editor"
     vscode:
       command: "editor.action.insertCursorAtEndOfEachLineSelected"
       when: "editorTextFocus"
@@ -43,6 +46,7 @@ mappings:
   - id: "actions.selection.addNextOccurrence"
     short_description: "Add next occurrence"
     description: "Add next occurrence of selection to multicursor"
+    category: "Editor"
     vscode:
       command: "editor.action.addSelectionToNextFindMatch"
       when: "editorFocus"
@@ -57,6 +61,7 @@ mappings:
   - id: "actions.selection.addPreviousOccurrence"
     short_description: "Add previous occurrence"
     description: "Add previous occurrence of selection to multicursor"
+    category: "Editor"
     vscode:
       command: "editor.action.addSelectionToPreviousFindMatch"
       when: "editorFocus"
@@ -71,6 +76,7 @@ mappings:
   - id: "actions.selection.selectAllOccurrences"
     short_description: "Select all occurrences"
     description: "Select all occurrences of current selection"
+    category: "Editor"
     vscode:
       command: "editor.action.selectHighlights"
       when: "editorFocus"

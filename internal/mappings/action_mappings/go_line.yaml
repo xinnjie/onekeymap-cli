@@ -2,6 +2,7 @@ mappings:
   - id: "actions.go.line"
     short_description: "Go to line"
     description: "Go to Line/Column"
+    category: "Navigation"
     vscode:
       command: "workbench.action.gotoLine"
       when: ""
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.go.bracket"
     short_description: "Go to bracket"
     description: "Go to Bracket"
+    category: "Navigation"
     vscode:
       command: "editor.action.jumpToBracket"
       when: "editorTextFocus"

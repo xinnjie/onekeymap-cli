@@ -2,6 +2,7 @@ mappings:
   - id: "actions.edit.rename"
     short_description: "Rename symbol"
     description: "Rename"
+    category: "Editor"
     vscode:
       - command: "editor.action.rename"
         when: "editorHasRenameProvider && editorTextFocus && !editorReadonly"
@@ -21,6 +22,7 @@ mappings:
   - id: "actions.edit.refactor"
     short_description: "Refactor code"
     description: "Refactor This..."
+    category: "Editor"
     vscode:
       command: "editor.action.refactor"
       when: "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
@@ -34,6 +36,7 @@ mappings:
   - id: "actions.refactor.organizeImports"
     short_description: "Organize imports"
     description: "Organize Imports"
+    category: "Editor"
     vscode:
       command: "editor.action.organizeImports"
       when: "textInputFocus && !editorReadonly && supportedCodeAction =~ /(\\s|^)source\\.organizeImports\\b/"

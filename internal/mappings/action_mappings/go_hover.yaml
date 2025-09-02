@@ -2,6 +2,7 @@ mappings:
   - id: "actions.hover.quickFix"
     short_description: "Quick fix"
     description: "Quick Fix..."
+    category: "Navigation"
     vscode:
       command: "editor.action.quickFix"
       when: "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
@@ -15,6 +16,7 @@ mappings:
   - id: "actions.hover.codeAction"
     short_description: "Code action"
     description: "Code Action..."
+    category: "Navigation"
     vscode:
       command: "editor.action.codeAction"
       when: "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
@@ -29,6 +31,7 @@ mappings:
   - id: "actions.hover.triggerParameterHint"
     short_description: "Parameter hints"
     description: "Trigger Parameter Hints"
+    category: "Navigation"
     vscode:
       command: "editor.action.triggerParameterHints"
       when: "editorHasSignatureHelpProvider && editorTextFocus"
@@ -43,6 +46,7 @@ mappings:
   - id: "actions.hover.showHover"
     short_description: "Show hover"
     description: "Show Hover"
+    category: "Navigation"
     vscode:
       command: "editor.action.showHover"
       when: "editorTextFocus"

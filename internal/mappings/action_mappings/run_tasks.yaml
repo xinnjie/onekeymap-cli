@@ -2,6 +2,7 @@ mappings:
   - id: "actions.run.runTask"
     short_description: "Run task"
     description: "Run Task"
+    category: "Run"
     vscode:
       command: "workbench.action.tasks.runTask"
       when: ""
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.run.reRunTask"
     short_description: "Re-run task"
     description: "Re-run last Task"
+    category: "Run"
     vscode:
       command: "workbench.action.tasks.reRunTask"
       when: ""
@@ -24,6 +26,7 @@ mappings:
   - id: "actions.run.configureTaskRunner"
     short_description: "Configure tasks"
     description: "Configure Task Runner"
+    category: "Run"
     vscode:
       command: "workbench.action.tasks.configureTaskRunner"
       when: ""
@@ -34,6 +37,7 @@ mappings:
   - id: "actions.terminal.runBuildTask"
     short_description: "Run build task"
     description: "Run the default build task"
+    category: "Run"
     vscode:
       command: "workbench.action.tasks.build"
       when: "taskCommandsRegistered"

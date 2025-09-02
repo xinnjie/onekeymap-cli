@@ -2,6 +2,7 @@ mappings:
   - id: "actions.file.openFile"
     short_description: "Open file"
     description: "Open file dialog"
+    category: "File Management"
     vscode:
       command: "workbench.action.files.openFile"
       when: "false"
@@ -15,6 +16,7 @@ mappings:
   - id: "actions.file.showOpenedFileInNewWindow"
     short_description: "Show in new window"
     description: "Show opened file in new window"
+    category: "View Management"
     vscode:
       command: "workbench.action.files.showOpenedFileInNewWindow"
       when: "emptyWorkspaceSupport"
@@ -28,6 +30,7 @@ mappings:
   - id: "actions.file.openRecent"
     short_description: "Open recent"
     description: "Open Recent"
+    category: "File Management"
     vscode:
       - command: "workbench.action.openRecent"
         when: "!inQuickOpen"

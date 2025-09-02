@@ -2,6 +2,7 @@ mappings:
   - id: "actions.go.goToDeclaration"
     short_description: "Go to declaration"
     description: "Go to Declaration or Usages"
+    category: "Navigation"
     vscode:
       command: "editor.action.goToDeclaration"
       when: "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !peekViewVisible"
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.go.peekDeclaration"
     short_description: "Peek declaration"
     description: "Peek Declaration"
+    category: "Navigation"
     vscode:
       command: "editor.action.previewDeclaration"
       when: "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !peekViewVisible"
@@ -24,6 +26,7 @@ mappings:
   - id: "actions.go.implementations"
     short_description: "Go to implementations"
     description: "Go to Implementations"
+    category: "Navigation"
     vscode:
       command: "editor.action.goToImplementation"
       when: "editorHasImplementationProvider && editorTextFocus"
@@ -35,6 +38,7 @@ mappings:
   - id: "actions.go.goToTest"
     short_description: "Go to test"
     description: "Go to Test"
+    category: "Navigation"
     vscode:
       command: "java.test.goToTest"
       when: "editorTextFocus && java:testRunnerActivated"
@@ -45,6 +49,7 @@ mappings:
   - id: "actions.go.goToSuper"
     short_description: "Go to super"
     description: "Go to Super Class/Super Method"
+    category: "Navigation"
     vscode:
       command: "dart.goToSuper"
       when: "editorTextFocus && dart.isTestFile != true && dart.isTestFile != true"
@@ -55,6 +60,7 @@ mappings:
   - id: "actions.go.typeDefinition"
     short_description: "Go to type definition"
     description: "Go to Type Definition"
+    category: "Navigation"
     vscode:
       command: "editor.action.goToTypeDefinition"
       when: "editorTextFocus"
@@ -66,6 +72,7 @@ mappings:
   - id: "actions.go.references"
     short_description: "Go to references"
     description: "Go to References"
+    category: "Navigation"
     vscode:
       command: "references-view.findReferences"
       when: "editorHasReferenceProvider"
@@ -77,6 +84,7 @@ mappings:
   - id: "actions.go.referencePeek"
     short_description: "Reference peek"
     description: "Show Usages / Reference Search"
+    category: "Navigation"
     vscode:
       command: "editor.action.referenceSearch.trigger"
       when: "editorHasReferenceProvider && editorTextFocus && !inReferenceSearchEditor"
@@ -88,6 +96,7 @@ mappings:
   - id: "actions.go.callHierarchy"
     short_description: "Call hierarchy"
     description: "Show Call Hierarchy"
+    category: "Navigation"
     vscode:
       command: "references-view.showCallHierarchy"
       when: "editorHasCallHierarchyProvider && editorTextFocus"
@@ -99,6 +108,7 @@ mappings:
   - id: "actions.go.typeHierarchy"
     short_description: "Type hierarchy"
     description: "Show Type Hierarchy"
+    category: "Navigation"
     vscode:
       command: "java.action.showTypeHierarchy"
       when: "editorLangId == java && javaLSReady && editorTextFocus"

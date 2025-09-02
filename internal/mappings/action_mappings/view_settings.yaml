@@ -2,6 +2,7 @@ mappings:
   - id: "actions.view.openGlobalSettings"
     short_description: "Open global settings"
     description: "Open Global Settings"
+    category: "View Management"
     vscode:
       command: "workbench.action.openGlobalSettings"
       when: ""
@@ -15,6 +16,7 @@ mappings:
   - id: "actions.view.selectTheme"
     short_description: "Select theme"
     description: "Select Theme"
+    category: "View Management"
     vscode:
       command: "workbench.action.selectTheme"
       when: ""

@@ -2,6 +2,7 @@ mappings:
   - id: "actions.file.newFile"
     short_description: "New file"
     description: "Create a new file"
+    category: "File Management"
     vscode:
       command: "workbench.action.files.newUntitledFile"
       when: ""
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.file.newWindow"
     short_description: "New window"
     description: "Open a new window"
+    category: "View Management"
     vscode:
       command: "workbench.action.newWindow"
       when: ""

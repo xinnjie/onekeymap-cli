@@ -2,6 +2,7 @@ mappings:
   - id: "actions.merge.acceptCurrent"
     short_description: "Accept current"
     description: "Accept current change (keep left side)"
+    category: "Version Control"
     vscode:
       command: "merge-conflict.accept.current"
       when: ""
@@ -12,6 +13,7 @@ mappings:
   - id: "actions.merge.acceptIncoming"
     short_description: "Accept incoming"
     description: "Accept incoming change (take right side)"
+    category: "Version Control"
     vscode:
       command: "merge-conflict.accept.incoming"
       when: ""

@@ -2,6 +2,7 @@ mappings:
   - id: "actions.selection.toggleColumnSelectionMode"
     short_description: "Toggle column mode"
     description: "Toggle column selection mode"
+    category: "Editor"
     # vscode could also presee `option` to cloumn select
     vscode:
       command: "editor.action.toggleColumnSelection"

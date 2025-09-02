@@ -2,6 +2,7 @@ mappings:
   - id: "actions.file.closeEditor"
     short_description: "Close editor"
     description: "Close the active editor"
+    category: "File Management"
     vscode:
       command: "workbench.action.closeActiveEditor"
       when: ""
@@ -16,6 +17,7 @@ mappings:
   - id: "actions.file.closeWindow"
     short_description: "Close window"
     description: "Close the current window"
+    category: "View Management"
     vscode:
       command: "workbench.action.closeWindow"
       when: "!editorIsOpen && !multipleEditorGroups"

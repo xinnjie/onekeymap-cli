@@ -2,6 +2,7 @@ mappings:
   - id: "actions.edit.formatDocument"
     short_description: "Format document"
     description: "Format Document"
+    category: "Editor"
     vscode:
       - command: "editor.action.formatDocument"
         when: "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
@@ -16,6 +17,7 @@ mappings:
   - id: "actions.edit.formatSelection"
     short_description: "Format selection"
     description: "Format Selection"
+    category: "Editor"
     vscode:
       - command: "editor.action.formatSelection"
         when: "editorHasDocumentSelectionFormattingProvider && editorTextFocus && !editorReadonly"

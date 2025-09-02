@@ -3,6 +3,7 @@ mappings:
   - id: "actions.terminal.new"
     short_description: "New terminal"
     description: "Create a new terminal"
+    category: "Terminal"
     vscode:
       command: "workbench.action.terminal.new"
       when: "terminalProcessSupported || terminalWebExtensionContributedProfile"
@@ -15,6 +16,7 @@ mappings:
   - id: "actions.terminal.split"
     short_description: "Split terminal"
     description: "Split the active terminal"
+    category: "Terminal"
     vscode:
       command: "workbench.action.terminal.split"
       when: "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"

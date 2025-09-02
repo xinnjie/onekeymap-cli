@@ -2,6 +2,7 @@ mappings:
   - id: "actions.view.toggleDebugPanel"
     short_description: "Toggle debug panel"
     description: "Toggle Debug Panel"
+    category: "View Management"
     vscode:
       - command: "workbench.view.debug"
         when: "viewContainer.workbench.view.debug.enabled"
@@ -19,6 +20,7 @@ mappings:
   - id: "actions.view.showDebugOutputConsole"
     short_description: "Show debug console"
     description: "Show Debug Output Console view"
+    category: "View Management"
     vscode:
       command: "workbench.debug.action.toggleRepl"
       when: "workbench.panel.repl.view.active"

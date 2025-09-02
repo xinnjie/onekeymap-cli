@@ -2,6 +2,7 @@ mappings:
   - id: "actions.run.selectionToRepl"
     short_description: "Send to REPL"
     description: "Send selection to REPL"
+    category: "Debug"
     vscode:
       command: "editor.debug.action.selectionToRepl"
       when: "debuggersAvailable && editorTextFocus && editorHasSelection"

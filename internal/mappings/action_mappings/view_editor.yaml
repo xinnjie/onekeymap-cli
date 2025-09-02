@@ -2,6 +2,7 @@ mappings:
   - id: "actions.view.toggleWordWrap"
     short_description: "Toggle word wrap"
     description: "Toggle word wrap in the editor"
+    category: "View Management"
     vscode:
       command: "editor.action.toggleWordWrap"
       when: ""

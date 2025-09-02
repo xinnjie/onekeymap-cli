@@ -2,6 +2,7 @@ mappings:
   - id: "actions.view.showCommandPalette"
     short_description: "Show command palette"
     description: "Show Command Palette"
+    category: "View Management"
     vscode:
       command: "workbench.action.showCommands"
       when: ""

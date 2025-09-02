@@ -2,6 +2,7 @@ mappings:
   - id: "actions.view.focusNextSplit"
     short_description: "Focus next split"
     description: "Focus next editor split"
+    category: "View Management"
     vscode:
       command: "workbench.action.focusNextGroup"
       when: "editorFocus"
@@ -16,6 +17,7 @@ mappings:
   - id: "actions.view.focusPreviousSplit"
     short_description: "Focus previous split"
     description: "Focus previous editor split"
+    category: "View Management"
     vscode:
       command: "workbench.action.focusPreviousGroup"
       when: "editorFocus"

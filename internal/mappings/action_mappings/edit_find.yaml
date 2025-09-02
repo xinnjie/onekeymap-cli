@@ -2,6 +2,7 @@ mappings:
   - id: "actions.edit.find"
     short_description: "Find in file"
     description: "Find in current file"
+    category: "Editor"
     vscode:
       command: "actions.find"
       when: "editorFocus || editorIsOpen"
@@ -16,6 +17,7 @@ mappings:
   - id: "actions.edit.nextMatchFindAction"
     short_description: "Find next"
     description: "Find Next"
+    category: "Navigation"
     vscode:
       command: "editor.action.nextMatchFindAction"
       when: "editorFocus && findInputFocussed"
@@ -30,6 +32,7 @@ mappings:
   - id: "actions.edit.previousMatchFindAction"
     short_description: "Find previous"
     description: "Find Previous"
+    category: "Navigation"
     vscode:
       command: "editor.action.previousMatchFindAction"
       when: "editorFocus && findInputFocussed"
@@ -44,6 +47,7 @@ mappings:
   - id: "actions.edit.replace"
     short_description: "Replace in file"
     description: "Replace in current file"
+    category: "Editor"
     vscode:
       command: "editor.action.startFindReplaceAction"
       when: "editorFocus || editorIsOpen"
@@ -57,6 +61,7 @@ mappings:
   - id: "actions.edit.findInFiles"
     short_description: "Find in project"
     description: "Find in all files in the project"
+    category: "Editor"
     vscode:
       command: "workbench.action.findInFiles"
       when: "!explorerResourceIsFolder || !filesExplorerFocus"
@@ -71,6 +76,7 @@ mappings:
   - id: "actions.edit.replaceInFiles"
     short_description: "Replace in project"
     description: "Replace in all files in the project"
+    category: "Editor"
     vscode:
       command: "workbench.action.replaceInFiles"
       when: ""

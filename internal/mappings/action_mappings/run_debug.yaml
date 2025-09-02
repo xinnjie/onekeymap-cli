@@ -2,6 +2,7 @@ mappings:
   - id: "actions.run.startDebugging"
     short_description: "Start debugging"
     description: "Start Debugging"
+    category: "Debug"
     vscode:
       command: "workbench.action.debug.run"
       when: "debuggersAvailable && debugState == 'inactive'"
@@ -15,6 +16,7 @@ mappings:
   - id: "actions.run.stopDebugging"
     short_description: "Stop debugging"
     description: "Stop Debugging"
+    category: "Debug"
     vscode:
       command: "workbench.action.debug.stop"
       when: "inDebugMode && !focusedSessionIsAttach"
@@ -28,6 +30,7 @@ mappings:
   - id: "actions.run.restartDebugging"
     short_description: "Restart debugging"
     description: "Restart Debugging"
+    category: "Debug"
     vscode:
       command: "workbench.action.debug.restart"
       when: "inDebugMode"

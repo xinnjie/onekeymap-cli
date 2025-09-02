@@ -2,6 +2,7 @@ mappings:
   - id: "actions.tabSwitcher.next"
     short_description: "Next tab"
     description: "Switch to next tab"
+    category: "View Management"
     vscode:
       - command: "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
         when: "editorFocus"
@@ -20,6 +21,7 @@ mappings:
   - id: "actions.tabSwitcher.previous"
     short_description: "Previous tab"
     description: "Switch to previous tab"
+    category: "View Management"
     vscode:
       - command: "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup"
         when: "editorFocus"

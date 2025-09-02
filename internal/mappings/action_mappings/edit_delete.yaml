@@ -2,6 +2,7 @@ mappings:
   - id: "actions.edit.deleteWordRight"
     short_description: "Delete next word"
     description: "Delete to the end of the next word"
+    category: "Editor"
     vscode:
       command: "deleteWordRight"
       when: "textInputFocus && !editorReadonly"
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.edit.deleteLines"
     short_description: "Delete line"
     description: "Delete line"
+    category: "Editor"
     vscode:
       command: "editor.action.deleteLines"
       when: "textInputFocus && !editorReadonly"
@@ -24,6 +26,7 @@ mappings:
   - id: "actions.edit.deleteWordPartRight"
     short_description: "Delete next subword"
     description: "Delete to the end of the next subword (hump)"
+    category: "Editor"
     vscode:
       command: "deleteWordPartRight"
       when: "textInputFocus && !editorReadonly"
@@ -36,6 +39,7 @@ mappings:
   - id: "actions.edit.deleteWordLeft"
     short_description: "Delete previous word"
     description: "Delete to the start of the previous word"
+    category: "Editor"
     vscode:
       command: "deleteWordLeft"
       when: "textInputFocus && !editorReadonly"
@@ -47,6 +51,7 @@ mappings:
   - id: "actions.edit.deleteWordPartLeft"
     short_description: "Delete previous subword"
     description: "Delete to the start of the previous subword (hump)"
+    category: "Editor"
     vscode:
       command: "deleteWordPartLeft"
       when: "textInputFocus && !editorReadonly"

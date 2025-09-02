@@ -33,6 +33,7 @@ type ActionMappingConfig struct {
 	ID               string                `yaml:"id"`
 	Description      string                `yaml:"description"`
 	ShortDescription string                `yaml:"short_description"`
+	Category         string                `yaml:"category"`
 	VSCode           VscodeConfigs         `yaml:"vscode"`
 	Zed              ZedConfigs            `yaml:"zed"`
 	IntelliJ         IntelliJMappingConfig `yaml:"intellij"`

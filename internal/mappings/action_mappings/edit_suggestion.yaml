@@ -2,6 +2,7 @@ mappings:
   - id: "actions.edit.suggest.show"
     short_description: "Show suggestions"
     description: "Trigger Suggest"
+    category: "Editor"
     vscode:
       command: "editor.action.triggerSuggest"
       when: "editorHasCompletionItemProvider && textInputFocus && !editorReadonly"
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.edit.inlineSuggest.show"
     short_description: "Show inline suggestion"
     description: "Show inline suggestion"
+    category: "Editor"
     vscode:
       command: "editor.action.inlineSuggest.trigger"
       when: "editorFocus && !editorHasSelection && !inlineSuggestionVisible"
@@ -24,6 +26,7 @@ mappings:
   - id: "actions.edit.inlineSuggest.previous"
     short_description: "Previous suggestion"
     description: "Show previous inline suggestion"
+    category: "Navigation"
     vscode:
       command: "editor.action.inlineSuggest.showPrevious"
       when: "inlineSuggestionVisible && !editorReadonly"
@@ -35,6 +38,7 @@ mappings:
   - id: "actions.edit.inlineSuggest.next"
     short_description: "Next suggestion"
     description: "Show next inline suggestion"
+    category: "Navigation"
     vscode:
       command: "editor.action.inlineSuggest.showNext"
       when: "inlineSuggestionVisible && !editorReadonly"

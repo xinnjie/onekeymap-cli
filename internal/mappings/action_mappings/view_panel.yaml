@@ -2,6 +2,7 @@ mappings:
   - id: "actions.view.toggleExplorer"
     short_description: "Toggle explorer"
     description: "Toggle Explorer view"
+    category: "View Management"
     vscode:
       - command: "workbench.view.explorer"
         when: "viewContainer.workbench.view.explorer.enabled"
@@ -20,6 +21,7 @@ mappings:
   - id: "actions.view.toggleSearch"
     short_description: "Toggle search"
     description: "Toggle Search view"
+    category: "View Management"
     vscode:
       - command: "workbench.view.search"
         when: "workbench.view.search.active && neverMatch =~ /doesNotMatch/"
@@ -38,6 +40,7 @@ mappings:
   - id: "actions.view.toggleSourceControl"
     short_description: "Toggle source control"
     description: "Toggle Source Control view"
+    category: "View Management"
     vscode:
       - command: "workbench.view.scm"
         when: "workbench.scm.active"
@@ -56,6 +59,7 @@ mappings:
   - id: "actions.view.showExtensions"
     short_description: "Show extensions"
     description: "Show Extensions view"
+    category: "View Management"
     vscode:
       command: "workbench.view.extensions"
       when: "viewContainer.workbench.view.extensions.enabled"
@@ -69,6 +73,7 @@ mappings:
   - id: "actions.view.showTesting"
     short_description: "Show testing"
     description: "Show Testing view"
+    category: "View Management"
     vscode:
       command: "workbench.view.testing"
       when: ""
@@ -81,6 +86,7 @@ mappings:
   - id: "actions.view.toggleProblems"
     short_description: "Toggle problems"
     description: "Toggle Problems view"
+    category: "View Management"
     vscode:
       command: "workbench.actions.view.problems"
       when: ""
@@ -96,6 +102,7 @@ mappings:
   - id: "actions.view.toggleOutput"
     short_description: "Toggle output"
     description: "Toggle Output view"
+    category: "View Management"
     vscode:
       command: "workbench.action.output.toggleOutput"
       when: "workbench.panel.output.active"
@@ -109,6 +116,7 @@ mappings:
   - id: "actions.view.toggleTerminal"
     short_description: "Toggle terminal"
     description: "Toggle Terminal view"
+    category: "View Management"
     vscode:
       command: "workbench.action.terminal.toggleTerminal"
       when: "terminal.active"

@@ -2,6 +2,7 @@ mappings:
   - id: "actions.fold.fold"
     short_description: "Fold code"
     description: "Collapse the current code block"
+    category: "Editor"
     vscode:
       command: "editor.fold"
       when: "editorTextFocus && foldingEnabled"
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.fold.unfold"
     short_description: "Unfold code"
     description: "Expand the current code block"
+    category: "Editor"
     vscode:
       command: "editor.unfold"
       when: "editorTextFocus && foldingEnabled"
@@ -24,6 +26,7 @@ mappings:
   - id: "actions.fold.foldRecursively"
     short_description: "Fold recursively"
     description: "Collapse the current code block and its children recursively"
+    category: "Editor"
     vscode:
       command: "editor.foldRecursively"
       when: "editorTextFocus && foldingEnabled"
@@ -35,6 +38,7 @@ mappings:
   - id: "actions.fold.unfoldRecursively"
     short_description: "Unfold recursively"
     description: "Expand the current code block and its children recursively"
+    category: "Editor"
     vscode:
       command: "editor.unfoldRecursively"
       when: "editorTextFocus && foldingEnabled"
@@ -46,6 +50,7 @@ mappings:
   - id: "actions.fold.toggleFold"
     short_description: "Toggle fold"
     description: "Toggle Fold"
+    category: "Editor"
     vscode:
       command: "editor.toggleFold"
       when: "editorTextFocus && foldingEnabled"
@@ -57,6 +62,7 @@ mappings:
   - id: "actions.fold.foldAll"
     short_description: "Fold all"
     description: "Collapse all code blocks in the editor"
+    category: "Editor"
     vscode:
       command: "editor.foldAll"
       when: "editorTextFocus && foldingEnabled"
@@ -68,6 +74,7 @@ mappings:
   - id: "actions.fold.unfoldAll"
     short_description: "Unfold all"
     description: "Expand all code blocks in the editor"
+    category: "Editor"
     vscode:
       command: "editor.unfoldAll"
       when: "editorTextFocus && foldingEnabled"

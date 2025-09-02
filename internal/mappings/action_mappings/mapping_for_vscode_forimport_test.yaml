@@ -3,6 +3,7 @@ mappings:
   # ForImport preference among command+args ignoring when
   - id: "actions.test.forimport.withArgs.A"
     description: "ForImport args candidate A"
+    category: "Testing"
     vscode:
       - command: "cmd.forimp.args"
         when: "W_A"
@@ -10,6 +11,7 @@ mappings:
           x: 1
   - id: "actions.test.forimport.withArgs.B"
     description: "ForImport args candidate B (preferred)"
+    category: "Testing"
     vscode:
       - command: "cmd.forimp.args"
         when: "W_B"
@@ -19,11 +21,13 @@ mappings:
   # ForImport preference in command-only fallback (no args)
   - id: "actions.test.forimport.cmdOnly.A"
     description: "ForImport cmd-only candidate A"
+    category: "Testing"
     vscode:
       - command: "cmd.forimp.noargs"
         when: "Y_A"
   - id: "actions.test.forimport.cmdOnly.B"
     description: "ForImport cmd-only candidate B (preferred)"
+    category: "Testing"
     vscode:
       - command: "cmd.forimp.noargs"
         when: "Y_B"
@@ -31,11 +35,13 @@ mappings:
   # Single-entry implicit ForImport vs multi-entry
   - id: "actions.test.forimport.singleImplicit"
     description: "Single-entry mapping implicitly preferred"
+    category: "Testing"
     vscode:
       command: "cmd.forimp.single"
       when: "W_S"
   - id: "actions.test.forimport.multi"
     description: "Multi-entry mapping"
+    category: "Testing"
     vscode:
       - command: "could.be.imported"
         when: "SomeCondition"

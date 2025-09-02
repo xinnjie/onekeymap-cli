@@ -2,6 +2,7 @@ mappings:
   - id: "actions.go.nextChange"
     short_description: "Next change"
     description: "Go to Next Change"
+    category: "Navigation"
     vscode:
       command: "editor.action.dirtydiff.next"
       when: "editorTextFocus"
@@ -13,6 +14,7 @@ mappings:
   - id: "actions.go.previousChange"
     short_description: "Previous change"
     description: "Go to Previous Change"
+    category: "Navigation"
     vscode:
       command: "editor.action.dirtydiff.previous"
       when: "editorTextFocus"

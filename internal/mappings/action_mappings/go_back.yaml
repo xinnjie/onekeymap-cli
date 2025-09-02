@@ -2,6 +2,7 @@ mappings:
   - id: "actions.go.back"
     short_description: "Go back"
     description: "Go to previous cursor location"
+    category: "Navigation"
     vscode:
       command: "workbench.action.navigateBack"
       when: "canNavigateBack"
@@ -12,6 +13,7 @@ mappings:
   - id: "actions.go.forward"
     short_description: "Go forward"
     description: "Go to next cursor location"
+    category: "Navigation"
     vscode:
       command: "workbench.action.navigateForward"
       when: "canNavigateForward"
@@ -22,6 +24,7 @@ mappings:
   - id: "actions.go.lastEditLocation"
     short_description: "Last edit"
     description: "Go to last edit location"
+    category: "Navigation"
     vscode:
       command: "workbench.action.navigateToLastEditLocation"
       when: ""

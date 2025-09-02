@@ -3,6 +3,7 @@ mappings:
   # Simplest mapping
   - id: "actions.edit.copy"
     description: "Copy selected text"
+    category: "Editor"
     vscode:
       command: "editor.action.clipboardCopyAction"
       when: "editorTextFocus"
@@ -17,6 +18,7 @@ mappings:
   ## Mapping with multiple actions
   - id: "actions.test.mutipleActions"
     description: "Test multiple actions"
+    category: "Testing"
     vscode:
       - command: "command1"
         when: "condition1"
@@ -32,6 +34,7 @@ mappings:
   # Mapping with args
   - id: "actions.test.withArgs"
     description: "Test action with arguments"
+    category: "Testing"
     vscode:
       command: "cursorEnd"
       args:
