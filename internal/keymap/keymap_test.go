@@ -23,11 +23,11 @@ func TestSave(t *testing.T) {
 			name: "Single keybinding",
 			input: &keymapv1.KeymapSetting{
 				Keybindings: []*keymapv1.KeyBinding{
-					NewBinding("actions.copy", "ctrl+c"),
+					NewBindingWithDescription("actions.copy", "ctrl+c", "copy"),
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
-				{Id: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}},
+				{Id: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}, Description: "copy"},
 			},
 			expectedNumKeymaps: 1,
 		},
