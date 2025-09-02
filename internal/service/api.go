@@ -79,7 +79,13 @@ func (s *Server) DefaultConfigPath(ctx context.Context, req *keymapv1.DefaultCon
 		if !ok {
 			return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
 		}
-		v, err := plugin.DefaultConfigPath()
+		var v []string
+		var err error
+		if req.GetRelativeToHome() {
+			v, err = plugin.DefaultConfigPath(pluginapi.WithRelativeToHome(true))
+		} else {
+			v, err = plugin.DefaultConfigPath()
+		}
 		if err != nil || len(v) == 0 {
 			return nil, status.Errorf(codes.NotFound, "no default config paths found for editor: %s", et)
 		}

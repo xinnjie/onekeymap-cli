@@ -7,12 +7,19 @@ import (
 	"runtime"
 	"sort"
 	"time"
+
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 )
 
 // DefaultConfigPath returns default keymap config path for IntelliJ.
 // NOTE: IntelliJ family has multiple editions/versions; precise discovery will
 // be implemented later. For now, we return a not-supported error placeholder.
-func (p *intellijPlugin) DefaultConfigPath() ([]string, error) {
+func (p *intellijPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
+	options := &pluginapi.DefaultConfigPathOptions{}
+	for _, opt := range opts {
+		opt(options)
+	}
+
 	if runtime.GOOS != "darwin" {
 		return nil, errors.New("automatic path discovery is only supported on macOS for IntelliJ")
 	}
@@ -52,5 +59,15 @@ func (p *intellijPlugin) DefaultConfigPath() ([]string, error) {
 		return ti.After(tj)
 	})
 
-	return []string{filepath.Join(keymapDirs[0], "Onekeymap.xml")}, nil
+	configPath := filepath.Join(keymapDirs[0], "Onekeymap.xml")
+
+	if options.RelativeToHome {
+		relPath, err := filepath.Rel(home, configPath)
+		if err == nil {
+			return []string{relPath}, nil
+		}
+		// Fallback to absolute path if relative path fails
+	}
+
+	return []string{configPath}, nil
 }

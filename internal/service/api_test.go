@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"log/slog"
+	"os"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -22,8 +24,8 @@ func TestServer_LoadKeymap(t *testing.T) {
 			"action3": {Description: "Description 3"},
 		},
 	}
-
-	server := NewServer(nil, nil, nil, mockMappingConfig)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	server := NewServer(nil, nil, nil, mockMappingConfig, logger)
 
 	tests := []struct {
 		name          string

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"log/slog"
+
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
@@ -14,13 +16,15 @@ type Server struct {
 	exporter      exportapi.Exporter
 	registry      *plugins.Registry
 	mappingConfig *mappings.MappingConfig
+	logger        *slog.Logger
 }
 
-func NewServer(registry *plugins.Registry, importer importapi.Importer, exporter exportapi.Exporter, mappingConfig *mappings.MappingConfig) *Server {
+func NewServer(registry *plugins.Registry, importer importapi.Importer, exporter exportapi.Exporter, mappingConfig *mappings.MappingConfig, logger *slog.Logger) *Server {
 	return &Server{
 		importer:      importer,
 		exporter:      exporter,
 		registry:      registry,
 		mappingConfig: mappingConfig,
+		logger:        logger,
 	}
 }

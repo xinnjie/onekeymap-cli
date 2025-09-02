@@ -5,22 +5,40 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 )
 
 // DefaultConfigPath returns a reasonable default config path for the demo plugin.
 // It does not correspond to a real editor, but provides a stable location for testing.
-func (p *demoPlugin) DefaultConfigPath() ([]string, error) {
+func (p *demoPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
+	options := &pluginapi.DefaultConfigPathOptions{}
+	for _, opt := range opts {
+		opt(options)
+	}
+
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
 	}
 
+	var configPath string
 	switch runtime.GOOS {
 	case "darwin", "linux":
-		return []string{filepath.Join(home, ".config", "onekeymap", "demo.keybindings.json")}, nil
+		configPath = filepath.Join(home, ".config", "onekeymap", "demo.keybindings.json")
 	case "windows":
-		return []string{filepath.Join(os.Getenv("APPDATA"), "onekeymap", "demo.keybindings.json")}, nil
+		configPath = filepath.Join(os.Getenv("APPDATA"), "onekeymap", "demo.keybindings.json")
 	default:
 		return nil, errors.New("unsupported operating system")
 	}
+
+	if options.RelativeToHome {
+		relPath, err := filepath.Rel(home, configPath)
+		if err == nil {
+			return []string{relPath}, nil
+		}
+		// Fallback to absolute path if relative path fails
+	}
+
+	return []string{configPath}, nil
 }

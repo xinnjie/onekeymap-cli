@@ -74,8 +74,7 @@ var serveCmd = &cobra.Command{
 		}
 
 		s := grpc.NewServer()
-		keymapv1.RegisterOnekeymapServiceServer(s, service.NewServer(pluginRegistry, importService, exportService, mappingConfig))
-
+		keymapv1.RegisterOnekeymapServiceServer(s, service.NewServer(pluginRegistry, importService, exportService, mappingConfig, logger))
 		if err := s.Serve(lis); err != nil {
 			logger.Error("failed to serve", "err", err.Error())
 			os.Exit(1)
