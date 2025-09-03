@@ -1,11 +1,14 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"os"
 	"strings"
 
+	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/service"
@@ -73,7 +76,43 @@ var serveCmd = &cobra.Command{
 			logger.Info("server listening", "address", "tcp://"+lis.Addr().String())
 		}
 
-		s := grpc.NewServer()
+		logEvents := func() []grpc_logging.LoggableEvent {
+			verbose := viper.GetBool("verbose")
+			quiet := viper.GetBool("quiet")
+
+			if quiet {
+				return []grpc_logging.LoggableEvent{}
+			}
+
+			if verbose {
+				return []grpc_logging.LoggableEvent{
+					grpc_logging.StartCall,
+					grpc_logging.FinishCall,
+				}
+			}
+
+			return []grpc_logging.LoggableEvent{
+				grpc_logging.StartCall,
+				grpc_logging.FinishCall,
+				grpc_logging.PayloadReceived,
+				grpc_logging.PayloadSent,
+			}
+		}()
+
+		// gRPC logging interceptors (unary and stream)
+		opt := []grpc_logging.Option{
+			grpc_logging.WithLevels(grpc_logging.DefaultServerCodeToLevel),
+			grpc_logging.WithLogOnEvents(logEvents...),
+		}
+
+		s := grpc.NewServer(
+			grpc.ChainUnaryInterceptor(
+				grpc_logging.UnaryServerInterceptor(grpcLogger(logger), opt...),
+			),
+			grpc.ChainStreamInterceptor(
+				grpc_logging.StreamServerInterceptor(grpcLogger(logger), opt...),
+			),
+		)
 		keymapv1.RegisterOnekeymapServiceServer(s, service.NewServer(pluginRegistry, importService, exportService, mappingConfig, logger))
 		if err := s.Serve(lis); err != nil {
 			logger.Error("failed to serve", "err", err.Error())
@@ -88,4 +127,22 @@ func init() {
 	serveCmd.Flags().String("listen", "", "Listen address, e.g., tcp://127.0.0.1:50051 or unix:///tmp/onekeymap.sock")
 	// Bind listen flag to config key server.listen
 	_ = viper.BindPFlag("server.listen", serveCmd.Flags().Lookup("listen"))
+}
+
+// grpcLogger adapts slog to grpc_logging.Logger
+func grpcLogger(l *slog.Logger) grpc_logging.Logger {
+	return grpc_logging.LoggerFunc(func(ctx context.Context, lvl grpc_logging.Level, msg string, fields ...any) {
+		switch lvl {
+		case grpc_logging.LevelDebug:
+			l.Debug(msg, fields...)
+		case grpc_logging.LevelInfo:
+			l.Info(msg, fields...)
+		case grpc_logging.LevelWarn:
+			l.Warn(msg, fields...)
+		case grpc_logging.LevelError:
+			l.Error(msg, fields...)
+		default:
+			l.Info(msg, fields...)
+		}
+	})
 }

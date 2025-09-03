@@ -12,7 +12,6 @@ import (
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func (s *Server) ExportKeymap(ctx context.Context, req *keymapv1.ExportKeymapRequest) (*keymapv1.ExportKeymapResponse, error) {
@@ -32,18 +31,19 @@ func (s *Server) ExportKeymap(ctx context.Context, req *keymapv1.ExportKeymapReq
 }
 
 func (s *Server) ImportKeymap(ctx context.Context, req *keymapv1.ImportKeymapRequest) (*keymapv1.ImportKeymapResponse, error) {
-
-	var baseSetting keymapv1.KeymapSetting
+	var baseSetting *keymapv1.KeymapSetting
 	if req.Base != "" {
-		if err := protojson.Unmarshal([]byte(req.Base), &baseSetting); err != nil {
-			return nil, err
+		km, err := keymap.Load(strings.NewReader(req.Base))
+		if err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "failed to parse base keymap: %v", err)
 		}
+		baseSetting = km
 	}
 
 	result, err := s.importer.Import(ctx, importapi.ImportOptions{
 		EditorType:  pluginapi.EditorType(strings.ToLower(req.EditorType.String())),
 		InputStream: strings.NewReader(req.Source),
-		Base:        &baseSetting,
+		Base:        baseSetting,
 	})
 	if err != nil {
 		return nil, err
