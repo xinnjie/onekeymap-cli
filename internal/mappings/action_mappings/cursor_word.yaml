@@ -2,7 +2,7 @@ mappings:
   - id: "actions.cursor.wordRight"
     short_description: "Next word"
     description: "Move cursor to the end of the next word"
-    category: "Navigation"
+    category: "Editor"
     vscode:
       command: "cursorWordRight"
       when: "editorTextFocus"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.cursor.wordPartRight"
     short_description: "Next subword"
     description: "Move cursor to the end of the next subword (hump)"
-    category: "Navigation"
+    category: "Editor"
     vscode:
       command: "cursorWordPartRight"
       when: "textInputFocus"
@@ -33,7 +33,7 @@ mappings:
   - id: "actions.cursor.wordLeft"
     short_description: "Previous word"
     description: "Move cursor to the start of the previous word"
-    category: "Navigation"
+    category: "Editor"
     vscode:
       command: "cursorWordLeft"
       when: "textInputFocus"
@@ -48,7 +48,7 @@ mappings:
   - id: "actions.cursor.wordPartLeft"
     short_description: "Previous subword"
     description: "Move cursor to the start of the previous subword (hump)"
-    category: "Navigation"
+    category: "Editor"
     vscode:
       command: "cursorWordPartStartLeft"
       when: "editorTextFocus"
@@ -64,7 +64,7 @@ mappings:
   - id: "actions.cursor.wordRightSelect"
     short_description: "Select next word"
     description: "Select to the end of the next word"
-    category: "Navigation"
+    category: "Editor"
     vscode:
       command: "cursorWordRightSelect"
       when: "editorTextFocus"
@@ -79,7 +79,7 @@ mappings:
   - id: "actions.cursor.wordPartRightSelect"
     short_description: "Select next subword"
     description: "Select to the end of the next subword (hump)"
-    category: "Navigation"
+    category: "Editor"
     vscode:
       command: "cursorWordPartRightSelect"
       when: "textInputFocus"
@@ -93,7 +93,7 @@ mappings:
   - id: "actions.cursor.wordLeftSelect"
     short_description: "Select previous word"
     description: "Select to the start of the previous word"
-    category: "Navigation"
+    category: "Editor"
     vscode:
       command: "cursorWordLeftSelect"
       when: "textInputFocus"
@@ -108,7 +108,7 @@ mappings:
   - id: "actions.cursor.wordPartLeftSelect"
     short_description: "Select previous subword"
     description: "Select to the start of the previous subword (hump)"
-    category: "Navigation"
+    category: "Editor"
     vscode:
       command: "cursorWordPartStartLeftSelect"
       when: "editorTextFocus"
