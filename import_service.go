@@ -56,6 +56,9 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 		return nil, fmt.Errorf("failed to import config: %w", err)
 	}
 
+	// Add extra description etc.
+	setting = s.decorateSetting(setting)
+
 	s.recorder.RecordCommandProcessed(ctx, string(opts.EditorType), setting)
 
 	// Sort by action for determinism
@@ -108,6 +111,21 @@ func (s *importService) validate(ctx context.Context, setting *keymapv1.KeymapSe
 	}
 
 	return s.validator.Validate(ctx, setting, opts)
+}
+
+func (s *importService) decorateSetting(setting *keymapv1.KeymapSetting) *keymapv1.KeymapSetting {
+	if setting == nil || s.mappingConfig == nil {
+		return setting
+	}
+
+	for _, kb := range setting.Keybindings {
+		if mapping, ok := s.mappingConfig.Mappings[kb.Id]; ok {
+			kb.Description = mapping.Description
+			kb.ShortDescription = mapping.ShortDescription
+			kb.Category = mapping.Category
+		}
+	}
+	return setting
 }
 
 func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *keymapv1.KeymapSetting) (*importapi.KeymapChanges, error) {

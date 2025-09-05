@@ -1,6 +1,3 @@
-/*
-Copyright 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -13,9 +10,9 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 )
 
-// formatSupportActionsCmd represents the formatSupportActions command
-var formatSupportActionsCmd = &cobra.Command{
-	Use:   "formatSupportActions",
+// docSupportActionsCmd represents the docSupportActions command
+var docSupportActionsCmd = &cobra.Command{
+	Use:   "docSupportActions",
 	Short: "Generate markdown table showing action support across editors",
 	Long: `Reads all action mappings and generates a markdown table showing which editors
 support each action. The table includes columns for VSCode, Zed, IntelliJ, and Helix.`,
@@ -124,5 +121,5 @@ func formatSupport(supported bool, reason string) string {
 }
 
 func init() {
-	devCmd.AddCommand(formatSupportActionsCmd)
+	devCmd.AddCommand(docSupportActionsCmd)
 }
