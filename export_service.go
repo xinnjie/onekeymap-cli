@@ -30,7 +30,7 @@ func NewExportService(registry *plugins.Registry, config *mappings.MappingConfig
 }
 
 // Export is the method implementation for the default service.
-func (s *exportService) Export(destination io.Writer, setting *keymapv1.KeymapSetting, opts exportapi.ExportOptions) (*exportapi.ExportReport, error) {
+func (s *exportService) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts exportapi.ExportOptions) (*exportapi.ExportReport, error) {
 	plugin, ok := s.registry.Get(opts.EditorType)
 	if !ok {
 		return nil, fmt.Errorf("no plugin found for editor type '%s'", opts.EditorType)
@@ -41,7 +41,7 @@ func (s *exportService) Export(destination io.Writer, setting *keymapv1.KeymapSe
 		return nil, fmt.Errorf("failed to get exporter for %s: %w", opts.EditorType, err)
 	}
 
-	report, err := exporter.Export(context.TODO(), destination, setting, pluginapi.PluginExportOption{Base: opts.Base})
+	report, err := exporter.Export(ctx, destination, setting, pluginapi.PluginExportOption{Base: opts.Base})
 	if err != nil {
 		return nil, fmt.Errorf("failed to export config: %w", err)
 	}

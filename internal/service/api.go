@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"io"
 	"strings"
 
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
@@ -15,10 +16,25 @@ import (
 )
 
 func (s *Server) ExportKeymap(ctx context.Context, req *keymapv1.ExportKeymapRequest) (*keymapv1.ExportKeymapResponse, error) {
+	// Validate editor type and ensure it's supported
+	if req.GetEditorType() == keymapv1.EditorType_EDITOR_TYPE_UNSPECIFIED {
+		return nil, status.Errorf(codes.InvalidArgument, "editor_type is required")
+	}
+	et := pluginapi.EditorType(strings.ToLower(req.GetEditorType().String()))
+	if _, ok := s.registry.Get(et); !ok {
+		return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
+	}
+
+	// Only pass Base when provided; if empty, do not pass
+	var base io.Reader
+	if strings.TrimSpace(req.GetBase()) != "" {
+		base = strings.NewReader(req.GetBase())
+	}
+
 	var buf bytes.Buffer
-	report, err := s.exporter.Export(&buf, req.Keymap, exportapi.ExportOptions{
-		EditorType: pluginapi.EditorType(strings.ToLower(req.EditorType.String())),
-		Base:       strings.NewReader(req.Base),
+	report, err := s.exporter.Export(ctx, &buf, req.Keymap, exportapi.ExportOptions{
+		EditorType: et,
+		Base:       base,
 	})
 	if err != nil {
 		return nil, err
@@ -31,6 +47,15 @@ func (s *Server) ExportKeymap(ctx context.Context, req *keymapv1.ExportKeymapReq
 }
 
 func (s *Server) ImportKeymap(ctx context.Context, req *keymapv1.ImportKeymapRequest) (*keymapv1.ImportKeymapResponse, error) {
+	// Validate editor type and ensure it's supported
+	if req.GetEditorType() == keymapv1.EditorType_EDITOR_TYPE_UNSPECIFIED {
+		return nil, status.Errorf(codes.InvalidArgument, "editor_type is required")
+	}
+	et := pluginapi.EditorType(strings.ToLower(req.GetEditorType().String()))
+	if _, ok := s.registry.Get(et); !ok {
+		return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
+	}
+
 	var baseSetting *keymapv1.KeymapSetting
 	if req.Base != "" {
 		km, err := keymap.Load(strings.NewReader(req.Base))
@@ -41,7 +66,7 @@ func (s *Server) ImportKeymap(ctx context.Context, req *keymapv1.ImportKeymapReq
 	}
 
 	result, err := s.importer.Import(ctx, importapi.ImportOptions{
-		EditorType:  pluginapi.EditorType(strings.ToLower(req.EditorType.String())),
+		EditorType:  et,
 		InputStream: strings.NewReader(req.Source),
 		Base:        baseSetting,
 	})

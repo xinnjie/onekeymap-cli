@@ -1,7 +1,7 @@
 mappings:
   - id: "actions.view.toggleExplorer"
-    short_description: "Toggle explorer"
-    description: "Toggle Explorer view"
+    short_description: "Toggle file explorer"
+    description: "Toggle file explorer view"
     category: "View Management"
     vscode:
       - command: "workbench.view.explorer"

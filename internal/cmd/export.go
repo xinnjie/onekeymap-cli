@@ -74,7 +74,7 @@ var exportCmd = &cobra.Command{
 
 		// Export to memory buffer first for preview, optional confirmation, and then write
 		var mem bytes.Buffer
-		report, err := exportService.Export(&mem, setting, opts)
+		report, err := exportService.Export(cmd.Context(), &mem, setting, opts)
 		if err != nil {
 			logger.Error("export failed", "error", err)
 			return err

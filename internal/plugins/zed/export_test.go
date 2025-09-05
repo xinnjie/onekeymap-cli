@@ -42,6 +42,25 @@ func TestExportZedKeymap(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "exports multiple keybindings for same action",
+			setting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.edit.copy", "meta+c"),
+					keymap.NewBinding("actions.edit.copy", "ctrl+c"),
+				},
+			},
+			wantJSON: `[
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-c": "editor::Copy",
+      "ctrl-c": "editor::Copy"
+    }
+  }
+]`,
+			wantErr: false,
+		},
+		{
 			name: "correctly exports multiple actions",
 			setting: &keymapv1.KeymapSetting{
 				Keybindings: []*keymapv1.KeyBinding{

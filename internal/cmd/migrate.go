@@ -29,6 +29,7 @@ var migrateCmd = &cobra.Command{
 
 		interactive, _ := cmd.Flags().GetBool("interactive")
 		backup, _ := cmd.Flags().GetBool("backup")
+		ctx := cmd.Context()
 
 		if interactive {
 			// In interactive mode, we can use the form to get missing values.
@@ -89,7 +90,7 @@ var migrateCmd = &cobra.Command{
 			EditorType:  pluginapi.EditorType(*migrateFrom),
 			InputStream: inputStream,
 		}
-		importResult, err := importService.Import(cmd.Context(), importOpts)
+		importResult, err := importService.Import(ctx, importOpts)
 		if err != nil {
 			logger.Error("migrate failed during import step", "error", err)
 			return err
@@ -117,7 +118,7 @@ var migrateCmd = &cobra.Command{
 		// Export to memory buffer first for preview, optional confirmation, and then write
 		var mem bytes.Buffer
 		exportOpts := exportapi.ExportOptions{EditorType: pluginapi.EditorType(*migrateTo), Base: base}
-		exportReport, err := exportService.Export(&mem, importResult.Setting, exportOpts)
+		exportReport, err := exportService.Export(ctx, &mem, importResult.Setting, exportOpts)
 		if err != nil {
 			logger.Error("migrate failed during export step", "error", err)
 			return err
