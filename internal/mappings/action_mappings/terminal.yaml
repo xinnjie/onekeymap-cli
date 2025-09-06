@@ -1,7 +1,7 @@
 mappings:
   # TODO(xinnjie): Unify new operation. When in terminal view, create a new terminal; When in editor view, create a new file
   - id: "actions.terminal.new"
-    short_description: "New terminal"
+    name: "New terminal"
     description: "Create a new terminal"
     category: "Terminal"
     vscode:
@@ -14,7 +14,7 @@ mappings:
       action: "Terminal.NewTab"
   # TODO(xinnjie): Unify split operation.
   - id: "actions.terminal.split"
-    short_description: "Split terminal"
+    name: "Split terminal"
     description: "Split the active terminal"
     category: "Terminal"
     vscode:

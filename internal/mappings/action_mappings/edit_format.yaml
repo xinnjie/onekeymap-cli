@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.edit.formatDocument"
-    short_description: "Format document"
+    name: "Format document"
     description: "Format Document"
     category: "Editor"
     vscode:
@@ -15,7 +15,7 @@ mappings:
     intellij:
       action: "ShowReformatFileDialog"
   - id: "actions.edit.formatSelection"
-    short_description: "Format selection"
+    name: "Format selection"
     description: "Format Selection"
     category: "Editor"
     vscode:

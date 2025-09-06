@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.notebook.cell.edit"
-    short_description: "Edit cell"
+    name: "Edit cell"
     description: "Edit Cell"
     category: "Editor"
     vscode:
@@ -12,7 +12,7 @@ mappings:
       notSupported: true
       notSupportedReason: "zed do not support jupyter notebook yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.execute"
-    short_description: "Execute cell"
+    name: "Execute cell"
     description: "Execute Cell"
     category: "Editor"
     vscode:
@@ -23,7 +23,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.cell.executeAndInsertBelow"
-    short_description: "Execute and insert"
+    name: "Execute and insert"
     description: "Execute Cell and Insert Below"
     category: "Editor"
     vscode:
@@ -34,7 +34,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.cell.executeAndSelectBelow"
-    short_description: "Execute and select"
+    name: "Execute and select"
     description: "Execute Cell and Select Below"
     category: "Editor"
     vscode:
@@ -45,7 +45,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.cell.insertCodeCellAbove"
-    short_description: "Insert above"
+    name: "Insert above"
     description: "Insert Code Cell Above"
     category: "Editor"
     vscode:
@@ -56,7 +56,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.cell.insertCodeCellBelow"
-    short_description: "Insert below"
+    name: "Insert below"
     description: "Insert Code Cell Below"
     category: "Editor"
     vscode:
@@ -67,7 +67,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.cell.moveDown"
-    short_description: "Move down"
+    name: "Move down"
     description: "Move Cell Down"
     category: "Editor"
     vscode:
@@ -78,7 +78,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.cell.moveUp"
-    short_description: "Move up"
+    name: "Move up"
     description: "Move Cell Up"
     category: "Editor"
     vscode:
@@ -89,7 +89,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.cell.quitEdit"
-    short_description: "Quit edit"
+    name: "Quit edit"
     description: "Stop Editing Cell"
     category: "Editor"
     vscode:
@@ -100,7 +100,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.focusBottom"
-    short_description: "Focus bottom"
+    name: "Focus bottom"
     description: "Focus Bottom"
     category: "Editor"
     vscode:
@@ -111,7 +111,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.notebook.focusTop"
-    short_description: "Focus top"
+    name: "Focus top"
     description: "Focus Top"
     category: "Editor"
     vscode:

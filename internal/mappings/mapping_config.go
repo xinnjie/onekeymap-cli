@@ -30,15 +30,15 @@ func NewMappingConfig() (*MappingConfig, error) {
 
 // ActionMappingConfig holds the complete mapping information for a single action ID.
 type ActionMappingConfig struct {
-	ID               string                `yaml:"id"`
-	Description      string                `yaml:"description"`
-	ShortDescription string                `yaml:"short_description"`
-	Category         string                `yaml:"category"`
-	VSCode           VscodeConfigs         `yaml:"vscode"`
-	Zed              ZedConfigs            `yaml:"zed"`
-	IntelliJ         IntelliJMappingConfig `yaml:"intellij"`
-	Vim              VimMappingConfig      `yaml:"vim"`
-	Helix            HelixConfig           `yaml:"helix"`
+	ID          string                `yaml:"id"`
+	Description string                `yaml:"description"`
+	Name        string                `yaml:"name"`
+	Category    string                `yaml:"category"`
+	VSCode      VscodeConfigs         `yaml:"vscode"`
+	Zed         ZedConfigs            `yaml:"zed"`
+	IntelliJ    IntelliJMappingConfig `yaml:"intellij"`
+	Vim         VimMappingConfig      `yaml:"vim"`
+	Helix       HelixConfig           `yaml:"helix"`
 }
 
 // every editor action mapping config should hold EditorActionMapping to provide extra support

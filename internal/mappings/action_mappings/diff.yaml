@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.diff.compareTwoFiles"
-    short_description: "Compare files"
+    name: "Compare files"
     description: "Compare two files"
     category: "View Management"
     vscode:
@@ -12,7 +12,7 @@ mappings:
       action: "project_panel::CompareMarkedFiles"
       context: "ProjectPanel"
   - id: "actions.diff.nextChange"
-    short_description: "Next change"
+    name: "Next change"
     description: "Go to next change in compare editor"
     category: "Navigation"
     vscode:
@@ -24,7 +24,7 @@ mappings:
       action: "editor::GoToNextChange"
       context: "Editor && mode == full"
   - id: "actions.diff.previousChange"
-    short_description: "Previous change"
+    name: "Previous change"
     description: "Go to previous change in compare editor"
     category: "Navigation"
     vscode:

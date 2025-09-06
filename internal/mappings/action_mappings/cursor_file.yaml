@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.cursor.moveToTop"
-    short_description: "Move to top"
+    name: "Move to top"
     description: "Move caret to text start"
     category: "Navigation"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "goto_file_start"
       mode: "insert"
   - id: "actions.cursor.moveToBottom"
-    short_description: "Move to bottom"
+    name: "Move to bottom"
     description: "Move caret to text end"
     category: "Navigation"
     vscode:
@@ -30,7 +30,7 @@ mappings:
       command: "goto_file_end"
       mode: "insert"
   - id: "actions.cursor.moveToTopSelect"
-    short_description: "Select to top"
+    name: "Select to top"
     description: "Select from cursor to text start"
     category: "Navigation"
     vscode:
@@ -45,7 +45,7 @@ mappings:
       command: "extend_to_file_start"
       mode: "insert"
   - id: "actions.cursor.moveToBottomSelect"
-    short_description: "Select to bottom"
+    name: "Select to bottom"
     description: "Select from cursor to text end"
     category: "Navigation"
     vscode:
@@ -60,7 +60,7 @@ mappings:
       command: "extend_to_file_end"
       mode: "insert"
   - id: "actions.cursor.pageDown"
-    short_description: "Page down"
+    name: "Page down"
     description: "Move cursor down by one page"
     category: "Navigation"
     vscode:
@@ -75,7 +75,7 @@ mappings:
       command: "page_down"
       mode: "insert"
   - id: "actions.cursor.pageDownSelect"
-    short_description: "Select page down"
+    name: "Select page down"
     description: "Select down by one page"
     category: "Navigation"
     vscode:
@@ -89,7 +89,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.cursor.pageUp"
-    short_description: "Page up"
+    name: "Page up"
     description: "Move cursor up by one page"
     category: "Navigation"
     vscode:
@@ -104,7 +104,7 @@ mappings:
       command: "page_up"
       mode: "insert"
   - id: "actions.cursor.pageUpSelect"
-    short_description: "Select page up"
+    name: "Select page up"
     description: "Select up by one page"
     category: "Navigation"
     vscode:

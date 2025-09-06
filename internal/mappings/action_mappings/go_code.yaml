@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.go.goToDeclaration"
-    short_description: "Go to declaration"
+    name: "Go to declaration"
     description: "Go to Declaration or Usages"
     category: "Navigation"
     vscode:
@@ -12,7 +12,7 @@ mappings:
       action: "editor::GoToDeclaration"
       context: "Editor"
   - id: "actions.go.peekDeclaration"
-    short_description: "Peek declaration"
+    name: "Peek declaration"
     description: "Peek Declaration"
     category: "Navigation"
     vscode:
@@ -24,7 +24,7 @@ mappings:
       action: "editor::GoToDefinitionSplit"
       context: "Editor"
   - id: "actions.go.implementations"
-    short_description: "Go to implementations"
+    name: "Go to implementations"
     description: "Go to Implementations"
     category: "Navigation"
     vscode:
@@ -36,7 +36,7 @@ mappings:
     intellij:
       action: "GotoImplementation"
   - id: "actions.go.goToTest"
-    short_description: "Go to test"
+    name: "Go to test"
     description: "Go to Test"
     category: "Navigation"
     vscode:
@@ -47,7 +47,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.go.goToSuper"
-    short_description: "Go to super"
+    name: "Go to super"
     description: "Go to Super Class/Super Method"
     category: "Navigation"
     vscode:
@@ -58,7 +58,7 @@ mappings:
     intellij:
       action: "GotoSuperMethod"
   - id: "actions.go.typeDefinition"
-    short_description: "Go to type definition"
+    name: "Go to type definition"
     description: "Go to Type Definition"
     category: "Navigation"
     vscode:
@@ -70,7 +70,7 @@ mappings:
     intellij:
       action: "GotoTypeDeclaration"
   - id: "actions.go.references"
-    short_description: "Go to references"
+    name: "Go to references"
     description: "Go to References"
     category: "Navigation"
     vscode:
@@ -82,7 +82,7 @@ mappings:
     intellij:
       action: "FindUsages"
   - id: "actions.go.referencePeek"
-    short_description: "Reference peek"
+    name: "Reference peek"
     description: "Show Usages / Reference Search"
     category: "Navigation"
     vscode:
@@ -94,7 +94,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.go.callHierarchy"
-    short_description: "Call hierarchy"
+    name: "Call hierarchy"
     description: "Show Call Hierarchy"
     category: "Navigation"
     vscode:
@@ -106,7 +106,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.go.typeHierarchy"
-    short_description: "Type hierarchy"
+    name: "Type hierarchy"
     description: "Show Type Hierarchy"
     category: "Navigation"
     vscode:

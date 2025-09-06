@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.view.showCommandPalette"
-    short_description: "Show command palette"
+    name: "Show command palette"
     description: "Show Command Palette"
     category: "View Management"
     vscode:

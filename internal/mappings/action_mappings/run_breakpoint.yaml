@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.run.toggleBreakpoint"
-    short_description: "Toggle breakpoint"
+    name: "Toggle breakpoint"
     description: "Toggle Breakpoint"
     category: "Debug"
     vscode:

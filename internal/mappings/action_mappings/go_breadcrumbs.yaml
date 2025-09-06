@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.go.breadcrumbsFocus"
-    short_description: "Focus breadcrumbs"
+    name: "Focus breadcrumbs"
     description: "Jump to Navigation Bar"
     category: "Navigation"
     vscode:

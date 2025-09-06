@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.fold.fold"
-    short_description: "Fold code"
+    name: "Fold code"
     description: "Collapse the current code block"
     category: "Editor"
     vscode:
@@ -12,7 +12,7 @@ mappings:
     intellij:
       action: "CollapseRegion"
   - id: "actions.fold.unfold"
-    short_description: "Unfold code"
+    name: "Unfold code"
     description: "Expand the current code block"
     category: "Editor"
     vscode:
@@ -24,7 +24,7 @@ mappings:
     intellij:
       action: "ExpandRegion"
   - id: "actions.fold.foldRecursively"
-    short_description: "Fold recursively"
+    name: "Fold recursively"
     description: "Collapse the current code block and its children recursively"
     category: "Editor"
     vscode:
@@ -36,7 +36,7 @@ mappings:
     intellij:
       action: "CollapseRegionRecursively"
   - id: "actions.fold.unfoldRecursively"
-    short_description: "Unfold recursively"
+    name: "Unfold recursively"
     description: "Expand the current code block and its children recursively"
     category: "Editor"
     vscode:
@@ -48,7 +48,7 @@ mappings:
     intellij:
       action: "ExpandRegionRecursively"
   - id: "actions.fold.toggleFold"
-    short_description: "Toggle fold"
+    name: "Toggle fold"
     description: "Toggle Fold"
     category: "Editor"
     vscode:
@@ -60,7 +60,7 @@ mappings:
     intellij:
       action: "ExpandCollapseToggleAction"
   - id: "actions.fold.foldAll"
-    short_description: "Fold all"
+    name: "Fold all"
     description: "Collapse all code blocks in the editor"
     category: "Editor"
     vscode:
@@ -72,7 +72,7 @@ mappings:
     intellij:
       action: "CollapseAllRegions"
   - id: "actions.fold.unfoldAll"
-    short_description: "Unfold all"
+    name: "Unfold all"
     description: "Expand all code blocks in the editor"
     category: "Editor"
     vscode:

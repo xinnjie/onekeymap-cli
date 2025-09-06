@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.view.toggleDebugPanel"
-    short_description: "Toggle debug panel"
+    name: "Toggle debug panel"
     description: "Toggle Debug Panel"
     category: "View Management"
     vscode:
@@ -18,7 +18,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.showDebugOutputConsole"
-    short_description: "Show debug console"
+    name: "Show debug console"
     description: "Show Debug Output Console view"
     category: "View Management"
     vscode:

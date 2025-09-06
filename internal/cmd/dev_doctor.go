@@ -19,7 +19,7 @@ var doctorCmd = &cobra.Command{
 	Long: `The doctor command runs a series of diagnostic checks on the action mapping configurations.
 
 It currently performs two main checks:
-1. Description Check: Verifies that all mappings have a 'description' and 'short_description'.
+1. Description Check: Verifies that all mappings have a 'description' and 'name'.
 2. Zed Action Validation: Ensures that all 'zed.action' entries correspond to valid, known actions.
 
 This command is essential for maintaining the quality, consistency, and correctness of the keymap configurations.`,
@@ -60,7 +60,7 @@ func checkDescriptions() error {
 			fmt.Printf("  - [Missing Description] Action ID: %s\n", id)
 			foundMissing = true
 		}
-		if mapping.ShortDescription == "" {
+		if mapping.Name == "" {
 			fmt.Printf("  - [Missing Short Description] Action ID: %s\n", id)
 			foundMissing = true
 		}

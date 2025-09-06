@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.file.openFile"
-    short_description: "Open file"
+    name: "Open file"
     description: "Open file dialog"
     category: "File Management"
     vscode:
@@ -14,7 +14,7 @@ mappings:
       command: "file_picker"
       mode: "insert"
   - id: "actions.file.showOpenedFileInNewWindow"
-    short_description: "Show in new window"
+    name: "Show in new window"
     description: "Show opened file in new window"
     category: "View Management"
     vscode:
@@ -28,7 +28,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.file.openRecent"
-    short_description: "Open recent"
+    name: "Open recent"
     description: "Open Recent"
     category: "File Management"
     vscode:

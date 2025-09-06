@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.file.save"
-    short_description: "Save file"
+    name: "Save file"
     description: "Save current file"
     category: "File Management"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: ":write"
       mode: "insert"
   - id: "actions.file.saveAs"
-    short_description: "Save as"
+    name: "Save as"
     description: "Save current file with a new name"
     category: "File Management"
     vscode:
@@ -29,7 +29,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.file.saveAll"
-    short_description: "Save all"
+    name: "Save all"
     description: "Save all open files"
     category: "File Management"
     vscode:

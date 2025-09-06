@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.file.closeEditor"
-    short_description: "Close editor"
+    name: "Close editor"
     description: "Close the active editor"
     category: "File Management"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: ":buffer-close"
       mode: "insert"
   - id: "actions.file.closeWindow"
-    short_description: "Close window"
+    name: "Close window"
     description: "Close the current window"
     category: "View Management"
     vscode:

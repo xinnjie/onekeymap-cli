@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.edit.insertLineBefore"
-    short_description: "Insert line before"
+    name: "Insert line before"
     description: "Insert a new line before the current line"
     category: "Editor"
     vscode:
@@ -12,7 +12,7 @@ mappings:
     intellij:
       action: "EditorStartNewLineBefore"
   - id: "actions.edit.joinLines"
-    short_description: "Join lines"
+    name: "Join lines"
     description: "Join lines"
     category: "Editor"
     vscode:
@@ -24,7 +24,7 @@ mappings:
       action: "editor::JoinLines"
       context: "Editor"
   - id: "actions.edit.lineBreakInsert"
-    short_description: "Insert line break"
+    name: "Insert line break"
     description: "Insert line break"
     category: "Editor"
     vscode:
@@ -36,7 +36,7 @@ mappings:
       action: "editor::Newline"
       context: "Editor"
   - id: "actions.edit.insertLineAfter"
-    short_description: "Insert line after"
+    name: "Insert line after"
     description: "Insert a new line after the current line"
     category: "Editor"
     vscode:

@@ -11,11 +11,11 @@ import (
 
 // OneKeymapConfig is a struct that matches the user config file format.
 type OneKeymapConfig struct {
-	Id               string            `json:"id"`
-	Keybinding       KeybindingStrings `json:"keybinding"`
-	Comment          string            `json:"comment,omitempty"`
-	Description      string            `json:"description,omitempty"`
-	ShortDescription string            `json:"short_description,omitempty"`
+	Id          string            `json:"id"`
+	Keybinding  KeybindingStrings `json:"keybinding"`
+	Comment     string            `json:"comment,omitempty"`
+	Description string            `json:"description,omitempty"`
+	Name        string            `json:"name,omitempty"`
 }
 
 // OneKeymapSetting is the root struct for the user config file.
@@ -101,10 +101,10 @@ func Save(writer io.Writer, setting *keymapv1.KeymapSetting) error {
 		config, ok := groupedKeybindings[key]
 		if !ok {
 			config = &OneKeymapConfig{
-				Id:               k.Id,
-				Comment:          k.Comment,
-				Description:      k.Description,
-				ShortDescription: k.ShortDescription,
+				Id:          k.Id,
+				Comment:     k.Comment,
+				Description: k.Description,
+				Name:        k.Name,
 			}
 			groupedKeybindings[key] = config
 		}

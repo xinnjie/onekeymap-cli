@@ -123,7 +123,7 @@ func (s *importService) decorateSetting(setting *keymapv1.KeymapSetting) *keymap
 	for _, kb := range setting.Keybindings {
 		if mapping, ok := s.mappingConfig.Mappings[kb.Id]; ok {
 			kb.Description = mapping.Description
-			kb.ShortDescription = mapping.ShortDescription
+			kb.Name = mapping.Name
 			kb.Category = mapping.Category
 		}
 

@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.run.stepOver"
-    short_description: "Step over"
+    name: "Step over"
     description: "Step Over"
     category: "Debug"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "dap_next"
       mode: "insert"
   - id: "actions.run.stepInto"
-    short_description: "Step into"
+    name: "Step into"
     description: "Step Into"
     category: "Debug"
     vscode:
@@ -30,7 +30,7 @@ mappings:
       command: "dap_step_in"
       mode: "insert"
   - id: "actions.run.stepOut"
-    short_description: "Step out"
+    name: "Step out"
     description: "Step Out"
     category: "Debug"
     vscode:
@@ -45,7 +45,7 @@ mappings:
       command: "dap_step_out"
       mode: "insert"
   - id: "actions.run.continue"
-    short_description: "Continue"
+    name: "Continue"
     description: "Continue"
     category: "Debug"
     vscode:
@@ -60,7 +60,7 @@ mappings:
       command: "dap_continue"
       mode: "insert"
   - id: "actions.run.runToCursor"
-    short_description: "Run to cursor"
+    name: "Run to cursor"
     description: "Run to Cursor"
     category: "Debug"
     vscode:

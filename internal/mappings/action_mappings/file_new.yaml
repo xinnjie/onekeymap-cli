@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.file.newFile"
-    short_description: "New file"
+    name: "New file"
     description: "Create a new file"
     category: "File Management"
     vscode:
@@ -12,7 +12,7 @@ mappings:
     intellij:
       action: "NewScratchFile"
   - id: "actions.file.newWindow"
-    short_description: "New window"
+    name: "New window"
     description: "Open a new window"
     category: "View Management"
     vscode:

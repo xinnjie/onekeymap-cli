@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.hover.quickFix"
-    short_description: "Quick fix"
+    name: "Quick fix"
     description: "Quick Fix..."
     category: "Navigation"
     vscode:
@@ -14,7 +14,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.hover.codeAction"
-    short_description: "Code action"
+    name: "Code action"
     description: "Code Action..."
     category: "Navigation"
     vscode:
@@ -29,7 +29,7 @@ mappings:
       command: "code_action"
       mode: "insert"
   - id: "actions.hover.triggerParameterHint"
-    short_description: "Parameter hints"
+    name: "Parameter hints"
     description: "Trigger Parameter Hints"
     category: "Navigation"
     vscode:
@@ -44,7 +44,7 @@ mappings:
       command: "signature_help"
       mode: "insert"
   - id: "actions.hover.showHover"
-    short_description: "Show hover"
+    name: "Show hover"
     description: "Show Hover"
     category: "Navigation"
     vscode:

@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.view.toggleStatusBar"
-    short_description: "Toggle status bar"
+    name: "Toggle status bar"
     description: "Toggle Status Bar visibility"
     category: "View Management"
     vscode:

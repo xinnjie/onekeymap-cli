@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.view.openGlobalSettings"
-    short_description: "Open global settings"
+    name: "Open global settings"
     description: "Open Global Settings"
     category: "View Management"
     vscode:
@@ -14,7 +14,7 @@ mappings:
       command: ":config-open"
       mode: "insert"
   - id: "actions.view.selectTheme"
-    short_description: "Select theme"
+    name: "Select theme"
     description: "Select Theme"
     category: "View Management"
     vscode:

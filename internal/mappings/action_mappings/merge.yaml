@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.merge.acceptCurrent"
-    short_description: "Accept current"
+    name: "Accept current"
     description: "Accept current change (keep left side)"
     category: "Version Control"
     vscode:
@@ -11,7 +11,7 @@ mappings:
     zed:
       notSupported: true
   - id: "actions.merge.acceptIncoming"
-    short_description: "Accept incoming"
+    name: "Accept incoming"
     description: "Accept incoming change (take right side)"
     category: "Version Control"
     vscode:

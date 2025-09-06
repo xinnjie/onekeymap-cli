@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.edit.undo"
-    short_description: "Undo action"
+    name: "Undo action"
     description: "Undo last action"
     category: "Editor"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "undo"
       mode: "insert"
   - id: "actions.edit.cursorUndo"
-    short_description: "Undo cursor"
+    name: "Undo cursor"
     description: "Undo last cursor operation"
     category: "Editor"
     vscode:
@@ -29,7 +29,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.edit.redo"
-    short_description: "Redo action"
+    name: "Redo action"
     description: "Redo last undone action"
     category: "Editor"
     vscode:

@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.go.nextProblem"
-    short_description: "Next problem"
+    name: "Next problem"
     description: "Go to Next Problem (Error, Warning, Info)"
     category: "Navigation"
     vscode:
@@ -13,7 +13,7 @@ mappings:
     intellij:
       action: "GotoNextError"
   - id: "actions.go.previousProblem"
-    short_description: "Previous problem"
+    name: "Previous problem"
     description: "Go to Previous Problem (Error, Warning, Info)"
     category: "Navigation"
     vscode:

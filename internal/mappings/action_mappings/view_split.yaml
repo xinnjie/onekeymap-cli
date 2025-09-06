@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.view.focusNextSplit"
-    short_description: "Focus next split"
+    name: "Focus next split"
     description: "Focus next editor split"
     category: "View Management"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "rotate_view"
       mode: "insert"
   - id: "actions.view.focusPreviousSplit"
-    short_description: "Focus previous split"
+    name: "Focus previous split"
     description: "Focus previous editor split"
     category: "View Management"
     vscode:

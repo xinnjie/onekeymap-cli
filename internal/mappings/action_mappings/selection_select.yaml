@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.selection.selectAll"
-    short_description: "Select all"
+    name: "Select all"
     description: "Select all text in the editor"
     category: "Editor"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "select_all"
       mode: "insert"
   - id: "actions.selection.expand"
-    short_description: "Expand selection"
+    name: "Expand selection"
     description: "Expand selection"
     category: "Editor"
     vscode:
@@ -30,7 +30,7 @@ mappings:
       command: "expand_selection"
       mode: "insert"
   - id: "actions.selection.shrink"
-    short_description: "Shrink selection"
+    name: "Shrink selection"
     description: "Shrink selection"
     category: "Editor"
     vscode:

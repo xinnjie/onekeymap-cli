@@ -123,8 +123,8 @@ func (m *KeymapViewModel) View() string {
 		b.WriteString("\n")
 		b.WriteString(fmt.Sprintf("Action: %s\n", selectedID))
 		if mapping := m.mc.FindByUniversalAction(selectedID); mapping != nil {
-			if mapping.ShortDescription != "" {
-				b.WriteString(fmt.Sprintf("Description: %s\n", mapping.ShortDescription))
+			if mapping.Name != "" {
+				b.WriteString(fmt.Sprintf("Description: %s\n", mapping.Name))
 			} else if mapping.Description != "" {
 				b.WriteString(fmt.Sprintf("Description: %s\n", mapping.Description))
 			}
@@ -172,7 +172,7 @@ func (m *KeymapViewModel) rebuildRows() {
 			if mapping == nil {
 				return id
 			}
-			return mapping.ShortDescription
+			return mapping.Name
 		}()
 		rows = append(rows, table.Row{d, strings.Join(keys, " or ")})
 	}

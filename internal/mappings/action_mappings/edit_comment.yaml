@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.edit.toggleLineComment"
-    short_description: "Toggle line comment"
+    name: "Toggle line comment"
     description: "Toggle line comment"
     category: "Editor"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "toggle_line_comments"
       mode: "insert"
   - id: "actions.edit.toggleBlockComment"
-    short_description: "Toggle block comment"
+    name: "Toggle block comment"
     description: "Toggle block comment"
     category: "Editor"
     vscode:

@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.go.back"
-    short_description: "Go back"
+    name: "Go back"
     description: "Go to previous cursor location"
     category: "Navigation"
     vscode:
@@ -11,7 +11,7 @@ mappings:
     intellij:
       action: "Back"
   - id: "actions.go.forward"
-    short_description: "Go forward"
+    name: "Go forward"
     description: "Go to next cursor location"
     category: "Navigation"
     vscode:
@@ -22,7 +22,7 @@ mappings:
     intellij:
       action: "Forward"
   - id: "actions.go.lastEditLocation"
-    short_description: "Last edit"
+    name: "Last edit"
     description: "Go to last edit location"
     category: "Navigation"
     vscode:

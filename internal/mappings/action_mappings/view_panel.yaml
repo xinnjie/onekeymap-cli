@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.view.toggleExplorer"
-    short_description: "Toggle file explorer"
+    name: "Toggle file explorer"
     description: "Toggle file explorer view"
     category: "View Management"
     vscode:
@@ -19,7 +19,7 @@ mappings:
       command: "file_explorer"
       mode: "insert"
   - id: "actions.view.toggleSearch"
-    short_description: "Toggle search"
+    name: "Toggle search"
     description: "Toggle Search view"
     category: "View Management"
     vscode:
@@ -38,7 +38,7 @@ mappings:
       command: "global_search"
       mode: "insert"
   - id: "actions.view.toggleSourceControl"
-    short_description: "Toggle source control"
+    name: "Toggle source control"
     description: "Toggle Source Control view"
     category: "View Management"
     vscode:
@@ -57,7 +57,7 @@ mappings:
       command: "changed_file_picker"
       mode: "insert"
   - id: "actions.view.showExtensions"
-    short_description: "Show extensions"
+    name: "Show extensions"
     description: "Show Extensions view"
     category: "View Management"
     vscode:
@@ -71,7 +71,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.showTesting"
-    short_description: "Show testing"
+    name: "Show testing"
     description: "Show Testing view"
     category: "View Management"
     vscode:
@@ -84,7 +84,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.toggleProblems"
-    short_description: "Toggle problems"
+    name: "Toggle problems"
     description: "Toggle Problems view"
     category: "View Management"
     vscode:
@@ -100,7 +100,7 @@ mappings:
       command: "workspace_diagnostics_picker"
       mode: "insert"
   - id: "actions.view.toggleOutput"
-    short_description: "Toggle output"
+    name: "Toggle output"
     description: "Toggle Output view"
     category: "View Management"
     vscode:
@@ -114,7 +114,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.view.toggleTerminal"
-    short_description: "Toggle terminal"
+    name: "Toggle terminal"
     description: "Toggle Terminal view"
     category: "View Management"
     vscode:

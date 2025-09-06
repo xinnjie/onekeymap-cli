@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.git.commitAll"
-    short_description: "Commit all"
+    name: "Commit all"
     description: "Commit All"
     category: "Version Control"
     vscode:
@@ -12,7 +12,7 @@ mappings:
       action: "git::Commit"
       context: "Editor"
   - id: "actions.git.openChanges"
-    short_description: "Open changes"
+    name: "Open changes"
     description: "Open all git changed files"
     category: "Version Control"
     vscode:
@@ -24,7 +24,7 @@ mappings:
       action: "git::OpenModifiedFiles"
       context: "Editor"
   - id: "actions.git.unstage"
-    short_description: "Unstage changes"
+    name: "Unstage changes"
     description: "Unstage Changes"
     category: "Version Control"
     vscode:
@@ -36,7 +36,7 @@ mappings:
       action: "git::UnstageAndNext"
       context: "Editor && !agent_diff"
   - id: "actions.git.revert"
-    short_description: "Revert changes"
+    name: "Revert changes"
     description: "Revert Changes"
     category: "Version Control"
     vscode:
@@ -48,7 +48,7 @@ mappings:
       action: "git::Restore"
       context: "Editor"
   - id: "actions.git.stage"
-    short_description: "Stage changes"
+    name: "Stage changes"
     description: "Stage Changes"
     category: "Version Control"
     vscode:
@@ -60,7 +60,7 @@ mappings:
       action: "git::StageAndNext"
       context: "Editor && !agent_diff"
   - id: "actions.git.push"
-    short_description: "Push changes"
+    name: "Push changes"
     description: "Push Changes"
     category: "Version Control"
     vscode:
@@ -72,7 +72,7 @@ mappings:
       action: "git::Push"
       context: "Editor"
   - id: "actions.git.sync"
-    short_description: "Sync changes"
+    name: "Sync changes"
     description: "Sync (Pull, Push)"
     category: "Version Control"
     vscode:
@@ -84,7 +84,7 @@ mappings:
       action: "git::Pull"
       context: "Editor"
   - id: "actions.git.toggleBlame"
-    short_description: "Toggle blame"
+    name: "Toggle blame"
     description: "Toggle Blame"
     category: "Version Control"
     vscode:

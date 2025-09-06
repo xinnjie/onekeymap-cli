@@ -142,14 +142,14 @@ func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest
 		for id, mapping := range s.mappingConfig.Mappings {
 			if binding, exists := existingBindings[id]; exists {
 				binding.Description = mapping.Description
-				binding.ShortDescription = mapping.ShortDescription
+				binding.Name = mapping.Name
 				binding.Category = mapping.Category
 			} else {
 				km.Keybindings = append(km.Keybindings, &keymapv1.KeyBinding{
-					Id:               id,
-					Description:      mapping.Description,
-					ShortDescription: mapping.ShortDescription,
-					Category:         mapping.Category,
+					Id:          id,
+					Description: mapping.Description,
+					Name:        mapping.Name,
+					Category:    mapping.Category,
 				})
 			}
 		}

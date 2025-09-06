@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.go.nextChange"
-    short_description: "Next change"
+    name: "Next change"
     description: "Go to Next Change"
     category: "Navigation"
     vscode:
@@ -12,7 +12,7 @@ mappings:
     intellij:
       action: "VcsShowNextChangeMarker"
   - id: "actions.go.previousChange"
-    short_description: "Previous change"
+    name: "Previous change"
     description: "Go to Previous Change"
     category: "Navigation"
     vscode:

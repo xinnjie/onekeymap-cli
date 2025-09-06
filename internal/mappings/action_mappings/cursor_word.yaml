@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.cursor.wordRight"
-    short_description: "Next word"
+    name: "Next word"
     description: "Move cursor to the end of the next word"
     category: "Editor"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "move_next_word_end"
       mode: "insert"
   - id: "actions.cursor.wordPartRight"
-    short_description: "Next subword"
+    name: "Next subword"
     description: "Move cursor to the end of the next subword (hump)"
     category: "Editor"
     vscode:
@@ -31,7 +31,7 @@ mappings:
       command: "move_next_sub_word_start"
       mode: "insert"
   - id: "actions.cursor.wordLeft"
-    short_description: "Previous word"
+    name: "Previous word"
     description: "Move cursor to the start of the previous word"
     category: "Editor"
     vscode:
@@ -46,7 +46,7 @@ mappings:
       command: "move_prev_word_start"
       mode: "insert"
   - id: "actions.cursor.wordPartLeft"
-    short_description: "Previous subword"
+    name: "Previous subword"
     description: "Move cursor to the start of the previous subword (hump)"
     category: "Editor"
     vscode:
@@ -62,7 +62,7 @@ mappings:
       command: "move_prev_sub_word_start"
       mode: "insert"
   - id: "actions.cursor.wordRightSelect"
-    short_description: "Select next word"
+    name: "Select next word"
     description: "Select to the end of the next word"
     category: "Editor"
     vscode:
@@ -77,7 +77,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.cursor.wordPartRightSelect"
-    short_description: "Select next subword"
+    name: "Select next subword"
     description: "Select to the end of the next subword (hump)"
     category: "Editor"
     vscode:
@@ -91,7 +91,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.cursor.wordLeftSelect"
-    short_description: "Select previous word"
+    name: "Select previous word"
     description: "Select to the start of the previous word"
     category: "Editor"
     vscode:
@@ -106,7 +106,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.cursor.wordPartLeftSelect"
-    short_description: "Select previous subword"
+    name: "Select previous subword"
     description: "Select to the start of the previous subword (hump)"
     category: "Editor"
     vscode:

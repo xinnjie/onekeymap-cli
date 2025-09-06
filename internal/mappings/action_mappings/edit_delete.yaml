@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.edit.deleteWordRight"
-    short_description: "Delete next word"
+    name: "Delete next word"
     description: "Delete to the end of the next word"
     category: "Editor"
     vscode:
@@ -12,7 +12,7 @@ mappings:
     intellij:
       action: "EditorDeleteToWordEnd"
   - id: "actions.edit.deleteLines"
-    short_description: "Delete line"
+    name: "Delete line"
     description: "Delete line"
     category: "Editor"
     vscode:
@@ -24,7 +24,7 @@ mappings:
       action: "editor::DeleteLine"
       context: "Editor"
   - id: "actions.edit.deleteWordPartRight"
-    short_description: "Delete next subword"
+    name: "Delete next subword"
     description: "Delete to the end of the next subword (hump)"
     category: "Editor"
     vscode:
@@ -37,7 +37,7 @@ mappings:
     intellij:
       notSupported: true
   - id: "actions.edit.deleteWordLeft"
-    short_description: "Delete previous word"
+    name: "Delete previous word"
     description: "Delete to the start of the previous word"
     category: "Editor"
     vscode:
@@ -49,7 +49,7 @@ mappings:
     intellij:
       action: "EditorDeleteToWordStart"
   - id: "actions.edit.deleteWordPartLeft"
-    short_description: "Delete previous subword"
+    name: "Delete previous subword"
     description: "Delete to the start of the previous subword (hump)"
     category: "Editor"
     vscode:

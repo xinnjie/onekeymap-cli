@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.run.runTask"
-    short_description: "Run task"
+    name: "Run task"
     description: "Run Task"
     category: "Run"
     vscode:
@@ -12,7 +12,7 @@ mappings:
       action: "task::Run"
       context: "Workspace"
   - id: "actions.run.reRunTask"
-    short_description: "Re-run task"
+    name: "Re-run task"
     description: "Re-run last Task"
     category: "Run"
     vscode:
@@ -24,7 +24,7 @@ mappings:
       action: "task::Rerun"
       context: "Workspace"
   - id: "actions.run.configureTaskRunner"
-    short_description: "Configure tasks"
+    name: "Configure tasks"
     description: "Configure Task Runner"
     category: "Run"
     vscode:
@@ -35,7 +35,7 @@ mappings:
     zed:
       action: "zed::OpenTasks"
   - id: "actions.terminal.runBuildTask"
-    short_description: "Run build task"
+    name: "Run build task"
     description: "Run the default build task"
     category: "Run"
     vscode:

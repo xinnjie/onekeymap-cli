@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.selection.addCursorAbove"
-    short_description: "Add cursor above"
+    name: "Add cursor above"
     description: "Add cursor above current line"
     category: "Editor"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "copy_selection_on_prev_line"
       mode: "insert"
   - id: "actions.selection.addCursorBelow"
-    short_description: "Add cursor below"
+    name: "Add cursor below"
     description: "Add cursor below current line"
     category: "Editor"
     vscode:
@@ -30,7 +30,7 @@ mappings:
       command: "copy_selection_on_next_line"
       mode: "insert"
   - id: "actions.selection.addCursorsToLineEnds"
-    short_description: "Add cursors to ends"
+    name: "Add cursors to ends"
     description: "Add cursors to the end of selected lines"
     category: "Editor"
     vscode:
@@ -44,7 +44,7 @@ mappings:
     helix:
       notSupported: true
   - id: "actions.selection.addNextOccurrence"
-    short_description: "Add next occurrence"
+    name: "Add next occurrence"
     description: "Add next occurrence of selection to multicursor"
     category: "Editor"
     vscode:
@@ -59,7 +59,7 @@ mappings:
       command: "extend_search_next"
       mode: "insert"
   - id: "actions.selection.addPreviousOccurrence"
-    short_description: "Add previous occurrence"
+    name: "Add previous occurrence"
     description: "Add previous occurrence of selection to multicursor"
     category: "Editor"
     vscode:
@@ -74,7 +74,7 @@ mappings:
       command: "extend_search_prev"
       mode: "insert"
   - id: "actions.selection.selectAllOccurrences"
-    short_description: "Select all occurrences"
+    name: "Select all occurrences"
     description: "Select all occurrences of current selection"
     category: "Editor"
     vscode:

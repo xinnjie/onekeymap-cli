@@ -53,7 +53,7 @@ support each action. The table includes columns for VSCode, Zed, IntelliJ, and H
 			}
 
 			fmt.Printf("| %s | %s | %s | %s | %s | %s | %s |\n",
-				mapping.ShortDescription,
+				mapping.Name,
 				formatSupport(vscodeSupport, vscodeReason),
 				formatSupport(zedSupport, zedReason),
 				formatSupport(intellijSupport, intellijReason),
