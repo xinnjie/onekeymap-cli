@@ -129,8 +129,17 @@ func TestLoad(t *testing.T) {
 `,
 			expected: &keymapv1.KeymapSetting{
 				Keybindings: []*keymapv1.KeyBinding{
-					NewBindingWithComment("actions.copy", "ctrl+c", "Standard copy command"),
-					NewBinding("actions.find", "ctrl+shift+f"),
+					{
+						Id:                "actions.copy",
+						Comment:           "Standard copy command",
+						KeyChords:         NewKeyBinding(NewBinding("actions.copy", "ctrl+c")).KeyChords,
+						KeyChordsReadable: "Ctrl+C",
+					},
+					{
+						Id:                "actions.find",
+						KeyChords:         NewKeyBinding(NewBinding("actions.find", "ctrl+shift+f")).KeyChords,
+						KeyChordsReadable: "Ctrl+Shift+F",
+					},
 				},
 			},
 			expectErr: false,
@@ -150,8 +159,18 @@ func TestLoad(t *testing.T) {
 `,
 			expected: &keymapv1.KeymapSetting{
 				Keybindings: []*keymapv1.KeyBinding{
-					NewBindingWithComment("actions.copy", "ctrl+c", "Standard copy command"),
-					NewBindingWithComment("actions.copy", "cmd+c", "Standard copy command"),
+					{
+						Id:                "actions.copy",
+						Comment:           "Standard copy command",
+						KeyChords:         NewKeyBinding(NewBinding("actions.copy", "ctrl+c")).KeyChords,
+						KeyChordsReadable: "Ctrl+C",
+					},
+					{
+						Id:                "actions.copy",
+						Comment:           "Standard copy command",
+						KeyChords:         NewKeyBinding(NewBinding("actions.copy", "cmd+c")).KeyChords,
+						KeyChordsReadable: "Cmd+C",
+					},
 				},
 			},
 			expectErr: false,

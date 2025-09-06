@@ -53,7 +53,8 @@ func TestServer_LoadKeymap(t *testing.T) {
 				Keymap: &keymapv1.KeymapSetting{
 					Keybindings: []*keymapv1.KeyBinding{
 						{
-							Id: "action1",
+							Id:          "action1",
+							Description: "Description 1",
 							KeyChords: &keymapv1.KeyChordSequence{
 								Chords: []*keymapv1.KeyChord{
 									{
@@ -62,6 +63,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 									},
 								},
 							},
+							KeyChordsReadable: "ctrl+a",
 						},
 					},
 				},
@@ -104,6 +106,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 									},
 								},
 							},
+							KeyChordsReadable: "ctrl+a",
 						},
 						{Id: "action2", Description: "Description 2"},
 						{Id: "action3", Description: "Description 3"},

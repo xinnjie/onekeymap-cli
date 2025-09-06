@@ -123,12 +123,11 @@ func (s *Server) DefaultConfigPath(ctx context.Context, req *keymapv1.DefaultCon
 func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest) (*keymapv1.LoadKeymapResponse, error) {
 	km, err := keymap.Load(strings.NewReader(req.Config))
 	if err != nil {
-		// If the config is empty, we can still proceed if return_all is true.
-		if req.ReturnAll {
-			km = &keymapv1.KeymapSetting{}
-		} else {
+		if !req.ReturnAll {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to parse keymap config: %v", err)
 		}
+		// If the config is empty, we can still proceed if return_all is true.
+		km = &keymapv1.KeymapSetting{}
 	}
 
 	if req.ReturnAll {
@@ -140,11 +139,7 @@ func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest
 
 		// Iterate through all available mappings and add them if they don't exist.
 		for id, mapping := range s.mappingConfig.Mappings {
-			if binding, exists := existingBindings[id]; exists {
-				binding.Description = mapping.Description
-				binding.Name = mapping.Name
-				binding.Category = mapping.Category
-			} else {
+			if _, exists := existingBindings[id]; !exists {
 				km.Keybindings = append(km.Keybindings, &keymapv1.KeyBinding{
 					Id:          id,
 					Description: mapping.Description,
@@ -154,6 +149,8 @@ func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest
 			}
 		}
 	}
+
+	km = keymap.DecorateSetting(km, s.mappingConfig)
 
 	return &keymapv1.LoadKeymapResponse{Keymap: km}, nil
 }

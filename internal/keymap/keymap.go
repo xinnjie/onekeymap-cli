@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
@@ -16,6 +17,36 @@ type OneKeymapConfig struct {
 	Comment     string            `json:"comment,omitempty"`
 	Description string            `json:"description,omitempty"`
 	Name        string            `json:"name,omitempty"`
+}
+
+// DecorateSetting applies metadata (Description, Name, Category) to each
+// KeyBinding in the provided KeymapSetting using the given MappingConfig.
+// It also fills the KeyChordsReadable field when chords are present.
+func DecorateSetting(
+	setting *keymapv1.KeymapSetting,
+	config *mappings.MappingConfig,
+) *keymapv1.KeymapSetting {
+	if setting == nil || config == nil {
+		return setting
+	}
+
+	for _, kb := range setting.Keybindings {
+		if cfg := config.FindByUniversalAction(kb.GetId()); cfg != nil {
+			kb.Description = cfg.Description
+			kb.Name = cfg.Name
+			kb.Category = cfg.Category
+		}
+
+		// Fill key_chords_readable field using KeyBinding.Format
+		if len(kb.GetKeyChords().GetChords()) > 0 {
+			binding := NewKeyBinding(kb)
+			if formatted, err := binding.Format(platform.PlatformMacOS, "+"); err == nil {
+				kb.KeyChordsReadable = formatted
+			}
+		}
+	}
+
+	return setting
 }
 
 // OneKeymapSetting is the root struct for the user config file.
@@ -73,9 +104,10 @@ func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
 				return nil, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.Id, err)
 			}
 			setting.Keybindings = append(setting.Keybindings, &keymapv1.KeyBinding{
-				Id:        fk.Id,
-				KeyChords: kb.KeyChords,
-				Comment:   fk.Comment,
+				Id:                fk.Id,
+				KeyChords:         kb.KeyChords,
+				Comment:           fk.Comment,
+				KeyChordsReadable: keybindingStr,
 			})
 		}
 	}

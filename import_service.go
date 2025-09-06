@@ -8,7 +8,6 @@ import (
 
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/metrics"
@@ -58,8 +57,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 		return nil, fmt.Errorf("failed to import config: %w", err)
 	}
 
-	// Add extra description etc.
-	setting = s.decorateSetting(setting)
+	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 
 	s.recorder.RecordCommandProcessed(ctx, string(opts.EditorType), setting)
 
@@ -113,29 +111,6 @@ func (s *importService) validate(ctx context.Context, setting *keymapv1.KeymapSe
 	}
 
 	return s.validator.Validate(ctx, setting, opts)
-}
-
-func (s *importService) decorateSetting(setting *keymapv1.KeymapSetting) *keymapv1.KeymapSetting {
-	if setting == nil || s.mappingConfig == nil {
-		return setting
-	}
-
-	for _, kb := range setting.Keybindings {
-		if mapping, ok := s.mappingConfig.Mappings[kb.Id]; ok {
-			kb.Description = mapping.Description
-			kb.Name = mapping.Name
-			kb.Category = mapping.Category
-		}
-
-		// Fill key_chords_readable field using KeyBinding.Format
-		if len(kb.GetKeyChords().GetChords()) > 0 {
-			keyBinding := keymap.NewKeyBinding(kb)
-			if formatted, err := keyBinding.Format(platform.PlatformMacOS, "+"); err == nil {
-				kb.KeyChordsReadable = formatted
-			}
-		}
-	}
-	return setting
 }
 
 func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *keymapv1.KeymapSetting) (*importapi.KeymapChanges, error) {
