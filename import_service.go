@@ -6,7 +6,9 @@ import (
 	"log/slog"
 	"sort"
 
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/metrics"
@@ -123,6 +125,14 @@ func (s *importService) decorateSetting(setting *keymapv1.KeymapSetting) *keymap
 			kb.Description = mapping.Description
 			kb.ShortDescription = mapping.ShortDescription
 			kb.Category = mapping.Category
+		}
+
+		// Fill key_chords_readable field using KeyBinding.Format
+		if len(kb.GetKeyChords().GetChords()) > 0 {
+			keyBinding := keymap.NewKeyBinding(kb)
+			if formatted, err := keyBinding.Format(platform.PlatformMacOS, "+"); err == nil {
+				kb.KeyChordsReadable = formatted
+			}
 		}
 	}
 	return setting

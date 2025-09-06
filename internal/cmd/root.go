@@ -88,7 +88,9 @@ var rootCmd = &cobra.Command{
 			output = os.Stdout
 		}
 
-		logger = slog.New(slog.NewTextHandler(output, &slog.HandlerOptions{
+		logJson := viper.GetBool("log-json")
+		var handler slog.Handler
+		handlerOpts := &slog.HandlerOptions{
 			Level: logLevel,
 			ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
 				if a.Key == slog.TimeKey {
@@ -96,7 +98,15 @@ var rootCmd = &cobra.Command{
 				}
 				return a
 			},
-		}))
+		}
+
+		if logJson {
+			handler = slog.NewJSONHandler(output, handlerOpts)
+		} else {
+			handler = slog.NewTextHandler(output, handlerOpts)
+		}
+
+		logger = slog.New(handler)
 
 		// Initialize plugin registry and services
 		pluginRegistry = plugins.NewRegistry()
@@ -130,6 +140,7 @@ func init() {
 	// Define persistent flags for verbose and quiet modes.
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose output")
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Suppress all output except for errors")
+	rootCmd.PersistentFlags().Bool("log-json", false, "Output logs in JSON format")
 	backup = rootCmd.PersistentFlags().BoolP("backup", "b", true, "Create a backup of the target editor's keymap")
 	interactive = rootCmd.PersistentFlags().BoolP("interactive", "i", true, "Run in interactive mode")
 	enableTelemetry = rootCmd.PersistentFlags().Bool("telemetry", false, "Enable OpenTelemetry to help improve onekeymap")
@@ -141,6 +152,10 @@ func init() {
 	}
 	if err := viper.BindPFlag("quiet", rootCmd.PersistentFlags().Lookup("quiet")); err != nil {
 		fmt.Fprintf(os.Stderr, "Error binding quiet flag: %v\n", err)
+		os.Exit(1)
+	}
+	if err := viper.BindPFlag("log-json", rootCmd.PersistentFlags().Lookup("log-json")); err != nil {
+		fmt.Fprintf(os.Stderr, "Error binding log-json flag: %v\n", err)
 		os.Exit(1)
 	}
 

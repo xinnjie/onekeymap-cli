@@ -88,14 +88,13 @@ var serveCmd = &cobra.Command{
 				return []grpc_logging.LoggableEvent{
 					grpc_logging.StartCall,
 					grpc_logging.FinishCall,
+					grpc_logging.PayloadReceived,
+					grpc_logging.PayloadSent,
 				}
 			}
-
 			return []grpc_logging.LoggableEvent{
 				grpc_logging.StartCall,
 				grpc_logging.FinishCall,
-				grpc_logging.PayloadReceived,
-				grpc_logging.PayloadSent,
 			}
 		}()
 
