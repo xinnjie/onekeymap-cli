@@ -187,5 +187,28 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 		}
 		sort.Slice(changes.Remove, func(i, j int) bool { return changes.Remove[i].Id < changes.Remove[j].Id })
 	}
+
+	// Decorate metadata (Name/Description/Category) for all keybindings in changes
+	decorate := func(kb *keymapv1.KeyBinding) {
+		if kb == nil {
+			return
+		}
+		if cfg := s.mappingConfig.FindByUniversalAction(kb.GetId()); cfg != nil {
+			kb.Description = cfg.Description
+			kb.Name = cfg.Name
+			kb.Category = cfg.Category
+		}
+	}
+	for _, kb := range changes.Add {
+		decorate(kb)
+	}
+	for _, kb := range changes.Remove {
+		decorate(kb)
+	}
+	for i := range changes.Update {
+		decorate(changes.Update[i].Before)
+		decorate(changes.Update[i].After)
+	}
+
 	return changes, nil
 }
