@@ -51,14 +51,12 @@ func (p *zedExporter) Export(ctx context.Context, destination io.Writer, setting
 		return finalKeymaps[i].Context < finalKeymaps[j].Context
 	})
 
-	jsonData, err := json.MarshalIndent(finalKeymaps, "", "  ")
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal zed keymap to json: %w", err)
-	}
-
-	_, err = destination.Write(jsonData)
-	if err != nil {
-		return nil, fmt.Errorf("failed to write to destination: %w", err)
+	// Write JSON without HTML escaping so that '&&', '<', '>' remain as-is
+	enc := json.NewEncoder(destination)
+	enc.SetEscapeHTML(false)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(finalKeymaps); err != nil {
+		return nil, fmt.Errorf("failed to encode vscode keybindings to json: %w", err)
 	}
 
 	diff, err := p.calculateDiff(opts.Base, finalKeymaps)

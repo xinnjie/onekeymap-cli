@@ -38,7 +38,7 @@ func TestExporter_Export(t *testing.T) {
 			  {
 			    "key": "cmd+c",
 			    "command": "editor.action.clipboardCopyAction",
-			    "when": "editorTextFocus"
+			    "when": "editorTextFocus && condition > 0"
 			  }
 			]`,
 		},
@@ -81,7 +81,7 @@ func TestExporter_Export(t *testing.T) {
 				{
 					"key": "cmd+c",
 					"command": "editor.action.clipboardCopyAction",
-					"when": "editorTextFocus"
+					"when": "editorTextFocus && condition > 0"
 				},
 				{
 					"key": "cmd+x",
@@ -108,7 +108,7 @@ func TestExporter_Export(t *testing.T) {
 				{
 					"key": "cmd+c",
 					"command": "editor.action.clipboardCopyAction",
-					"when": "editorTextFocus"
+					"when": "editorTextFocus && condition > 0"
 				}
 			]`,
 		},
@@ -139,7 +139,7 @@ func TestExporter_Export(t *testing.T) {
 				{
 					"key": "cmd+c",
 					"command": "editor.action.clipboardCopyAction",
-					"when": "editorTextFocus"
+					"when": "editorTextFocus && condition > 0"
 				},
 				{
 					"key": "alt+3",
@@ -174,7 +174,7 @@ func TestExporter_Export(t *testing.T) {
 				{
 					"key": "cmd+c",
 					"command": "editor.action.clipboardCopyAction",
-					"when": "editorTextFocus"
+					"when": "editorTextFocus && condition > 0"
 				}
 			]`,
 		},

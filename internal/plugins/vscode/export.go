@@ -49,14 +49,12 @@ func (e *vscodeExporter) Export(ctx context.Context, destination io.Writer, sett
 
 	finalKeybindings := e.mergeKeybindings(managedKeybindings, unmanagedKeybindings)
 
-	jsonData, err := json.MarshalIndent(finalKeybindings, "", "  ")
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal vscode keybindings to json: %w", err)
-	}
-
-	_, err = destination.Write(jsonData)
-	if err != nil {
-		return nil, fmt.Errorf("failed to write to destination: %w", err)
+	// Write JSON without HTML escaping so that '&&', '<', '>' remain as-is
+	enc := json.NewEncoder(destination)
+	enc.SetEscapeHTML(false)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(finalKeybindings); err != nil {
+		return nil, fmt.Errorf("failed to encode vscode keybindings to json: %w", err)
 	}
 
 	diff, err := e.calculateDiff(opts.Base, finalKeybindings)

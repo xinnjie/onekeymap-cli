@@ -6,7 +6,7 @@ mappings:
     category: "Editor"
     vscode:
       command: "editor.action.clipboardCopyAction"
-      when: "editorTextFocus"
+      when: "editorTextFocus && condition > 0"
     zed:
       action: "editor::Copy"
       context: "Editor"

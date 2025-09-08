@@ -8,7 +8,7 @@ mappings:
         when: "editorHasRenameProvider && editorTextFocus && !editorReadonly"
         forImport: true
       - command: "editor.action.changeAll"
-        when: "editorTextFocus && !editorReadonly"
+        when: "!editorHasRenameProvider &&editorTextFocus && !editorReadonly"
       - command: "renameFile"
         when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
     intellij:
