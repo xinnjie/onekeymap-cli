@@ -62,7 +62,7 @@ func TestSave(t *testing.T) {
 				Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:       "actions.find",
-						Bindings: []*keymapv1.Binding{NewBindingProto("ctrl+f"), NewBindingProto("cmd+f")},
+						Bindings: newBindingProto("ctrl+f", "cmd+f"),
 					},
 				},
 			},

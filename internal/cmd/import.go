@@ -53,7 +53,7 @@ var importCmd = &cobra.Command{
 				defer func() { _ = baseConfigFile.Close() }()
 				baseConfig, err := keymap.Load(baseConfigFile)
 				if err != nil {
-					logger.Error("Failed to load base keymap", "error", err)
+					logger.Warn("Failed to load base keymap, treat as no base config", "error", err)
 					return nil
 				}
 				return baseConfig

@@ -15,6 +15,7 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/validateapi"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"google.golang.org/protobuf/proto"
 )
 
 // importService is the default implementation of the Importer interface.
@@ -24,6 +25,73 @@ type importService struct {
 	logger        *slog.Logger
 	validator     *validateapi.Validator
 	recorder      metrics.Recorder
+}
+
+// unionWithBase merges baseline and imported settings per action id,
+// preserving baseline bindings and adding new imported bindings. Metadata from Decorate is preserved.
+func unionWithBase(base *keymapv1.KeymapSetting, imported *keymapv1.KeymapSetting) *keymapv1.KeymapSetting {
+	if imported == nil {
+		return base
+	}
+	if base == nil || len(base.GetKeybindings()) == 0 {
+		return imported
+	}
+	// index existing results by action id
+	out := &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{}}
+	byID := make(map[string]*keymapv1.ActionBinding)
+
+	// start with baseline (so Before reflects baseline order/first occurrence)
+	for _, kb := range base.GetKeybindings() {
+		if kb == nil {
+			continue
+		}
+		// shallow copy action binding shell; reuse bindings slice ref (safe; will be appended below possibly)
+		ab := &keymapv1.ActionBinding{Id: kb.GetId(), Name: kb.GetName(), Description: kb.GetDescription(), Category: kb.GetCategory()}
+		// copy bindings
+		for _, b := range kb.GetBindings() {
+			if b != nil {
+				ab.Bindings = append(ab.Bindings, b)
+			}
+		}
+		byID[ab.Id] = ab
+		out.Keybindings = append(out.Keybindings, ab)
+	}
+	// merge imported bindings into corresponding actions (or create new action entries)
+	for _, kb := range imported.GetKeybindings() {
+		if kb == nil {
+			continue
+		}
+		existing, ok := byID[kb.GetId()]
+		if !ok {
+			// add as new action
+			ab := &keymapv1.ActionBinding{Id: kb.GetId(), Name: kb.GetName(), Description: kb.GetDescription(), Category: kb.GetCategory()}
+			for _, b := range kb.GetBindings() {
+				if b != nil {
+					ab.Bindings = append(ab.Bindings, b)
+				}
+			}
+			byID[ab.Id] = ab
+			out.Keybindings = append(out.Keybindings, ab)
+			continue
+		}
+		// union bindings
+		for _, nb := range kb.GetBindings() {
+			if nb == nil {
+				continue
+			}
+			dup := false
+			for _, eb := range existing.GetBindings() {
+				if proto.Equal(eb.GetKeyChords(), nb.GetKeyChords()) {
+					dup = true
+					break
+				}
+			}
+			if !dup {
+				existing.Bindings = append(existing.Bindings, nb)
+			}
+		}
+	}
+	return out
 }
 
 // NewImportService creates a new default import service.
@@ -59,6 +127,10 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	}
 
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
+	// Normalize: merge same-action entries and deduplicate identical bindings before downstream logic
+	if setting != nil && len(setting.Keybindings) > 0 {
+		setting.Keybindings = dedupKeyBindings(setting.Keybindings)
+	}
 
 	s.recorder.RecordCommandProcessed(ctx, string(opts.EditorType), setting)
 
@@ -73,19 +145,27 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 		return nil, nil
 	}
 
+	// Validate
+	report, err := s.validate(ctx, setting, opts)
+	if err != nil {
+		return nil, fmt.Errorf("failed to validate config: %w", err)
+	}
+
 	// No baseline provided: all imported keymaps are additions.
 	if opts.Base == nil || len(opts.Base.GetKeybindings()) == 0 {
 		changes := &importapi.KeymapChanges{}
 		if len(setting.Keybindings) > 0 {
 			changes.Add = append(changes.Add, setting.Keybindings...)
 		}
-		return &importapi.ImportResult{Setting: setting, Changes: changes}, nil
+		return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
 	}
 
-	// Validate
-	report, err := s.validate(ctx, setting, opts)
-	if err != nil {
-		return nil, fmt.Errorf("failed to validate config: %w", err)
+	// If baseline provided, first union baseline chords into current setting so unchanged chords are retained.
+	if opts.Base != nil {
+		setting = unionWithBase(opts.Base, setting)
+		setting.Keybindings = dedupKeyBindings(setting.GetKeybindings())
+		// Re-decorate after union so metadata (Name/Description/Category) and readable chords are present
+		setting = keymap.DecorateSetting(setting, s.mappingConfig)
 	}
 
 	// With baseline: compute changes via helper.
@@ -94,6 +174,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 		return nil, err
 	}
 
+	// Safety: ensure dedup on output as well
 	setting.Keybindings = dedupKeyBindings(setting.Keybindings)
 	return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
 }

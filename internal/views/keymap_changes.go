@@ -3,6 +3,7 @@ package views
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
@@ -29,11 +30,13 @@ type keymapChangesModel struct {
 }
 
 func NewKeymapChangesModel(changes *importapi.KeymapChanges, confirm *bool) tea.Model {
+	// Compute dynamic widths for Before/After based on actual content
+	beforeW, afterW := measureBeforeAfterWidths(changes)
 	cols := []table.Column{
 		{Title: "Type", Width: 8},
 		{Title: "Action", Width: 50},
-		{Title: "Before", Width: 20},
-		{Title: "After", Width: 20},
+		{Title: "Before", Width: beforeW},
+		{Title: "After", Width: afterW},
 	}
 	var rows []table.Row
 	if changes != nil {
@@ -153,4 +156,58 @@ func formatKeyBinding(kb *keymapv1.ActionBinding) string {
 		parts = append(parts, f)
 	}
 	return strings.Join(parts, " or ")
+}
+
+// measureBeforeAfterWidths calculates the suitable column widths for Before/After
+// using the display length of formatted keybindings, with sensible caps.
+func measureBeforeAfterWidths(changes *importapi.KeymapChanges) (before, after int) {
+	const (
+		minW      = 12
+		maxW      = 80
+		prefixLen = 2 // account for "+ " or "- " prefixes
+	)
+	if changes == nil {
+		return 20, 20
+	}
+	maxBefore := 0
+	maxAfter := 0
+	for _, kb := range changes.Remove {
+		l := utf8.RuneCountInString(formatKeyBinding(kb)) + prefixLen
+		if l > maxBefore {
+			maxBefore = l
+		}
+	}
+	for _, kb := range changes.Add {
+		l := utf8.RuneCountInString(formatKeyBinding(kb)) + prefixLen
+		if l > maxAfter {
+			maxAfter = l
+		}
+	}
+	for _, diff := range changes.Update {
+		if diff.Before != nil {
+			l := utf8.RuneCountInString(formatKeyBinding(diff.Before)) + prefixLen
+			if l > maxBefore {
+				maxBefore = l
+			}
+		}
+		if diff.After != nil {
+			l := utf8.RuneCountInString(formatKeyBinding(diff.After)) + prefixLen
+			if l > maxAfter {
+				maxAfter = l
+			}
+		}
+	}
+	if maxBefore < minW {
+		maxBefore = minW
+	}
+	if maxAfter < minW {
+		maxAfter = minW
+	}
+	if maxBefore > maxW {
+		maxBefore = maxW
+	}
+	if maxAfter > maxW {
+		maxAfter = maxW
+	}
+	return maxBefore, maxAfter
 }

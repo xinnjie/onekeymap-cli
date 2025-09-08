@@ -22,18 +22,22 @@ func NewKeyBinding(binding *keymapv1.Binding) *KeyBinding {
 	return &KeyBinding{Binding: binding}
 }
 
-// NewBindingProto creates a Binding proto from a vscode-like key sequence string.
-func NewBindingProto(keyChords string) *keymapv1.Binding {
-	return &keymapv1.Binding{
-		KeyChords: MustParseKeyBinding(keyChords).KeyChords,
+// newBindingProto creates a Binding proto from a vscode-like key sequence string.
+func newBindingProto(keyChords ...string) []*keymapv1.Binding {
+	var bindings []*keymapv1.Binding
+	for _, keyChord := range keyChords {
+		bindings = append(bindings, &keymapv1.Binding{
+			KeyChords: MustParseKeyBinding(keyChord).KeyChords,
+		})
 	}
+	return bindings
 }
 
 // NewActioinBinding creates an ActionBinding with a single Binding.
-func NewActioinBinding(action, keyChords string) *keymapv1.ActionBinding {
+func NewActioinBinding(action string, keyChords ...string) *keymapv1.ActionBinding {
 	return &keymapv1.ActionBinding{
 		Id:       action,
-		Bindings: []*keymapv1.Binding{NewBindingProto(keyChords)},
+		Bindings: newBindingProto(keyChords...),
 	}
 }
 

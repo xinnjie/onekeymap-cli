@@ -43,19 +43,69 @@ func dedupKeyBindings(keybindings []*keymapv1.ActionBinding) []*keymapv1.ActionB
 	if len(keybindings) == 0 {
 		return keybindings
 	}
-	seen := make(map[string]struct{}, len(keybindings))
+	// Merge by action ID, concatenating unique bindings while preserving first metadata and order
+	idxByID := make(map[string]int, len(keybindings))
 	out := make([]*keymapv1.ActionBinding, 0, len(keybindings))
+
 	for _, kb := range keybindings {
 		if kb == nil {
 			continue
 		}
-		// Use the unified String() method for consistent signature generation
-		sig := pairKey(kb)
-		if _, ok := seen[sig]; ok {
+		id := kb.GetId()
+		if pos, ok := idxByID[id]; ok {
+			// Merge bindings into existing
+			existing := out[pos]
+			for _, b := range kb.GetBindings() {
+				if b == nil {
+					continue
+				}
+				dup := false
+				nb := keymap.NewKeyBinding(b)
+				nbf := keymap.MustFormatKeyBinding(nb, platform.PlatformMacOS)
+				for _, eb := range existing.GetBindings() {
+					ebf := keymap.MustFormatKeyBinding(keymap.NewKeyBinding(eb), platform.PlatformMacOS)
+					if ebf == nbf {
+						dup = true
+						break
+					}
+				}
+				if !dup {
+					existing.Bindings = append(existing.Bindings, b)
+				}
+			}
+			// Optionally fill missing metadata from later entries
+			if existing.GetName() == "" && kb.GetName() != "" {
+				existing.Name = kb.GetName()
+			}
+			if existing.GetDescription() == "" && kb.GetDescription() != "" {
+				existing.Description = kb.GetDescription()
+			}
+			if existing.GetCategory() == "" && kb.GetCategory() != "" {
+				existing.Category = kb.GetCategory()
+			}
 			continue
 		}
-		seen[sig] = struct{}{}
-		out = append(out, kb)
+		// First occurrence: create a fresh ActionBinding and deduplicate its own bindings
+		fresh := &keymapv1.ActionBinding{Id: kb.GetId(), Name: kb.GetName(), Description: kb.GetDescription(), Category: kb.GetCategory()}
+		for _, b := range kb.GetBindings() {
+			if b == nil {
+				continue
+			}
+			dup := false
+			nbf := keymap.MustFormatKeyBinding(keymap.NewKeyBinding(b), platform.PlatformMacOS)
+			for _, eb := range fresh.GetBindings() {
+				ebf := keymap.MustFormatKeyBinding(keymap.NewKeyBinding(eb), platform.PlatformMacOS)
+				if ebf == nbf {
+					dup = true
+					break
+				}
+			}
+			if !dup {
+				fresh.Bindings = append(fresh.Bindings, b)
+			}
+		}
+		idxByID[id] = len(out)
+		out = append(out, fresh)
 	}
 	return out
 }
