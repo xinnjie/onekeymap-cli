@@ -169,7 +169,7 @@ func Save(writer io.Writer, setting *keymapv1.KeymapSetting) error {
 		}
 
 		for _, b := range k.GetBindings() {
-			if b == nil {
+			if b == nil || len(b.GetKeyChords().GetChords()) == 0 {
 				continue
 			}
 			binding := NewKeyBinding(b)

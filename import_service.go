@@ -206,15 +206,30 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 	basePair := map[string]*keymapv1.ActionBinding{}
 	newPair := map[string]*keymapv1.ActionBinding{}
 
-	for _, kb := range base.GetKeybindings() {
+	// hasValidChord returns true if the action has at least one binding with non-empty chords
+	hasValidChord := func(kb *keymapv1.ActionBinding) bool {
 		if kb == nil {
+			return false
+		}
+		for _, b := range kb.GetBindings() {
+			if b != nil && b.GetKeyChords() != nil && len(b.GetKeyChords().GetChords()) > 0 {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, kb := range base.GetKeybindings() {
+		if kb == nil || !hasValidChord(kb) {
+			// Treat base actions with no valid chords as absent for change calculation
 			continue
 		}
 		baseByAction[kb.GetId()] = append(baseByAction[kb.GetId()], kb)
 		basePair[pairKey(kb)] = kb
 	}
 	for _, kb := range setting.GetKeybindings() {
-		if kb == nil {
+		if kb == nil || !hasValidChord(kb) {
+			// Likewise, ignore empty actions in new setting when computing diffs
 			continue
 		}
 		newByAction[kb.GetId()] = append(newByAction[kb.GetId()], kb)

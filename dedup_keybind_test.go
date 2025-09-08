@@ -17,6 +17,18 @@ func TestDedupKeyBindings_Table(t *testing.T) {
 		expected []*keymapv1.ActionBinding
 	}{
 		{
+			name: "EmptyChords",
+			input: []*keymapv1.ActionBinding{
+				{
+					Id: "actions.copy",
+					Bindings: []*keymapv1.Binding{
+						{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{}}},
+					},
+				},
+			},
+			expected: []*keymapv1.ActionBinding{},
+		},
+		{
 			name: "DuplicatesByActionAndChords",
 			input: []*keymapv1.ActionBinding{
 				keymap.NewActioinBinding("actions.copy", "k"),

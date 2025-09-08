@@ -16,7 +16,7 @@ func pairKey(km *keymapv1.ActionBinding) string {
 	// Format each binding
 	parts := make([]string, 0, len(km.GetBindings()))
 	for _, b := range km.GetBindings() {
-		if b == nil {
+		if b == nil || b.GetKeyChords() == nil || len(b.GetKeyChords().GetChords()) == 0 {
 			continue
 		}
 		parts = append(parts, keymap.MustFormatKeyBinding(keymap.NewKeyBinding(b), platform.PlatformMacOS))
@@ -56,7 +56,7 @@ func dedupKeyBindings(keybindings []*keymapv1.ActionBinding) []*keymapv1.ActionB
 			// Merge bindings into existing
 			existing := out[pos]
 			for _, b := range kb.GetBindings() {
-				if b == nil {
+				if len(b.GetKeyChords().GetChords()) == 0 {
 					continue
 				}
 				dup := false
@@ -87,8 +87,9 @@ func dedupKeyBindings(keybindings []*keymapv1.ActionBinding) []*keymapv1.ActionB
 		}
 		// First occurrence: create a fresh ActionBinding and deduplicate its own bindings
 		fresh := &keymapv1.ActionBinding{Id: kb.GetId(), Name: kb.GetName(), Description: kb.GetDescription(), Category: kb.GetCategory()}
+		hadBindings := len(kb.GetBindings()) > 0
 		for _, b := range kb.GetBindings() {
-			if b == nil {
+			if len(b.GetKeyChords().GetChords()) == 0 {
 				continue
 			}
 			dup := false
@@ -103,6 +104,10 @@ func dedupKeyBindings(keybindings []*keymapv1.ActionBinding) []*keymapv1.ActionB
 			if !dup {
 				fresh.Bindings = append(fresh.Bindings, b)
 			}
+		}
+		// If there were explicit bindings but all were invalid/empty -> drop this action entirely
+		if len(fresh.GetBindings()) == 0 && hadBindings {
+			continue
 		}
 		idxByID[id] = len(out)
 		out = append(out, fresh)
