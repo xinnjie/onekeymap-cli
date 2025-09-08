@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
@@ -16,6 +17,7 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/metrics"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 // testPlugin implements pluginapi.Plugin interface for testing
@@ -71,153 +73,279 @@ func (e *testPluginExporter) Export(ctx context.Context, destination io.Writer, 
 	return &pluginapi.PluginExportReport{}, nil
 }
 
-func TestImportService_Import_SortsByAction(t *testing.T) {
-	// Create test data with unsorted actions
-	unsortedKeymaps := []*keymapv1.KeyBinding{
-		keymap.NewBinding("actions.editor.paste", "ctrl+v"),
-		keymap.NewBinding("actions.editor.copy", "ctrl+c"),
-		keymap.NewBinding("actions.file.save", "ctrl+s"),
-		keymap.NewBinding("actions.editor.cut", "ctrl+x"),
+func TestImportService_Import(t *testing.T) {
+	testCases := []struct {
+		name        string
+		importData  *keymapv1.KeymapSetting
+		baseData    *keymapv1.KeymapSetting
+		importError error
+		expectError bool
+		expect      *importapi.ImportResult
+	}{
+		{
+			name: "sorts imported keymaps by action ID",
+			importData: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.editor.paste", "ctrl+v"),
+					keymap.NewBinding("actions.editor.copy", "ctrl+c"),
+				},
+			},
+			expect: &importapi.ImportResult{
+				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.KeyBinding{
+					{
+						Id:                "actions.editor.copy",
+						KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
+						Name:              "Copy",
+						Description:       "Copy",
+						Category:          "Editor",
+						KeyChordsReadable: "ctrl+c",
+					},
+					{
+						Id:                "actions.editor.paste",
+						KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
+						Name:              "Paste",
+						Description:       "Paste",
+						Category:          "Editor",
+						KeyChordsReadable: "ctrl+v",
+					},
+				}},
+				Changes: &importapi.KeymapChanges{
+					Add: []*keymapv1.KeyBinding{
+						{
+							Id:                "actions.editor.copy",
+							KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
+							Name:              "Copy",
+							Description:       "Copy",
+							Category:          "Editor",
+							KeyChordsReadable: "ctrl+c",
+						},
+						{
+							Id:                "actions.editor.paste",
+							KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
+							Name:              "Paste",
+							Description:       "Paste",
+							Category:          "Editor",
+							KeyChordsReadable: "ctrl+v",
+						},
+					},
+				},
+			},
+		},
+		{
+			name:       "handles empty keymap list",
+			importData: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.KeyBinding{}},
+			expect: &importapi.ImportResult{
+				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.KeyBinding{}},
+				Changes: &importapi.KeymapChanges{},
+			},
+		},
+		{
+			name:       "handles nil setting from plugin",
+			importData: nil,
+			expect:     nil,
+		},
+		{
+			name: "calculates added keybindings",
+			baseData: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.editor.copy", "ctrl+c"),
+				},
+			},
+			importData: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.editor.copy", "ctrl+c"),
+					keymap.NewBinding("actions.editor.paste", "ctrl+v"),
+				},
+			},
+			expect: &importapi.ImportResult{
+				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.KeyBinding{
+					{
+						Id:                "actions.editor.copy",
+						KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
+						Name:              "Copy",
+						Description:       "Copy",
+						Category:          "Editor",
+						KeyChordsReadable: "ctrl+c",
+					},
+					{
+						Id:                "actions.editor.paste",
+						KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
+						Name:              "Paste",
+						Description:       "Paste",
+						Category:          "Editor",
+						KeyChordsReadable: "ctrl+v",
+					},
+				}},
+				Changes: &importapi.KeymapChanges{
+					Add: []*keymapv1.KeyBinding{
+						{
+							Id:                "actions.editor.paste",
+							KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
+							Name:              "Paste",
+							Description:       "Paste",
+							Category:          "Editor",
+							KeyChordsReadable: "ctrl+v",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "calculates not removed keybindings",
+			baseData: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.editor.copy", "ctrl+c"),
+					keymap.NewBinding("actions.editor.paste", "ctrl+v"),
+				},
+			},
+			importData: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.editor.copy", "ctrl+c"),
+					// According to import semantics, unchanged keybindings should not be removed.
+					keymap.NewBinding("actions.editor.paste", "ctrl+v"),
+				},
+			},
+			expect: &importapi.ImportResult{
+				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.KeyBinding{
+					{
+						Id:                "actions.editor.copy",
+						KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
+						Name:              "Copy",
+						Description:       "Copy",
+						Category:          "Editor",
+						KeyChordsReadable: "ctrl+c",
+					},
+					{
+						Id:                "actions.editor.paste",
+						KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
+						Name:              "Paste",
+						Description:       "Paste",
+						Category:          "Editor",
+						KeyChordsReadable: "ctrl+v",
+					},
+				}},
+				Changes: &importapi.KeymapChanges{},
+			},
+		},
+		{
+			name: "calculates updated keybindings",
+			baseData: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.editor.copy", "ctrl+c"),
+				},
+			},
+			importData: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.KeyBinding{
+					keymap.NewBinding("actions.editor.copy", "cmd+c"),
+				},
+			},
+			expect: &importapi.ImportResult{
+				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.KeyBinding{
+					{
+						Id:                "actions.editor.copy",
+						KeyChords:         keymap.MustParseKeyBinding("cmd+c").KeyChords,
+						Name:              "Copy",
+						Description:       "Copy",
+						Category:          "Editor",
+						KeyChordsReadable: "cmd+c",
+					},
+				}},
+				Changes: &importapi.KeymapChanges{
+					Update: []importapi.KeymapDiff{{
+						Before: &keymapv1.KeyBinding{
+							Id:          "actions.editor.copy",
+							KeyChords:   keymap.MustParseKeyBinding("ctrl+c").KeyChords,
+							Name:        "Copy",
+							Description: "Copy",
+							Category:    "Editor",
+						},
+						After: &keymapv1.KeyBinding{
+							Id:                "actions.editor.copy",
+							KeyChords:         keymap.MustParseKeyBinding("cmd+c").KeyChords,
+							Name:              "Copy",
+							Description:       "Copy",
+							Category:          "Editor",
+							KeyChordsReadable: "cmd+c",
+						},
+					}},
+				},
+			},
+		},
 	}
 
-	unsortedSetting := &keymapv1.KeymapSetting{
-		Keybindings: unsortedKeymaps,
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Setup common test dependencies
+			testFile, err := os.CreateTemp("", "test_config_*.json")
+			require.NoError(t, err)
+			defer func() { _ = os.Remove(testFile.Name()); _ = testFile.Close() }()
+			_, err = testFile.WriteString(`{}`)
+			require.NoError(t, err)
+
+			testPlug := newTestPlugin(pluginapi.EditorTypeVSCode, testFile.Name(), tc.importData, tc.importError)
+			registry := plugins.NewRegistry()
+			registry.Register(testPlug)
+
+			mappingConfig := &mappings.MappingConfig{
+				Mappings: map[string]mappings.ActionMappingConfig{
+					"actions.editor.copy": {
+						ID:          "actions.editor.copy",
+						Description: "Copy",
+						Name:        "Copy",
+						Category:    "Editor",
+					},
+					"actions.editor.paste": {
+						ID:          "actions.editor.paste",
+						Description: "Paste",
+						Name:        "Paste",
+						Category:    "Editor",
+					},
+					"actions.file.save": {
+						ID:          "actions.file.save",
+						Description: "Save",
+						Name:        "Save",
+						Category:    "File",
+					},
+					"actions.editor.cut": {
+						ID:          "actions.editor.cut",
+						Description: "Cut",
+						Name:        "Cut",
+						Category:    "Editor",
+					},
+				},
+			}
+
+			logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+			service := NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
+
+			opts := importapi.ImportOptions{
+				EditorType:  pluginapi.EditorTypeVSCode,
+				InputStream: testFile,
+				Base:        tc.baseData,
+			}
+
+			// Execute the import
+			res, err := service.Import(context.Background(), opts)
+
+			// Assertions
+			if tc.expectError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			if tc.expect == nil {
+				assert.Nil(t, res)
+				return
+			}
+
+			require.NotNil(t, res)
+
+			settingDiff := cmp.Diff(tc.expect.Setting, res.Setting, protocmp.Transform())
+			assert.Empty(t, settingDiff)
+
+			changesDiff := cmp.Diff(tc.expect.Changes, res.Changes, protocmp.Transform())
+			assert.Empty(t, changesDiff)
+		})
 	}
-
-	// Create a temporary test file
-	testFile, err := os.CreateTemp("", "test_config_*.json")
-	require.NoError(t, err)
-	defer func() {
-		_ = os.Remove(testFile.Name())
-		_ = testFile.Close()
-	}()
-
-	// Write some dummy content to the test file
-	_, err = testFile.WriteString(`{"test": "data"}`)
-	require.NoError(t, err)
-
-	// Setup test plugin
-	testPlug := newTestPlugin(pluginapi.EditorTypeVSCode, testFile.Name(), unsortedSetting, nil)
-
-	registry := plugins.NewRegistry()
-	registry.Register(testPlug)
-
-	// Create mapping config and logger
-	mappingConfig, err := mappings.NewTestMappingConfig()
-	require.NoError(t, err)
-
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-
-	// Create import service
-	service := NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
-
-	// Test import with sorting
-	opts := importapi.ImportOptions{
-		EditorType:  pluginapi.EditorTypeVSCode,
-		InputStream: testFile,
-	}
-
-	res, err := service.Import(context.Background(), opts)
-
-	// Assertions
-	require.NoError(t, err)
-	require.NotNil(t, res)
-	require.NotNil(t, res.Setting)
-	require.Len(t, res.Setting.Keybindings, 4)
-
-	// Verify sorting by action
-	expectedActions := []string{
-		"actions.editor.copy",
-		"actions.editor.cut",
-		"actions.editor.paste",
-		"actions.file.save",
-	}
-
-	actualActions := make([]string, len(res.Setting.Keybindings))
-	for i, keymap := range res.Setting.Keybindings {
-		actualActions[i] = keymap.Id
-	}
-
-	assert.Equal(t, expectedActions, actualActions, "Keymaps should be sorted by action")
-}
-
-func TestImportService_Import_EmptyKeymaps(t *testing.T) {
-	// Test with empty keymaps
-	emptySetting := &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{},
-	}
-
-	// Create a temporary test file
-	testFile, err := os.CreateTemp("", "test_config_*.json")
-	require.NoError(t, err)
-	defer func() {
-		_ = os.Remove(testFile.Name())
-		_ = testFile.Close()
-	}()
-
-	// Setup test plugin
-	testPlug := newTestPlugin(pluginapi.EditorTypeVSCode, testFile.Name(), emptySetting, nil)
-
-	registry := plugins.NewRegistry()
-	registry.Register(testPlug)
-
-	// Create mapping config and logger
-	mappingConfig, err := mappings.NewTestMappingConfig()
-	require.NoError(t, err)
-
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-
-	// Create import service
-	service := NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
-
-	// Test import with empty keymaps
-	opts := importapi.ImportOptions{
-		EditorType:  pluginapi.EditorTypeVSCode,
-		InputStream: testFile,
-	}
-
-	res, err := service.Import(context.Background(), opts)
-
-	// Assertions
-	require.NoError(t, err)
-	require.NotNil(t, res)
-	require.NotNil(t, res.Setting)
-	assert.Len(t, res.Setting.Keybindings, 0)
-}
-
-func TestImportService_Import_NilSetting(t *testing.T) {
-	// Create a temporary test file
-	testFile, err := os.CreateTemp("", "test_config_*.json")
-	require.NoError(t, err)
-	defer func() {
-		_ = os.Remove(testFile.Name())
-		_ = testFile.Close()
-	}()
-
-	// Setup test plugin with nil setting
-	testPlug := newTestPlugin(pluginapi.EditorTypeVSCode, testFile.Name(), nil, nil)
-
-	registry := plugins.NewRegistry()
-	registry.Register(testPlug)
-
-	// Create mapping config and logger
-	mappingConfig, err := mappings.NewTestMappingConfig()
-	require.NoError(t, err)
-
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-
-	// Create import service
-	service := NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
-
-	// Test import with nil setting
-	opts := importapi.ImportOptions{
-		EditorType:  pluginapi.EditorTypeVSCode,
-		InputStream: testFile,
-	}
-
-	res, err := service.Import(context.Background(), opts)
-
-	// Assertions
-	require.NoError(t, err)
-	assert.Nil(t, res)
 }
