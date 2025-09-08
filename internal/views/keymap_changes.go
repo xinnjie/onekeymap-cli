@@ -137,13 +137,20 @@ func redMinus(s string) string {
 	return fmt.Sprintf("\x1b[31m-\x1b[0m %s", s)
 }
 
-func formatKeyBinding(kb *keymapv1.KeyBinding) string {
+func formatKeyBinding(kb *keymapv1.ActionBinding) string {
 	if kb == nil {
 		return ""
 	}
-	f, err := keymap.NewKeyBinding(kb).Format(platform.PlatformMacOS, "+")
-	if err != nil {
-		return ""
+	var parts []string
+	for _, b := range kb.GetBindings() {
+		if b == nil {
+			continue
+		}
+		f, err := keymap.NewKeyBinding(b).Format(platform.PlatformMacOS, "+")
+		if err != nil || f == "" {
+			continue
+		}
+		parts = append(parts, f)
 	}
-	return f
+	return strings.Join(parts, " or ")
 }

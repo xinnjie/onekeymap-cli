@@ -37,8 +37,8 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "export copy keymap",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			wantTOML: `
@@ -50,8 +50,8 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "non-destructive export preserves user keybindings",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -73,8 +73,8 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -91,8 +91,8 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "multiple modes with mixed conflicts",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -123,8 +123,8 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "empty existing config behaves as destructive export",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "ctrl+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 				},
 			},
 			existingConfig: `[keys.normal]`,
@@ -178,8 +178,8 @@ normal = "block"
 
 	// Managed keymap setting to apply
 	setting := &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
-			keymap.NewBinding("actions.edit.copy", "ctrl+c"),
+		Keybindings: []*keymapv1.ActionBinding{
+			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 		},
 	}
 

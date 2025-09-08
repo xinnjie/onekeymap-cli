@@ -8,6 +8,7 @@ import (
 
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/metrics"
@@ -118,11 +119,11 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 		return &importapi.KeymapChanges{}, nil
 	}
 
-	type kmList []*keymapv1.KeyBinding
+	type kmList []*keymapv1.ActionBinding
 	baseByAction := map[string]kmList{}
 	newByAction := map[string]kmList{}
-	basePair := map[string]*keymapv1.KeyBinding{}
-	newPair := map[string]*keymapv1.KeyBinding{}
+	basePair := map[string]*keymapv1.ActionBinding{}
+	newPair := map[string]*keymapv1.ActionBinding{}
 
 	for _, kb := range base.GetKeybindings() {
 		if kb == nil {
@@ -140,8 +141,8 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 	}
 
 	// Initial adds/removes by exact (action,keybinding) pair.
-	adds := map[string]*keymapv1.KeyBinding{}
-	removes := map[string]*keymapv1.KeyBinding{}
+	adds := map[string]*keymapv1.ActionBinding{}
+	removes := map[string]*keymapv1.ActionBinding{}
 	for k, v := range newPair {
 		adds[k] = v
 	}
@@ -174,14 +175,14 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 
 	changes := &importapi.KeymapChanges{Update: updates}
 	if len(adds) > 0 {
-		changes.Add = make([]*keymapv1.KeyBinding, 0, len(adds))
+		changes.Add = make([]*keymapv1.ActionBinding, 0, len(adds))
 		for _, v := range adds {
 			changes.Add = append(changes.Add, v)
 		}
 		sort.Slice(changes.Add, func(i, j int) bool { return changes.Add[i].Id < changes.Add[j].Id })
 	}
 	if len(removes) > 0 {
-		changes.Remove = make([]*keymapv1.KeyBinding, 0, len(removes))
+		changes.Remove = make([]*keymapv1.ActionBinding, 0, len(removes))
 		for _, v := range removes {
 			changes.Remove = append(changes.Remove, v)
 		}
@@ -189,7 +190,7 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 	}
 
 	// Decorate metadata (Name/Description/Category) for all keybindings in changes
-	decorate := func(kb *keymapv1.KeyBinding) {
+	decorate := func(kb *keymapv1.ActionBinding) {
 		if kb == nil {
 			return
 		}
@@ -197,6 +198,13 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 			kb.Description = cfg.Description
 			kb.Name = cfg.Name
 			kb.Category = cfg.Category
+		}
+		for _, b := range kb.GetBindings() {
+			if b != nil && b.GetKeyChords() != nil && len(b.GetKeyChords().GetChords()) > 0 {
+				if formatted, err := keymap.NewKeyBinding(b).Format(platform.PlatformMacOS, "+"); err == nil {
+					b.KeyChordsReadable = formatted
+				}
+			}
 		}
 	}
 	for _, kb := range changes.Add {

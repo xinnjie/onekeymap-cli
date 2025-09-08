@@ -38,9 +38,9 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 	validator := NewValidator(NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
 	setting := &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
-			keymap.NewBinding("actions.supported", "ctrl+s"),
-			keymap.NewBinding("actions.vscode.only", "ctrl+v"), // Unsupported in Zed
+		Keybindings: []*keymapv1.ActionBinding{
+			keymap.NewActioinBinding("actions.supported", "ctrl+s"),
+			keymap.NewActioinBinding("actions.vscode.only", "ctrl+v"), // Unsupported in Zed
 		},
 	}
 
@@ -76,8 +76,8 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 	validator := NewValidator(NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
 	setting := &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
-			keymap.NewBinding("actions.universal", "ctrl+u"),
+		Keybindings: []*keymapv1.ActionBinding{
+			keymap.NewActioinBinding("actions.universal", "ctrl+u"),
 		},
 	}
 
@@ -106,8 +106,8 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 	// Test with VSCode target - should pass
 	validatorVSCode := NewValidator(NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeVSCode))
 	setting := &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
-			keymap.NewBinding("actions.test", "ctrl+t"),
+		Keybindings: []*keymapv1.ActionBinding{
+			keymap.NewActioinBinding("actions.test", "ctrl+t"),
 		},
 	}
 

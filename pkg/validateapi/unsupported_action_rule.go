@@ -29,13 +29,13 @@ func (r *UnsupportedActionRule) Validate(ctx context.Context, validationContext 
 	setting := validationContext.Setting
 	report := validationContext.Report
 
-	for _, binding := range setting.GetKeybindings() {
-		if binding == nil {
+	for _, ab := range setting.GetKeybindings() {
+		if ab == nil {
 			continue
 		}
 
 		// Check if this action has a mapping for the target editor
-		actionMapping, exists := r.mappingConfig.Mappings[binding.Id]
+		actionMapping, exists := r.mappingConfig.Mappings[ab.Id]
 		if !exists {
 			// This would be caught by DanglingActionRule, skip here
 			continue
@@ -58,24 +58,28 @@ func (r *UnsupportedActionRule) Validate(ctx context.Context, validationContext 
 		}
 
 		if !hasTargetMapping {
-			// Format the key binding for the error message
-			kb := keymap.NewKeyBinding(binding)
-			formattedKeys, err := kb.Format(platform.PlatformMacOS, " ")
-			if err != nil {
-				formattedKeys = "unknown"
-			}
-
-			// Add error for unsupported action
-			issue := &keymapv1.ValidationIssue{
-				Issue: &keymapv1.ValidationIssue_UnsupportedAction{
-					UnsupportedAction: &keymapv1.UnsupportedAction{
-						Action:       binding.Id,
-						Keybinding:   formattedKeys,
-						TargetEditor: string(r.targetEditor),
+			for _, b := range ab.GetBindings() {
+				if b == nil {
+					continue
+				}
+				// Format the key binding for the error message
+				kb := keymap.NewKeyBinding(b)
+				formattedKeys, err := kb.Format(platform.PlatformMacOS, " ")
+				if err != nil {
+					formattedKeys = "unknown"
+				}
+				// Add error for unsupported action
+				issue := &keymapv1.ValidationIssue{
+					Issue: &keymapv1.ValidationIssue_UnsupportedAction{
+						UnsupportedAction: &keymapv1.UnsupportedAction{
+							Action:       ab.Id,
+							Keybinding:   formattedKeys,
+							TargetEditor: string(r.targetEditor),
+						},
 					},
-				},
+				}
+				report.Issues = append(report.Issues, issue)
 			}
-			report.Issues = append(report.Issues, issue)
 		}
 	}
 

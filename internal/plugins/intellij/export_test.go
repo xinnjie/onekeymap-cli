@@ -31,8 +31,8 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "basic single-chord export ($Copy)",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -60,11 +60,11 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "multi entries and multi-chord export (command1)",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
+				Keybindings: []*keymapv1.ActionBinding{
 					// single chord ctrl+alt+s
-					keymap.NewBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 					// two-chord ctrl+k ctrl+c
-					keymap.NewBinding("actions.test.mutipleActions", "ctrl+k ctrl+c"),
+					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+k ctrl+c"),
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -88,8 +88,8 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "unmapped actions skipped",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.unknown", "meta+x"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.unknown", "meta+x"),
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -100,9 +100,9 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "dedup identical shortcuts for an action",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.test.mutipleActions", "ctrl+alt+s"),
-					keymap.NewBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -124,10 +124,10 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "special keys are formatted correctly",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.test.mutipleActions", "f5"),
-					keymap.NewBinding("actions.test.mutipleActions", "ctrl+numpad3"),
-					keymap.NewBinding("actions.test.mutipleActions", "ctrl+shift+["),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.test.mutipleActions", "f5"),
+					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+numpad3"),
+					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+shift+["),
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -151,8 +151,8 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "non-destructive export preserves user actions",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -192,8 +192,8 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "managed action takes priority over conflicting user action",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -232,8 +232,8 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "empty existing config behaves as destructive export",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>

@@ -155,51 +155,56 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 			continue
 		}
 
-		kb := keymap.NewKeyBinding(km)
-		keyStr, err := formatKeybinding(kb)
-		if err != nil {
-			// TODO(xinnjie): Add doc about this behavior: because helix do not recognize numpad keys(numpad1 is recognized as "1"), to avoid conflict with other keybindings, we skip these keybindings
-			if errors.Is(err, ErrNotSupportKeyChords) {
-				e.logger.Debug("Skipping keybinding with unsupported key chords", "key", km.KeyChords)
-			} else {
-				e.logger.Warn("Skipping keybinding with un-formattable key", "key", km.KeyChords, "error", err)
-			}
-			continue
-		}
-
-		for _, hconf := range mapping.Helix {
-			if hconf.Command == "" {
+		for _, b := range km.GetBindings() {
+			if b == nil {
 				continue
 			}
-			var m HelixMode
-			if hconf.Mode == "" {
-				m = HelixModeNormal
-			} else {
-				m = HelixMode(hconf.Mode)
-			}
-
-			var dest *map[string]string
-			switch m {
-			case HelixModeNormal:
-				if keysByMode.Normal == nil {
-					keysByMode.Normal = make(map[string]string)
+			kb := keymap.NewKeyBinding(b)
+			keyStr, err := formatKeybinding(kb)
+			if err != nil {
+				// TODO(xinnjie): Add doc about this behavior: because helix do not recognize numpad keys(numpad1 is recognized as "1"), to avoid conflict with other keybindings, we skip these keybindings
+				if errors.Is(err, ErrNotSupportKeyChords) {
+					e.logger.Debug("Skipping keybinding with unsupported key chords", "action", km.Id)
+				} else {
+					e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.Id, "error", err)
 				}
-				dest = &keysByMode.Normal
-			case HelixModeInsert:
-				if keysByMode.Insert == nil {
-					keysByMode.Insert = make(map[string]string)
-				}
-				dest = &keysByMode.Insert
-			case HelixModeSelect:
-				if keysByMode.Select == nil {
-					keysByMode.Select = make(map[string]string)
-				}
-				dest = &keysByMode.Select
-			default:
-				e.logger.Warn("Unsupported Helix mode; skipping", "mode", string(m), "action", km.Id)
 				continue
 			}
-			(*dest)[keyStr] = hconf.Command
+
+			for _, hconf := range mapping.Helix {
+				if hconf.Command == "" {
+					continue
+				}
+				var m HelixMode
+				if hconf.Mode == "" {
+					m = HelixModeNormal
+				} else {
+					m = HelixMode(hconf.Mode)
+				}
+
+				var dest *map[string]string
+				switch m {
+				case HelixModeNormal:
+					if keysByMode.Normal == nil {
+						keysByMode.Normal = make(map[string]string)
+					}
+					dest = &keysByMode.Normal
+				case HelixModeInsert:
+					if keysByMode.Insert == nil {
+						keysByMode.Insert = make(map[string]string)
+					}
+					dest = &keysByMode.Insert
+				case HelixModeSelect:
+					if keysByMode.Select == nil {
+						keysByMode.Select = make(map[string]string)
+					}
+					dest = &keysByMode.Select
+				default:
+					e.logger.Warn("Unsupported Helix mode; skipping", "mode", string(m), "action", km.Id)
+					continue
+				}
+				(*dest)[keyStr] = hconf.Command
+			}
 		}
 	}
 

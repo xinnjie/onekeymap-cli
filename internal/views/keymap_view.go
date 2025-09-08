@@ -147,15 +147,17 @@ func (m *KeymapViewModel) selectedActionID() string {
 func (m *KeymapViewModel) rebuildRows() {
 	// Aggregate keybindings by action id
 	agg := map[string][]string{}
-	for _, kb := range m.setting.GetKeybindings() {
-		if !m.includeByCategory(kb.GetId()) {
+	for _, ab := range m.setting.GetKeybindings() {
+		if !m.includeByCategory(ab.GetId()) {
 			continue
 		}
-		k := keybindingToString(kb)
-		if k == "" {
-			continue
+		for _, b := range ab.GetBindings() {
+			k := keybindingToString(b)
+			if k == "" {
+				continue
+			}
+			agg[ab.GetId()] = append(agg[ab.GetId()], k)
 		}
-		agg[kb.GetId()] = append(agg[kb.GetId()], k)
 	}
 	ids := make([]string, 0, len(agg))
 	for id := range agg {
@@ -203,7 +205,7 @@ func dedup(in []string) []string {
 	return out
 }
 
-func keybindingToString(kb *keymapv1.KeyBinding) string {
+func keybindingToString(kb *keymapv1.Binding) string {
 	if kb == nil {
 		return ""
 	}

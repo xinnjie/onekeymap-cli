@@ -73,9 +73,11 @@ func (p *zedImporter) Import(ctx context.Context, source io.Reader, opts plugina
 				p.logger.Warn("failed to find action", "action", actionStr, "context", zk.Context, "args", actionArgs, "error", err)
 				continue
 			}
-			keymapEntry := &keymapv1.KeyBinding{
-				Id:        actionID,
-				KeyChords: kb.KeyChords,
+			keymapEntry := &keymapv1.ActionBinding{
+				Id: actionID,
+				Bindings: []*keymapv1.Binding{
+					{KeyChords: kb.KeyChords},
+				},
 			}
 
 			setting.Keybindings = append(setting.Keybindings, keymapEntry)

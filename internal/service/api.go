@@ -84,10 +84,10 @@ func (s *Server) ImportKeymap(ctx context.Context, req *keymapv1.ImportKeymapReq
 	}, nil
 }
 
-func toProtoKeymapDiff(diffs []importapi.KeymapDiff) []*keymapv1.KeymapDiff {
-	var result []*keymapv1.KeymapDiff
+func toProtoKeymapDiff(diffs []importapi.KeymapDiff) []*keymapv1.ActionDiff {
+	var result []*keymapv1.ActionDiff
 	for _, d := range diffs {
-		result = append(result, &keymapv1.KeymapDiff{
+		result = append(result, &keymapv1.ActionDiff{
 			Origin:  d.Before,
 			Updated: d.After,
 		})
@@ -132,7 +132,7 @@ func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest
 
 	if req.ReturnAll {
 		// Create a map for quick lookup of existing bindings.
-		existingBindings := make(map[string]*keymapv1.KeyBinding)
+		existingBindings := make(map[string]*keymapv1.ActionBinding)
 		for _, binding := range km.Keybindings {
 			existingBindings[binding.Id] = binding
 		}
@@ -140,7 +140,7 @@ func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest
 		// Iterate through all available mappings and add them if they don't exist.
 		for id, mapping := range s.mappingConfig.Mappings {
 			if _, exists := existingBindings[id]; !exists {
-				km.Keybindings = append(km.Keybindings, &keymapv1.KeyBinding{
+				km.Keybindings = append(km.Keybindings, &keymapv1.ActionBinding{
 					Id:          id,
 					Description: mapping.Description,
 					Name:        mapping.Name,

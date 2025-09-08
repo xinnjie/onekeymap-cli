@@ -32,21 +32,24 @@ func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *V
 	}
 
 	// Group keybindings by their formatted key combination
-	keybindingMap := make(map[string][]*keymapv1.KeyBinding) // key: formatted keybinding, value: list of keybindings
+	keybindingMap := make(map[string][]*keymapv1.ActionBinding) // key: formatted keybinding, value: list of action bindings having it
 
-	for _, kb := range validationContext.Setting.Keybindings {
-		if kb == nil || kb.KeyChords == nil {
+	for _, ab := range validationContext.Setting.Keybindings {
+		if ab == nil {
 			continue
 		}
-
-		// Format the key combination for comparison
-		formatted, err := keymap.NewKeyBinding(kb).Format(platform.PlatformMacOS, "+")
-		if err != nil {
-			// Skip invalid keybindings but don't fail validation
-			continue
+		for _, b := range ab.GetBindings() {
+			if b == nil {
+				continue
+			}
+			// Format the key combination for comparison
+			formatted, err := keymap.NewKeyBinding(b).Format(platform.PlatformMacOS, "+")
+			if err != nil {
+				// Skip invalid keybindings but don't fail validation
+				continue
+			}
+			keybindingMap[formatted] = append(keybindingMap[formatted], ab)
 		}
-
-		keybindingMap[formatted] = append(keybindingMap[formatted], kb)
 	}
 
 	// Check for conflicts (multiple actions for same keybinding)

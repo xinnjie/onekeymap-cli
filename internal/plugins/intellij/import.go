@@ -55,9 +55,9 @@ func (p *intellijImporter) Import(ctx context.Context, source io.Reader, opts pl
 				p.logger.Warn("failed to parse key binding", "binding", ks, "error", err)
 				continue
 			}
-			newBinding := &keymapv1.KeyBinding{
-				Id:        actionID,
-				KeyChords: kb.KeyChords,
+			newBinding := &keymapv1.ActionBinding{
+				Id:       actionID,
+				Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}},
 			}
 			setting.Keybindings = append(setting.Keybindings, newBinding)
 		}

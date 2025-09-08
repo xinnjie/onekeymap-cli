@@ -54,7 +54,7 @@ func (i *demoImporter) Import(ctx context.Context, source io.Reader, _ pluginapi
 			i.logger.Warn("Skipping unparsable keybinding", "keys", b.Keys, "error", err)
 			continue
 		}
-		setting.Keybindings = append(setting.Keybindings, &keymapv1.KeyBinding{Id: b.Action, KeyChords: kb.KeyChords})
+		setting.Keybindings = append(setting.Keybindings, &keymapv1.ActionBinding{Id: b.Action, Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}}})
 	}
 	return setting, nil
 }

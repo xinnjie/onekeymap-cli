@@ -105,7 +105,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.KeymapSettin
 	var actionOrder []string
 
 	for _, km := range setting.Keybindings {
-		if km == nil || km.KeyChords == nil || len(km.KeyChords.Chords) == 0 {
+		if km == nil || len(km.GetBindings()) == 0 {
 			continue
 		}
 		mapping := e.mappingConfig.FindByUniversalAction(km.Id)
@@ -115,17 +115,22 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.KeymapSettin
 		}
 		actionID := mapping.IntelliJ.Action
 
-		shortcutXML, err := formatKeybinding(keymap.NewKeyBinding(km))
-		if err != nil {
-			e.logger.Warn("failed to format keybinding", "action", km.Id, "error", err)
-			continue
-		}
+		for _, b := range km.GetBindings() {
+			if b == nil {
+				continue
+			}
+			shortcutXML, err := formatKeybinding(keymap.NewKeyBinding(b))
+			if err != nil {
+				e.logger.Warn("failed to format keybinding", "action", km.Id, "error", err)
+				continue
+			}
 
-		if _, exists := actionsMap[actionID]; !exists {
-			actionsMap[actionID] = &ActionXML{ID: actionID}
-			actionOrder = append(actionOrder, actionID)
+			if _, exists := actionsMap[actionID]; !exists {
+				actionsMap[actionID] = &ActionXML{ID: actionID}
+				actionOrder = append(actionOrder, actionID)
+			}
+			actionsMap[actionID].KeyboardShortcuts = append(actionsMap[actionID].KeyboardShortcuts, KeyboardShortcutXML{First: shortcutXML.First, Second: shortcutXML.Second})
 		}
-		actionsMap[actionID].KeyboardShortcuts = append(actionsMap[actionID].KeyboardShortcuts, KeyboardShortcutXML{First: shortcutXML.First, Second: shortcutXML.Second})
 	}
 
 	// Build Actions slice in stable order (by first appearance, then fallback to sort for determinism if empty)

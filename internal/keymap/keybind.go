@@ -15,34 +15,40 @@ const oneKeymapDefaultKeyChordSeparator = "+"
 // pressed in order to trigger an action. This allows for multi-key sequences
 // like "shift shift" or "ctrl+k ctrl+s".
 type KeyBinding struct {
-	*keymapv1.KeyBinding
+	*keymapv1.Binding
 }
 
-func NewKeyBinding(protoKeyBinding *keymapv1.KeyBinding) *KeyBinding {
-	return &KeyBinding{KeyBinding: protoKeyBinding}
+func NewKeyBinding(binding *keymapv1.Binding) *KeyBinding {
+	return &KeyBinding{Binding: binding}
 }
 
-func NewBinding(action, keyChords string) *keymapv1.KeyBinding {
-	return &keymapv1.KeyBinding{
-		Id:        action,
+// NewBindingProto creates a Binding proto from a vscode-like key sequence string.
+func NewBindingProto(keyChords string) *keymapv1.Binding {
+	return &keymapv1.Binding{
 		KeyChords: MustParseKeyBinding(keyChords).KeyChords,
 	}
 }
 
-func NewBindingWithComment(action, keyChords, comment string) *keymapv1.KeyBinding {
-	return &keymapv1.KeyBinding{
-		Id:        action,
-		KeyChords: MustParseKeyBinding(keyChords).KeyChords,
-		Comment:   comment,
+// NewActioinBinding creates an ActionBinding with a single Binding.
+func NewActioinBinding(action, keyChords string) *keymapv1.ActionBinding {
+	return &keymapv1.ActionBinding{
+		Id:       action,
+		Bindings: []*keymapv1.Binding{NewBindingProto(keyChords)},
 	}
 }
 
-func NewBindingWithDescription(action, keyChords, description string) *keymapv1.KeyBinding {
-	return &keymapv1.KeyBinding{
-		Id:          action,
-		KeyChords:   MustParseKeyBinding(keyChords).KeyChords,
-		Description: description,
-	}
+// NewActionBindingWithComment creates an ActionBinding with one Binding and a comment.
+func NewActionBindingWithComment(action, keyChords, comment string) *keymapv1.ActionBinding {
+	ab := NewActioinBinding(action, keyChords)
+	ab.Comment = comment
+	return ab
+}
+
+// NewActionBindingWithDescription creates an ActionBinding with one Binding and a description.
+func NewActionBindingWithDescription(action, keyChords, description string) *keymapv1.ActionBinding {
+	ab := NewActioinBinding(action, keyChords)
+	ab.Description = description
+	return ab
 }
 
 // ParseKeyBinding parse from vscode-like keybind into `KeyBinding` struct e.g. ctrl+c
@@ -57,9 +63,10 @@ func ParseKeyBinding(keybind string, modifierSeparator string) (*KeyBinding, err
 		}
 		chords = append(chords, kc.KeyChord)
 	}
-	return NewKeyBinding(&keymapv1.KeyBinding{Id: "", KeyChords: &keymapv1.KeyChordSequence{Chords: chords}}), nil
+	return NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: chords}}), nil
 }
 
+// Parse a vscode-like keybind string, e.g. ctrl+c to KeyBinding
 func MustParseKeyBinding(keybind string) *KeyBinding {
 	kb, err := ParseKeyBinding(keybind, oneKeymapDefaultKeyChordSeparator)
 	if err != nil {
@@ -84,16 +91,6 @@ func (kb *KeyBinding) Format(p platform.Platform, keyChordSeparator string) (str
 		parts = append(parts, strings.Join(s, keyChordSeparator))
 	}
 	return strings.Join(parts, " "), nil
-}
-
-func (kb *KeyBinding) String() string {
-	// Format the key binding for macOS by default (most common case)
-	formattedKeys, err := kb.Format(platform.PlatformMacOS, "+")
-	if err != nil {
-		// Fallback to empty string if formatting fails
-		formattedKeys = ""
-	}
-	return kb.Id + "|" + formattedKeys
 }
 
 func MustFormatKeyBinding(kb *KeyBinding, p platform.Platform) string {

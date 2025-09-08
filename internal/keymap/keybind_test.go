@@ -82,7 +82,7 @@ func TestKeyBinding_Format(t *testing.T) {
 	}{
 		{
 			name: "Single chord(cmd+s)",
-			input: NewKeyBinding(&keymapv1.KeyBinding{KeyChords: &keymapv1.KeyChordSequence{
+			input: NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
 					{KeyCode: keycode.MustKeyCode("s"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META}},
 				},
@@ -92,7 +92,7 @@ func TestKeyBinding_Format(t *testing.T) {
 		},
 		{
 			name: "Multi-chord(shift shift)",
-			input: NewKeyBinding(&keymapv1.KeyBinding{KeyChords: &keymapv1.KeyChordSequence{
+			input: NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
 					{KeyCode: keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
 					{KeyCode: keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT}},
@@ -103,7 +103,7 @@ func TestKeyBinding_Format(t *testing.T) {
 		},
 		{
 			name: "Multi-chord(ctrl+k ctrl+s)",
-			input: NewKeyBinding(&keymapv1.KeyBinding{KeyChords: &keymapv1.KeyChordSequence{
+			input: NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{
 				Chords: []*keymapv1.KeyChord{
 					{KeyCode: keycode.MustKeyCode("k"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
 					{KeyCode: keycode.MustKeyCode("s"), Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL}},
@@ -120,7 +120,7 @@ func TestKeyBinding_Format(t *testing.T) {
 		},
 		{
 			name:        "Empty Chords",
-			input:       NewKeyBinding(&keymapv1.KeyBinding{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{}}}),
+			input:       NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{}}}),
 			separator:   "+",
 			expectError: true,
 		},

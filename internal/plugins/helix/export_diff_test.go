@@ -19,8 +19,8 @@ import (
 
 func testSettingCopy() *keymapv1.KeymapSetting {
 	return &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
-			keymap.NewBinding("actions.edit.copy", "meta+c"),
+		Keybindings: []*keymapv1.ActionBinding{
+			keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 		},
 	}
 }

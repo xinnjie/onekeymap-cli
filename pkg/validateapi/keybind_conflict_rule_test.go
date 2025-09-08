@@ -15,9 +15,9 @@ func TestValidator_Validate_WithKeybindConflict(t *testing.T) {
 
 	// Create keymaps with conflicting keybindings
 	setting := &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
-			keymap.NewBinding("action1", "ctrl+c"),
-			keymap.NewBinding("action2", "ctrl+c"),
+		Keybindings: []*keymapv1.ActionBinding{
+			keymap.NewActioinBinding("action1", "ctrl+c"),
+			keymap.NewActioinBinding("action2", "ctrl+c"),
 		},
 	}
 

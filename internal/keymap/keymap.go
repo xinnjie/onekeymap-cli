@@ -12,8 +12,8 @@ import (
 
 // OneKeymapConfig is a struct that matches the user config file format.
 type OneKeymapConfig struct {
-	Id          string            `json:"id"`
-	Keybinding  KeybindingStrings `json:"keybinding"`
+	Id          string            `json:"id,omitempty"`
+	Keybinding  KeybindingStrings `json:"keybinding,omitempty"`
 	Comment     string            `json:"comment,omitempty"`
 	Description string            `json:"description,omitempty"`
 	Name        string            `json:"name,omitempty"`
@@ -30,18 +30,19 @@ func DecorateSetting(
 		return setting
 	}
 
-	for _, kb := range setting.Keybindings {
-		if cfg := config.FindByUniversalAction(kb.GetId()); cfg != nil {
-			kb.Description = cfg.Description
-			kb.Name = cfg.Name
-			kb.Category = cfg.Category
+	for _, ab := range setting.Keybindings {
+		if cfg := config.FindByUniversalAction(ab.GetId()); cfg != nil {
+			ab.Description = cfg.Description
+			ab.Name = cfg.Name
+			ab.Category = cfg.Category
 		}
 
-		// Fill key_chords_readable field using KeyBinding.Format
-		if len(kb.GetKeyChords().GetChords()) > 0 {
-			binding := NewKeyBinding(kb)
-			if formatted, err := binding.Format(platform.PlatformMacOS, "+"); err == nil {
-				kb.KeyChordsReadable = formatted
+		for _, b := range ab.GetBindings() {
+			if b != nil && b.GetKeyChords() != nil && len(b.GetKeyChords().GetChords()) > 0 {
+				kb := NewKeyBinding(b)
+				if formatted, err := kb.Format(platform.PlatformMacOS, "+"); err == nil {
+					b.KeyChordsReadable = formatted
+				}
 			}
 		}
 	}
@@ -96,20 +97,46 @@ func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
 	}
 
 	setting := &keymapv1.KeymapSetting{}
+	// Group keybindings by Id ONLY. Preserve insertion order of first appearance.
+	grouped := make(map[string]*keymapv1.ActionBinding)
+	order := make([]string, 0)
+
 	for _, fk := range friendlyData.Keymaps {
+		key := fk.Id
+		ab, ok := grouped[key]
+		if !ok {
+			ab = &keymapv1.ActionBinding{
+				Id:          fk.Id,
+				Comment:     fk.Comment,
+				Description: fk.Description,
+				Name:        fk.Name,
+			}
+			grouped[key] = ab
+			order = append(order, key)
+		} else {
+			// Preserve first non-empty metadata.
+			if ab.GetComment() == "" && fk.Comment != "" {
+				ab.Comment = fk.Comment
+			}
+			if ab.GetDescription() == "" && fk.Description != "" {
+				ab.Description = fk.Description
+			}
+			if ab.GetName() == "" && fk.Name != "" {
+				ab.Name = fk.Name
+			}
+		}
+
 		for _, keybindingStr := range fk.Keybinding {
 			kb, err := ParseKeyBinding(keybindingStr, "+")
 			if err != nil {
-				// Potentially wrap this error for more context
 				return nil, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.Id, err)
 			}
-			setting.Keybindings = append(setting.Keybindings, &keymapv1.KeyBinding{
-				Id:                fk.Id,
-				KeyChords:         kb.KeyChords,
-				Comment:           fk.Comment,
-				KeyChordsReadable: keybindingStr,
-			})
+			ab.Bindings = append(ab.Bindings, &keymapv1.Binding{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr})
 		}
+	}
+
+	for _, k := range order {
+		setting.Keybindings = append(setting.Keybindings, grouped[k])
 	}
 
 	return setting, nil
@@ -141,12 +168,17 @@ func Save(writer io.Writer, setting *keymapv1.KeymapSetting) error {
 			groupedKeybindings[key] = config
 		}
 
-		binding := NewKeyBinding(k)
-		keys, err := binding.Format(platform.PlatformMacOS, "+")
-		if err != nil {
-			return err
+		for _, b := range k.GetBindings() {
+			if b == nil {
+				continue
+			}
+			binding := NewKeyBinding(b)
+			keys, err := binding.Format(platform.PlatformMacOS, "+")
+			if err != nil {
+				return err
+			}
+			config.Keybinding = append(config.Keybinding, keys)
 		}
-		config.Keybinding = append(config.Keybinding, keys)
 	}
 
 	for _, config := range groupedKeybindings {

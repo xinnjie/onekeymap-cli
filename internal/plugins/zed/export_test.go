@@ -27,8 +27,8 @@ func TestExportZedKeymap(t *testing.T) {
 		{
 			name: "export copy keymap",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			wantJSON: `[
@@ -44,9 +44,9 @@ func TestExportZedKeymap(t *testing.T) {
 		{
 			name: "exports multiple keybindings for same action",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
-					keymap.NewBinding("actions.edit.copy", "ctrl+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+					keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 				},
 			},
 			wantJSON: `[
@@ -63,8 +63,8 @@ func TestExportZedKeymap(t *testing.T) {
 		{
 			name: "correctly exports multiple actions",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.test.mutipleActions", "alt+3"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
 			},
 			wantJSON: `[
@@ -120,8 +120,8 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 		{
 			name: "export copy keymap without existing config",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: "",
@@ -138,8 +138,8 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 		{
 			name: "non-destructive export preserves user keybindings",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `[
@@ -175,8 +175,8 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `[
@@ -201,8 +201,8 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 		{
 			name: "multiple contexts with mixed conflicts",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `[
@@ -251,8 +251,8 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 		{
 			name: "empty existing config behaves as destructive export",
 			setting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `[]`,

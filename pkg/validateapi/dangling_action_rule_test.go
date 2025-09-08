@@ -24,9 +24,9 @@ func TestValidator_Validate_WithDanglingAction(t *testing.T) {
 	validator := NewValidator(NewDanglingActionRule(mappingConfig))
 
 	setting := &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
-			keymap.NewBinding("valid.action", "a"),
-			keymap.NewBinding("invalid.action", "b"),
+		Keybindings: []*keymapv1.ActionBinding{
+			keymap.NewActioinBinding("valid.action", "a"),
+			keymap.NewActioinBinding("invalid.action", "b"),
 		},
 	}
 

@@ -29,16 +29,16 @@ type ImportResult struct {
 // KeymapChanges represents the changes to a keymap setting.
 type KeymapChanges struct {
 	// The keymaps that are added.
-	Add []*keymapv1.KeyBinding
+	Add []*keymapv1.ActionBinding
 	// The keymaps that are removed.
-	Remove []*keymapv1.KeyBinding
+	Remove []*keymapv1.ActionBinding
 	// The keymaps that are updated.
 	Update []KeymapDiff
 }
 
 type KeymapDiff struct {
-	Before *keymapv1.KeyBinding
-	After  *keymapv1.KeyBinding
+	Before *keymapv1.ActionBinding
+	After  *keymapv1.ActionBinding
 }
 
 // Importer defines the interface for the import service, which handles the

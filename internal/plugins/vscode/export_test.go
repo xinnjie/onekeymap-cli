@@ -30,8 +30,8 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "correctly exports a standard action",
 			keymapSetting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			expectedJSON: `[
@@ -45,8 +45,8 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "correctly exports multiple actions",
 			keymapSetting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.test.mutipleActions", "alt+3"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
 			},
 			expectedJSON: `[
@@ -66,8 +66,8 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "non-destructive export preserves user keybindings",
 			keymapSetting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `[
@@ -93,8 +93,8 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
 			keymapSetting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `[
@@ -115,9 +115,9 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "multiple user keybindings with mixed conflicts",
 			keymapSetting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
-					keymap.NewBinding("actions.test.mutipleActions", "alt+3"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
 			},
 			existingConfig: `[
@@ -165,8 +165,8 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "empty existing config behaves as destructive export",
 			keymapSetting: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					keymap.NewBinding("actions.edit.copy", "meta+c"),
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `[]`,

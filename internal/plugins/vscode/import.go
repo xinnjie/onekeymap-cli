@@ -55,9 +55,9 @@ func (i *vscodeImporter) Import(ctx context.Context, source io.Reader, option pl
 			continue
 		}
 
-		newKeymap := &keymapv1.KeyBinding{
-			Id:        mapping.ID,
-			KeyChords: kb.KeyChords,
+		newKeymap := &keymapv1.ActionBinding{
+			Id:       mapping.ID,
+			Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}},
 		}
 		setting.Keybindings = append(setting.Keybindings, newKeymap)
 	}

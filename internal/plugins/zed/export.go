@@ -98,32 +98,37 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetting
 			continue
 		}
 
-		keys, err := formatZedKeybind(keymap.NewKeyBinding(km))
-		if err != nil {
-			p.logger.Warn("failed to format key binding", "error", err)
-			continue
-		}
-
-		// For each Zed mapping config, create a binding under its context
-		for _, zconf := range *actionConfig {
-			if zconf.Action == "" {
+		for _, b := range km.GetBindings() {
+			if b == nil {
 				continue
 			}
-			if _, ok := keymapsByContext[zconf.Context]; !ok {
-				keymapsByContext[zconf.Context] = make(map[string]zedActionValue)
+			keys, err := formatZedKeybind(keymap.NewKeyBinding(b))
+			if err != nil {
+				p.logger.Warn("failed to format key binding", "error", err)
+				continue
 			}
 
-			// Create action value - either string or array with args
-			var actionValue zedActionValue
-			if len(zconf.Args) > 0 {
-				// Use array format: [action, args]
-				actionValue = zedActionValue{Action: zconf.Action, Args: zconf.Args}
-			} else {
-				// Use simple string format
-				actionValue = zedActionValue{Action: zconf.Action}
-			}
+			// For each Zed mapping config, create a binding under its context
+			for _, zconf := range *actionConfig {
+				if zconf.Action == "" {
+					continue
+				}
+				if _, ok := keymapsByContext[zconf.Context]; !ok {
+					keymapsByContext[zconf.Context] = make(map[string]zedActionValue)
+				}
 
-			keymapsByContext[zconf.Context][keys] = actionValue
+				// Create action value - either string or array with args
+				var actionValue zedActionValue
+				if len(zconf.Args) > 0 {
+					// Use array format: [action, args]
+					actionValue = zedActionValue{Action: zconf.Action, Args: zconf.Args}
+				} else {
+					// Use simple string format
+					actionValue = zedActionValue{Action: zconf.Action}
+				}
+
+				keymapsByContext[zconf.Context][keys] = actionValue
+			}
 		}
 	}
 

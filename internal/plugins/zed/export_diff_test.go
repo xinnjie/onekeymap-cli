@@ -18,16 +18,14 @@ import (
 
 func testSettingCopy() *keymapv1.KeymapSetting {
 	return &keymapv1.KeymapSetting{
-		Keybindings: []*keymapv1.KeyBinding{
+		Keybindings: []*keymapv1.ActionBinding{
 			{
 				Id: "actions.edit.copy",
-				KeyChords: &keymapv1.KeyChordSequence{
-					Chords: []*keymapv1.KeyChord{
-						{
-							KeyCode:   keycode.MustKeyCode("c"),
-							Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META},
-						},
-					},
+				Bindings: []*keymapv1.Binding{
+					{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{{
+						KeyCode:   keycode.MustKeyCode("c"),
+						Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META},
+					}}}},
 				},
 			},
 		},

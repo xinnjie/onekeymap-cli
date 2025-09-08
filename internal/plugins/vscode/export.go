@@ -113,23 +113,27 @@ func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.KeymapSett
 			continue
 		}
 
-		binding := keymap.NewKeyBinding(km)
-		keys, err := formatKeybinding(binding)
-		if err != nil {
-			e.logger.Warn("Skipping keybinding with un-formattable key", "key", km.KeyChords, "error", err)
-			continue
-		}
-
-		for _, vscodeConfig := range vscodeConfigs {
-			if vscodeConfig.Command == "" {
+		for _, b := range km.GetBindings() {
+			if b == nil {
 				continue
 			}
-			vscodeKeybindings = append(vscodeKeybindings, vscodeKeybinding{
-				Key:     keys,
-				Command: vscodeConfig.Command,
-				When:    vscodeConfig.When,
-				Args:    vscodeConfig.Args,
-			})
+			binding := keymap.NewKeyBinding(b)
+			keys, err := formatKeybinding(binding)
+			if err != nil {
+				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.Id, "error", err)
+				continue
+			}
+			for _, vscodeConfig := range vscodeConfigs {
+				if vscodeConfig.Command == "" {
+					continue
+				}
+				vscodeKeybindings = append(vscodeKeybindings, vscodeKeybinding{
+					Key:     keys,
+					Command: vscodeConfig.Command,
+					When:    vscodeConfig.When,
+					Args:    vscodeConfig.Args,
+				})
+			}
 		}
 	}
 

@@ -51,19 +51,23 @@ func TestServer_LoadKeymap(t *testing.T) {
 			},
 			want: &keymapv1.LoadKeymapResponse{
 				Keymap: &keymapv1.KeymapSetting{
-					Keybindings: []*keymapv1.KeyBinding{
+					Keybindings: []*keymapv1.ActionBinding{
 						{
 							Id:          "action1",
 							Description: "Description 1",
-							KeyChords: &keymapv1.KeyChordSequence{
-								Chords: []*keymapv1.KeyChord{
-									{
-										KeyCode:   keymapv1.KeyCode_A,
-										Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
+							Bindings: []*keymapv1.Binding{
+								{
+									KeyChords: &keymapv1.KeyChordSequence{
+										Chords: []*keymapv1.KeyChord{
+											{
+												KeyCode:   keymapv1.KeyCode_A,
+												Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
+											},
+										},
 									},
+									KeyChordsReadable: "ctrl+a",
 								},
 							},
-							KeyChordsReadable: "ctrl+a",
 						},
 					},
 				},
@@ -77,7 +81,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 			},
 			want: &keymapv1.LoadKeymapResponse{
 				Keymap: &keymapv1.KeymapSetting{
-					Keybindings: []*keymapv1.KeyBinding{
+					Keybindings: []*keymapv1.ActionBinding{
 						{Id: "action1", Description: "Description 1"},
 						{Id: "action2", Description: "Description 2"},
 						{Id: "action3", Description: "Description 3"},
@@ -94,19 +98,23 @@ func TestServer_LoadKeymap(t *testing.T) {
 			},
 			want: &keymapv1.LoadKeymapResponse{
 				Keymap: &keymapv1.KeymapSetting{
-					Keybindings: []*keymapv1.KeyBinding{
+					Keybindings: []*keymapv1.ActionBinding{
 						{
 							Id:          "action1",
 							Description: "Description 1",
-							KeyChords: &keymapv1.KeyChordSequence{
-								Chords: []*keymapv1.KeyChord{
-									{
-										KeyCode:   keymapv1.KeyCode_A,
-										Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
+							Bindings: []*keymapv1.Binding{
+								{
+									KeyChords: &keymapv1.KeyChordSequence{
+										Chords: []*keymapv1.KeyChord{
+											{
+												KeyCode:   keymapv1.KeyCode_A,
+												Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
+											},
+										},
 									},
+									KeyChordsReadable: "ctrl+a",
 								},
 							},
-							KeyChordsReadable: "ctrl+a",
 						},
 						{Id: "action2", Description: "Description 2"},
 						{Id: "action3", Description: "Description 3"},
@@ -131,7 +139,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 			},
 			want: &keymapv1.LoadKeymapResponse{
 				Keymap: &keymapv1.KeymapSetting{
-					Keybindings: []*keymapv1.KeyBinding{
+					Keybindings: []*keymapv1.ActionBinding{
 						{Id: "action1", Description: "Description 1"},
 						{Id: "action2", Description: "Description 2"},
 						{Id: "action3", Description: "Description 3"},
@@ -156,7 +164,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 			},
 			want: &keymapv1.LoadKeymapResponse{
 				Keymap: &keymapv1.KeymapSetting{
-					Keybindings: []*keymapv1.KeyBinding{
+					Keybindings: []*keymapv1.ActionBinding{
 						{Id: "action1", Description: "Description 1"},
 						{Id: "action2", Description: "Description 2"},
 						{Id: "action3", Description: "Description 3"},

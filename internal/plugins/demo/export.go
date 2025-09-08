@@ -31,13 +31,18 @@ func newExporter(logger *slog.Logger, differ diff.Differ) pluginapi.PluginExport
 func (e *demoExporter) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts pluginapi.PluginExportOption) (*pluginapi.PluginExportReport, error) {
 	var out []demoBinding
 	for _, km := range setting.GetKeybindings() {
-		binding := keymap.NewKeyBinding(km)
-		keys, err := binding.Format(platform.PlatformMacOS, "+")
-		if err != nil {
-			e.logger.Warn("Skipping un-formattable keybinding", "action", km.GetId(), "error", err)
-			continue
+		for _, b := range km.GetBindings() {
+			if b == nil {
+				continue
+			}
+			binding := keymap.NewKeyBinding(b)
+			keys, err := binding.Format(platform.PlatformMacOS, "+")
+			if err != nil {
+				e.logger.Warn("Skipping un-formattable keybinding", "action", km.GetId(), "error", err)
+				continue
+			}
+			out = append(out, demoBinding{Keys: keys, Action: km.GetId()})
 		}
-		out = append(out, demoBinding{Keys: keys, Action: km.GetId()})
 	}
 
 	data, err := json.MarshalIndent(out, "", "  ")

@@ -22,8 +22,8 @@ func TestSave(t *testing.T) {
 		{
 			name: "Single keybinding",
 			input: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					NewBindingWithDescription("actions.copy", "ctrl+c", "copy"),
+				Keybindings: []*keymapv1.ActionBinding{
+					NewActionBindingWithDescription("actions.copy", "ctrl+c", "copy"),
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
@@ -34,8 +34,8 @@ func TestSave(t *testing.T) {
 		{
 			name: "Single keybinding with comment",
 			input: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					NewBindingWithComment("actions.find", "shift+f", "with comment"),
+				Keybindings: []*keymapv1.ActionBinding{
+					NewActionBindingWithComment("actions.find", "shift+f", "with comment"),
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
@@ -46,9 +46,24 @@ func TestSave(t *testing.T) {
 		{
 			name: "Multiple keybindings for the same action",
 			input: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					NewBinding("actions.find", "ctrl+f"),
-					NewBinding("actions.find", "cmd+f"),
+				Keybindings: []*keymapv1.ActionBinding{
+					NewActioinBinding("actions.find", "ctrl+f"),
+					NewActioinBinding("actions.find", "cmd+f"),
+				},
+			},
+			expectedKeymaps: []OneKeymapConfig{
+				{Id: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
+			},
+			expectedNumKeymaps: 1,
+		},
+		{
+			name: "Multiple keybindings for the same action",
+			input: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.ActionBinding{
+					{
+						Id:       "actions.find",
+						Bindings: []*keymapv1.Binding{NewBindingProto("ctrl+f"), NewBindingProto("cmd+f")},
+					},
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
@@ -59,11 +74,11 @@ func TestSave(t *testing.T) {
 		{
 			name: "Multiple keybindings for different actions",
 			input: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
-					NewBinding("actions.copy", "ctrl+c"),
-					NewBinding("actions.find", "ctrl+f"),
-					NewBinding("actions.find", "cmd+f"),
-					NewBindingWithComment("actions.find", "shift+f", "with comment"),
+				Keybindings: []*keymapv1.ActionBinding{
+					NewActioinBinding("actions.copy", "ctrl+c"),
+					NewActioinBinding("actions.find", "ctrl+f"),
+					NewActioinBinding("actions.find", "cmd+f"),
+					NewActionBindingWithComment("actions.find", "shift+f", "with comment"),
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
@@ -128,17 +143,19 @@ func TestLoad(t *testing.T) {
 }
 `,
 			expected: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
+				Keybindings: []*keymapv1.ActionBinding{
 					{
-						Id:                "actions.copy",
-						Comment:           "Standard copy command",
-						KeyChords:         NewKeyBinding(NewBinding("actions.copy", "ctrl+c")).KeyChords,
-						KeyChordsReadable: "Ctrl+C",
+						Id:      "actions.copy",
+						Comment: "Standard copy command",
+						Bindings: []*keymapv1.Binding{
+							{KeyChords: MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
+						},
 					},
 					{
-						Id:                "actions.find",
-						KeyChords:         NewKeyBinding(NewBinding("actions.find", "ctrl+shift+f")).KeyChords,
-						KeyChordsReadable: "Ctrl+Shift+F",
+						Id: "actions.find",
+						Bindings: []*keymapv1.Binding{
+							{KeyChords: MustParseKeyBinding("ctrl+shift+f").KeyChords, KeyChordsReadable: "Ctrl+Shift+F"},
+						},
 					},
 				},
 			},
@@ -158,18 +175,46 @@ func TestLoad(t *testing.T) {
 }
 `,
 			expected: &keymapv1.KeymapSetting{
-				Keybindings: []*keymapv1.KeyBinding{
+				Keybindings: []*keymapv1.ActionBinding{
 					{
-						Id:                "actions.copy",
-						Comment:           "Standard copy command",
-						KeyChords:         NewKeyBinding(NewBinding("actions.copy", "ctrl+c")).KeyChords,
-						KeyChordsReadable: "Ctrl+C",
+						Id:      "actions.copy",
+						Comment: "Standard copy command",
+						Bindings: []*keymapv1.Binding{
+							{KeyChords: MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
+							{KeyChords: MustParseKeyBinding("cmd+c").KeyChords, KeyChordsReadable: "Cmd+C"},
+						},
 					},
+				},
+			},
+			expectErr: false,
+		},
+		{
+			name: "Valid configuration with multiple keybindings",
+			jsonInput: `
+{
+  "keymaps": [
+    {
+      "id": "actions.copy",
+      "keybinding": "Ctrl+C",
+      "comment": "Standard copy command"
+    },
+		{
+      "id": "actions.copy",
+      "keybinding": "Cmd+C",
+      "comment": "Standard copy command"
+    }
+  ]
+}
+`,
+			expected: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.ActionBinding{
 					{
-						Id:                "actions.copy",
-						Comment:           "Standard copy command",
-						KeyChords:         NewKeyBinding(NewBinding("actions.copy", "cmd+c")).KeyChords,
-						KeyChordsReadable: "Cmd+C",
+						Id:      "actions.copy",
+						Comment: "Standard copy command",
+						Bindings: []*keymapv1.Binding{
+							{KeyChords: MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
+							{KeyChords: MustParseKeyBinding("cmd+c").KeyChords, KeyChordsReadable: "Cmd+C"},
+						},
 					},
 				},
 			},

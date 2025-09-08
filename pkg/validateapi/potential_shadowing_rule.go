@@ -90,35 +90,37 @@ func (r *PotentialShadowingRule) Validate(ctx context.Context, validationContext
 		return nil
 	}
 
-	for _, binding := range setting.GetKeybindings() {
-		if binding == nil {
+	for _, ab := range setting.GetKeybindings() {
+		if ab == nil {
 			continue
 		}
-
-		// Format the key binding to get a consistent string representation
-		kb := keymap.NewKeyBinding(binding)
-		formattedKeys, err := kb.Format(r.platform, "+")
-		if err != nil {
-			continue
-		}
-
-		// Normalize the key combination for comparison
-		normalizedKeys := strings.ToLower(formattedKeys)
-
-		// Check if this keybinding shadows a critical shortcut
-		if description, isCritical := criticalKeybindings[normalizedKeys]; isCritical {
-			// Add warning for potential shadowing
-			warning := &keymapv1.ValidationIssue{
-				Issue: &keymapv1.ValidationIssue_PotentialShadowing{
-					PotentialShadowing: &keymapv1.PotentialShadowing{
-						Keybinding:   formattedKeys,
-						Action:       binding.Id,
-						TargetEditor: string(r.targetEditor),
-						Message:      "This key chord is the default for " + description + ".",
-					},
-				},
+		for _, b := range ab.GetBindings() {
+			if b == nil {
+				continue
 			}
-			report.Warnings = append(report.Warnings, warning)
+			// Format the key binding to get a consistent string representation
+			kb := keymap.NewKeyBinding(b)
+			formattedKeys, err := kb.Format(r.platform, "+")
+			if err != nil {
+				continue
+			}
+			// Normalize the key combination for comparison
+			normalizedKeys := strings.ToLower(formattedKeys)
+			// Check if this keybinding shadows a critical shortcut
+			if description, isCritical := criticalKeybindings[normalizedKeys]; isCritical {
+				// Add warning for potential shadowing
+				warning := &keymapv1.ValidationIssue{
+					Issue: &keymapv1.ValidationIssue_PotentialShadowing{
+						PotentialShadowing: &keymapv1.PotentialShadowing{
+							Keybinding:   formattedKeys,
+							Action:       ab.Id,
+							TargetEditor: string(r.targetEditor),
+							Message:      "This key chord is the default for " + description + ".",
+						},
+					},
+				}
+				report.Warnings = append(report.Warnings, warning)
+			}
 		}
 	}
 

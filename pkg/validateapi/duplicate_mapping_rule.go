@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
@@ -21,34 +22,33 @@ func (r *DuplicateMappingRule) Validate(ctx context.Context, validationContext *
 	report := validationContext.Report
 
 	// Track seen combinations of action + formatted keys
-	seen := make(map[string]*keymapv1.KeyBinding)
+	seen := make(map[string]struct{})
 
-	for _, binding := range setting.GetKeybindings() {
-		if binding == nil {
+	for _, ab := range setting.GetKeybindings() {
+		if ab == nil {
 			continue
 		}
-
-		// Create KeyBinding with action to use String() method
-		kb := keymap.NewKeyBinding(binding)
-
-		// Use the unified String() method for consistent key generation
-		key := kb.String()
-
-		if _, exists := seen[key]; exists {
-			// Found a duplicate - add warning
-			warning := &keymapv1.ValidationIssue{
-				Issue: &keymapv1.ValidationIssue_DuplicateMapping{
-					DuplicateMapping: &keymapv1.DuplicateMapping{
-						Action:     binding.Id,
-						Keybinding: kb.String(),
-						Message:    "This keymap is defined multiple times in the source configuration.",
-					},
-				},
+		for _, b := range ab.GetBindings() {
+			if b == nil {
+				continue
 			}
-			report.Warnings = append(report.Warnings, warning)
-		} else {
-			// First time seeing this combination
-			seen[key] = binding
+			kb := keymap.NewKeyBinding(b)
+			key := keymap.MustFormatKeyBinding(kb, platform.PlatformMacOS)
+			composite := ab.GetId() + "\x00" + key
+			if _, exists := seen[composite]; exists {
+				warning := &keymapv1.ValidationIssue{
+					Issue: &keymapv1.ValidationIssue_DuplicateMapping{
+						DuplicateMapping: &keymapv1.DuplicateMapping{
+							Action:     ab.GetId(),
+							Keybinding: key,
+							Message:    "This keymap is defined multiple times in the source configuration.",
+						},
+					},
+				}
+				report.Warnings = append(report.Warnings, warning)
+			} else {
+				seen[composite] = struct{}{}
+			}
 		}
 	}
 
