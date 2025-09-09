@@ -47,6 +47,12 @@ type PluginExportReport struct {
 	// The diff between the base and the exported keymap.
 	// If base is nil or diff is not supported, this field will be nil.
 	Diff *string
+
+	// If BaseEditorConfig and ExportEditorConfig set, and Diff is not set, export exportService will calculate diff for plugin by using json diff
+	// BaseEditorConfig contains the original editor-specific configuration before export.
+	BaseEditorConfig any
+	// ExportEditorConfig contains the editor-specific configuration after export.
+	ExportEditorConfig any
 }
 
 type DefaultConfigPathOptions struct {

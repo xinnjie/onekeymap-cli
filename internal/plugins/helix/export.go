@@ -73,11 +73,20 @@ func (e *helixExporter) Export(ctx context.Context, destination io.Writer, setti
 		return nil, fmt.Errorf("failed to encode helix toml: %w", err)
 	}
 
-	d, err := e.calculateDiff(opts.Base, finalKeys)
-	if err != nil {
-		return nil, fmt.Errorf("failed to calculate diff: %w", err)
+	// Prepare structured base keys for centralized diffing
+	var baseKeys helixKeys
+	if opts.Base != nil {
+		var cfg helixConfig
+		if err := toml.NewDecoder(opts.Base).Decode(&cfg); err != nil {
+			return nil, fmt.Errorf("failed to decode base: %w", err)
+		}
+		baseKeys = cfg.Keys
 	}
-	return &pluginapi.PluginExportReport{Diff: &d}, nil
+
+	return &pluginapi.PluginExportReport{
+		BaseEditorConfig:   baseKeys,
+		ExportEditorConfig: finalKeys,
+	}, nil
 }
 
 // identifyUnmanagedKeybindings performs reverse lookup to identify keybindings
@@ -332,18 +341,4 @@ func (e *helixExporter) convertHelixKeysToMap(keys helixKeys) map[string]interfa
 	}
 
 	return result
-}
-
-func (e *helixExporter) calculateDiff(base io.Reader, after helixKeys) (string, error) {
-	var before helixKeys
-	if base == nil {
-		before = helixKeys{}
-	} else {
-		var cfg helixConfig
-		if err := toml.NewDecoder(base).Decode(&cfg); err != nil {
-			return "", fmt.Errorf("failed to decode base: %w", err)
-		}
-		before = cfg.Keys
-	}
-	return e.differ.Diff(before, after)
 }

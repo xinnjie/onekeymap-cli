@@ -67,11 +67,19 @@ func (e *intellijExporter) Export(ctx context.Context, destination io.Writer, se
 	if _, err := destination.Write(data); err != nil {
 		return nil, fmt.Errorf("failed to write xml body: %w", err)
 	}
-	d, err := e.calculateDiff(opts.Base, doc)
-	if err != nil {
-		return nil, fmt.Errorf("failed to calculate diff: %w", err)
+
+	// Prepare structured base doc for centralized diffing
+	var baseDoc KeymapXML
+	if opts.Base != nil {
+		if err := xml.NewDecoder(opts.Base).Decode(&baseDoc); err != nil {
+			return nil, fmt.Errorf("failed to decode base: %w", err)
+		}
 	}
-	return &pluginapi.PluginExportReport{Diff: &d}, nil
+
+	return &pluginapi.PluginExportReport{
+		BaseEditorConfig:   baseDoc,
+		ExportEditorConfig: doc,
+	}, nil
 }
 
 // identifyUnmanagedActions performs reverse lookup to identify actions
@@ -186,19 +194,4 @@ func (e *intellijExporter) mergeActions(managed, unmanaged []ActionXML) []Action
 	}
 
 	return result
-}
-
-func (e *intellijExporter) calculateDiff(base io.Reader, afterDoc KeymapXML) (string, error) {
-	var before KeymapXML
-	if base != nil {
-		if err := xml.NewDecoder(base).Decode(&before); err != nil {
-			return "", fmt.Errorf("failed to decode base: %w", err)
-		}
-	}
-
-	d, err := e.differ.Diff(before, afterDoc)
-	if err != nil {
-		return "", fmt.Errorf("failed to calculate diff: %w", err)
-	}
-	return d, nil
 }

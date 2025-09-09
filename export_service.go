@@ -54,17 +54,36 @@ func (s *exportService) Export(ctx context.Context, destination io.Writer, setti
 		return nil, fmt.Errorf("failed to export config: %w", err)
 	}
 
-	var diffStr string
-	if opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF && opts.Base != nil {
-		gitDiffer := diff.NewUnifiedDiffFormatDiffer()
-		diffString, err := gitDiffer.Diff(opts.Base, &newConfigBuf)
-		if err != nil {
-			return nil, fmt.Errorf("failed to compute git diff: %w", err)
-		}
-		diffStr = diffString
-	} else if report != nil && report.Diff != nil {
-		diffStr = *report.Diff
+	diffStr, err := s.computeDiff(opts, &newConfigBuf, report)
+	if err != nil {
+		return nil, err
 	}
-
 	return &exportapi.ExportReport{Diff: diffStr}, nil
+}
+
+// computeDiff centralizes diff generation for export results based on requested options
+func (s *exportService) computeDiff(opts exportapi.ExportOptions, newConfigBuf *bytes.Buffer, report *pluginapi.PluginExportReport) (string, error) {
+	switch {
+	case opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF && opts.Base != nil:
+		// Unified diff over raw editor configs
+		ud := diff.NewUnifiedDiffFormatDiffer()
+		d, err := ud.Diff(opts.Base, newConfigBuf)
+		if err != nil {
+			return "", fmt.Errorf("failed to compute unified diff: %w", err)
+		}
+		return d, nil
+	case report != nil && report.BaseEditorConfig != nil && report.ExportEditorConfig != nil:
+		// JSON ASCII diff over structured editor configs supplied by plugin
+		jd := diff.NewJsonAsciiDiffer()
+		d, err := jd.Diff(report.BaseEditorConfig, report.ExportEditorConfig)
+		if err != nil {
+			return "", fmt.Errorf("failed to compute ascii json diff: %w", err)
+		}
+		return d, nil
+	case report != nil && report.Diff != nil:
+		// Backward compatibility with legacy plugin-provided diffs
+		return *report.Diff, nil
+	default:
+		return "", nil
+	}
 }

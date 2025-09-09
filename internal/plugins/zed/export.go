@@ -59,30 +59,19 @@ func (p *zedExporter) Export(ctx context.Context, destination io.Writer, setting
 		return nil, fmt.Errorf("failed to encode vscode keybindings to json: %w", err)
 	}
 
-	diff, err := p.calculateDiff(opts.Base, finalKeymaps)
-	if err != nil {
-		return nil, fmt.Errorf("failed to calculate diff: %w", err)
-	}
-	return &pluginapi.PluginExportReport{
-		Diff: &diff,
-	}, nil
-}
-
-func (p *zedExporter) calculateDiff(base io.Reader, zedKeymap zedKeymapConfig) (string, error) {
-	var before zedKeymapConfig
-	if base == nil {
-		before = zedKeymapConfig{}
-	} else {
-		if err := json.NewDecoder(base).Decode(&before); err != nil {
-			return "", fmt.Errorf("failed to decode base: %w", err)
+	// Prepare structured 'before' from opts.Base for centralized diffing
+	var baseConfig zedKeymapConfig
+	if opts.Base != nil {
+		if err := json.NewDecoder(opts.Base).Decode(&baseConfig); err != nil {
+			return nil, fmt.Errorf("failed to decode base: %w", err)
 		}
 	}
 
-	d, err := p.differ.Diff(before, zedKeymap)
-	if err != nil {
-		return "", fmt.Errorf("failed to calculate diff: %w", err)
-	}
-	return d, nil
+	// Defer diff calculation to exportService. Provide structured before/after configs.
+	return &pluginapi.PluginExportReport{
+		BaseEditorConfig:   baseConfig,
+		ExportEditorConfig: finalKeymaps,
+	}, nil
 }
 
 // generateManagedKeybindings creates keybindings from the current setting

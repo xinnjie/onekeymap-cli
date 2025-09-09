@@ -57,11 +57,19 @@ func (e *vscodeExporter) Export(ctx context.Context, destination io.Writer, sett
 		return nil, fmt.Errorf("failed to encode vscode keybindings to json: %w", err)
 	}
 
-	diff, err := e.calculateDiff(opts.Base, finalKeybindings)
-	if err != nil {
-		return nil, fmt.Errorf("failed to calculate diff: %w", err)
+	// Prepare structured 'before' from opts.Base for centralized diffing
+	var baseCfg vscodeKeybindingConfig
+	if opts.Base != nil {
+		if err := json.NewDecoder(opts.Base).Decode(&baseCfg); err != nil {
+			return nil, fmt.Errorf("failed to decode base: %w", err)
+		}
 	}
-	return &pluginapi.PluginExportReport{Diff: &diff}, nil
+
+	// Defer diff calculation to exportService
+	return &pluginapi.PluginExportReport{
+		BaseEditorConfig:   baseCfg,
+		ExportEditorConfig: finalKeybindings,
+	}, nil
 }
 
 // identifyUnmanagedKeybindings performs reverse lookup to identify keybindings
@@ -184,22 +192,4 @@ func equalVSCodeArgs(a map[string]interface{}, b vscodeArgs) bool {
 	}
 
 	return string(aJSON) == string(bJSON)
-}
-
-func (e *vscodeExporter) calculateDiff(base io.Reader, vscodeKeybindings vscodeKeybindingConfig) (string, error) {
-	var before vscodeKeybindingConfig
-	if base == nil {
-		before = vscodeKeybindingConfig{}
-	} else {
-		if err := json.NewDecoder(base).Decode(&before); err != nil {
-			return "", fmt.Errorf("failed to decode base: %w", err)
-		}
-	}
-
-	d, err := e.differ.Diff(before, vscodeKeybindings)
-	if err != nil {
-		return "", fmt.Errorf("failed to calculate diff: %w", err)
-	}
-
-	return d, nil
 }
