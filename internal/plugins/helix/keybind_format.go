@@ -27,7 +27,7 @@ var (
 		"ret":       keymapv1.KeyCode_RETURN,
 		"esc":       keymapv1.KeyCode_ESCAPE,
 		"del":       keymapv1.KeyCode_FORWARD_DELETE, // Note: Helix 'del' is our 'forward_delete'
-		"ins":       keymapv1.KeyCode_INSERT,
+		"ins":       keymapv1.KeyCode_INSERT_OR_HELP,
 		"left":      keymapv1.KeyCode_LEFT_ARROW,
 		"right":     keymapv1.KeyCode_RIGHT_ARROW,
 		"up":        keymapv1.KeyCode_UP_ARROW,

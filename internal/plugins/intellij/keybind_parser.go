@@ -54,7 +54,7 @@ var (
 		"SPACE":      keymapv1.KeyCode_SPACE,
 		"DELETE":     keymapv1.KeyCode_FORWARD_DELETE,
 		"CAPS_LOCK":  keymapv1.KeyCode_CAPS_LOCK,
-		"INSERT":     keymapv1.KeyCode_INSERT,
+		"INSERT":     keymapv1.KeyCode_INSERT_OR_HELP,
 
 		// Function keys
 		"F1":  keymapv1.KeyCode_F1,
