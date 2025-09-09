@@ -17,6 +17,7 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/views"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
 var (
@@ -71,6 +72,7 @@ var exportCmd = &cobra.Command{
 			logger.Warn("Failed to open existing output as base", "error", err)
 		}
 		opts.Base = base
+		opts.DiffType = keymapv1.ExportKeymapRequest_ASCII_DIFF
 
 		// Export to memory buffer first for preview, optional confirmation, and then write
 		var mem bytes.Buffer

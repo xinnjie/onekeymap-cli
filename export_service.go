@@ -1,11 +1,13 @@
 package onekeymap
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"log/slog"
 
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
@@ -41,17 +43,28 @@ func (s *exportService) Export(ctx context.Context, destination io.Writer, setti
 		return nil, fmt.Errorf("failed to get exporter for %s: %w", opts.EditorType, err)
 	}
 
-	report, err := exporter.Export(ctx, destination, setting, pluginapi.PluginExportOption{Base: opts.Base})
+	var newConfigBuf bytes.Buffer
+	writer := destination
+	if opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF && opts.Base != nil {
+		writer = io.MultiWriter(destination, &newConfigBuf)
+	}
+
+	report, err := exporter.Export(ctx, writer, setting, pluginapi.PluginExportOption{Base: opts.Base})
 	if err != nil {
 		return nil, fmt.Errorf("failed to export config: %w", err)
 	}
 
-	diff := func() string {
-		if report.Diff == nil {
-			return ""
+	var diffStr string
+	if opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF && opts.Base != nil {
+		gitDiffer := diff.NewUnifiedDiffFormatDiffer()
+		diffString, err := gitDiffer.Diff(opts.Base, &newConfigBuf)
+		if err != nil {
+			return nil, fmt.Errorf("failed to compute git diff: %w", err)
 		}
-		return *report.Diff
-	}()
+		diffStr = diffString
+	} else if report != nil && report.Diff != nil {
+		diffStr = *report.Diff
+	}
 
-	return &exportapi.ExportReport{Diff: diff}, nil
+	return &exportapi.ExportReport{Diff: diffStr}, nil
 }
