@@ -3,59 +3,55 @@ package diff
 import (
 	"bytes"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGitDiffer_NoChange_ReturnsEqualDelta(t *testing.T) {
 	d := NewUnifiedDiffFormatDiffer()
 	text := "hello world"
-	got, err := d.Diff(bytes.NewBufferString(text), bytes.NewBufferString(text))
+	got, err := d.Diff(bytes.NewBufferString(text), bytes.NewBufferString(text), "test")
 	if err != nil {
 		t.Fatalf("Diff returned error: %v", err)
 	}
-	want := ""
-	if got != want {
-		t.Fatalf("unexpected delta for identical inputs\nwant: %q\n got: %q", want, got)
-	}
+	// go-diff-fmt prints only headers when there is no change, with a git header line
+	want := "diff --git a/test b/test\n--- a/test\n+++ b/test\n"
+	assert.Equal(t, want, got)
 }
 
 func TestGitDiffer_OnlyInsert(t *testing.T) {
 	d := NewUnifiedDiffFormatDiffer()
-	before := ""
-	after := "abc"
-	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after))
+	before := "line1\n"
+	after := "line1\nline2\n"
+	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after), "test")
 	if err != nil {
 		t.Fatalf("Diff returned error: %v", err)
 	}
-	want := "@@ -0,0 +1,3 @@\n+abc\n"
-	if got != want {
-		t.Fatalf("unexpected delta for insert\nwant: %q\n got: %q", want, got)
-	}
+	want := "diff --git a/test b/test\n--- a/test\n+++ b/test\n@@ -1 +1,2 @@\n line1\n+line2\n"
+	assert.Equal(t, want, got)
 }
 
 func TestGitDiffer_OnlyDelete(t *testing.T) {
 	d := NewUnifiedDiffFormatDiffer()
 	before := "abc"
 	after := ""
-	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after))
+	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after), "test")
 	if err != nil {
 		t.Fatalf("Diff returned error: %v", err)
 	}
-	want := "@@ -1,3 +0,0 @@\n-abc\n"
-	if got != want {
-		t.Fatalf("unexpected delta for delete\nwant: %q\n got: %q", want, got)
-	}
+	// No trailing newline in input, expect explicit no-newline message
+	want := "diff --git a/test b/test\n--- a/test\n+++ b/test\n@@ -1 +0,0 @@\n-abc\n\\ No newline at end of file\n"
+	assert.Equal(t, want, got)
 }
 
 func TestGitDiffer_ReplaceMiddleChar(t *testing.T) {
 	d := NewUnifiedDiffFormatDiffer()
 	before := "abc"
 	after := "axc"
-	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after))
+	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after), "test")
 	if err != nil {
 		t.Fatalf("Diff returned error: %v", err)
 	}
-	want := "@@ -1,3 +1,3 @@\n a\n-b\n+x\n c\n"
-	if got != want {
-		t.Fatalf("unexpected delta for replace\nwant: %q\n got: %q", want, got)
-	}
+	want := "diff --git a/test b/test\n--- a/test\n+++ b/test\n@@ -1 +1 @@\n-abc\n\\ No newline at end of file\n+axc\n\\ No newline at end of file\n"
+	assert.Equal(t, want, got)
 }

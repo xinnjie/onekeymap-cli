@@ -44,6 +44,10 @@ func (e *testExporter) Export(ctx context.Context, destination io.Writer, settin
 	if e.writeContent != "" {
 		_, _ = io.Copy(destination, strings.NewReader(e.writeContent))
 	}
+	// Simulate plugins that consume the base stream if provided
+	if opts.Base != nil {
+		_, _ = io.Copy(io.Discard, opts.Base)
+	}
 	return &pluginapi.PluginExportReport{
 		Diff:               e.reportDiff,
 		BaseEditorConfig:   e.baseEditorConfig,
@@ -70,13 +74,13 @@ func TestExportService_Diff_Unified(t *testing.T) {
 		EditorType: pluginapi.EditorType("test"),
 		Base:       strings.NewReader(before),
 		DiffType:   keymapv1.ExportKeymapRequest_UNIFIED_DIFF,
+		FilePath:   "test.txt",
 	})
 	require.NoError(t, err)
 	assert.Equal(t, after, out.String())
 	require.NotNil(t, report)
-	assert.NotEmpty(t, report.Diff)
-	// Unified patch text should include additions marker or hunk header
-	assert.True(t, strings.Contains(report.Diff, "@@") || strings.Contains(report.Diff, "\n+"))
+	want := "diff --git a/test.txt b/test.txt\n--- a/test.txt\n+++ b/test.txt\n@@ -1 +1,2 @@\n line1\n+line2\n"
+	assert.Equal(t, want, report.Diff)
 }
 
 func TestExportService_Diff_JSONASCII_FromStructuredConfigs(t *testing.T) {
@@ -92,10 +96,8 @@ func TestExportService_Diff_JSONASCII_FromStructuredConfigs(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotNil(t, report)
-	assert.NotEmpty(t, report.Diff)
-	assert.Contains(t, report.Diff, "k")
-	// JSON ascii differ denotes removals and additions
-	assert.True(t, strings.Contains(report.Diff, "+") || strings.Contains(report.Diff, "-"))
+	want := " {\n\x1b[30;41m-  \"k\": \"v1\"\x1b[0m\n\x1b[30;42m+  \"k\": \"v2\"\x1b[0m\n }\n"
+	assert.Equal(t, want, report.Diff)
 }
 
 func TestExportService_Diff_FallbackFromPlugin(t *testing.T) {

@@ -14,6 +14,9 @@ type ExportOptions struct {
 	Base       io.Reader // Optional base keymap for specific editor
 	// TODO(xinnjie): export api level enum is not a good idea
 	DiffType keymapv1.ExportKeymapRequest_DiffType
+
+	// file path for the keymap config
+	FilePath string
 }
 
 // Exporter defines the contract for converting a universal KeymapSetting

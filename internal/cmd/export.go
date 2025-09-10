@@ -73,6 +73,7 @@ var exportCmd = &cobra.Command{
 		}
 		opts.Base = base
 		opts.DiffType = keymapv1.ExportKeymapRequest_ASCII_DIFF
+		opts.FilePath = *exportOutput
 
 		// Export to memory buffer first for preview, optional confirmation, and then write
 		var mem bytes.Buffer

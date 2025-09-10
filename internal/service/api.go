@@ -35,6 +35,8 @@ func (s *Server) ExportKeymap(ctx context.Context, req *keymapv1.ExportKeymapReq
 	report, err := s.exporter.Export(ctx, &buf, req.Keymap, exportapi.ExportOptions{
 		EditorType: et,
 		Base:       base,
+		DiffType:   req.GetDiffType(),
+		FilePath:   req.GetFilePath(),
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "internal error: %s", err)
