@@ -155,12 +155,18 @@ func prepareImportInputFlags(cmd *cobra.Command, onekeymapConfig string) error {
 	}
 
 	if *importInput == "" {
-		v, err := p.DefaultConfigPath()
-		if err != nil {
-			logger.Error("Failed to get default config path", "error", err)
-			return err
+		configPath := viper.GetString(fmt.Sprintf("editors.%s.keymap_path", *importFrom))
+		if configPath != "" {
+			*importInput = configPath
+			logger.Info("Using keymap path from config", "editor", *importFrom, "path", configPath)
+		} else {
+			v, err := p.DefaultConfigPath()
+			if err != nil {
+				logger.Error("Failed to get default config path", "error", err)
+				return err
+			}
+			*importInput = v[0]
 		}
-		*importInput = v[0]
 	}
 	return nil
 }

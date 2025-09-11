@@ -9,13 +9,28 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Config holds application configuration settings
+// EditorConfig holds per-editor configuration settings.
+type EditorConfig struct {
+	// KeymapPath is the path to the editor's keymap file.
+	KeymapPath string `mapstructure:"keymap_path"`
+	// TODO(xinnjie): Sync command is not implement yet
+	// SyncEnabled specifies whether keymap syncing is enabled for this editor.
+	SyncEnabled bool `mapstructure:"sync_enabled"`
+}
+
 type Config struct {
-	Verbose                  bool   `mapstructure:"verbose"`
-	Quiet                    bool   `mapstructure:"quiet"`
-	OneKeyMap                string `mapstructure:"onekeymap"`
+	// Verbose enables verbose output.
+	Verbose bool `mapstructure:"verbose"`
+	// Quiet suppresses all output except for errors.
+	Quiet bool `mapstructure:"quiet"`
+	// OneKeyMap is the path to the main onekeymap configuration file.
+	OneKeyMap string `mapstructure:"onekeymap"`
+	// OtelExporterOtlpEndpoint is the OpenTelemetry OTLP exporter endpoint.
 	OtelExporterOtlpEndpoint string `mapstructure:"otel.exporter.otlp.endpoint"`
-	ServerListen             string `mapstructure:"server.listen"`
+	// ServerListen is the server listen address (e.g., "tcp://127.0.0.1:50051" or "unix:///tmp/onekeymap.sock").
+	ServerListen string `mapstructure:"server.listen"`
+	// Editors holds configuration for different editors.
+	Editors map[string]EditorConfig `mapstructure:"editors"`
 }
 
 // Environment variables mapping

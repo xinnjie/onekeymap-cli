@@ -166,8 +166,14 @@ func prepareExportInputFlags(cmd *cobra.Command, onekeymapPlaceholder string) er
 	}
 	// Determine output path
 	if *exportOutput == "" {
-		if v, err := p.DefaultConfigPath(); err == nil {
-			*exportOutput = v[0]
+		configPath := viper.GetString(fmt.Sprintf("editors.%s.keymap_path", *toFlag))
+		if configPath != "" {
+			*exportOutput = configPath
+			logger.Info("Using keymap path from config", "editor", *toFlag, "path", configPath)
+		} else {
+			if v, err := p.DefaultConfigPath(); err == nil {
+				*exportOutput = v[0]
+			}
 		}
 	}
 	return nil
