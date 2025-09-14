@@ -53,7 +53,7 @@ func (e *demoExporter) Export(ctx context.Context, destination io.Writer, settin
 		return nil, fmt.Errorf("failed to write to destination: %w", err)
 	}
 
-	d, err := e.calculateDiff(opts.Base, out)
+	d, err := e.calculateDiff(opts.ExistingConfig, out)
 	if err != nil {
 		return nil, err
 	}

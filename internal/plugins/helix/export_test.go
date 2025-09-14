@@ -142,7 +142,7 @@ func TestExportHelixKeymap(t *testing.T) {
 			require.NoError(t, err)
 
 			var buf bytes.Buffer
-			opts := pluginapi.PluginExportOption{Base: nil}
+			opts := pluginapi.PluginExportOption{ExistingConfig: nil}
 
 			if tt.existingConfig != "" {
 				opts.ExistingConfig = strings.NewReader(tt.existingConfig)
@@ -188,7 +188,7 @@ normal = "block"
 	require.NoError(t, err)
 
 	var buf bytes.Buffer
-	opts := pluginapi.PluginExportOption{Base: nil}
+	opts := pluginapi.PluginExportOption{ExistingConfig: nil}
 	if existingConfig != "" {
 		opts.ExistingConfig = strings.NewReader(existingConfig)
 	}

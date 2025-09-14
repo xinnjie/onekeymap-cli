@@ -73,18 +73,8 @@ func (e *helixExporter) Export(ctx context.Context, destination io.Writer, setti
 		return nil, fmt.Errorf("failed to encode helix toml: %w", err)
 	}
 
-	// Prepare structured base keys for centralized diffing
-	var baseKeys helixKeys
-	if opts.Base != nil {
-		var cfg helixConfig
-		if err := toml.NewDecoder(opts.Base).Decode(&cfg); err != nil {
-			return nil, fmt.Errorf("failed to decode base: %w", err)
-		}
-		baseKeys = cfg.Keys
-	}
-
 	return &pluginapi.PluginExportReport{
-		BaseEditorConfig:   baseKeys,
+		BaseEditorConfig:   existingKeys,
 		ExportEditorConfig: finalKeys,
 	}, nil
 }

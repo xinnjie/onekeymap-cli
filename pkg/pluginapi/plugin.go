@@ -33,7 +33,6 @@ type PluginExporter interface {
 
 // PluginExportOption provides configuration for an export operation.
 type PluginExportOption struct {
-	Base io.Reader // Optional base keymap for specific editor
 	// ExistingConfig provides a reader for the editor's current keymap
 	// configuration. If provided, the exporter will merge the settings
 	// instead of overwriting the entire file, preserving any keybindings

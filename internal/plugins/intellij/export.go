@@ -68,16 +68,8 @@ func (e *intellijExporter) Export(ctx context.Context, destination io.Writer, se
 		return nil, fmt.Errorf("failed to write xml body: %w", err)
 	}
 
-	// Prepare structured base doc for centralized diffing
-	var baseDoc KeymapXML
-	if opts.Base != nil {
-		if err := xml.NewDecoder(opts.Base).Decode(&baseDoc); err != nil {
-			return nil, fmt.Errorf("failed to decode base: %w", err)
-		}
-	}
-
 	return &pluginapi.PluginExportReport{
-		BaseEditorConfig:   baseDoc,
+		BaseEditorConfig:   existingDoc,
 		ExportEditorConfig: doc,
 	}, nil
 }

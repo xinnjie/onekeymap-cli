@@ -45,8 +45,8 @@ func (e *testExporter) Export(ctx context.Context, destination io.Writer, settin
 		_, _ = io.Copy(destination, strings.NewReader(e.writeContent))
 	}
 	// Simulate plugins that consume the base stream if provided
-	if opts.Base != nil {
-		_, _ = io.Copy(io.Discard, opts.Base)
+	if opts.ExistingConfig != nil {
+		_, _ = io.Copy(io.Discard, opts.ExistingConfig)
 	}
 	return &pluginapi.PluginExportReport{
 		Diff:               e.reportDiff,

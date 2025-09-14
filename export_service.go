@@ -59,7 +59,7 @@ func (s *exportService) Export(ctx context.Context, destination io.Writer, setti
 		writer = io.MultiWriter(destination, &newConfigBuf)
 	}
 
-	report, err := exporter.Export(ctx, writer, setting, pluginapi.PluginExportOption{Base: pluginBase})
+	report, err := exporter.Export(ctx, writer, setting, pluginapi.PluginExportOption{ExistingConfig: pluginBase})
 	if err != nil {
 		return nil, fmt.Errorf("failed to export config: %w", err)
 	}

@@ -46,10 +46,14 @@ func (p *zedExporter) Export(ctx context.Context, destination io.Writer, setting
 	// Merge managed and existing keybindings
 	finalKeymaps := p.mergeKeybindings(managedKeymaps, existingConfig)
 
-	// Ensure deterministic order by sorting contexts
-	sort.Slice(finalKeymaps, func(i, j int) bool {
-		return finalKeymaps[i].Context < finalKeymaps[j].Context
-	})
+	// Order contexts by base if provided; otherwise fallback to alphabetical for determinism
+	if len(existingConfig) > 0 {
+		finalKeymaps = orderByBaseContext(finalKeymaps, existingConfig)
+	} else {
+		sort.Slice(finalKeymaps, func(i, j int) bool {
+			return finalKeymaps[i].Context < finalKeymaps[j].Context
+		})
+	}
 
 	// Write JSON without HTML escaping so that '&&', '<', '>' remain as-is
 	enc := json.NewEncoder(destination)
@@ -59,19 +63,50 @@ func (p *zedExporter) Export(ctx context.Context, destination io.Writer, setting
 		return nil, fmt.Errorf("failed to encode vscode keybindings to json: %w", err)
 	}
 
-	// Prepare structured 'before' from opts.Base for centralized diffing
-	var baseConfig zedKeymapConfig
-	if opts.Base != nil {
-		if err := json.NewDecoder(opts.Base).Decode(&baseConfig); err != nil {
-			return nil, fmt.Errorf("failed to decode base: %w", err)
-		}
-	}
-
 	// Defer diff calculation to exportService. Provide structured before/after configs.
 	return &pluginapi.PluginExportReport{
-		BaseEditorConfig:   baseConfig,
+		BaseEditorConfig:   existingConfig,
 		ExportEditorConfig: finalKeymaps,
 	}, nil
+}
+
+// orderByBaseContext reorders exported contexts following the order present
+// in the base config. Contexts not present in base keep their relative order
+// after those that do, with an alphabetical fallback for determinism.
+func orderByBaseContext(final zedKeymapConfig, base zedKeymapConfig) zedKeymapConfig {
+	if len(final) == 0 || len(base) == 0 {
+		return final
+	}
+	baseOrder := make(map[string]int, len(base))
+	next := 0
+	for _, ctx := range base {
+		if ctx.Context == "" {
+			continue
+		}
+		if _, ok := baseOrder[ctx.Context]; !ok {
+			baseOrder[ctx.Context] = next
+			next++
+		}
+	}
+	if len(baseOrder) == 0 {
+		return final
+	}
+	sort.SliceStable(final, func(i, j int) bool {
+		oi, okI := baseOrder[final[i].Context]
+		oj, okJ := baseOrder[final[j].Context]
+		if okI && okJ {
+			return oi < oj
+		}
+		if okI && !okJ {
+			return true
+		}
+		if !okI && okJ {
+			return false
+		}
+		// Neither in base: fallback to alphabetical for determinism
+		return final[i].Context < final[j].Context
+	})
+	return final
 }
 
 // generateManagedKeybindings creates keybindings from the current setting

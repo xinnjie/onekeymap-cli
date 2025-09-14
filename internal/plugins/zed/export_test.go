@@ -94,7 +94,7 @@ func TestExportZedKeymap(t *testing.T) {
 			var buf bytes.Buffer
 			exporter, err := p.Exporter()
 			require.NoError(t, err)
-			_, err = exporter.Export(context.Background(), &buf, tt.setting, pluginapi.PluginExportOption{Base: nil})
+			_, err = exporter.Export(context.Background(), &buf, tt.setting, pluginapi.PluginExportOption{ExistingConfig: nil})
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -235,15 +235,15 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
     }
   },
   {
-    "context": "Terminal",
-    "bindings": {
-      "ctrl-c": "custom::TerminalAction"
-    }
-  },
-  {
     "context": "Workspace",
     "bindings": {
       "cmd-shift-p": "custom::WorkspaceAction"
+    }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-c": "custom::TerminalAction"
     }
   }
 ]`,
@@ -274,7 +274,7 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 			require.NoError(t, err)
 
 			var buf bytes.Buffer
-			opts := pluginapi.PluginExportOption{Base: nil}
+			opts := pluginapi.PluginExportOption{ExistingConfig: nil}
 
 			if tt.existingConfig != "" {
 				opts.ExistingConfig = strings.NewReader(tt.existingConfig)
@@ -286,4 +286,57 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 			assert.JSONEq(t, tt.wantJSON, buf.String())
 		})
 	}
+}
+
+func TestExportZedKeymap_OrderByBaseContext(t *testing.T) {
+	mappingConfig, err := mappings.NewTestMappingConfig()
+	require.NoError(t, err)
+
+	existingConfig := `[
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-x": "custom::UserAction"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-p": "custom::WorkspaceAction"
+    }
+  }
+]`
+
+	setting := &keymapv1.KeymapSetting{
+		Keybindings: []*keymapv1.ActionBinding{
+			keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+		},
+	}
+
+	p := New(mappingConfig, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	exporter, err := p.Exporter()
+	require.NoError(t, err)
+
+	var buf bytes.Buffer
+	_, err = exporter.Export(context.Background(), &buf, setting, pluginapi.PluginExportOption{
+		ExistingConfig: strings.NewReader(existingConfig),
+	})
+	require.NoError(t, err)
+
+	wantJSON := `[
+	  {
+	    "context": "Editor",
+	    "bindings": {
+	      "cmd-c": "editor::Copy",
+	      "cmd-x": "custom::UserAction"
+	    }
+	  },
+	  {
+	    "context": "Workspace",
+	    "bindings": {
+	      "cmd-shift-p": "custom::WorkspaceAction"
+	    }
+	  }
+	]`
+	assert.JSONEq(t, wantJSON, buf.String())
 }

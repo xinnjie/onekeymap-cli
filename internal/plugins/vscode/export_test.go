@@ -178,6 +178,56 @@ func TestExporter_Export(t *testing.T) {
 				}
 			]`,
 		},
+		// Base order preservation tests
+		{
+			name: "preserves order by base config using command as key",
+			keymapSetting: &keymapv1.KeymapSetting{
+				Keybindings: []*keymapv1.ActionBinding{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
+				},
+			},
+			// Base config defines the desired order by command: command2, copy, command1, custom.undo
+			existingConfig: `[
+				{"key":"x","command":"command2"},
+				{"key":"x","command":"editor.action.clipboardCopyAction"},
+				{"key":"x","command":"command1"},
+				{"key":"x","command":"custom.undo.command"}
+			]`,
+			expectedJSON: `[
+				{
+					"key": "alt+3",
+					"command": "command2",
+					"when": "condition2"
+				},
+				{
+					"key": "x",
+					"command": "command2"
+				},
+				{
+					"key": "cmd+c",
+					"command": "editor.action.clipboardCopyAction",
+					"when": "editorTextFocus && condition > 0"
+				},
+				{
+					"key": "x",
+					"command": "editor.action.clipboardCopyAction"
+				},
+				{
+					"key": "alt+3",
+					"command": "command1",
+					"when": "condition1"
+				},
+				{
+					"key": "x",
+					"command": "command1"
+				},
+				{
+					"key": "x",
+					"command": "custom.undo.command"
+				}
+			]`,
+		},
 	}
 
 	for _, tt := range tests {
@@ -187,7 +237,7 @@ func TestExporter_Export(t *testing.T) {
 			require.NoError(t, err)
 
 			var buf bytes.Buffer
-			opts := pluginapi.PluginExportOption{Base: nil}
+			opts := pluginapi.PluginExportOption{ExistingConfig: nil}
 
 			if tt.existingConfig != "" {
 				opts.ExistingConfig = strings.NewReader(tt.existingConfig)
