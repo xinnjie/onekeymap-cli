@@ -55,7 +55,7 @@ func (i *demoImporter) Import(
 		}
 		kb, err := keymap.ParseKeyBinding(b.Keys, "+")
 		if err != nil {
-			i.logger.Warn("Skipping unparsable keybinding", "keys", b.Keys, "error", err)
+			i.logger.WarnContext(ctx, "Skipping unparsable keybinding", "keys", b.Keys, "error", err)
 			continue
 		}
 		setting.Keybindings = append(

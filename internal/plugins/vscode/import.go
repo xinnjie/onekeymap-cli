@@ -49,7 +49,8 @@ func (i *vscodeImporter) Import(
 	for _, binding := range vscodeKeybindings {
 		mapping := i.FindByVSCodeActionWithArgs(binding.Command, binding.When, binding.Args)
 		if mapping == nil {
-			i.logger.Debug(
+			i.logger.DebugContext(
+				ctx,
 				"Skipping keybinding with unknown action",
 				"action",
 				binding.Command,
@@ -63,7 +64,7 @@ func (i *vscodeImporter) Import(
 
 		kb, err := parseKeybinding(binding.Key)
 		if err != nil {
-			i.logger.Warn("Skipping keybinding with unparsable key", "key", binding.Key, "error", err)
+			i.logger.WarnContext(ctx, "Skipping keybinding with unparsable key", "key", binding.Key, "error", err)
 			continue
 		}
 

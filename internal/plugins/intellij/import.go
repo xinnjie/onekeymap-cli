@@ -46,7 +46,7 @@ func (p *intellijImporter) Import(
 		actionID, err := p.ActionIDFromIntelliJ(act.ID)
 		if err != nil {
 			// Not found in mapping, skip quietly
-			p.logger.Debug("no universal mapping for intellij action", "action", act.ID)
+			p.logger.DebugContext(ctx, "no universal mapping for intellij action", "action", act.ID)
 			continue
 		}
 
@@ -56,7 +56,7 @@ func (p *intellijImporter) Import(
 			}
 			kb, err := parseKeyBinding(ks)
 			if err != nil {
-				p.logger.Warn("failed to parse key binding", "binding", ks, "error", err)
+				p.logger.WarnContext(ctx, "failed to parse key binding", "binding", ks, "error", err)
 				continue
 			}
 			newBinding := &keymapv1.ActionBinding{
