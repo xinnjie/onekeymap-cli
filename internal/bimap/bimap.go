@@ -5,12 +5,12 @@ type BiMap[K comparable, V comparable] struct {
 	inverse map[V]K
 }
 
-// NewBiMap returns a an empty, mutable, biMap
+// NewBiMap returns a new empty, mutable BiMap.
 func NewBiMap[K comparable, V comparable]() *BiMap[K, V] {
 	return &BiMap[K, V]{forward: make(map[K]V), inverse: make(map[V]K)}
 }
 
-// NewBiMapFrom returns a new BiMap from a map[K, V]
+// NewBiMapFromMap returns a new BiMap from a map[K, V].
 func NewBiMapFromMap[K comparable, V comparable](forwardMap map[K]V) *BiMap[K, V] {
 	biMap := NewBiMap[K, V]()
 	for k, v := range forwardMap {
@@ -19,7 +19,7 @@ func NewBiMapFromMap[K comparable, V comparable](forwardMap map[K]V) *BiMap[K, V
 	return biMap
 }
 
-// Insert puts a key and value into the BiMap, provided its mutable. Also creates the reverse mapping from value to key.
+// Insert inserts a key and value into the BiMap, provided its mutable. Also creates the reverse mapping from value to key.
 func (b *BiMap[K, V]) Insert(k K, v V) {
 	if _, ok := b.forward[k]; ok {
 		delete(b.inverse, b.forward[k])
@@ -29,15 +29,15 @@ func (b *BiMap[K, V]) Insert(k K, v V) {
 	b.inverse[v] = k
 }
 
-// Exists checks whether or not a key exists in the BiMap
+// Exists checks whether or not a key exists in the BiMap.
 func (b *BiMap[K, V]) Exists(k K) bool {
 	_, ok := b.forward[k]
 	return ok
 }
 
-// ExistsInverse checks whether or not a value exists in the BiMap
-func (b *BiMap[K, V]) ExistsInverse(k V) bool {
-	_, ok := b.inverse[k]
+// ExistsInverse checks whether or not a value exists in the BiMap.
+func (b *BiMap[K, V]) ExistsInverse(v V) bool {
+	_, ok := b.inverse[v]
 	return ok
 }
 
@@ -55,5 +55,4 @@ func (b *BiMap[K, V]) GetInverse(v V) (K, bool) {
 		return *new(K), false
 	}
 	return b.inverse[v], true
-
 }

@@ -8,18 +8,18 @@ import (
 )
 
 func TestJsonDiffer_NoChange_ReturnsEmpty(t *testing.T) {
-	d := NewJsonDiffer()
+	d := NewJSONDiffer()
 
 	before := map[string]any{"a": 1, "b": map[string]any{"c": 2}}
 	after := map[string]any{"a": 1, "b": map[string]any{"c": 2}}
 
 	ds, err := d.Diff(before, after)
 	require.NoError(t, err)
-	assert.Equal(t, "", ds)
+	assert.Empty(t, ds)
 }
 
 func TestJsonDiffer_MapChanged_ReturnsDiff(t *testing.T) {
-	d := NewJsonDiffer()
+	d := NewJSONDiffer()
 
 	before := map[string]any{"a": 1}
 	after := map[string]any{"a": 2}
@@ -32,7 +32,7 @@ func TestJsonDiffer_MapChanged_ReturnsDiff(t *testing.T) {
 }
 
 func TestJsonDiffer_ArrayChanged_ReturnsDiff(t *testing.T) {
-	d := NewJsonDiffer()
+	d := NewJSONDiffer()
 
 	var before []any
 	after := []any{"x"}
@@ -44,11 +44,11 @@ func TestJsonDiffer_ArrayChanged_ReturnsDiff(t *testing.T) {
 }
 
 func TestJsonDiffer_TypeMismatch_ReturnsError(t *testing.T) {
-	d := NewJsonDiffer()
+	d := NewJSONDiffer()
 
 	before := map[string]any{"a": 1}
 	after := []any{"x"}
 
 	_, err := d.Diff(before, after)
-	assert.Error(t, err)
+	require.Error(t, err)
 }

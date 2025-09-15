@@ -20,7 +20,7 @@ type helixPlugin struct {
 func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
 	return &helixPlugin{
 		mappingConfig: mappingConfig,
-		exporter:      newExporter(mappingConfig, logger, diff.NewJsonAsciiDiffer()),
+		exporter:      newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer()),
 		logger:        logger,
 	}
 }

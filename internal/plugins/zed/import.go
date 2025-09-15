@@ -28,7 +28,11 @@ func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *ze
 
 // Import reads the editor's configuration source and converts it into the
 // universal onekeymap KeymapSetting format.
-func (p *zedImporter) Import(ctx context.Context, source io.Reader, opts pluginapi.PluginImportOption) (*keymapv1.KeymapSetting, error) {
+func (p *zedImporter) Import(
+	ctx context.Context,
+	source io.Reader,
+	opts pluginapi.PluginImportOption,
+) (*keymapv1.KeymapSetting, error) {
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from reader: %w", err)
@@ -70,7 +74,17 @@ func (p *zedImporter) Import(ctx context.Context, source io.Reader, opts plugina
 			if err != nil {
 				// If a mapping is not found, we simply skip it for now.
 				// In the future, this could be logged or added to a report.
-				p.logger.Warn("failed to find action", "action", actionStr, "context", zk.Context, "args", actionArgs, "error", err)
+				p.logger.Warn(
+					"failed to find action",
+					"action",
+					actionStr,
+					"context",
+					zk.Context,
+					"args",
+					actionArgs,
+					"error",
+					err,
+				)
 				continue
 			}
 			keymapEntry := &keymapv1.ActionBinding{

@@ -87,7 +87,10 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 				Description: "Format Selection",
 				Category:    "Editor",
 				Bindings: []*keymapv1.Binding{
-					{KeyChords: keymap.MustParseKeyBinding("ctrl+shift+alt+l").KeyChords, KeyChordsReadable: "ctrl+shift+alt+l"},
+					{
+						KeyChords:         keymap.MustParseKeyBinding("ctrl+shift+alt+l").KeyChords,
+						KeyChordsReadable: "ctrl+shift+alt+l",
+					},
 				},
 			},
 		}},

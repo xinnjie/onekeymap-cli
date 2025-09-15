@@ -20,7 +20,7 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-// testPlugin implements pluginapi.Plugin interface for testing
+// testPlugin implements pluginapi.Plugin interface for testing.
 type testPlugin struct {
 	editorType  pluginapi.EditorType
 	configPath  string
@@ -28,7 +28,12 @@ type testPlugin struct {
 	importError error
 }
 
-func newTestPlugin(editorType pluginapi.EditorType, configPath string, importData *keymapv1.KeymapSetting, importError error) *testPlugin {
+func newTestPlugin(
+	editorType pluginapi.EditorType,
+	configPath string,
+	importData *keymapv1.KeymapSetting,
+	importError error,
+) *testPlugin {
 	return &testPlugin{
 		editorType:  editorType,
 		configPath:  configPath,
@@ -56,20 +61,29 @@ func (p *testPlugin) Exporter() (pluginapi.PluginExporter, error) {
 	return &testPluginExporter{}, nil
 }
 
-// testPluginImporter implements pluginapi.PluginImporter interface for testing
+// testPluginImporter implements pluginapi.PluginImporter interface for testing.
 type testPluginImporter struct {
 	importData  *keymapv1.KeymapSetting
 	importError error
 }
 
-func (i *testPluginImporter) Import(ctx context.Context, source io.Reader, opts pluginapi.PluginImportOption) (*keymapv1.KeymapSetting, error) {
+func (i *testPluginImporter) Import(
+	ctx context.Context,
+	source io.Reader,
+	opts pluginapi.PluginImportOption,
+) (*keymapv1.KeymapSetting, error) {
 	return i.importData, i.importError
 }
 
-// testPluginExporter implements pluginapi.PluginExporter interface for testing
+// testPluginExporter implements pluginapi.PluginExporter interface for testing.
 type testPluginExporter struct{}
 
-func (e *testPluginExporter) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts pluginapi.PluginExportOption) (*pluginapi.PluginExportReport, error) {
+func (e *testPluginExporter) Export(
+	ctx context.Context,
+	destination io.Writer,
+	setting *keymapv1.KeymapSetting,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	return &pluginapi.PluginExportReport{}, nil
 }
 
@@ -119,7 +133,10 @@ func TestImportService_Import(t *testing.T) {
 							Description: "Copy",
 							Category:    "Editor",
 							Bindings: []*keymapv1.Binding{
-								{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "ctrl+c"},
+								{
+									KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
+									KeyChordsReadable: "ctrl+c",
+								},
 							},
 						},
 						{
@@ -128,7 +145,10 @@ func TestImportService_Import(t *testing.T) {
 							Description: "Paste",
 							Category:    "Editor",
 							Bindings: []*keymapv1.Binding{
-								{KeyChords: keymap.MustParseKeyBinding("ctrl+v").KeyChords, KeyChordsReadable: "ctrl+v"},
+								{
+									KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
+									KeyChordsReadable: "ctrl+v",
+								},
 							},
 						},
 					},
@@ -170,7 +190,10 @@ func TestImportService_Import(t *testing.T) {
 							Description: "Paste",
 							Category:    "Editor",
 							Bindings: []*keymapv1.Binding{
-								{KeyChords: keymap.MustParseKeyBinding("ctrl+v").KeyChords, KeyChordsReadable: "ctrl+v"},
+								{
+									KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
+									KeyChordsReadable: "ctrl+v",
+								},
 							},
 						},
 					},
@@ -275,7 +298,10 @@ func TestImportService_Import(t *testing.T) {
 							Description: "Paste",
 							Category:    "Editor",
 							Bindings: []*keymapv1.Binding{
-								{KeyChords: keymap.MustParseKeyBinding("ctrl+v").KeyChords, KeyChordsReadable: "ctrl+v"},
+								{
+									KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
+									KeyChordsReadable: "ctrl+v",
+								},
 							},
 						},
 					},
@@ -344,7 +370,10 @@ func TestImportService_Import(t *testing.T) {
 							Description: "Copy",
 							Category:    "Editor",
 							Bindings: []*keymapv1.Binding{
-								{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "ctrl+c"},
+								{
+									KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
+									KeyChordsReadable: "ctrl+c",
+								},
 							},
 						},
 						After: &keymapv1.ActionBinding{
@@ -353,7 +382,10 @@ func TestImportService_Import(t *testing.T) {
 							Description: "Copy",
 							Category:    "Editor",
 							Bindings: []*keymapv1.Binding{
-								{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "ctrl+c"},
+								{
+									KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
+									KeyChordsReadable: "ctrl+c",
+								},
 								{KeyChords: keymap.MustParseKeyBinding("cmd+c").KeyChords, KeyChordsReadable: "cmd+c"},
 								{KeyChords: keymap.MustParseKeyBinding("alt+c").KeyChords, KeyChordsReadable: "alt+c"},
 							},
@@ -367,7 +399,7 @@ func TestImportService_Import(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup common test dependencies
-			testFile, err := os.CreateTemp("", "test_config_*.json")
+			testFile, err := os.CreateTemp(t.TempDir(), "test_config_*.json")
 			require.NoError(t, err)
 			defer func() { _ = os.Remove(testFile.Name()); _ = testFile.Close() }()
 			_, err = testFile.WriteString(`{}`)

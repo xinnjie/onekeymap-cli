@@ -19,7 +19,7 @@ func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.P
 	return &demoPlugin{
 		mappingConfig: mappingConfig,
 		importer:      newImporter(logger),
-		exporter:      newExporter(logger, diff.NewJsonAsciiDiffer()),
+		exporter:      newExporter(logger, diff.NewJSONASCIIDiffer()),
 		logger:        logger,
 	}
 }

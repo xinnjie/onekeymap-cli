@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 )
 
@@ -27,7 +28,7 @@ func TestDefaultConfigPath_Darwin(t *testing.T) {
 		t.Setenv("HOME", home)
 
 		_, err := plugin.DefaultConfigPath()
-		assert.Error(t, err)
+		require.Error(t, err)
 		assert.Contains(t, err.Error(), "could not locate JetBrains keymaps directory")
 	})
 
@@ -55,9 +56,8 @@ func TestDefaultConfigPath_Darwin(t *testing.T) {
 		}
 
 		p, err := plugin.DefaultConfigPath()
-		if assert.NoError(t, err) {
-			expected := []string{filepath.Join(newDir, "Onekeymap.xml")}
-			assert.EqualValues(t, expected, p)
-		}
+		require.NoError(t, err)
+		expected := []string{filepath.Join(newDir, "Onekeymap.xml")}
+		assert.Equal(t, expected, p)
 	})
 }

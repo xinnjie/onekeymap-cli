@@ -1,6 +1,7 @@
 package helix
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -62,43 +63,43 @@ func formatKeybinding(kb *keymap.KeyBinding) (string, error) {
 	var outChords []string
 
 	for _, chord := range kb.GetKeyChords().GetChords() {
-		if keycode.IsNumpad(chord.KeyCode) {
+		if keycode.IsNumpad(chord.GetKeyCode()) {
 			return "", ErrNotSupportKeyChords
 		}
 
 		// Special case for C--
-		if chord.KeyCode == keymapv1.KeyCode_MINUS &&
-			len(chord.Modifiers) == 1 &&
-			chord.Modifiers[0] == keymapv1.KeyModifier_KEY_MODIFIER_CTRL {
+		if chord.GetKeyCode() == keymapv1.KeyCode_MINUS &&
+			len(chord.GetModifiers()) == 1 &&
+			chord.GetModifiers()[0] == keymapv1.KeyModifier_KEY_MODIFIER_CTRL {
 			outChords = append(outChords, "C--")
 			continue
 		}
 
 		var parts []string
 		// Modifiers first, in M-C-S-A order for consistency
-		if slices.Contains(chord.Modifiers, keymapv1.KeyModifier_KEY_MODIFIER_META) {
+		if slices.Contains(chord.GetModifiers(), keymapv1.KeyModifier_KEY_MODIFIER_META) {
 			if mod, ok := helixModifierMapping.GetInverse(keymapv1.KeyModifier_KEY_MODIFIER_META); ok {
 				parts = append(parts, mod)
 			}
 		}
-		if slices.Contains(chord.Modifiers, keymapv1.KeyModifier_KEY_MODIFIER_CTRL) {
+		if slices.Contains(chord.GetModifiers(), keymapv1.KeyModifier_KEY_MODIFIER_CTRL) {
 			if mod, ok := helixModifierMapping.GetInverse(keymapv1.KeyModifier_KEY_MODIFIER_CTRL); ok {
 				parts = append(parts, mod)
 			}
 		}
-		if slices.Contains(chord.Modifiers, keymapv1.KeyModifier_KEY_MODIFIER_SHIFT) {
+		if slices.Contains(chord.GetModifiers(), keymapv1.KeyModifier_KEY_MODIFIER_SHIFT) {
 			if mod, ok := helixModifierMapping.GetInverse(keymapv1.KeyModifier_KEY_MODIFIER_SHIFT); ok {
 				parts = append(parts, mod)
 			}
 		}
-		if slices.Contains(chord.Modifiers, keymapv1.KeyModifier_KEY_MODIFIER_ALT) {
+		if slices.Contains(chord.GetModifiers(), keymapv1.KeyModifier_KEY_MODIFIER_ALT) {
 			if mod, ok := helixModifierMapping.GetInverse(keymapv1.KeyModifier_KEY_MODIFIER_ALT); ok {
 				parts = append(parts, mod)
 			}
 		}
 
 		// Then the key
-		keyStr, err := toHelixKey(chord.KeyCode)
+		keyStr, err := toHelixKey(chord.GetKeyCode())
 		if err != nil {
 			return "", err
 		}
@@ -132,7 +133,7 @@ func toHelixKey(kc keymapv1.KeyCode) (string, error) {
 func parseKeybinding(s string) (*keymap.KeyBinding, error) {
 	s = strings.TrimSpace(s)
 	if s == "" {
-		return nil, fmt.Errorf("empty keybinding")
+		return nil, errors.New("empty keybinding")
 	}
 
 	var chords []*keymapv1.KeyChord

@@ -20,14 +20,18 @@ func TestParseKeyBinding_Table(t *testing.T) {
 		{name: "SingleChord", in: KeyboardShortcutXML{First: "alt HOME"}, want: "alt+home"},
 		{name: "TwoChords", in: KeyboardShortcutXML{First: "control E", Second: "control S"}, want: "ctrl+e ctrl+s"},
 		{name: "InvalidFirst", in: KeyboardShortcutXML{First: "control UNKNOWN_KEY"}, wantErr: true},
-		{name: "InvalidSecond", in: KeyboardShortcutXML{First: "alt HOME", Second: "control UNKNOWN_KEY"}, wantErr: true},
+		{
+			name:    "InvalidSecond",
+			in:      KeyboardShortcutXML{First: "alt HOME", Second: "control UNKNOWN_KEY"},
+			wantErr: true,
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			kb, err := parseKeyBinding(tc.in)
 			if tc.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Nil(t, kb)
 				return
 			}
@@ -54,7 +58,9 @@ func TestFormatKeybinding_Table(t *testing.T) {
 		{name: "TwoChords", in: "ctrl+e ctrl+s", wantFirst: "control E", wantSecond: "control S"},
 		{name: "TooManyChords", in: "ctrl+a ctrl+b ctrl+c", wantErr: true, wantNil: true},
 		{name: "InvalidChordProto", build: func() *keymap.KeyBinding {
-			return keymap.NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{{}}}})
+			return keymap.NewKeyBinding(
+				&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{{}}}},
+			)
 		}, wantErr: true, wantNil: true},
 	}
 
@@ -68,7 +74,7 @@ func TestFormatKeybinding_Table(t *testing.T) {
 			}
 			ks, err := formatKeybinding(kb)
 			if tc.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Nil(t, ks)
 				return
 			}

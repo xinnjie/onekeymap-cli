@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -12,7 +13,7 @@ import (
 
 const validZedActionsPath = "onekeymap/onekeymap-cli/chore/zed-valid-action.json"
 
-// doctorCmd represents the doctor command
+// doctorCmd represents the doctor command.
 var doctorCmd = &cobra.Command{
 	Use:   "doctor",
 	Short: "Runs diagnostic checks on mapping configurations.",
@@ -69,7 +70,7 @@ func checkDescriptions() error {
 	if !foundMissing {
 		fmt.Println("  => ✅ All mappings have descriptions and short descriptions.")
 	} else {
-		return fmt.Errorf("found mappings with missing descriptions")
+		return errors.New("found mappings with missing descriptions")
 	}
 
 	return nil
@@ -112,14 +113,20 @@ func validateZedActions() error {
 				continue // Skip if no zed action is defined for this entry
 			}
 			if _, ok := validActionsSet[zconf.Action]; !ok {
-				fmt.Fprintf(os.Stderr, "  - [Invalid Zed Action] Action: '%s', Context: '%s', Mapping ID: '%s'\n", zconf.Action, zconf.Context, mapping.ID)
+				fmt.Fprintf(
+					os.Stderr,
+					"  - [Invalid Zed Action] Action: '%s', Context: '%s', Mapping ID: '%s'\n",
+					zconf.Action,
+					zconf.Context,
+					mapping.ID,
+				)
 				invalidActionsFound = true
 			}
 		}
 	}
 
 	if invalidActionsFound {
-		return fmt.Errorf("invalid zed actions were found")
+		return errors.New("invalid zed actions were found")
 	}
 
 	fmt.Println("  => ✅ All Zed actions in mappings are valid.")

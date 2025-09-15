@@ -15,7 +15,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) ExportKeymap(ctx context.Context, req *keymapv1.ExportKeymapRequest) (*keymapv1.ExportKeymapResponse, error) {
+func (s *Server) ExportKeymap(
+	ctx context.Context,
+	req *keymapv1.ExportKeymapRequest,
+) (*keymapv1.ExportKeymapResponse, error) {
 	// Validate editor type and ensure it's supported
 	if req.GetEditorType() == keymapv1.EditorType_EDITOR_TYPE_UNSPECIFIED {
 		return nil, status.Errorf(codes.InvalidArgument, "editor_type is required")
@@ -32,7 +35,7 @@ func (s *Server) ExportKeymap(ctx context.Context, req *keymapv1.ExportKeymapReq
 	}
 
 	var buf bytes.Buffer
-	report, err := s.exporter.Export(ctx, &buf, req.Keymap, exportapi.ExportOptions{
+	report, err := s.exporter.Export(ctx, &buf, req.GetKeymap(), exportapi.ExportOptions{
 		EditorType: et,
 		Base:       base,
 		DiffType:   req.GetDiffType(),
@@ -48,7 +51,10 @@ func (s *Server) ExportKeymap(ctx context.Context, req *keymapv1.ExportKeymapReq
 	}, nil
 }
 
-func (s *Server) ImportKeymap(ctx context.Context, req *keymapv1.ImportKeymapRequest) (*keymapv1.ImportKeymapResponse, error) {
+func (s *Server) ImportKeymap(
+	ctx context.Context,
+	req *keymapv1.ImportKeymapRequest,
+) (*keymapv1.ImportKeymapResponse, error) {
 	// Validate editor type and ensure it's supported
 	if req.GetEditorType() == keymapv1.EditorType_EDITOR_TYPE_UNSPECIFIED {
 		return nil, status.Errorf(codes.InvalidArgument, "editor_type is required")
@@ -59,8 +65,8 @@ func (s *Server) ImportKeymap(ctx context.Context, req *keymapv1.ImportKeymapReq
 	}
 
 	var baseSetting *keymapv1.KeymapSetting
-	if req.Base != "" {
-		km, err := keymap.Load(strings.NewReader(req.Base))
+	if req.GetBase() != "" {
+		km, err := keymap.Load(strings.NewReader(req.GetBase()))
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to parse base keymap: %v", err)
 		}
@@ -69,7 +75,7 @@ func (s *Server) ImportKeymap(ctx context.Context, req *keymapv1.ImportKeymapReq
 
 	result, err := s.importer.Import(ctx, importapi.ImportOptions{
 		EditorType:  et,
-		InputStream: strings.NewReader(req.Source),
+		InputStream: strings.NewReader(req.GetSource()),
 		Base:        baseSetting,
 	})
 	if err != nil {
@@ -97,7 +103,10 @@ func toProtoKeymapDiff(diffs []importapi.KeymapDiff) []*keymapv1.ActionDiff {
 	return result
 }
 
-func (s *Server) DefaultConfigPath(ctx context.Context, req *keymapv1.DefaultConfigPathRequest) (*keymapv1.DefaultConfigPathResponse, error) {
+func (s *Server) DefaultConfigPath(
+	ctx context.Context,
+	req *keymapv1.DefaultConfigPathRequest,
+) (*keymapv1.DefaultConfigPathResponse, error) {
 	// For now, plugins resolve path by runtime.GOOS. We only support macOS requests on this server currently.
 	switch req.GetPlatform() {
 	case keymapv1.Platform_MACOS:
@@ -122,21 +131,24 @@ func (s *Server) DefaultConfigPath(ctx context.Context, req *keymapv1.DefaultCon
 	}
 }
 
-func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest) (*keymapv1.LoadKeymapResponse, error) {
-	km, err := keymap.Load(strings.NewReader(req.Config))
+func (s *Server) LoadKeymap(
+	ctx context.Context,
+	req *keymapv1.LoadKeymapRequest,
+) (*keymapv1.LoadKeymapResponse, error) {
+	km, err := keymap.Load(strings.NewReader(req.GetConfig()))
 	if err != nil {
-		if !req.ReturnAll {
+		if !req.GetReturnAll() {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to parse keymap config: %v", err)
 		}
 		// If the config is empty, we can still proceed if return_all is true.
 		km = &keymapv1.KeymapSetting{}
 	}
 
-	if req.ReturnAll {
+	if req.GetReturnAll() {
 		// Create a map for quick lookup of existing bindings.
 		existingBindings := make(map[string]*keymapv1.ActionBinding)
-		for _, binding := range km.Keybindings {
-			existingBindings[binding.Id] = binding
+		for _, binding := range km.GetKeybindings() {
+			existingBindings[binding.GetId()] = binding
 		}
 
 		// Iterate through all available mappings and add them if they don't exist.
@@ -157,9 +169,12 @@ func (s *Server) LoadKeymap(ctx context.Context, req *keymapv1.LoadKeymapRequest
 	return &keymapv1.LoadKeymapResponse{Keymap: km}, nil
 }
 
-func (s *Server) SaveKeymap(ctx context.Context, req *keymapv1.SaveKeymapRequest) (*keymapv1.SaveKeymapResponse, error) {
+func (s *Server) SaveKeymap(
+	ctx context.Context,
+	req *keymapv1.SaveKeymapRequest,
+) (*keymapv1.SaveKeymapResponse, error) {
 	var buf bytes.Buffer
-	err := keymap.Save(&buf, req.Keymap)
+	err := keymap.Save(&buf, req.GetKeymap())
 	if err != nil {
 		return nil, err
 	}

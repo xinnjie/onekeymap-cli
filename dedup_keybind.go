@@ -86,7 +86,12 @@ func dedupKeyBindings(keybindings []*keymapv1.ActionBinding) []*keymapv1.ActionB
 			continue
 		}
 		// First occurrence: create a fresh ActionBinding and deduplicate its own bindings
-		fresh := &keymapv1.ActionBinding{Id: kb.GetId(), Name: kb.GetName(), Description: kb.GetDescription(), Category: kb.GetCategory()}
+		fresh := &keymapv1.ActionBinding{
+			Id:          kb.GetId(),
+			Name:        kb.GetName(),
+			Description: kb.GetDescription(),
+			Category:    kb.GetCategory(),
+		}
 		hadBindings := len(kb.GetBindings()) > 0
 		for _, b := range kb.GetBindings() {
 			if len(b.GetKeyChords().GetChords()) == 0 {

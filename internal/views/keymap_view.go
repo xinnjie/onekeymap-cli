@@ -141,7 +141,7 @@ func (m *KeymapViewModel) selectedActionID() string {
 	if len(row) == 0 {
 		return ""
 	}
-	return fmt.Sprint(row[0])
+	return row[0]
 }
 
 func (m *KeymapViewModel) rebuildRows() {

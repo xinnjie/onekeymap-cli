@@ -20,7 +20,7 @@ func NewKeybindConflictRule() ValidationRule {
 
 // Validate checks for keybinding conflicts in the keymap setting.
 func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *ValidationContext) error {
-	if validationContext.Setting == nil || len(validationContext.Setting.Keybindings) == 0 {
+	if validationContext.Setting == nil || len(validationContext.Setting.GetKeybindings()) == 0 {
 		return nil
 	}
 
@@ -32,9 +32,11 @@ func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *V
 	}
 
 	// Group keybindings by their formatted key combination
-	keybindingMap := make(map[string][]*keymapv1.ActionBinding) // key: formatted keybinding, value: list of action bindings having it
+	keybindingMap := make(
+		map[string][]*keymapv1.ActionBinding,
+	) // key: formatted keybinding, value: list of action bindings having it
 
-	for _, ab := range validationContext.Setting.Keybindings {
+	for _, ab := range validationContext.Setting.GetKeybindings() {
 		if ab == nil {
 			continue
 		}
@@ -59,14 +61,14 @@ func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *V
 			var actions []*keymapv1.KeybindConflict_Action
 			for _, kb := range keybindings {
 				action := &keymapv1.KeybindConflict_Action{
-					Action: kb.Id,
+					Action: kb.GetId(),
 				}
 
 				// Try to get editor command from mapping config
 				if mappingConfig != nil {
-					if mapping := mappingConfig.FindByUniversalAction(kb.Id); mapping != nil {
+					if mapping := mappingConfig.FindByUniversalAction(kb.GetId()); mapping != nil {
 						// Get editor command based on source editor from report
-						editorCommand := getEditorCommand(mapping, validationContext.Report.SourceEditor)
+						editorCommand := getEditorCommand(mapping, validationContext.Report.GetSourceEditor())
 						action.EditorCommand = editorCommand
 					}
 				}
@@ -93,7 +95,7 @@ func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *V
 	return nil
 }
 
-// getEditorCommand extracts the editor command from mapping config based on source editor
+// getEditorCommand extracts the editor command from mapping config based on source editor.
 func getEditorCommand(mapping *mappings.ActionMappingConfig, sourceEditor string) string {
 	switch sourceEditor {
 	case "vscode":

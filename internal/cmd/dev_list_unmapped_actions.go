@@ -15,7 +15,7 @@ import (
 
 var editor string
 
-// listUnmappedActionsCmd represents the generic unmapped actions command
+// listUnmappedActionsCmd represents the generic unmapped actions command.
 var listUnmappedActionsCmd = &cobra.Command{
 	Use:     "listUnmappedActions",
 	Aliases: []string{"vscodeListUnmappedCommands"},
@@ -115,5 +115,6 @@ var listUnmappedActionsCmd = &cobra.Command{
 
 func init() {
 	devCmd.AddCommand(listUnmappedActionsCmd)
-	listUnmappedActionsCmd.Flags().StringVar(&editor, "editor", "vscode", "Editor to check: vscode|intellij|zed|vim|helix")
+	listUnmappedActionsCmd.Flags().
+		StringVar(&editor, "editor", "vscode", "Editor to check: vscode|intellij|zed|vim|helix")
 }

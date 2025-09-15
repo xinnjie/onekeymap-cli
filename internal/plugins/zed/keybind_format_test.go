@@ -54,7 +54,7 @@ func TestZed_ParseKeybinding(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			kb, err := parseZedKeybind(tc.in)
 			if tc.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Nil(t, kb)
 				return
 			}

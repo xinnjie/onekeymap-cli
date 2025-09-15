@@ -25,7 +25,7 @@ func NewPotentialShadowingRule(targetEditor pluginapi.EditorType, platform platf
 }
 
 // TODO(xinnjie): Read keybindings from system, e.g. read macos system keybindings from `~/Library/Preferences/com.apple.symbolichotkeys.plist`
-// criticalKeybindingsByPlatform defines system-critical keybindings that should not be overridden, organized by platform
+// criticalKeybindingsByPlatform defines system-critical keybindings that should not be overridden, organized by platform.
 var criticalKeybindingsByPlatform = map[platform.Platform]map[string]string{
 	platform.PlatformMacOS: {
 		// macOS specific shortcuts
@@ -113,7 +113,7 @@ func (r *PotentialShadowingRule) Validate(ctx context.Context, validationContext
 					Issue: &keymapv1.ValidationIssue_PotentialShadowing{
 						PotentialShadowing: &keymapv1.PotentialShadowing{
 							Keybinding:   formattedKeys,
-							Action:       ab.Id,
+							Action:       ab.GetId(),
 							TargetEditor: string(r.targetEditor),
 							Message:      "This key chord is the default for " + description + ".",
 						},

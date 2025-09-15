@@ -11,9 +11,10 @@ import (
 // including the command and its context.
 type VscodeMappingConfig struct {
 	EditorActionMapping `yaml:",inline"`
-	Command             string                 `yaml:"command"`
-	When                string                 `yaml:"when"`
-	Args                map[string]interface{} `yaml:"args,omitempty"`
+
+	Command string                 `yaml:"command"`
+	When    string                 `yaml:"when"`
+	Args    map[string]interface{} `yaml:"args,omitempty"`
 }
 
 // VscodeConfigs is a slice of VscodeMappingConfig that can be unmarshalled from either
@@ -38,7 +39,11 @@ func (v *VscodeConfigs) UnmarshalYAML(node *yaml.Node) error {
 		}
 		*v = slice
 	default:
-		return fmt.Errorf("cannot unmarshal!! (line %d, col %d): expected a mapping or sequence node for vscode config", node.Line, node.Column)
+		return fmt.Errorf(
+			"cannot unmarshal!! (line %d, col %d): expected a mapping or sequence node for vscode config",
+			node.Line,
+			node.Column,
+		)
 	}
 	return nil
 }

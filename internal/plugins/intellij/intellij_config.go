@@ -15,6 +15,7 @@ type KeymapXML struct {
 
 type ActionXML struct {
 	ShortcutXML
+
 	ID string `xml:"id,attr"`
 }
 

@@ -97,25 +97,25 @@ func (m ValidationReportModel) renderReport() string {
 	var b strings.Builder
 
 	// Summary
-	s := m.report.Summary
+	s := m.report.GetSummary()
 	b.WriteString(summaryStyle.Render(
 		fmt.Sprintf("Source: %s | Mappings Processed: %d | Succeeded: %d",
-			m.report.SourceEditor, s.MappingsProcessed, s.MappingsSucceeded),
+			m.report.GetSourceEditor(), s.GetMappingsProcessed(), s.GetMappingsSucceeded()),
 	))
 	b.WriteString("\n")
 
 	// Errors
-	if len(m.report.Issues) > 0 {
-		b.WriteString(errorHeader.Render(fmt.Sprintf("Errors (%d)", len(m.report.Issues))))
-		for _, issue := range m.report.Issues {
+	if len(m.report.GetIssues()) > 0 {
+		b.WriteString(errorHeader.Render(fmt.Sprintf("Errors (%d)", len(m.report.GetIssues()))))
+		for _, issue := range m.report.GetIssues() {
 			b.WriteString(renderIssue(issue))
 		}
 	}
 
 	// Warnings
-	if len(m.report.Warnings) > 0 {
-		b.WriteString(warningHeader.Render(fmt.Sprintf("Warnings (%d)", len(m.report.Warnings))))
-		for _, warning := range m.report.Warnings {
+	if len(m.report.GetWarnings()) > 0 {
+		b.WriteString(warningHeader.Render(fmt.Sprintf("Warnings (%d)", len(m.report.GetWarnings()))))
+		for _, warning := range m.report.GetWarnings() {
 			b.WriteString(renderIssue(warning))
 		}
 	}
@@ -125,40 +125,40 @@ func (m ValidationReportModel) renderReport() string {
 
 func renderIssue(issue *keymapv1.ValidationIssue) string {
 	var content string
-	switch v := issue.Issue.(type) {
+	switch v := issue.GetIssue().(type) {
 	case *keymapv1.ValidationIssue_KeybindConflict:
 		c := v.KeybindConflict
 		var actionLines []string
-		for _, action := range c.Actions {
-			if action.EditorCommand != "" {
-				actionLines = append(actionLines, fmt.Sprintf("%s (%s)", action.EditorCommand, action.Action))
+		for _, action := range c.GetActions() {
+			if action.GetEditorCommand() != "" {
+				actionLines = append(actionLines, fmt.Sprintf("%s (%s)", action.GetEditorCommand(), action.GetAction()))
 			} else {
-				actionLines = append(actionLines, action.Action)
+				actionLines = append(actionLines, action.GetAction())
 			}
 		}
 		content = fmt.Sprintf("Keybind Conflict: %s is mapped to multiple actions:\n  - %s",
-			keyStyle.Render(c.Keybinding),
+			keyStyle.Render(c.GetKeybinding()),
 			actionStyle.Render(strings.Join(actionLines, "\n  - ")))
 	case *keymapv1.ValidationIssue_DanglingAction:
 		d := v.DanglingAction
 		suggestion := ""
-		if d.Suggestion != "" {
-			suggestion = fmt.Sprintf(" (Did you mean %s?)", actionStyle.Render(d.Suggestion))
+		if d.GetSuggestion() != "" {
+			suggestion = fmt.Sprintf(" (Did you mean %s?)", actionStyle.Render(d.GetSuggestion()))
 		}
 		content = fmt.Sprintf("Dangling Action: %s for key %s does not exist.%s",
-			actionStyle.Render(d.Action), keyStyle.Render(d.Keybinding), suggestion)
+			actionStyle.Render(d.GetAction()), keyStyle.Render(d.GetKeybinding()), suggestion)
 	case *keymapv1.ValidationIssue_UnsupportedAction:
 		u := v.UnsupportedAction
 		content = fmt.Sprintf("Unsupported Action: %s (on key %s) is not supported for target %s.",
-			actionStyle.Render(u.Action), keyStyle.Render(u.Keybinding), keyStyle.Render(u.TargetEditor))
+			actionStyle.Render(u.GetAction()), keyStyle.Render(u.GetKeybinding()), keyStyle.Render(u.GetTargetEditor()))
 	case *keymapv1.ValidationIssue_DuplicateMapping:
 		d := v.DuplicateMapping
 		content = fmt.Sprintf("Duplicate Mapping: Action %s with key %s is defined multiple times.",
-			actionStyle.Render(d.Action), keyStyle.Render(d.Keybinding))
+			actionStyle.Render(d.GetAction()), keyStyle.Render(d.GetKeybinding()))
 	case *keymapv1.ValidationIssue_PotentialShadowing:
 		p := v.PotentialShadowing
 		content = fmt.Sprintf("Potential Shadowing: Key %s (for action %s) might override a system or editor default on %s.",
-			keyStyle.Render(p.Keybinding), actionStyle.Render(p.Action), keyStyle.Render(p.TargetEditor))
+			keyStyle.Render(p.GetKeybinding()), actionStyle.Render(p.GetAction()), keyStyle.Render(p.GetTargetEditor()))
 	default:
 		content = "Unknown issue type."
 	}

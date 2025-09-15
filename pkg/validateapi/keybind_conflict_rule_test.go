@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
@@ -26,10 +27,10 @@ func TestValidator_Validate_WithKeybindConflict(t *testing.T) {
 	}
 
 	report, err := validator.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Issues, 1)
-	assert.NotNil(t, report.Issues[0].GetKeybindConflict())
+	require.NoError(t, err)
+	assert.Len(t, report.GetIssues(), 1)
+	assert.NotNil(t, report.GetIssues()[0].GetKeybindConflict())
 
-	conflict := report.Issues[0].GetKeybindConflict()
-	assert.Len(t, conflict.Actions, 2)
+	conflict := report.GetIssues()[0].GetKeybindConflict()
+	assert.Len(t, conflict.GetActions(), 2)
 }

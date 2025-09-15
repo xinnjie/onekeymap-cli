@@ -4,8 +4,8 @@ import _ "embed"
 
 var (
 	//go:embed vscode-intellij.json
-	VscodeIntellijKeymapJson []byte
+	VscodeIntellijKeymapJSON []byte
 
 	//go:embed vscode-mac-default.json
-	VscodeMacDefaultKeymapJson []byte
+	VscodeMacDefaultKeymapJSON []byte
 )

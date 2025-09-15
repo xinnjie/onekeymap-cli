@@ -28,8 +28,12 @@ func newImporter(logger *slog.Logger) pluginapi.PluginImporter {
 //	{ "keys": "ctrl+c", "action": "actions.edit.copy" },
 //	{ "keys": "ctrl+v", "action": "actions.edit.paste" }
 //
-// ]
-func (i *demoImporter) Import(ctx context.Context, source io.Reader, _ pluginapi.PluginImportOption) (*keymapv1.KeymapSetting, error) {
+// ].
+func (i *demoImporter) Import(
+	ctx context.Context,
+	source io.Reader,
+	_ pluginapi.PluginImportOption,
+) (*keymapv1.KeymapSetting, error) {
 	data, err := io.ReadAll(source)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from reader: %w", err)
@@ -54,7 +58,10 @@ func (i *demoImporter) Import(ctx context.Context, source io.Reader, _ pluginapi
 			i.logger.Warn("Skipping unparsable keybinding", "keys", b.Keys, "error", err)
 			continue
 		}
-		setting.Keybindings = append(setting.Keybindings, &keymapv1.ActionBinding{Id: b.Action, Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}}})
+		setting.Keybindings = append(
+			setting.Keybindings,
+			&keymapv1.ActionBinding{Id: b.Action, Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}}},
+		)
 	}
 	return setting, nil
 }

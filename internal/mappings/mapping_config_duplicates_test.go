@@ -2,10 +2,11 @@ package mappings
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func containsAll(slice []string, want ...string) bool {
@@ -21,14 +22,14 @@ func containsAll(slice []string, want ...string) bool {
 	return true
 }
 
-// -------------------- IntelliJ --------------------
+// -------------------- IntelliJ --------------------.
 func TestCheckIntelliJDuplicateConfig_NoDuplicates(t *testing.T) {
 	mappings := map[string]ActionMappingConfig{
 		"a": {IntelliJ: IntelliJMappingConfig{Action: "FocusEditor"}},
 		"b": {IntelliJ: IntelliJMappingConfig{Action: "ActivateCommitToolWindow"}},
 		"c": {IntelliJ: IntelliJMappingConfig{Action: ""}}, // ignored
 	}
-	assert.NoError(t, checkIntellijDuplicateConfig(mappings))
+	require.NoError(t, checkIntellijDuplicateConfig(mappings))
 }
 
 func TestCheckIntelliJDuplicateConfig_Duplicates(t *testing.T) {
@@ -38,23 +39,23 @@ func TestCheckIntelliJDuplicateConfig_Duplicates(t *testing.T) {
 		"z": {IntelliJ: IntelliJMappingConfig{Action: "Other"}},
 	}
 	err := checkIntellijDuplicateConfig(mappings)
-	assert.Error(t, err)
+	require.Error(t, err)
 	var derr *DuplicateActionMappingError
-	assert.True(t, errors.As(err, &derr), fmt.Sprintf("expected DuplicateActionMappingError, got %T: %v", err, err))
+	require.ErrorAs(t, err, &derr, "expected DuplicateActionMappingError, got %T: %v", err, err)
 	assert.Equal(t, "intellij", derr.Editor)
 	got, ok := derr.Duplicates["FocusEditor"]
-	assert.True(t, ok, fmt.Sprintf("expected duplicates for FocusEditor, got keys: %v", keys(derr.Duplicates)))
-	assert.True(t, len(got) >= 2, fmt.Sprintf("expected at least 2 ids, got %v", got))
-	assert.True(t, containsAll(got, "x", "y"), fmt.Sprintf("expected ids [x y] in any order, got %v", got))
+	assert.True(t, ok, "expected duplicates for FocusEditor, got keys: %v", keys(derr.Duplicates))
+	assert.GreaterOrEqual(t, len(got), 2, "expected at least 2 ids, got %v", got)
+	assert.True(t, containsAll(got, "x", "y"), "expected ids [x y] in any order, got %v", got)
 }
 
-// -------------------- VSCode --------------------
+// -------------------- VSCode --------------------.
 func TestCheckVscodeDuplicateConfig_NoDuplicates(t *testing.T) {
 	mappings := map[string]ActionMappingConfig{
 		"a": {VSCode: VscodeConfigs{{Command: "editor.action.goToDefinition", When: "editorTextFocus"}}},
 		"b": {VSCode: VscodeConfigs{{Command: "workbench.action.quickOpen", When: "inputFocus"}}},
 	}
-	assert.NoError(t, checkVscodeDuplicateConfig(mappings))
+	require.NoError(t, checkVscodeDuplicateConfig(mappings))
 }
 
 func TestCheckVscodeDuplicateConfig_Duplicates(t *testing.T) {
@@ -64,26 +65,31 @@ func TestCheckVscodeDuplicateConfig_Duplicates(t *testing.T) {
 		"id2": {VSCode: VscodeConfigs{{Command: "workbench.action.some", When: "editorTextFocus", Args: args}}},
 	}
 	err := checkVscodeDuplicateConfig(mappings)
-	assert.Error(t, err)
+	require.Error(t, err)
 	var derr *DuplicateActionMappingError
-	assert.True(t, errors.As(err, &derr), fmt.Sprintf("expected DuplicateActionMappingError, got %T: %v", err, err))
+	require.ErrorAs(t, err, &derr, "expected DuplicateActionMappingError, got %T: %v", err, err)
 	assert.Equal(t, "vscode", derr.Editor)
 	// Build expected dup key exactly as code does
 	argsBytes, _ := json.Marshal(args)
-	key := fmt.Sprintf(`{"command":%q,"when":%q,"args":%q}`, "workbench.action.some", "editorTextFocus", string(argsBytes))
+	key := fmt.Sprintf(
+		`{"command":%q,"when":%q,"args":%q}`,
+		"workbench.action.some",
+		"editorTextFocus",
+		string(argsBytes),
+	)
 	got, ok := derr.Duplicates[key]
-	assert.True(t, ok, fmt.Sprintf("expected duplicates for key %s, got keys: %v", key, keys(derr.Duplicates)))
-	assert.True(t, len(got) >= 2, fmt.Sprintf("expected at least 2 ids, got %v", got))
-	assert.True(t, containsAll(got, "id1", "id2"), fmt.Sprintf("expected ids [id1 id2] in any order, got %v", got))
+	assert.True(t, ok, "expected duplicates for key %s, got keys: %v", key, keys(derr.Duplicates))
+	assert.GreaterOrEqual(t, len(got), 2, "expected at least 2 ids, got %v", got)
+	assert.True(t, containsAll(got, "id1", "id2"), "expected ids [id1 id2] in any order, got %v", got)
 }
 
-// -------------------- Zed --------------------
+// -------------------- Zed --------------------.
 func TestCheckZedDuplicateConfig_NoDuplicates(t *testing.T) {
 	mappings := map[string]ActionMappingConfig{
 		"a": {Zed: ZedConfigs{{Action: "editor:go-to-definition", Context: "Editor"}}},
 		"b": {Zed: ZedConfigs{{Action: "window:show-quick-open", Context: "Global"}}},
 	}
-	assert.NoError(t, checkZedDuplicateConfig(mappings))
+	require.NoError(t, checkZedDuplicateConfig(mappings))
 }
 
 func TestCheckZedDuplicateConfig_Duplicates(t *testing.T) {
@@ -93,16 +99,16 @@ func TestCheckZedDuplicateConfig_Duplicates(t *testing.T) {
 		"k2": {Zed: ZedConfigs{{Action: "editor:go-to-definition", Context: "Editor", Args: args}}},
 	}
 	err := checkZedDuplicateConfig(mappings)
-	assert.Error(t, err)
+	require.Error(t, err)
 	var derr *DuplicateActionMappingError
-	assert.True(t, errors.As(err, &derr), fmt.Sprintf("expected DuplicateActionMappingError, got %T: %v", err, err))
+	require.ErrorAs(t, err, &derr, "expected DuplicateActionMappingError, got %T: %v", err, err)
 	assert.Equal(t, "zed", derr.Editor)
 	argsBytes, _ := json.Marshal(args)
 	key := fmt.Sprintf(`{"action":%q,"context":%q,"args":%q}`, "editor:go-to-definition", "Editor", string(argsBytes))
 	got, ok := derr.Duplicates[key]
-	assert.True(t, ok, fmt.Sprintf("expected duplicates for key %s, got keys: %v", key, keys(derr.Duplicates)))
-	assert.True(t, len(got) >= 2, fmt.Sprintf("expected at least 2 ids, got %v", got))
-	assert.True(t, containsAll(got, "k1", "k2"), fmt.Sprintf("expected ids [k1 k2] in any order, got %v", got))
+	assert.True(t, ok, "expected duplicates for key %s, got keys: %v", key, keys(derr.Duplicates))
+	assert.GreaterOrEqual(t, len(got), 2, "expected at least 2 ids, got %v", got)
+	assert.True(t, containsAll(got, "k1", "k2"), "expected ids [k1 k2] in any order, got %v", got)
 }
 
 func keys(m map[string][]string) []string {

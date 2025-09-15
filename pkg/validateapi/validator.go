@@ -20,7 +20,11 @@ func NewValidator(rules ...ValidationRule) *Validator {
 }
 
 // Validate executes all validation rules in the chain.
-func (v *Validator) Validate(ctx context.Context, setting *keymapv1.KeymapSetting, opts importapi.ImportOptions) (*keymapv1.ValidationReport, error) {
+func (v *Validator) Validate(
+	ctx context.Context,
+	setting *keymapv1.KeymapSetting,
+	opts importapi.ImportOptions,
+) (*keymapv1.ValidationReport, error) {
 	report := &keymapv1.ValidationReport{
 		SourceEditor: string(opts.EditorType),
 		Summary: &keymapv1.Summary{
@@ -45,8 +49,8 @@ func (v *Validator) Validate(ctx context.Context, setting *keymapv1.KeymapSettin
 	}
 
 	// Update succeeded count (total - issues)
-	issueCount := len(report.Issues)
-	report.Summary.MappingsSucceeded = report.Summary.MappingsProcessed - int32(issueCount)
+	issueCount := len(report.GetIssues())
+	report.Summary.MappingsSucceeded = report.GetSummary().GetMappingsProcessed() - int32(issueCount)
 
 	return report, nil
 }

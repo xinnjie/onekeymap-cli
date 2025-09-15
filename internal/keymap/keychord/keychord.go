@@ -1,6 +1,7 @@
 package keychord
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -33,7 +34,7 @@ func NewKeyChord(protoKeyChord *keymapv1.KeyChord) *KeyChord {
 // into a structured KeyChord proto message.
 func Parse(keybind string, modifierSeparator string) (*KeyChord, error) {
 	if keybind == "" {
-		return nil, fmt.Errorf("cannot parse empty string")
+		return nil, errors.New("cannot parse empty string")
 	}
 
 	lowerKeybind := strings.ToLower(keybind)
@@ -80,16 +81,16 @@ func Parse(keybind string, modifierSeparator string) (*KeyChord, error) {
 			// If it's not a modifier, it must be a key code.
 			// But we already found a key code (or decided the last part was a modifier).
 			// So this is an invalid sequence.
-			keyStr, _ := keycode.ToString(chord.KeyCode)
+			keyStr, _ := keycode.ToString(chord.GetKeyCode())
 			return nil, fmt.Errorf("invalid key chord string: multiple key codes found ('%s' and '%s')", part, keyStr)
 		}
 	}
 
 	// Final validation
-	if chord.KeyCode == keymapv1.KeyCode_KEY_CODE_UNSPECIFIED {
+	if chord.GetKeyCode() == keymapv1.KeyCode_KEY_CODE_UNSPECIFIED {
 		// Allow exactly one modifier without a key code, e.g. "shift" or "ctrl".
 		// Disallow zero or multiple modifiers without a key code.
-		if len(chord.Modifiers) != 1 {
+		if len(chord.GetModifiers()) != 1 {
 			return nil, fmt.Errorf("invalid key chord string: no key code found in '%s'", keybind)
 		}
 	}
@@ -101,7 +102,7 @@ func Parse(keybind string, modifierSeparator string) (*KeyChord, error) {
 // string representation, e.g., "ctrl+shift+f".
 func (kc *KeyChord) Format(p platform.Platform) ([]string, error) {
 	if kc == nil || kc.KeyChord == nil {
-		return nil, fmt.Errorf("invalid key chord: nil")
+		return nil, errors.New("invalid key chord: nil")
 	}
 
 	var parts []string
@@ -140,7 +141,7 @@ func (kc *KeyChord) Format(p platform.Platform) ([]string, error) {
 		return parts, nil
 	}
 
-	return nil, fmt.Errorf("invalid key chord: empty key code")
+	return nil, errors.New("invalid key chord: empty key code")
 }
 
 func containsModifier(modifiers []keymapv1.KeyModifier, target keymapv1.KeyModifier) bool {

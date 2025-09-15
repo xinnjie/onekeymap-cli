@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDuplicateCheckWithArgs(t *testing.T) {
@@ -121,11 +122,11 @@ mappings:
 			config, err := load(reader)
 
 			if tc.expectError {
-				assert.Error(t, err)
+				require.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.NotNil(t, config)
-				assert.Equal(t, tc.expectedMappingsCount, len(config.Mappings))
+				assert.Len(t, config.Mappings, tc.expectedMappingsCount)
 			}
 		})
 	}

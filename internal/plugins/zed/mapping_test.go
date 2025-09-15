@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 )
 
@@ -83,10 +84,10 @@ func TestActionIDFromZedWithArgs(t *testing.T) {
 			actualID, err := zedImporter.actionIDFromZedWithArgs(tt.action, tt.context, tt.args)
 
 			if tt.expectError {
-				assert.Error(t, err)
-				assert.ErrorContains(t, err, tt.expectedError)
+				require.Error(t, err)
+				require.ErrorContains(t, err, tt.expectedError)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tt.expectedID, actualID)
 			}
 		})

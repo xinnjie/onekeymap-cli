@@ -75,7 +75,7 @@ var importCmd = &cobra.Command{
 		if *interactive {
 			// Validation Report Display
 			if result != nil && result.Report != nil &&
-				(len(result.Report.Issues) > 0 || len(result.Report.Warnings) > 0) {
+				(len(result.Report.GetIssues()) > 0 || len(result.Report.GetWarnings()) > 0) {
 				logger.Info("Validation found issues. Displaying report...")
 				if err := runValidationReportPreview(result.Report); err != nil {
 					// Log the error but don't block the import process
@@ -141,7 +141,7 @@ func prepareImportInputFlags(cmd *cobra.Command, onekeymapConfig string) error {
 		}
 	} else {
 		if *importFrom == "" {
-			return fmt.Errorf("flag --from is required")
+			return errors.New("flag --from is required")
 		}
 		if onekeymapConfig != "" {
 			*importOutput = onekeymapConfig
@@ -182,7 +182,16 @@ func runImportChangesPreview(changes *importapi.KeymapChanges) (bool, error) {
 // All TUI logic is encapsulated here to keep cmd/import.go simple.
 func runImportForm(pluginRegistry *plugins.Registry, from, input, output *string, onekeymapConfigPlaceHolder string,
 	needSelectEditor, needInput, needOutput bool) error {
-	m, err := views.NewImportFormModel(pluginRegistry, needSelectEditor, needInput, needOutput, from, input, output, onekeymapConfigPlaceHolder)
+	m, err := views.NewImportFormModel(
+		pluginRegistry,
+		needSelectEditor,
+		needInput,
+		needOutput,
+		from,
+		input,
+		output,
+		onekeymapConfigPlaceHolder,
+	)
 	if err != nil {
 		return err
 	}
@@ -196,7 +205,7 @@ func runImportForm(pluginRegistry *plugins.Registry, from, input, output *string
 	return nil
 }
 
-// run the validation report TUI ---
+// run the validation report TUI ---.
 func runValidationReportPreview(report *keymapv1.ValidationReport) error {
 	m := views.NewValidationReportModel(report)
 	p := tea.NewProgram(m)
@@ -210,10 +219,14 @@ func init() {
 	rootCmd.AddCommand(importCmd)
 	importFrom = importCmd.Flags().String("from", "", "Source editor to import from (e.g., vscode, zed)")
 	importOutput = importCmd.Flags().String("output", "", "Path to save the generated onekeymap.json file")
-	importInput = importCmd.Flags().String("input", "", "Optional: Path to the source editor's config file (overrides env vars)")
+	importInput = importCmd.Flags().
+		String("input", "", "Optional: Path to the source editor's config file (overrides env vars)")
 
 	// Add completion for 'from' flag
-	_ = importCmd.RegisterFlagCompletionFunc("from", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return pluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = importCmd.RegisterFlagCompletionFunc(
+		"from",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return pluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 }

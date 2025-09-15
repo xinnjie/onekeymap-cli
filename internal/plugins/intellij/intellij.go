@@ -20,7 +20,7 @@ func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.P
 	return &intellijPlugin{
 		mappingConfig: mappingConfig,
 		importer:      newImporter(mappingConfig, logger),
-		exporter:      newExporter(mappingConfig, logger, diff.NewJsonAsciiDiffer()),
+		exporter:      newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer()),
 		logger:        logger,
 	}
 }

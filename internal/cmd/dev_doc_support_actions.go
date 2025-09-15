@@ -10,7 +10,7 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 )
 
-// docSupportActionsCmd represents the docSupportActions command
+// docSupportActionsCmd represents the docSupportActions command.
 var docSupportActionsCmd = &cobra.Command{
 	Use:   "docSupportActions",
 	Short: "Generate markdown table showing action support across editors",

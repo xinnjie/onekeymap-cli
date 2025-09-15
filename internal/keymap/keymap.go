@@ -2,6 +2,7 @@ package keymap
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 
@@ -12,7 +13,7 @@ import (
 
 // OneKeymapConfig is a struct that matches the user config file format.
 type OneKeymapConfig struct {
-	Id          string            `json:"id,omitempty"`
+	ID          string            `json:"id,omitempty"`
 	Keybinding  KeybindingStrings `json:"keybinding,omitempty"`
 	Comment     string            `json:"comment,omitempty"`
 	Description string            `json:"description,omitempty"`
@@ -30,7 +31,7 @@ func DecorateSetting(
 		return setting
 	}
 
-	for _, ab := range setting.Keybindings {
+	for _, ab := range setting.GetKeybindings() {
 		if cfg := config.FindByUniversalAction(ab.GetId()); cfg != nil {
 			ab.Description = cfg.Description
 			ab.Name = cfg.Name
@@ -76,7 +77,7 @@ func (ks *KeybindingStrings) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	return fmt.Errorf("keybinding must be a string or an array of strings")
+	return errors.New("keybinding must be a string or an array of strings")
 }
 
 // MarshalJSON allows KeybindingStrings to be marshalled to a single string if it contains only one element.
@@ -102,11 +103,11 @@ func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
 	order := make([]string, 0)
 
 	for _, fk := range friendlyData.Keymaps {
-		key := fk.Id
+		key := fk.ID
 		ab, ok := grouped[key]
 		if !ok {
 			ab = &keymapv1.ActionBinding{
-				Id:          fk.Id,
+				Id:          fk.ID,
 				Comment:     fk.Comment,
 				Description: fk.Description,
 				Name:        fk.Name,
@@ -129,9 +130,12 @@ func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
 		for _, keybindingStr := range fk.Keybinding {
 			kb, err := ParseKeyBinding(keybindingStr, "+")
 			if err != nil {
-				return nil, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.Id, err)
+				return nil, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.ID, err)
 			}
-			ab.Bindings = append(ab.Bindings, &keymapv1.Binding{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr})
+			ab.Bindings = append(
+				ab.Bindings,
+				&keymapv1.Binding{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr},
+			)
 		}
 	}
 
@@ -155,15 +159,15 @@ func Save(writer io.Writer, setting *keymapv1.KeymapSetting) error {
 	}
 	groupedKeybindings := make(map[groupKey]*OneKeymapConfig)
 
-	for _, k := range setting.Keybindings {
-		key := groupKey{ID: k.Id, Comment: k.Comment, Description: k.Description}
+	for _, k := range setting.GetKeybindings() {
+		key := groupKey{ID: k.GetId(), Comment: k.GetComment(), Description: k.GetDescription()}
 		config, ok := groupedKeybindings[key]
 		if !ok {
 			config = &OneKeymapConfig{
-				Id:          k.Id,
-				Comment:     k.Comment,
-				Description: k.Description,
-				Name:        k.Name,
+				ID:          k.GetId(),
+				Comment:     k.GetComment(),
+				Description: k.GetDescription(),
+				Name:        k.GetName(),
 			}
 			groupedKeybindings[key] = config
 		}

@@ -21,11 +21,20 @@ type helixExporter struct {
 	differ        diff.Differ
 }
 
-func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, differ diff.Differ) pluginapi.PluginExporter {
+func newExporter(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	differ diff.Differ,
+) pluginapi.PluginExporter {
 	return &helixExporter{mappingConfig: mappingConfig, logger: logger, differ: differ}
 }
 
-func (e *helixExporter) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts pluginapi.PluginExportOption) (*pluginapi.PluginExportReport, error) {
+func (e *helixExporter) Export(
+	ctx context.Context,
+	destination io.Writer,
+	setting *keymapv1.KeymapSetting,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	// Read existing configuration if provided for non-destructive export
 	var existingKeys helixKeys
 	var existingFullConfig map[string]interface{}
@@ -80,7 +89,7 @@ func (e *helixExporter) Export(ctx context.Context, destination io.Writer, setti
 }
 
 // identifyUnmanagedKeybindings performs reverse lookup to identify keybindings
-// that are not managed by onekeymap
+// that are not managed by onekeymap.
 func (e *helixExporter) identifyUnmanagedKeybindings(existingKeys helixKeys) helixKeys {
 	unmanaged := helixKeys{}
 
@@ -124,7 +133,7 @@ func (e *helixExporter) identifyUnmanagedKeybindings(existingKeys helixKeys) hel
 	return unmanaged
 }
 
-// isManagedKeybinding checks if a keybinding is managed by onekeymap
+// isManagedKeybinding checks if a keybinding is managed by onekeymap.
 func (e *helixExporter) isManagedKeybinding(key, command string, mode HelixMode) bool {
 	for _, mapping := range e.mappingConfig.Mappings {
 		for _, hconf := range mapping.Helix {
@@ -144,12 +153,12 @@ func (e *helixExporter) isManagedKeybinding(key, command string, mode HelixMode)
 	return false
 }
 
-// generateManagedKeybindings generates Helix keybindings from KeymapSetting
+// generateManagedKeybindings generates Helix keybindings from KeymapSetting.
 func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetting) helixKeys {
 	keysByMode := helixKeys{}
 
-	for _, km := range setting.Keybindings {
-		mapping := e.mappingConfig.FindByUniversalAction(km.Id)
+	for _, km := range setting.GetKeybindings() {
+		mapping := e.mappingConfig.FindByUniversalAction(km.GetId())
 		if mapping == nil || len(mapping.Helix) == 0 {
 			continue
 		}
@@ -163,9 +172,9 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 			if err != nil {
 				// TODO(xinnjie): Add doc about this behavior: because helix do not recognize numpad keys(numpad1 is recognized as "1"), to avoid conflict with other keybindings, we skip these keybindings
 				if errors.Is(err, ErrNotSupportKeyChords) {
-					e.logger.Debug("Skipping keybinding with unsupported key chords", "action", km.Id)
+					e.logger.Debug("Skipping keybinding with unsupported key chords", "action", km.GetId())
 				} else {
-					e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.Id, "error", err)
+					e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetId(), "error", err)
 				}
 				continue
 			}
@@ -199,7 +208,7 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 					}
 					dest = &keysByMode.Select
 				default:
-					e.logger.Warn("Unsupported Helix mode; skipping", "mode", string(m), "action", km.Id)
+					e.logger.Warn("Unsupported Helix mode; skipping", "mode", string(m), "action", km.GetId())
 					continue
 				}
 				(*dest)[keyStr] = hconf.Command
@@ -210,7 +219,7 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 	return keysByMode
 }
 
-// mergeKeybindings merges managed and unmanaged keybindings, with managed taking priority
+// mergeKeybindings merges managed and unmanaged keybindings, with managed taking priority.
 func (e *helixExporter) mergeKeybindings(managed, unmanaged helixKeys) helixKeys {
 	result := helixKeys{}
 
@@ -280,7 +289,7 @@ func (e *helixExporter) mergeKeybindings(managed, unmanaged helixKeys) helixKeys
 	return result
 }
 
-// convertMapToHelixKeys converts a generic map to helixKeys structure
+// convertMapToHelixKeys converts a generic map to helixKeys structure.
 func (e *helixExporter) convertMapToHelixKeys(keysMap map[string]interface{}) helixKeys {
 	keys := helixKeys{}
 
@@ -314,7 +323,7 @@ func (e *helixExporter) convertMapToHelixKeys(keysMap map[string]interface{}) he
 	return keys
 }
 
-// convertHelixKeysToMap converts helixKeys structure to a generic map
+// convertHelixKeysToMap converts helixKeys structure to a generic map.
 func (e *helixExporter) convertHelixKeysToMap(keys helixKeys) map[string]interface{} {
 	result := make(map[string]interface{})
 

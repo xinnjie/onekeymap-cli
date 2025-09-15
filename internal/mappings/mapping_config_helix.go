@@ -8,8 +8,9 @@ import (
 
 type HelixMappingConfig struct {
 	EditorActionMapping `yaml:",inline"`
-	Command             string `yaml:"command"`
-	Mode                string `yaml:"mode"`
+
+	Command string `yaml:"command"`
+	Mode    string `yaml:"mode"`
 }
 
 type HelixConfig []HelixMappingConfig
@@ -31,7 +32,11 @@ func (h *HelixConfig) UnmarshalYAML(node *yaml.Node) error {
 		}
 		*h = slice
 	default:
-		return fmt.Errorf("cannot unmarshal! (line %d, col %d): expected a mapping or sequence node for helix config", node.Line, node.Column)
+		return fmt.Errorf(
+			"cannot unmarshal! (line %d, col %d): expected a mapping or sequence node for helix config",
+			node.Line,
+			node.Column,
+		)
 	}
 	return nil
 }

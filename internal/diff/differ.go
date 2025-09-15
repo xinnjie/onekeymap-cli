@@ -2,6 +2,7 @@ package diff
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 
@@ -15,22 +16,22 @@ type Differ interface {
 	Diff(before, after any) (asciiDiff string, err error)
 }
 
-// NewJsonAsciiDiffer creates a new JSON differ that outputs ANSI-colored ASCII diffs.
-func NewJsonAsciiDiffer() Differ {
-	return &jsonAsciiDiffer{}
+// NewJSONASCIIDiffer creates a new JSON differ that outputs ANSI-colored ASCII diffs.
+func NewJSONASCIIDiffer() Differ {
+	return &jsonASCIIDiffer{}
 }
 
-// NewJsonDiffer creates a new JSON differ that strips ANSI colors.
+// NewJSONDiffer creates a new JSON differ that strips ANSI colors.
 // It accepts nil, map[string]any, []any, or any strong-typed value which will be
 // normalized via JSON round-trip.
-func NewJsonDiffer() Differ {
+func NewJSONDiffer() Differ {
 	return &jsonDiffer{}
 }
 
-type jsonAsciiDiffer struct {
+type jsonASCIIDiffer struct {
 }
 
-func (d *jsonAsciiDiffer) Diff(before, after any) (asciiDiff string, err error) {
+func (d *jsonASCIIDiffer) Diff(before, after any) (asciiDiff string, err error) {
 	differ := gojsondiff.New()
 	var diff gojsondiff.Diff
 
@@ -53,7 +54,7 @@ func (d *jsonAsciiDiffer) Diff(before, after any) (asciiDiff string, err error) 
 	} else if arrayBeforeOk && arrayAfterOk {
 		diff = differ.CompareArrays(arrayBefore, arrayAfter)
 	} else {
-		return "", fmt.Errorf("type mismatch: before and after are not both objects or arrays")
+		return "", errors.New("type mismatch: before and after are not both objects or arrays")
 	}
 
 	if !diff.Modified() {
@@ -72,12 +73,12 @@ func (d *jsonAsciiDiffer) Diff(before, after any) (asciiDiff string, err error) 
 	return diffString, nil
 }
 
-// JsonAsciiDiffer but strip ansi color codes
+// jsonASCIIDiffer but strip ansi color codes.
 type jsonDiffer struct {
 }
 
 func (d *jsonDiffer) Diff(before, after any) (asciiDiff string, err error) {
-	asciiDiff, err = NewJsonAsciiDiffer().Diff(before, after)
+	asciiDiff, err = NewJSONASCIIDiffer().Diff(before, after)
 	if err != nil {
 		return "", err
 	}
@@ -92,7 +93,7 @@ func stripANSI(s string) string { return ansiRegexp.ReplaceAllString(s, "") }
 // Rules:
 // - nil => []any{}
 // - map[string]any or []any => returned as-is
-// - other types => marshal to JSON then unmarshal into 'any'
+// - other types => marshal to JSON then unmarshal into 'any'.
 func normalizeToJSONValue(v any) (any, error) {
 	if v == nil {
 		// Default to empty array to align with callers expecting array top-level (e.g., Zed keymaps)

@@ -17,8 +17,14 @@ package helix
 //	"M-c" = "another_command"
 //
 // See also: export.go/import.go for usage.
+// TODO(xinnjie): Strong type config type
+//
+//nolint:unused
 type helixConfig struct {
 	Keys helixKeys `toml:"keys,omitempty"`
+	// Extra holds all other top-level TOML fields we don't model explicitly.
+	// The ",inline" tag tells go-toml v2 to merge top-level keys into this map.
+	Extra map[string]interface{} `toml:",inline"`
 }
 
 // HelixMode enumerates known Helix modes. Underlying type is string to match TOML keys.

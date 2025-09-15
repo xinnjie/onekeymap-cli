@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	// Version information set by build system
+	// Version information set by build system.
 	version   = "dev"
 	buildTime = "unknown"
 	gitCommit = "unknown"
@@ -40,7 +40,7 @@ var (
 	mappingConfig   *mappings.MappingConfig
 )
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:     "onekeymap",
 	Short:   "A tool to import, export, and synchronize keyboard shortcuts between editors.",
@@ -58,7 +58,10 @@ var rootCmd = &cobra.Command{
 		if *enableTelemetry {
 			if viper.GetString("otel.exporter.otlp.endpoint") == "" {
 				// Maybe print a warning that endpoint is not set
-				fmt.Fprintln(os.Stderr, "Warning: --telemetry is enabled, but otel.exporter.otlp.endpoint is not set. Telemetry data will not be sent.")
+				fmt.Fprintln(
+					os.Stderr,
+					"Warning: --telemetry is enabled, but otel.exporter.otlp.endpoint is not set. Telemetry data will not be sent.",
+				)
 			}
 
 			recorder, err = metrics.New(context.Background(), version, logger, mappingConfig)
@@ -88,7 +91,7 @@ var rootCmd = &cobra.Command{
 			output = os.Stdout
 		}
 
-		logJson := viper.GetBool("log-json")
+		logJSON := viper.GetBool("log-json")
 		var handler slog.Handler
 		handlerOpts := &slog.HandlerOptions{
 			Level: logLevel,
@@ -100,7 +103,7 @@ var rootCmd = &cobra.Command{
 			},
 		}
 
-		if logJson {
+		if logJSON {
 			handler = slog.NewJSONHandler(output, handlerOpts)
 		} else {
 			handler = slog.NewTextHandler(output, handlerOpts)
@@ -143,7 +146,8 @@ func init() {
 	rootCmd.PersistentFlags().Bool("log-json", false, "Output logs in JSON format")
 	backup = rootCmd.PersistentFlags().BoolP("backup", "b", true, "Create a backup of the target editor's keymap")
 	interactive = rootCmd.PersistentFlags().BoolP("interactive", "i", true, "Run in interactive mode")
-	enableTelemetry = rootCmd.PersistentFlags().Bool("telemetry", false, "Enable OpenTelemetry to help improve onekeymap")
+	enableTelemetry = rootCmd.PersistentFlags().
+		Bool("telemetry", false, "Enable OpenTelemetry to help improve onekeymap")
 
 	// Bind cobra flags to viper.
 	if err := viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose")); err != nil {

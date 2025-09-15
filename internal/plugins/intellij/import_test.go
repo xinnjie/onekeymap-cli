@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
@@ -153,13 +154,13 @@ func TestImportIntelliJKeymap(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			reader := strings.NewReader(tc.input)
 			importer, err := plugin.Importer()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			result, err := importer.Import(context.Background(), reader, pluginapi.PluginImportOption{})
 
 			if tc.expectErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Truef(t, proto.Equal(tc.expected, result), "Expected and actual KeymapSetting should be equal, expect %s, got %s", tc.expected.String(), result.String())
 			}
 		})

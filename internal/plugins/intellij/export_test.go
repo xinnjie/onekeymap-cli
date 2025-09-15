@@ -38,7 +38,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 			validateFunc: func(t *testing.T, out KeymapXML) {
 				assert.Equal(t, "Onekeymap", out.Name)
 				assert.Equal(t, "1", out.Version)
-				assert.Equal(t, true, out.DisableMnemonics)
+				assert.True(t, out.DisableMnemonics)
 				assert.Equal(t, "$default", out.Parent)
 				// find $Copy action
 				var found *ActionXML
@@ -52,7 +52,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 					if assert.Len(t, found.KeyboardShortcuts, 1) {
 						ks := found.KeyboardShortcuts[0]
 						assert.Equal(t, "meta C", ks.First)
-						assert.Equal(t, "", ks.Second)
+						assert.Empty(t, ks.Second)
 					}
 				}
 			},
@@ -79,7 +79,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 					assert.Len(t, cmd1.KeyboardShortcuts, 2)
 					// Order preserved based on input order
 					assert.Equal(t, "control alt S", cmd1.KeyboardShortcuts[0].First)
-					assert.Equal(t, "", cmd1.KeyboardShortcuts[0].Second)
+					assert.Empty(t, cmd1.KeyboardShortcuts[0].Second)
 					assert.Equal(t, "control K", cmd1.KeyboardShortcuts[1].First)
 					assert.Equal(t, "control C", cmd1.KeyboardShortcuts[1].Second)
 				}
@@ -94,7 +94,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
 				// No actions should be exported
-				assert.Len(t, out.Actions, 0)
+				assert.Empty(t, out.Actions)
 			},
 		},
 		{
@@ -117,7 +117,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 					// Should only have one shortcut after dedup
 					assert.Len(t, cmd1.KeyboardShortcuts, 1)
 					assert.Equal(t, "control alt S", cmd1.KeyboardShortcuts[0].First)
-					assert.Equal(t, "", cmd1.KeyboardShortcuts[0].Second)
+					assert.Empty(t, cmd1.KeyboardShortcuts[0].Second)
 				}
 			},
 		},
@@ -225,7 +225,12 @@ func TestExportIntelliJKeymap(t *testing.T) {
 				// Managed action should override user's conflicting action
 				if copyAction != nil {
 					assert.Len(t, copyAction.KeyboardShortcuts, 1)
-					assert.Equal(t, "meta C", copyAction.KeyboardShortcuts[0].First, "managed action should take priority")
+					assert.Equal(
+						t,
+						"meta C",
+						copyAction.KeyboardShortcuts[0].First,
+						"managed action should take priority",
+					)
 				}
 			},
 		},

@@ -206,9 +206,9 @@ func TestImportZedKeymap(t *testing.T) {
 			result, err := importer.Import(context.Background(), reader, pluginapi.PluginImportOption{})
 
 			if tc.expectErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Truef(t, proto.Equal(tc.expected, result), "Expected and actual KeymapSetting should be equal, expect %s, got %s", tc.expected.String(), result.String())
 			}
 		})

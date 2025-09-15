@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -45,7 +46,7 @@ var migrateCmd = &cobra.Command{
 
 		// After potentially running the form, `from` and `to` must be set.
 		if *migrateFrom == "" || *migrateTo == "" {
-			return fmt.Errorf("required flags 'from' and 'to' not set")
+			return errors.New("required flags 'from' and 'to' not set")
 		}
 
 		logger.Info("Migrating keymaps", "from", *migrateFrom, "to", *migrateTo)
@@ -53,12 +54,12 @@ var migrateCmd = &cobra.Command{
 		inputPlugin, ok := pluginRegistry.Get(pluginapi.EditorType(*migrateFrom))
 		if !ok {
 			logger.Error("failed to get input plugin", "from", *migrateFrom)
-			return fmt.Errorf("failed to get input plugin")
+			return errors.New("failed to get input plugin")
 		}
 		outputPlugin, ok := pluginRegistry.Get(pluginapi.EditorType(*migrateTo))
 		if !ok {
 			logger.Error("failed to get output plugin", "to", *migrateTo)
-			return fmt.Errorf("failed to get output plugin")
+			return errors.New("failed to get output plugin")
 		}
 
 		if *migrateInput == "" {

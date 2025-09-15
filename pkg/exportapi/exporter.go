@@ -24,7 +24,12 @@ type ExportOptions struct {
 type Exporter interface {
 	// Export converts a KeymapSetting and writes it to a destination stream.
 	// It returns a report detailing any issues encountered during the conversion.
-	Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts ExportOptions) (*ExportReport, error)
+	Export(
+		ctx context.Context,
+		destination io.Writer,
+		setting *keymapv1.KeymapSetting,
+		opts ExportOptions,
+	) (*ExportReport, error)
 }
 
 // ExportReport details issues encountered during an export operation.

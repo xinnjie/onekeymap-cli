@@ -1,7 +1,7 @@
 package keymap
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keychord"
@@ -70,7 +70,7 @@ func ParseKeyBinding(keybind string, modifierSeparator string) (*KeyBinding, err
 	return NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: chords}}), nil
 }
 
-// Parse a vscode-like keybind string, e.g. ctrl+c to KeyBinding
+// MustParseKeyBinding parses a vscode-like keybind string (e.g., "ctrl+c") into a KeyBinding and panics on error.
 func MustParseKeyBinding(keybind string) *KeyBinding {
 	kb, err := ParseKeyBinding(keybind, oneKeymapDefaultKeyChordSeparator)
 	if err != nil {
@@ -83,7 +83,7 @@ func MustParseKeyBinding(keybind string) *KeyBinding {
 // separator between key chords can be customized.
 func (kb *KeyBinding) Format(p platform.Platform, keyChordSeparator string) (string, error) {
 	if kb == nil || len(kb.GetKeyChords().GetChords()) == 0 {
-		return "", fmt.Errorf("invalid key binding: empty key chords")
+		return "", errors.New("invalid key binding: empty key chords")
 	}
 	var parts []string
 	for _, protoChord := range kb.GetKeyChords().GetChords() {

@@ -112,7 +112,10 @@ var serveCmd = &cobra.Command{
 				grpc_logging.StreamServerInterceptor(grpcLogger(logger), opt...),
 			),
 		)
-		keymapv1.RegisterOnekeymapServiceServer(s, service.NewServer(pluginRegistry, importService, exportService, mappingConfig, logger))
+		keymapv1.RegisterOnekeymapServiceServer(
+			s,
+			service.NewServer(pluginRegistry, importService, exportService, mappingConfig, logger),
+		)
 		if err := s.Serve(lis); err != nil {
 			logger.Error("failed to serve", "err", err.Error())
 			os.Exit(1)
@@ -128,7 +131,7 @@ func init() {
 	_ = viper.BindPFlag("server.listen", serveCmd.Flags().Lookup("listen"))
 }
 
-// grpcLogger adapts slog to grpc_logging.Logger
+// grpcLogger adapts slog to grpc_logging.Logger.
 func grpcLogger(l *slog.Logger) grpc_logging.Logger {
 	return grpc_logging.LoggerFunc(func(ctx context.Context, lvl grpc_logging.Level, msg string, fields ...any) {
 		switch lvl {

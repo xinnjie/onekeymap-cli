@@ -31,7 +31,12 @@ func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, dif
 
 // Export takes a universal KeymapSetting and writes it to an editor-specific
 // configuration destination.
-func (p *zedExporter) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts pluginapi.PluginExportOption) (*pluginapi.PluginExportReport, error) {
+func (p *zedExporter) Export(
+	ctx context.Context,
+	destination io.Writer,
+	setting *keymapv1.KeymapSetting,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	// Parse existing configuration if provided
 	var existingConfig zedKeymapConfig
 	if opts.ExistingConfig != nil {
@@ -109,14 +114,14 @@ func orderByBaseContext(final zedKeymapConfig, base zedKeymapConfig) zedKeymapCo
 	return final
 }
 
-// generateManagedKeybindings creates keybindings from the current setting
+// generateManagedKeybindings creates keybindings from the current setting.
 func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetting) zedKeymapConfig {
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
-	for _, km := range setting.Keybindings {
-		actionConfig, err := p.actionIDToZed(km.Id)
+	for _, km := range setting.GetKeybindings() {
+		actionConfig, err := p.actionIDToZed(km.GetId())
 		if err != nil {
-			p.logger.Info("no mapping found for action", "action", km.Id)
+			p.logger.Info("no mapping found for action", "action", km.GetId())
 			continue
 		}
 
@@ -165,7 +170,7 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetting
 	return result
 }
 
-// mergeKeybindings merges managed and existing keybindings, with managed taking priority
+// mergeKeybindings merges managed and existing keybindings, with managed taking priority.
 func (p *zedExporter) mergeKeybindings(managed, existing zedKeymapConfig) zedKeymapConfig {
 	// Create a map for quick lookup of existing contexts
 	existingByContext := make(map[string]map[string]zedActionValue)
@@ -203,8 +208,17 @@ func (p *zedExporter) mergeKeybindings(managed, existing zedKeymapConfig) zedKey
 		if managedBindings, exists := managedByContext[context]; exists {
 			for key, action := range managedBindings {
 				if existingAction, exists := mergedBindings[key]; exists {
-					p.logger.Debug("Conflict resolved: managed keybinding takes priority",
-						"context", context, "key", key, "existing_action", existingAction.Action, "managed_action", action.Action)
+					p.logger.Debug(
+						"Conflict resolved: managed keybinding takes priority",
+						"context",
+						context,
+						"key",
+						key,
+						"existing_action",
+						existingAction.Action,
+						"managed_action",
+						action.Action,
+					)
 				}
 				mergedBindings[key] = action
 			}

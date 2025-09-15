@@ -1,7 +1,6 @@
 package mappings
 
 import (
-	"errors"
 	"strings"
 	"testing"
 
@@ -67,9 +66,9 @@ mappings:
 		_, err := load(reader)
 		require.Error(t, err)
 		var derr *DuplicateActionMappingError
-		require.True(t, errors.As(err, &derr), "expected DuplicateActionMappingError")
+		require.ErrorAs(t, err, &derr, "expected DuplicateActionMappingError")
 		assert.Equal(t, "vscode", derr.Editor)
-		assert.Greater(t, len(derr.Duplicates), 0)
+		assert.NotEmpty(t, derr.Duplicates)
 	})
 
 	t.Run("returns error on duplicate vscode config between single and list", func(t *testing.T) {
@@ -90,9 +89,9 @@ mappings:
 		_, err := load(reader)
 		require.Error(t, err)
 		var derr *DuplicateActionMappingError
-		require.True(t, errors.As(err, &derr), "expected DuplicateActionMappingError")
+		require.ErrorAs(t, err, &derr, "expected DuplicateActionMappingError")
 		assert.Equal(t, "vscode", derr.Editor)
-		assert.Greater(t, len(derr.Duplicates), 0)
+		assert.NotEmpty(t, derr.Duplicates)
 	})
 
 	t.Run("returns error on duplicate zed config", func(t *testing.T) {
@@ -113,9 +112,9 @@ mappings:
 		_, err := load(reader)
 		require.Error(t, err)
 		var derr *DuplicateActionMappingError
-		require.True(t, errors.As(err, &derr), "expected DuplicateActionMappingError")
+		require.ErrorAs(t, err, &derr, "expected DuplicateActionMappingError")
 		assert.Equal(t, "zed", derr.Editor)
-		assert.Greater(t, len(derr.Duplicates), 0)
+		assert.NotEmpty(t, derr.Duplicates)
 	})
 
 	t.Run("successfully loads and merges mappings from a multi-document stream", func(t *testing.T) {
@@ -171,7 +170,7 @@ mappings:
 		mappingData, err := load(reader)
 		require.NoError(t, err)
 		assert.NotNil(t, mappingData)
-		assert.Len(t, mappingData.Mappings, 0)
+		assert.Empty(t, mappingData.Mappings)
 	})
 }
 

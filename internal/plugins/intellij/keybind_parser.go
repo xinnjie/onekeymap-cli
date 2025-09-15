@@ -1,6 +1,7 @@
 package intellij
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -102,7 +103,7 @@ var (
 // into a normalized internal representation (e.g., ["ctrl","alt","s"]).
 func parseKeyStroke(raw string) ([]string, error) {
 	if strings.TrimSpace(raw) == "" {
-		return nil, fmt.Errorf("empty keystroke")
+		return nil, errors.New("empty keystroke")
 	}
 
 	tokens := strings.Fields(raw)
@@ -212,7 +213,7 @@ func formatKeyChord(parts []string) string {
 // - function keys (e.g., "f5" -> "F5")
 // - numpad digit keys (e.g., "numpad3" -> "NUMPAD3")
 // - named special keys via shared mapping (e.g., "enter" -> "ENTER")
-// - fallback: return as uppercased word
+// - fallback: return as uppercased word.
 func toIJKey(kc keymapv1.KeyCode) string {
 	// Named specials via shared mapping first
 	if v, ok := strokeMapping.GetInverse(kc); ok {

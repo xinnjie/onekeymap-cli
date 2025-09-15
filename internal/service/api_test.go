@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 	"google.golang.org/grpc/codes"
@@ -60,8 +61,10 @@ func TestServer_LoadKeymap(t *testing.T) {
 									KeyChords: &keymapv1.KeyChordSequence{
 										Chords: []*keymapv1.KeyChord{
 											{
-												KeyCode:   keymapv1.KeyCode_A,
-												Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
+												KeyCode: keymapv1.KeyCode_A,
+												Modifiers: []keymapv1.KeyModifier{
+													keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+												},
 											},
 										},
 									},
@@ -107,8 +110,10 @@ func TestServer_LoadKeymap(t *testing.T) {
 									KeyChords: &keymapv1.KeyChordSequence{
 										Chords: []*keymapv1.KeyChord{
 											{
-												KeyCode:   keymapv1.KeyCode_A,
-												Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
+												KeyCode: keymapv1.KeyCode_A,
+												Modifiers: []keymapv1.KeyModifier{
+													keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+												},
 											},
 										},
 									},
@@ -180,12 +185,12 @@ func TestServer_LoadKeymap(t *testing.T) {
 			got, err := server.LoadKeymap(ctx, tt.req)
 
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				st, ok := status.FromError(err)
 				assert.True(t, ok)
 				assert.Equal(t, tt.wantErrCode, st.Code())
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				if tt.expectNoOrder {
 					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform(), protocmp.SortRepeatedFields(&keymapv1.KeymapSetting{}, "keybindings")))
 				} else {

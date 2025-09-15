@@ -1,6 +1,7 @@
 package views
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -29,9 +30,12 @@ type importFormModel struct {
 	OnekeymapConfigPlaceHolder string
 }
 
-func NewImportFormModel(registry *plugins.Registry,
+func NewImportFormModel(
+	registry *plugins.Registry,
 	needSelectEditor, needInput, needOutput bool,
-	editor, editorKeymapConfigInput, onekeymapConfigOutput *string, onekeymapConfigPlaceHolder string) (*importFormModel, error) {
+	editor, editorKeymapConfigInput, onekeymapConfigOutput *string,
+	onekeymapConfigPlaceHolder string,
+) (*importFormModel, error) {
 	m := &importFormModel{
 		pluginRegistry:             registry,
 		needSelectEditor:           needSelectEditor,
@@ -50,7 +54,7 @@ func NewImportFormModel(registry *plugins.Registry,
 
 func (m *importFormModel) build() error {
 	if !m.needSelectEditor && !m.needInput && !m.needOutput {
-		return fmt.Errorf("form not needed")
+		return errors.New("form not needed")
 	}
 
 	var groups []*huh.Group
@@ -63,7 +67,7 @@ func (m *importFormModel) build() error {
 			opts = append(opts, huh.NewOption(n, n))
 		}
 		if len(opts) == 0 {
-			return fmt.Errorf("no editor plugins available")
+			return errors.New("no editor plugins available")
 		}
 		groups = append(groups,
 			huh.NewGroup(
@@ -142,7 +146,7 @@ func (m *importFormModel) GetImporterNames() []string {
 	return importerNames
 }
 
-// tea.Model minimal implementations (not used directly, kept for future extension)
+// tea.Model minimal implementations (not used directly, kept for future extension).
 func (m *importFormModel) Init() tea.Cmd { return m.form.Init() }
 
 func (m *importFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

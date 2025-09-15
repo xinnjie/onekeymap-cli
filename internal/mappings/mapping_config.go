@@ -1,6 +1,7 @@
 package mappings
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -9,7 +10,7 @@ import (
 )
 
 // MappingConfig holds the final, merged mapping config, indexed by action ID.
-// It serves as a `Anemic Domain Model` because I want the editor specific config query to be implemented in plugin
+// It serves as a `Anemic Domain Model` because I want the editor specific config query to be implemented in plugin.
 type MappingConfig struct {
 	// Mappings is a map where the key is the one_keymap_id (e.g., "actions.editor.copy")
 	// and the value is the detailed mapping information for that action.
@@ -41,7 +42,7 @@ type ActionMappingConfig struct {
 	Helix       HelixConfig           `yaml:"helix"`
 }
 
-// every editor action mapping config should hold EditorActionMapping to provide extra support
+// EditorActionMapping provides extra flags for editor-specific configurations.
 type EditorActionMapping struct {
 	// when true, this config is used for import, otherwise it is only used for export
 	ForImport bool `yaml:"forImport,omitempty"`
@@ -78,7 +79,7 @@ func load(reader io.Reader) (*MappingConfig, error) {
 	for {
 		var fileContent configFormat
 		if err := decoder.Decode(&fileContent); err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return nil, fmt.Errorf("failed to parse YAML stream: %w", err)

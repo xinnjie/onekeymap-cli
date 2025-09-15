@@ -2,7 +2,8 @@ package mappings
 
 type IntelliJMappingConfig struct {
 	EditorActionMapping `yaml:",inline"`
-	Action              string `yaml:"action"`
+
+	Action string `yaml:"action"`
 }
 
 func checkIntellijDuplicateConfig(mappings map[string]ActionMappingConfig) error {

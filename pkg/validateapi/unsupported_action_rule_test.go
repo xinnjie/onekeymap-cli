@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
@@ -49,13 +50,13 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 	}
 
 	report, err := validator.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Issues, 1)
-	assert.NotNil(t, report.Issues[0].GetUnsupportedAction())
+	require.NoError(t, err)
+	assert.Len(t, report.GetIssues(), 1)
+	assert.NotNil(t, report.GetIssues()[0].GetUnsupportedAction())
 
-	unsupported := report.Issues[0].GetUnsupportedAction()
-	assert.Equal(t, "actions.vscode.only", unsupported.Action)
-	assert.Equal(t, "zed", unsupported.TargetEditor)
+	unsupported := report.GetIssues()[0].GetUnsupportedAction()
+	assert.Equal(t, "actions.vscode.only", unsupported.GetAction())
+	assert.Equal(t, "zed", unsupported.GetTargetEditor())
 }
 
 func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
@@ -86,8 +87,8 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 	}
 
 	report, err := validator.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Issues, 0)
+	require.NoError(t, err)
+	assert.Empty(t, report.GetIssues())
 }
 
 func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
@@ -116,14 +117,14 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 	}
 
 	report, err := validatorVSCode.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Issues, 0)
+	require.NoError(t, err)
+	assert.Empty(t, report.GetIssues())
 
 	// Test with Zed target - should fail
 	validatorZed := NewValidator(NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 	opts.EditorType = "zed"
 
 	report, err = validatorZed.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Issues, 1)
+	require.NoError(t, err)
+	assert.Len(t, report.GetIssues(), 1)
 }

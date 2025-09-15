@@ -63,7 +63,11 @@ func orderByBaseCommand(final []vscodeKeybinding, base vscodeKeybindingConfig) [
 	return final
 }
 
-func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, differ diff.Differ) pluginapi.PluginExporter {
+func newExporter(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	differ diff.Differ,
+) pluginapi.PluginExporter {
 	return &vscodeExporter{
 		mappingConfig: mappingConfig,
 		logger:        logger,
@@ -71,7 +75,12 @@ func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, dif
 	}
 }
 
-func (e *vscodeExporter) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts pluginapi.PluginExportOption) (*pluginapi.PluginExportReport, error) {
+func (e *vscodeExporter) Export(
+	ctx context.Context,
+	destination io.Writer,
+	setting *keymapv1.KeymapSetting,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	// Decode existing config for non-destructive merge
 	var existingKeybindings []vscodeKeybinding
 	if opts.ExistingConfig != nil {
@@ -108,7 +117,7 @@ func (e *vscodeExporter) Export(ctx context.Context, destination io.Writer, sett
 }
 
 // identifyUnmanagedKeybindings performs reverse lookup to identify keybindings
-// that are not managed by onekeymap
+// that are not managed by onekeymap.
 func (e *vscodeExporter) identifyUnmanagedKeybindings(existingKeybindings []vscodeKeybinding) []vscodeKeybinding {
 	unmanaged := make([]vscodeKeybinding, 0)
 
@@ -125,7 +134,7 @@ func (e *vscodeExporter) identifyUnmanagedKeybindings(existingKeybindings []vsco
 }
 
 // findMappingByVSCodeKeybinding performs reverse lookup to find if a VSCode keybinding
-// corresponds to any action in our mappings
+// corresponds to any action in our mappings.
 func (e *vscodeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) *mappings.ActionMappingConfig {
 	for _, mapping := range e.mappingConfig.Mappings {
 		for _, vscodeConfig := range mapping.VSCode {
@@ -139,12 +148,12 @@ func (e *vscodeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) *map
 	return nil
 }
 
-// generateManagedKeybindings generates VSCode keybindings from KeymapSetting
+// generateManagedKeybindings generates VSCode keybindings from KeymapSetting.
 func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetting) []vscodeKeybinding {
 	var vscodeKeybindings []vscodeKeybinding
 
-	for _, km := range setting.Keybindings {
-		mapping := e.mappingConfig.FindByUniversalAction(km.Id)
+	for _, km := range setting.GetKeybindings() {
+		mapping := e.mappingConfig.FindByUniversalAction(km.GetId())
 		if mapping == nil {
 			continue
 		}
@@ -161,7 +170,7 @@ func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.KeymapSett
 			binding := keymap.NewKeyBinding(b)
 			keys, err := formatKeybinding(binding)
 			if err != nil {
-				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.Id, "error", err)
+				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetId(), "error", err)
 				continue
 			}
 			for _, vscodeConfig := range vscodeConfigs {
@@ -181,7 +190,7 @@ func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.KeymapSett
 	return vscodeKeybindings
 }
 
-// mergeKeybindings merges managed and unmanaged keybindings, with managed taking priority
+// mergeKeybindings merges managed and unmanaged keybindings, with managed taking priority.
 func (e *vscodeExporter) mergeKeybindings(managed, unmanaged []vscodeKeybinding) []vscodeKeybinding {
 	// Create a map to track managed keybindings by their key combination
 	managedKeys := make(map[string]bool)
@@ -207,7 +216,7 @@ func (e *vscodeExporter) mergeKeybindings(managed, unmanaged []vscodeKeybinding)
 	return result
 }
 
-// equalVSCodeArgs compares VSCode args, handling the conversion between different types
+// equalVSCodeArgs compares VSCode args, handling the conversion between different types.
 func equalVSCodeArgs(a map[string]interface{}, b vscodeArgs) bool {
 	if a == nil && b == nil {
 		return true

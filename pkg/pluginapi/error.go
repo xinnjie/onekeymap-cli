@@ -1,8 +1,8 @@
 package pluginapi
 
-import "fmt"
+import "errors"
 
 var (
 	// Returned when a plugin does not support a requested operation, like import or export.
-	ErrNotSupported = fmt.Errorf("not supported")
+	ErrNotSupported = errors.New("not supported")
 )

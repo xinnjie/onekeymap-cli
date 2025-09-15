@@ -259,7 +259,7 @@ func TestImporter_Import(t *testing.T) {
 			result, err := importer.Import(context.Background(), reader, pluginapi.PluginImportOption{})
 
 			if tt.expectError {
-				assert.Error(t, err)
+				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
 				assert.True(t, proto.Equal(tt.expected, result), "Expected %v, got %v", tt.expected, result)

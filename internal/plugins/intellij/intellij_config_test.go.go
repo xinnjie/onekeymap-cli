@@ -24,11 +24,11 @@ func TestUnmarshalKeymapXML(t *testing.T) {
 
 	var km KeymapXML
 	err := xml.Unmarshal([]byte(xmlData), &km)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, "$default", km.Name)
 	assert.Equal(t, "1", km.Version)
-	assert.Equal(t, false, km.DisableMnemonics)
+	assert.False(t, km.DisableMnemonics)
 	assert.Len(t, km.Actions, 3)
 
 	showNavBarIndex := slices.IndexFunc(km.Actions, func(a ActionXML) bool {

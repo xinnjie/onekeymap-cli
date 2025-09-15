@@ -41,8 +41,11 @@ func TestParse(t *testing.T) {
 			name:  "Multiple modifiers",
 			input: "ctrl+shift+f",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   keycode.MustKeyCode("f"),
-				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_SHIFT},
+				KeyCode: keycode.MustKeyCode("f"),
+				Modifiers: []keymapv1.KeyModifier{
+					keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+					keymapv1.KeyModifier_KEY_MODIFIER_SHIFT,
+				},
 			},
 			expectError: false,
 		},
@@ -50,8 +53,13 @@ func TestParse(t *testing.T) {
 			name:  "All modifiers",
 			input: "ctrl+alt+shift+meta+enter",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   keycode.MustKeyCode("enter"),
-				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_ALT, keymapv1.KeyModifier_KEY_MODIFIER_SHIFT, keymapv1.KeyModifier_KEY_MODIFIER_META},
+				KeyCode: keycode.MustKeyCode("enter"),
+				Modifiers: []keymapv1.KeyModifier{
+					keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+					keymapv1.KeyModifier_KEY_MODIFIER_ALT,
+					keymapv1.KeyModifier_KEY_MODIFIER_SHIFT,
+					keymapv1.KeyModifier_KEY_MODIFIER_META,
+				},
 			},
 			expectError: false,
 		},
@@ -86,8 +94,11 @@ func TestParse(t *testing.T) {
 			name:  "ctrl+alt++",
 			input: "ctrl+alt++",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   keycode.MustKeyCode("+"),
-				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_ALT},
+				KeyCode: keycode.MustKeyCode("+"),
+				Modifiers: []keymapv1.KeyModifier{
+					keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+					keymapv1.KeyModifier_KEY_MODIFIER_ALT,
+				},
 			},
 			expectError: false,
 		},
@@ -134,7 +145,7 @@ func TestParse(t *testing.T) {
 			actual, err := Parse(tc.input, "+")
 
 			if tc.expectError {
-				assert.Error(t, err)
+				require.Error(t, err)
 				if tc.errorContains != "" {
 					assert.Contains(t, err.Error(), tc.errorContains)
 				}
@@ -159,8 +170,11 @@ func TestParseMinus(t *testing.T) {
 			name:  "ctrl-alt-+",
 			input: "ctrl-alt-+",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   keycode.MustKeyCode("+"),
-				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_ALT},
+				KeyCode: keycode.MustKeyCode("+"),
+				Modifiers: []keymapv1.KeyModifier{
+					keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+					keymapv1.KeyModifier_KEY_MODIFIER_ALT,
+				},
 			},
 			expectError: false,
 		},
@@ -169,8 +183,11 @@ func TestParseMinus(t *testing.T) {
 			name:  "ctrl-alt--",
 			input: "ctrl-alt--",
 			expected: &keymapv1.KeyChord{
-				KeyCode:   keycode.MustKeyCode("-"),
-				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_ALT},
+				KeyCode: keycode.MustKeyCode("-"),
+				Modifiers: []keymapv1.KeyModifier{
+					keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+					keymapv1.KeyModifier_KEY_MODIFIER_ALT,
+				},
 			},
 			expectError: false,
 		},
@@ -181,7 +198,7 @@ func TestParseMinus(t *testing.T) {
 			actual, err := Parse(tc.input, "-")
 
 			if tc.expectError {
-				assert.Error(t, err)
+				require.Error(t, err)
 				if tc.errorContains != "" {
 					assert.Contains(t, err.Error(), tc.errorContains)
 				}
@@ -226,16 +243,24 @@ func TestFormat(t *testing.T) {
 		{
 			name: "Multiple modifiers unordered",
 			input: &keymapv1.KeyChord{
-				KeyCode:   keycode.MustKeyCode("f"),
-				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_SHIFT, keymapv1.KeyModifier_KEY_MODIFIER_CTRL},
+				KeyCode: keycode.MustKeyCode("f"),
+				Modifiers: []keymapv1.KeyModifier{
+					keymapv1.KeyModifier_KEY_MODIFIER_SHIFT,
+					keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+				},
 			},
 			expected: []string{"ctrl", "shift", "f"}, // Should be formatted in canonical order: meta, ctrl, shift, alt
 		},
 		{
 			name: "All modifiers",
 			input: &keymapv1.KeyChord{
-				KeyCode:   keycode.MustKeyCode("x"),
-				Modifiers: []keymapv1.KeyModifier{keymapv1.KeyModifier_KEY_MODIFIER_META, keymapv1.KeyModifier_KEY_MODIFIER_ALT, keymapv1.KeyModifier_KEY_MODIFIER_CTRL, keymapv1.KeyModifier_KEY_MODIFIER_SHIFT},
+				KeyCode: keycode.MustKeyCode("x"),
+				Modifiers: []keymapv1.KeyModifier{
+					keymapv1.KeyModifier_KEY_MODIFIER_META,
+					keymapv1.KeyModifier_KEY_MODIFIER_ALT,
+					keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
+					keymapv1.KeyModifier_KEY_MODIFIER_SHIFT,
+				},
 			},
 			expected: []string{"cmd", "ctrl", "shift", "alt", "x"},
 		},
@@ -274,9 +299,9 @@ func TestFormat(t *testing.T) {
 			keyChord := NewKeyChord(tc.input)
 			actual, err := keyChord.Format(platform.PlatformMacOS)
 			if tc.expectError {
-				assert.Error(t, err)
+				require.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tc.expected, actual)
 			}
 		})

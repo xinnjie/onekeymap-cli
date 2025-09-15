@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
@@ -27,13 +28,13 @@ func TestDuplicateMappingRule_Validate_WithDuplicates(t *testing.T) {
 	}
 
 	report, err := validator.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Warnings, 1)
-	assert.NotNil(t, report.Warnings[0].GetDuplicateMapping())
+	require.NoError(t, err)
+	assert.Len(t, report.GetWarnings(), 1)
+	assert.NotNil(t, report.GetWarnings()[0].GetDuplicateMapping())
 
-	duplicate := report.Warnings[0].GetDuplicateMapping()
-	assert.Equal(t, "actions.edit.copy", duplicate.Action)
-	assert.Contains(t, duplicate.Message, "multiple times")
+	duplicate := report.GetWarnings()[0].GetDuplicateMapping()
+	assert.Equal(t, "actions.edit.copy", duplicate.GetAction())
+	assert.Contains(t, duplicate.GetMessage(), "multiple times")
 }
 
 func TestDuplicateMappingRule_Validate_NoDuplicates(t *testing.T) {
@@ -52,8 +53,8 @@ func TestDuplicateMappingRule_Validate_NoDuplicates(t *testing.T) {
 	}
 
 	report, err := validator.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Warnings, 0)
+	require.NoError(t, err)
+	assert.Empty(t, report.GetWarnings())
 }
 
 func TestDuplicateMappingRule_Validate_SameActionDifferentKeys(t *testing.T) {
@@ -72,6 +73,6 @@ func TestDuplicateMappingRule_Validate_SameActionDifferentKeys(t *testing.T) {
 	}
 
 	report, err := validator.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Warnings, 0)
+	require.NoError(t, err)
+	assert.Empty(t, report.GetWarnings())
 }

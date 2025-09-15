@@ -28,7 +28,12 @@ type PluginImporter interface {
 type PluginExporter interface {
 	// Export takes a universal KeymapSetting and writes it to an editor-specific
 	// configuration destination.
-	Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts PluginExportOption) (*PluginExportReport, error)
+	Export(
+		ctx context.Context,
+		destination io.Writer,
+		setting *keymapv1.KeymapSetting,
+		opts PluginExportOption,
+	) (*PluginExportReport, error)
 }
 
 // PluginExportOption provides configuration for an export operation.

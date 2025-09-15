@@ -26,7 +26,12 @@ func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, dif
 }
 
 // Export writes IntelliJ-specific keymap XML to destination.
-func (e *intellijExporter) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts pluginapi.PluginExportOption) (*pluginapi.PluginExportReport, error) {
+func (e *intellijExporter) Export(
+	ctx context.Context,
+	destination io.Writer,
+	setting *keymapv1.KeymapSetting,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	_ = ctx
 
 	// Read existing configuration if provided for non-destructive export
@@ -75,7 +80,7 @@ func (e *intellijExporter) Export(ctx context.Context, destination io.Writer, se
 }
 
 // identifyUnmanagedActions performs reverse lookup to identify actions
-// that are not managed by onekeymap
+// that are not managed by onekeymap.
 func (e *intellijExporter) identifyUnmanagedActions(existingActions []ActionXML) []ActionXML {
 	var unmanaged []ActionXML
 
@@ -88,7 +93,7 @@ func (e *intellijExporter) identifyUnmanagedActions(existingActions []ActionXML)
 	return unmanaged
 }
 
-// isManagedAction checks if an action is managed by onekeymap
+// isManagedAction checks if an action is managed by onekeymap.
 func (e *intellijExporter) isManagedAction(actionID string) bool {
 	for _, mapping := range e.mappingConfig.Mappings {
 		if mapping.IntelliJ.Action == actionID {
@@ -98,19 +103,19 @@ func (e *intellijExporter) isManagedAction(actionID string) bool {
 	return false
 }
 
-// generateManagedActions generates IntelliJ actions from KeymapSetting
+// generateManagedActions generates IntelliJ actions from KeymapSetting.
 func (e *intellijExporter) generateManagedActions(setting *keymapv1.KeymapSetting) []ActionXML {
 	// Group keybindings by IntelliJ action ID while preserving order of first appearance.
 	actionsMap := make(map[string]*ActionXML)
 	var actionOrder []string
 
-	for _, km := range setting.Keybindings {
+	for _, km := range setting.GetKeybindings() {
 		if km == nil || len(km.GetBindings()) == 0 {
 			continue
 		}
-		mapping := e.mappingConfig.FindByUniversalAction(km.Id)
+		mapping := e.mappingConfig.FindByUniversalAction(km.GetId())
 		if mapping == nil || mapping.IntelliJ.Action == "" {
-			e.logger.Info("no mapping found for action", "action", km.Id)
+			e.logger.Info("no mapping found for action", "action", km.GetId())
 			continue
 		}
 		actionID := mapping.IntelliJ.Action
@@ -121,7 +126,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.KeymapSettin
 			}
 			shortcutXML, err := formatKeybinding(keymap.NewKeyBinding(b))
 			if err != nil {
-				e.logger.Warn("failed to format keybinding", "action", km.Id, "error", err)
+				e.logger.Warn("failed to format keybinding", "action", km.GetId(), "error", err)
 				continue
 			}
 
@@ -129,7 +134,10 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.KeymapSettin
 				actionsMap[actionID] = &ActionXML{ID: actionID}
 				actionOrder = append(actionOrder, actionID)
 			}
-			actionsMap[actionID].KeyboardShortcuts = append(actionsMap[actionID].KeyboardShortcuts, KeyboardShortcutXML{First: shortcutXML.First, Second: shortcutXML.Second})
+			actionsMap[actionID].KeyboardShortcuts = append(
+				actionsMap[actionID].KeyboardShortcuts,
+				KeyboardShortcutXML{First: shortcutXML.First, Second: shortcutXML.Second},
+			)
 		}
 	}
 
@@ -162,7 +170,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.KeymapSettin
 	return actions
 }
 
-// mergeActions merges managed and unmanaged actions, with managed taking priority
+// mergeActions merges managed and unmanaged actions, with managed taking priority.
 func (e *intellijExporter) mergeActions(managed, unmanaged []ActionXML) []ActionXML {
 	// Create a map of managed action IDs for quick lookup
 	managedIDs := make(map[string]bool)

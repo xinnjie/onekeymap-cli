@@ -59,7 +59,7 @@ func TestParseKeybinding(t *testing.T) {
 				return
 			}
 			norm, err := kb.Format(platform.PlatformLinux, "+")
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantNorm, norm)
 		})
 	}

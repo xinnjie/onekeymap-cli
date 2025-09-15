@@ -22,7 +22,11 @@ func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *in
 }
 
 // Import converts IntelliJ keymap XML into the universal KeymapSetting.
-func (p *intellijImporter) Import(ctx context.Context, source io.Reader, opts pluginapi.PluginImportOption) (*keymapv1.KeymapSetting, error) {
+func (p *intellijImporter) Import(
+	ctx context.Context,
+	source io.Reader,
+	opts pluginapi.PluginImportOption,
+) (*keymapv1.KeymapSetting, error) {
 	_ = ctx
 	_ = opts
 

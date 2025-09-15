@@ -16,12 +16,12 @@ import (
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
-// Metric names
+// Metric names.
 const (
 	commandProcessedName = "onekeymap.import.commands.processed"
 )
 
-// Attribute keys
+// Attribute keys.
 const (
 	attrKeyEditor  = "editor"
 	attrKeyCommand = "command"
@@ -58,7 +58,12 @@ func NewNoop() Recorder {
 }
 
 // New creates a new Recorder and initializes the OpenTelemetry provider.
-func New(ctx context.Context, version string, logger *slog.Logger, mappingConfig *mappings.MappingConfig) (Recorder, error) {
+func New(
+	ctx context.Context,
+	version string,
+	logger *slog.Logger,
+	mappingConfig *mappings.MappingConfig,
+) (Recorder, error) {
 	exporter, err := otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure())
 	if err != nil {
 		return nil, err
@@ -105,7 +110,7 @@ func (r *recorder) RecordCommandProcessed(ctx context.Context, editor string, se
 	if r.commandCounter == nil || setting == nil {
 		return
 	}
-	for _, binding := range setting.Keybindings {
+	for _, binding := range setting.GetKeybindings() {
 		isMapped := r.mappingConfig.IsActionMapped(binding.GetId())
 		r.commandCounter.Add(ctx, 1, metric.WithAttributes(
 			attribute.String(attrKeyEditor, editor),

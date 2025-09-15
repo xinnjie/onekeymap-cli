@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 	"google.golang.org/protobuf/testing/protocmp"
 )
@@ -27,7 +28,7 @@ func TestSave(t *testing.T) {
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
-				{Id: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}, Description: "copy"},
+				{ID: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}, Description: "copy"},
 			},
 			expectedNumKeymaps: 1,
 		},
@@ -39,7 +40,7 @@ func TestSave(t *testing.T) {
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
-				{Id: "actions.find", Keybinding: KeybindingStrings{"shift+f"}, Comment: "with comment"},
+				{ID: "actions.find", Keybinding: KeybindingStrings{"shift+f"}, Comment: "with comment"},
 			},
 			expectedNumKeymaps: 1,
 		},
@@ -52,7 +53,7 @@ func TestSave(t *testing.T) {
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
-				{Id: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
+				{ID: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
 			},
 			expectedNumKeymaps: 1,
 		},
@@ -67,7 +68,7 @@ func TestSave(t *testing.T) {
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
-				{Id: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
+				{ID: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
 			},
 			expectedNumKeymaps: 1,
 		},
@@ -82,9 +83,9 @@ func TestSave(t *testing.T) {
 				},
 			},
 			expectedKeymaps: []OneKeymapConfig{
-				{Id: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}},
-				{Id: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
-				{Id: "actions.find", Keybinding: KeybindingStrings{"shift+f"}, Comment: "with comment"},
+				{ID: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}},
+				{ID: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
+				{ID: "actions.find", Keybinding: KeybindingStrings{"shift+f"}, Comment: "with comment"},
 			},
 			expectedNumKeymaps: 3,
 		},
@@ -94,18 +95,18 @@ func TestSave(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			var buf bytes.Buffer
 			err := Save(&buf, tc.input)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			var result OneKeymapSetting
 			err = json.Unmarshal(buf.Bytes(), &result)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			assert.Len(t, result.Keymaps, tc.expectedNumKeymaps)
 
 			for _, expectedMap := range tc.expectedKeymaps {
 				found := false
 				for _, actualMap := range result.Keymaps {
-					if actualMap.Id == expectedMap.Id && actualMap.Comment == expectedMap.Comment {
+					if actualMap.ID == expectedMap.ID && actualMap.Comment == expectedMap.Comment {
 						assert.ElementsMatch(t, expectedMap.Keybinding, actualMap.Keybinding)
 						found = true
 						break
@@ -154,7 +155,10 @@ func TestLoad(t *testing.T) {
 					{
 						Id: "actions.find",
 						Bindings: []*keymapv1.Binding{
-							{KeyChords: MustParseKeyBinding("ctrl+shift+f").KeyChords, KeyChordsReadable: "Ctrl+Shift+F"},
+							{
+								KeyChords:         MustParseKeyBinding("ctrl+shift+f").KeyChords,
+								KeyChordsReadable: "Ctrl+Shift+F",
+							},
 						},
 					},
 				},
@@ -254,12 +258,12 @@ func TestLoad(t *testing.T) {
 			loadedSetting, err := Load(reader)
 
 			if tc.expectErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				if tc.errorContains != "" {
 					assert.Contains(t, err.Error(), tc.errorContains)
 				}
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				diff := cmp.Diff(tc.expected, loadedSetting, protocmp.Transform())
 				assert.Empty(t, diff, "The loaded setting should match the expected one")
 			}

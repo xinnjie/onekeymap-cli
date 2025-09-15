@@ -12,6 +12,7 @@ import (
 
 type Server struct {
 	keymapv1.UnimplementedOnekeymapServiceServer
+
 	importer      importapi.Importer
 	exporter      exportapi.Exporter
 	registry      *plugins.Registry
@@ -19,7 +20,13 @@ type Server struct {
 	logger        *slog.Logger
 }
 
-func NewServer(registry *plugins.Registry, importer importapi.Importer, exporter exportapi.Exporter, mappingConfig *mappings.MappingConfig, logger *slog.Logger) *Server {
+func NewServer(
+	registry *plugins.Registry,
+	importer importapi.Importer,
+	exporter exportapi.Exporter,
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+) *Server {
 	return &Server{
 		importer:      importer,
 		exporter:      exporter,

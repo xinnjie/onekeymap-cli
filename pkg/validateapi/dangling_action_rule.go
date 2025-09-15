@@ -21,21 +21,21 @@ func NewDanglingActionRule(mappingConfig *mappings.MappingConfig) ValidationRule
 
 // Validate checks for dangling actions in the keymap setting.
 func (r *DanglingActionRule) Validate(ctx context.Context, validationContext *ValidationContext) error {
-	if validationContext.Setting == nil || len(validationContext.Setting.Keybindings) == 0 {
+	if validationContext.Setting == nil || len(validationContext.Setting.GetKeybindings()) == 0 {
 		return nil
 	}
 
-	for _, kb := range validationContext.Setting.Keybindings {
+	for _, kb := range validationContext.Setting.GetKeybindings() {
 		if kb == nil {
 			continue
 		}
 
 		// Check if the action exists in the mapping configuration
-		if _, exists := r.mappingConfig.Mappings[kb.Id]; !exists {
+		if _, exists := r.mappingConfig.Mappings[kb.GetId()]; !exists {
 			// Create a dangling action issue
 			danglingAction := &keymapv1.DanglingAction{
-				Action:     kb.Id,
-				Keybinding: kb.Id, // Use action as placeholder for keybinding
+				Action:     kb.GetId(),
+				Keybinding: kb.GetId(), // Use action as placeholder for keybinding
 				Suggestion: "Check if the action ID is correct or if it needs to be added to action mappings",
 			}
 

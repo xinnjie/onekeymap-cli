@@ -53,7 +53,15 @@ func NewKeymapChangesModel(changes *importapi.KeymapChanges, confirm *bool) tea.
 			} else if diff.After != nil {
 				action = diff.After.GetId()
 			}
-			rows = append(rows, table.Row{"Update", action, redMinus(formatKeyBinding(diff.Before)), greenPlus(formatKeyBinding(diff.After))})
+			rows = append(
+				rows,
+				table.Row{
+					"Update",
+					action,
+					redMinus(formatKeyBinding(diff.Before)),
+					greenPlus(formatKeyBinding(diff.After)),
+				},
+			)
 		}
 	}
 

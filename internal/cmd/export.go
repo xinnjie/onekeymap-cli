@@ -145,7 +145,7 @@ func prepareExportInputFlags(cmd *cobra.Command, onekeymapPlaceholder string) er
 		}
 	} else {
 		if *toFlag == "" {
-			return fmt.Errorf("flag --to is required")
+			return errors.New("flag --to is required")
 		}
 		if !cmd.Flags().Changed("input") && onekeymapPlaceholder != "" {
 			*exportInput = onekeymapPlaceholder
@@ -181,7 +181,16 @@ func prepareExportInputFlags(cmd *cobra.Command, onekeymapPlaceholder string) er
 
 func runExportForm(pluginRegistry *plugins.Registry, to, input, output *string, onekeymapConfigPlaceHolder string,
 	needSelectEditor, needInput, needOutput bool) error {
-	m, err := views.NewOutputFormModel(pluginRegistry, needSelectEditor, needInput, needOutput, to, input, output, onekeymapConfigPlaceHolder)
+	m, err := views.NewOutputFormModel(
+		pluginRegistry,
+		needSelectEditor,
+		needInput,
+		needOutput,
+		to,
+		input,
+		output,
+		onekeymapConfigPlaceHolder,
+	)
 	if err != nil {
 		return err
 	}
@@ -200,7 +209,10 @@ func init() {
 	exportInput = exportCmd.Flags().String("input", "", "Path to the source onekeymap.json file")
 	exportOutput = exportCmd.Flags().String("output", "", "Optional: Path to the target editor's config file")
 
-	_ = exportCmd.RegisterFlagCompletionFunc("to", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return pluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
-	})
+	_ = exportCmd.RegisterFlagCompletionFunc(
+		"to",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return pluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
+		},
+	)
 }

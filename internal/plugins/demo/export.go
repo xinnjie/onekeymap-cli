@@ -28,7 +28,12 @@ func newExporter(logger *slog.Logger, differ diff.Differ) pluginapi.PluginExport
 	return &demoExporter{logger: logger, differ: differ}
 }
 
-func (e *demoExporter) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts pluginapi.PluginExportOption) (*pluginapi.PluginExportReport, error) {
+func (e *demoExporter) Export(
+	ctx context.Context,
+	destination io.Writer,
+	setting *keymapv1.KeymapSetting,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	var out []demoBinding
 	for _, km := range setting.GetKeybindings() {
 		for _, b := range km.GetBindings() {

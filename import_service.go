@@ -2,6 +2,7 @@ package onekeymap
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"sort"
@@ -46,14 +47,19 @@ func unionWithBase(base *keymapv1.KeymapSetting, imported *keymapv1.KeymapSettin
 			continue
 		}
 		// shallow copy action binding shell; reuse bindings slice ref (safe; will be appended below possibly)
-		ab := &keymapv1.ActionBinding{Id: kb.GetId(), Name: kb.GetName(), Description: kb.GetDescription(), Category: kb.GetCategory()}
+		ab := &keymapv1.ActionBinding{
+			Id:          kb.GetId(),
+			Name:        kb.GetName(),
+			Description: kb.GetDescription(),
+			Category:    kb.GetCategory(),
+		}
 		// copy bindings
 		for _, b := range kb.GetBindings() {
 			if b != nil {
 				ab.Bindings = append(ab.Bindings, b)
 			}
 		}
-		byID[ab.Id] = ab
+		byID[ab.GetId()] = ab
 		out.Keybindings = append(out.Keybindings, ab)
 	}
 	// merge imported bindings into corresponding actions (or create new action entries)
@@ -64,13 +70,18 @@ func unionWithBase(base *keymapv1.KeymapSetting, imported *keymapv1.KeymapSettin
 		existing, ok := byID[kb.GetId()]
 		if !ok {
 			// add as new action
-			ab := &keymapv1.ActionBinding{Id: kb.GetId(), Name: kb.GetName(), Description: kb.GetDescription(), Category: kb.GetCategory()}
+			ab := &keymapv1.ActionBinding{
+				Id:          kb.GetId(),
+				Name:        kb.GetName(),
+				Description: kb.GetDescription(),
+				Category:    kb.GetCategory(),
+			}
 			for _, b := range kb.GetBindings() {
 				if b != nil {
 					ab.Bindings = append(ab.Bindings, b)
 				}
 			}
-			byID[ab.Id] = ab
+			byID[ab.GetId()] = ab
 			out.Keybindings = append(out.Keybindings, ab)
 			continue
 		}
@@ -95,13 +106,21 @@ func unionWithBase(base *keymapv1.KeymapSetting, imported *keymapv1.KeymapSettin
 }
 
 // NewImportService creates a new default import service.
-func NewImportService(registry *plugins.Registry, config *mappings.MappingConfig, logger *slog.Logger, recorder metrics.Recorder) importapi.Importer {
+func NewImportService(
+	registry *plugins.Registry,
+	config *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) importapi.Importer {
 	service := &importService{
 		registry:      registry,
 		mappingConfig: config,
 		logger:        logger,
-		validator:     validateapi.NewValidator(validateapi.NewKeybindConflictRule(), validateapi.NewDanglingActionRule(config)),
-		recorder:      recorder,
+		validator: validateapi.NewValidator(
+			validateapi.NewKeybindConflictRule(),
+			validateapi.NewDanglingActionRule(config),
+		),
+		recorder: recorder,
 	}
 
 	return service
@@ -110,7 +129,7 @@ func NewImportService(registry *plugins.Registry, config *mappings.MappingConfig
 // Import is the method implementation for the default service.
 func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions) (*importapi.ImportResult, error) {
 	if opts.InputStream == nil {
-		return nil, fmt.Errorf("input stream is required")
+		return nil, errors.New("input stream is required")
 	}
 	plugin, ok := s.registry.Get(opts.EditorType)
 	if !ok {
@@ -128,16 +147,16 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 	// Normalize: merge same-action entries and deduplicate identical bindings before downstream logic
-	if setting != nil && len(setting.Keybindings) > 0 {
-		setting.Keybindings = dedupKeyBindings(setting.Keybindings)
+	if setting != nil && len(setting.GetKeybindings()) > 0 {
+		setting.Keybindings = dedupKeyBindings(setting.GetKeybindings())
 	}
 
 	s.recorder.RecordCommandProcessed(ctx, string(opts.EditorType), setting)
 
 	// Sort by action for determinism
-	if setting != nil && len(setting.Keybindings) > 0 {
-		sort.Slice(setting.Keybindings, func(i, j int) bool {
-			return setting.Keybindings[i].Id < setting.Keybindings[j].Id
+	if setting != nil && len(setting.GetKeybindings()) > 0 {
+		sort.Slice(setting.GetKeybindings(), func(i, j int) bool {
+			return setting.GetKeybindings()[i].GetId() < setting.GetKeybindings()[j].GetId()
 		})
 	}
 
@@ -154,8 +173,8 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	// No baseline provided: all imported keymaps are additions.
 	if opts.Base == nil || len(opts.Base.GetKeybindings()) == 0 {
 		changes := &importapi.KeymapChanges{}
-		if len(setting.Keybindings) > 0 {
-			changes.Add = append(changes.Add, setting.Keybindings...)
+		if len(setting.GetKeybindings()) > 0 {
+			changes.Add = append(changes.Add, setting.GetKeybindings()...)
 		}
 		return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
 	}
@@ -175,11 +194,15 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	}
 
 	// Safety: ensure dedup on output as well
-	setting.Keybindings = dedupKeyBindings(setting.Keybindings)
+	setting.Keybindings = dedupKeyBindings(setting.GetKeybindings())
 	return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
 }
 
-func (s *importService) validate(ctx context.Context, setting *keymapv1.KeymapSetting, opts importapi.ImportOptions) (*keymapv1.ValidationReport, error) {
+func (s *importService) validate(
+	ctx context.Context,
+	setting *keymapv1.KeymapSetting,
+	opts importapi.ImportOptions,
+) (*keymapv1.ValidationReport, error) {
 	if setting == nil {
 		return &keymapv1.ValidationReport{
 			SourceEditor: string(opts.EditorType),
@@ -195,7 +218,10 @@ func (s *importService) validate(ctx context.Context, setting *keymapv1.KeymapSe
 	return s.validator.Validate(ctx, setting, opts)
 }
 
-func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *keymapv1.KeymapSetting) (*importapi.KeymapChanges, error) {
+func (s *importService) calculateChanges(
+	base *keymapv1.KeymapSetting,
+	setting *keymapv1.KeymapSetting,
+) (*importapi.KeymapChanges, error) {
 	if base == nil || setting == nil {
 		return &importapi.KeymapChanges{}, nil
 	}
@@ -275,14 +301,14 @@ func (s *importService) calculateChanges(base *keymapv1.KeymapSetting, setting *
 		for _, v := range adds {
 			changes.Add = append(changes.Add, v)
 		}
-		sort.Slice(changes.Add, func(i, j int) bool { return changes.Add[i].Id < changes.Add[j].Id })
+		sort.Slice(changes.Add, func(i, j int) bool { return changes.Add[i].GetId() < changes.Add[j].GetId() })
 	}
 	if len(removes) > 0 {
 		changes.Remove = make([]*keymapv1.ActionBinding, 0, len(removes))
 		for _, v := range removes {
 			changes.Remove = append(changes.Remove, v)
 		}
-		sort.Slice(changes.Remove, func(i, j int) bool { return changes.Remove[i].Id < changes.Remove[j].Id })
+		sort.Slice(changes.Remove, func(i, j int) bool { return changes.Remove[i].GetId() < changes.Remove[j].GetId() })
 	}
 
 	// Decorate metadata (Name/Description/Category) for all keybindings in changes

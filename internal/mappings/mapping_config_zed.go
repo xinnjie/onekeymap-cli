@@ -10,9 +10,10 @@ import (
 
 type ZedMappingConfig struct {
 	EditorActionMapping `yaml:",inline"`
-	Action              string                 `yaml:"action"`
-	Context             string                 `yaml:"context"`
-	Args                map[string]interface{} `yaml:"args,omitempty"`
+
+	Action  string                 `yaml:"action"`
+	Context string                 `yaml:"context"`
+	Args    map[string]interface{} `yaml:"args,omitempty"`
 }
 
 type ZedConfigs []ZedMappingConfig
@@ -34,7 +35,11 @@ func (z *ZedConfigs) UnmarshalYAML(node *yaml.Node) error {
 		}
 		*z = slice
 	default:
-		return fmt.Errorf("cannot unmarshal!! (line %d, col %d): expected a mapping or sequence node for zed config", node.Line, node.Column)
+		return fmt.Errorf(
+			"cannot unmarshal!! (line %d, col %d): expected a mapping or sequence node for zed config",
+			node.Line,
+			node.Column,
+		)
 	}
 	return nil
 }

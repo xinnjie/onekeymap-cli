@@ -1,6 +1,7 @@
 package intellij
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -35,7 +36,7 @@ func formatKeybinding(keybind *keymap.KeyBinding) (*KeyboardShortcutXML, error) 
 	// Only support up to two chords for IntelliJ (first and optional second keystroke).
 	chords := keybind.GetKeyChords().GetChords()
 	if len(chords) > 2 {
-		return nil, fmt.Errorf("too many chords for intellij, only first two are supported")
+		return nil, errors.New("too many chords for intellij, only first two are supported")
 	}
 
 	first, err := keyChordToIJKeyStroke(chords[0])
@@ -56,7 +57,7 @@ func formatKeybinding(keybind *keymap.KeyBinding) (*KeyboardShortcutXML, error) 
 
 func keyChordToIJKeyStroke(kc *keymapv1.KeyChord) (string, error) {
 	if kc == nil {
-		return "", fmt.Errorf("invalid key chord: nil")
+		return "", errors.New("invalid key chord: nil")
 	}
 	// Use platform.PlatformLinus beacuse intellij convert `meta` key to `cmd` on macos internally
 	parts, err := keychord.NewKeyChord(kc).Format(platform.PlatformLinux)
@@ -65,7 +66,7 @@ func keyChordToIJKeyStroke(kc *keymapv1.KeyChord) (string, error) {
 	}
 	s := formatKeyChord(parts)
 	if s == "" {
-		return "", fmt.Errorf("invalid key chord: empty key code")
+		return "", errors.New("invalid key chord: empty key code")
 	}
 	return s, nil
 }

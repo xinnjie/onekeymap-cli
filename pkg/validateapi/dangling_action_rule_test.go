@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
@@ -35,10 +36,10 @@ func TestValidator_Validate_WithDanglingAction(t *testing.T) {
 	}
 
 	report, err := validator.Validate(context.Background(), setting, opts)
-	assert.NoError(t, err)
-	assert.Len(t, report.Issues, 1)
-	assert.NotNil(t, report.Issues[0].GetDanglingAction())
+	require.NoError(t, err)
+	assert.Len(t, report.GetIssues(), 1)
+	assert.NotNil(t, report.GetIssues()[0].GetDanglingAction())
 
-	danglingAction := report.Issues[0].GetDanglingAction()
-	assert.Equal(t, "invalid.action", danglingAction.Action)
+	danglingAction := report.GetIssues()[0].GetDanglingAction()
+	assert.Equal(t, "invalid.action", danglingAction.GetAction())
 }

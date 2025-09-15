@@ -27,7 +27,11 @@ func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *vs
 }
 
 // Import reads a VSCode keybindings.json file and converts it to a universal KeymapSetting.
-func (i *vscodeImporter) Import(ctx context.Context, source io.Reader, option pluginapi.PluginImportOption) (*keymapv1.KeymapSetting, error) {
+func (i *vscodeImporter) Import(
+	ctx context.Context,
+	source io.Reader,
+	option pluginapi.PluginImportOption,
+) (*keymapv1.KeymapSetting, error) {
 	// VSCode's keybindings.json can contain comments, so we need to strip them.
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
@@ -45,7 +49,15 @@ func (i *vscodeImporter) Import(ctx context.Context, source io.Reader, option pl
 	for _, binding := range vscodeKeybindings {
 		mapping := i.FindByVSCodeActionWithArgs(binding.Command, binding.When, binding.Args)
 		if mapping == nil {
-			i.logger.Debug("Skipping keybinding with unknown action", "action", binding.Command, "when", binding.When, "args", binding.Args)
+			i.logger.Debug(
+				"Skipping keybinding with unknown action",
+				"action",
+				binding.Command,
+				"when",
+				binding.When,
+				"args",
+				binding.Args,
+			)
 			continue
 		}
 

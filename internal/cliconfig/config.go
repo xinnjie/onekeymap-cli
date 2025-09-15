@@ -1,6 +1,7 @@
 package cliconfig
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -74,7 +75,8 @@ func NewConfig() (*Config, error) {
 
 	// Read configuration file if it exists
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+		var configFileNotFoundError viper.ConfigFileNotFoundError
+		if errors.As(err, &configFileNotFoundError) {
 			// Config file was found but another error was produced
 			fmt.Printf("Warning: Error reading config file: %v\n", err)
 		}
@@ -93,10 +95,10 @@ func NewConfig() (*Config, error) {
 	return &cfg, nil
 }
 
-// Validate checks if the configuration is valid
+// Validate checks if the configuration is valid.
 func (c *Config) Validate() error {
 	if c.Verbose && c.Quiet {
-		return fmt.Errorf("verbose and quiet modes cannot be enabled simultaneously")
+		return errors.New("verbose and quiet modes cannot be enabled simultaneously")
 	}
 	return nil
 }

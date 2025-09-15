@@ -94,12 +94,17 @@ func TestExportZedKeymap(t *testing.T) {
 			var buf bytes.Buffer
 			exporter, err := p.Exporter()
 			require.NoError(t, err)
-			_, err = exporter.Export(context.Background(), &buf, tt.setting, pluginapi.PluginExportOption{ExistingConfig: nil})
+			_, err = exporter.Export(
+				context.Background(),
+				&buf,
+				tt.setting,
+				pluginapi.PluginExportOption{ExistingConfig: nil},
+			)
 
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.JSONEq(t, tt.wantJSON, buf.String(), "The exported JSON should match the expected one.")
 			}
 		})

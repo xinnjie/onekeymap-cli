@@ -40,7 +40,12 @@ type testExporter struct {
 	reportDiff         *string
 }
 
-func (e *testExporter) Export(ctx context.Context, destination io.Writer, setting *keymapv1.KeymapSetting, opts pluginapi.PluginExportOption) (*pluginapi.PluginExportReport, error) {
+func (e *testExporter) Export(
+	ctx context.Context,
+	destination io.Writer,
+	setting *keymapv1.KeymapSetting,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	if e.writeContent != "" {
 		_, _ = io.Copy(destination, strings.NewReader(e.writeContent))
 	}
@@ -55,7 +60,11 @@ func (e *testExporter) Export(ctx context.Context, destination io.Writer, settin
 	}, nil
 }
 
-func newTestExportService(t *testing.T, exporter pluginapi.PluginExporter, editorType pluginapi.EditorType) exportapi.Exporter {
+func newTestExportService(
+	t *testing.T,
+	exporter pluginapi.PluginExporter,
+	editorType pluginapi.EditorType,
+) exportapi.Exporter {
 	t.Helper()
 	r := plugins.NewRegistry()
 	r.Register(&testExportPlugin{editorType: editorType, exporter: exporter})

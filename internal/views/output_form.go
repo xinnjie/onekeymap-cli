@@ -1,6 +1,7 @@
 package views
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -56,7 +57,7 @@ func NewOutputFormModel(
 
 func (m *outputFormModel) build() error {
 	if !m.needSelectEditor && !m.needInput && !m.needOutput {
-		return fmt.Errorf("form not needed")
+		return errors.New("form not needed")
 	}
 
 	var groups []*huh.Group
@@ -69,7 +70,7 @@ func (m *outputFormModel) build() error {
 			opts = append(opts, huh.NewOption(n, n))
 		}
 		if len(opts) == 0 {
-			return fmt.Errorf("no editor plugins available")
+			return errors.New("no editor plugins available")
 		}
 		groups = append(groups,
 			huh.NewGroup(

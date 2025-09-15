@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// devCmd represents the dev command
+// devCmd represents the dev command.
 var devCmd = &cobra.Command{
 	Use:   "dev",
 	Short: "A brief description of your command",

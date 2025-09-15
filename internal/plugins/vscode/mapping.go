@@ -10,8 +10,11 @@ import (
 
 // FindByVSCodeActionWithArgs searches for a mapping by VSCode command, when clause, and args.
 // strict exact matching for both `command` and `when` clauses
-// if strict matching fails, it will try to find a matching action by `command` only, return the command if only one action matches the `command`, else return nil
-func (i *vscodeImporter) FindByVSCodeActionWithArgs(command, when string, args map[string]interface{}) *mappings.ActionMappingConfig {
+// if strict matching fails, it will try to find a matching action by `command` only, return the command if only one action matches the `command`, else return nil.
+func (i *vscodeImporter) FindByVSCodeActionWithArgs(
+	command, when string,
+	args map[string]interface{},
+) *mappings.ActionMappingConfig {
 	// We collect candidates first, then decide deterministically to avoid
 	// any map-iteration induced non-determinism.
 	type candidate struct {
@@ -67,7 +70,10 @@ func (i *vscodeImporter) FindByVSCodeActionWithArgs(command, when string, args m
 				if whenExact {
 					if _, ok := seenExact[mapping.ID]; !ok {
 						m := mapping
-						exactWhenArgs = append(exactWhenArgs, &candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport})
+						exactWhenArgs = append(
+							exactWhenArgs,
+							&candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport},
+						)
 						seenExact[mapping.ID] = struct{}{}
 					}
 					continue
@@ -75,7 +81,10 @@ func (i *vscodeImporter) FindByVSCodeActionWithArgs(command, when string, args m
 				if whenWildcard {
 					if _, ok := seenWildcard[mapping.ID]; !ok {
 						m := mapping
-						wildcardWhenArgs = append(wildcardWhenArgs, &candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport})
+						wildcardWhenArgs = append(
+							wildcardWhenArgs,
+							&candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport},
+						)
 						seenWildcard[mapping.ID] = struct{}{}
 					}
 					continue
@@ -83,7 +92,10 @@ func (i *vscodeImporter) FindByVSCodeActionWithArgs(command, when string, args m
 				// args match but when doesn't — keep as command+args ignoring when
 				if _, ok := seenCmdArgs[mapping.ID]; !ok {
 					m := mapping
-					cmdArgsIgnoreWhen = append(cmdArgsIgnoreWhen, &candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport})
+					cmdArgsIgnoreWhen = append(
+						cmdArgsIgnoreWhen,
+						&candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport},
+					)
 					seenCmdArgs[mapping.ID] = struct{}{}
 				}
 				continue
@@ -93,7 +105,10 @@ func (i *vscodeImporter) FindByVSCodeActionWithArgs(command, when string, args m
 			if args == nil {
 				if _, ok := seenCmdOnly[mapping.ID]; !ok {
 					m := mapping
-					cmdOnly = append(cmdOnly, &candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport})
+					cmdOnly = append(
+						cmdOnly,
+						&candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport},
+					)
 					seenCmdOnly[mapping.ID] = struct{}{}
 				}
 			}
@@ -134,7 +149,15 @@ func (i *vscodeImporter) FindByVSCodeActionWithArgs(command, when string, args m
 		return m
 	}
 	if m := pick(cmdArgsIgnoreWhen); m != nil {
-		i.logger.Debug("Falling back to command+args match (ignoring when)", "command", command, "when", when, "args", args)
+		i.logger.Debug(
+			"Falling back to command+args match (ignoring when)",
+			"command",
+			command,
+			"when",
+			when,
+			"args",
+			args,
+		)
 		return m
 	}
 	if args == nil {
