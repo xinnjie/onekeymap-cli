@@ -20,24 +20,51 @@ import (
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
-var (
-	toFlag       *string
-	exportInput  *string
-	exportOutput *string
-)
+type exportFlags struct {
+	to          string
+	input       string
+	output      string
+	interactive bool
+	backup      bool
+}
 
-var exportCmd = &cobra.Command{
-	Use:   "export",
-	Short: "Export a universal keymap to an editor's format",
-	RunE: func(cmd *cobra.Command, args []string) error {
+// nolint:dupl
+func NewCmdExport() *cobra.Command {
+	f := exportFlags{}
+	cmd := &cobra.Command{
+		Use:   "export",
+		Short: "Export a universal keymap to an editor's format",
+		RunE:  exportRun(&f),
+		Args:  cobra.ExactArgs(0),
+	}
+
+	cmd.Flags().StringVar(&f.to, "to", "", "Target editor to export to")
+	cmd.Flags().StringVar(&f.input, "input", "", "Path to the source onekeymap.json file")
+	cmd.Flags().StringVar(&f.output, "output", "", "Optional: Path to the target editor's config file")
+	cmd.Flags().BoolVar(&f.interactive, "interactive", true, "Run in interactive mode")
+	cmd.Flags().BoolVar(&f.backup, "backup", false, "Create a backup of the target editor's keymap")
+
+	// Add completion for 'to' flag
+	_ = cmd.RegisterFlagCompletionFunc(
+		"to",
+		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return pluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
+		},
+	)
+
+	return cmd
+}
+
+func exportRun(f *exportFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
 		onekeymapPlaceHolder := viper.GetString("onekeymap")
-		err := prepareExportInputFlags(cmd, onekeymapPlaceHolder)
+		err := prepareExportInputFlags(cmd, f, onekeymapPlaceHolder)
 		if err != nil {
 			return err
 		}
-		logger.Info("Exporting config", "to", *toFlag, "from", *exportInput)
+		logger.Info("Exporting config", "to", f.to, "from", f.input)
 
-		file, err := os.Open(*exportInput)
+		file, err := os.Open(f.input)
 		if err != nil {
 			logger.Error("Failed to open input file", "error", err)
 			return err
@@ -54,26 +81,26 @@ var exportCmd = &cobra.Command{
 			return err
 		}
 
-		opts := exportapi.ExportOptions{EditorType: pluginapi.EditorType(*toFlag)}
+		opts := exportapi.ExportOptions{EditorType: pluginapi.EditorType(f.to)}
 
 		// Ensure parent directory exists
-		if err := os.MkdirAll(filepath.Dir(*exportOutput), 0o750); err != nil {
-			logger.Error("Failed to create output directory", "dir", filepath.Dir(*exportOutput), "error", err)
+		if err := os.MkdirAll(filepath.Dir(f.output), 0o750); err != nil {
+			logger.Error("Failed to create output directory", "dir", filepath.Dir(f.output), "error", err)
 			return err
 		}
 
 		// Prepare base reader from existing output file if present for diff calculation
 		var base io.Reader
-		if f, err := os.Open(*exportOutput); err == nil {
-			defer func() { _ = f.Close() }()
-			base = f
+		if file, err := os.Open(f.output); err == nil {
+			defer func() { _ = file.Close() }()
+			base = file
 		} else if !os.IsNotExist(err) {
 			// Non-ENOENT error opening base file; log and continue without base
 			logger.Warn("Failed to open existing output as base", "error", err)
 		}
 		opts.Base = base
 		opts.DiffType = keymapv1.ExportKeymapRequest_ASCII_DIFF
-		opts.FilePath = *exportOutput
+		opts.FilePath = f.output
 
 		// Export to memory buffer first for preview, optional confirmation, and then write
 		var mem bytes.Buffer
@@ -95,24 +122,24 @@ var exportCmd = &cobra.Command{
 		// TODO(xinnjie): optimize skip writing when output is the same. Whether same or not should not rely on report.Diff
 
 		// Confirm before writing only when interactive
-		if *interactive {
-			if !confirm(cmd, *exportOutput) {
+		if f.interactive {
+			if !confirm(cmd, f.output) {
 				cmd.Println("Export canceled; no changes were written.")
 				return nil
 			}
 		}
 
 		// Backup existing file if requested
-		if *backup {
-			if backupPath, err := backupIfExists(*exportOutput); err != nil {
-				logger.Warn("Failed to backup existing file", "path", *exportOutput, "error", err)
+		if f.backup {
+			if backupPath, err := backupIfExists(f.output); err != nil {
+				logger.Warn("Failed to backup existing file", "path", f.output, "error", err)
 			} else if backupPath != "" {
 				logger.Info("Created backup of existing config", "backup", backupPath)
 			}
 		}
 
 		// Write buffer to the target file
-		outputFile, err := os.OpenFile(*exportOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+		outputFile, err := os.OpenFile(f.output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 		if err != nil {
 			logger.Error("Failed to create output file", "error", err)
 			return err
@@ -127,52 +154,56 @@ var exportCmd = &cobra.Command{
 			return err
 		}
 
-		logger.Info("Successfully exported keymap", "to", *toFlag, "output", *exportOutput)
+		logger.Info("Successfully exported keymap", "to", f.to, "output", f.output)
 		return nil
-	},
+	}
 }
 
-func prepareExportInputFlags(cmd *cobra.Command, onekeymapPlaceholder string) error {
-	if *interactive {
-		needSelectEditor := !cmd.Flags().Changed("to") || *toFlag == ""
-		needInput := !cmd.Flags().Changed("input") || *exportInput == ""
-		needOutput := !cmd.Flags().Changed("output") || *exportOutput == ""
+func prepareExportInputFlags(
+	cmd *cobra.Command,
+	f *exportFlags,
+	onekeymapPlaceholder string,
+) error {
+	if f.interactive {
+		needSelectEditor := !cmd.Flags().Changed("to") || f.to == ""
+		needInput := !cmd.Flags().Changed("input") || f.input == ""
+		needOutput := !cmd.Flags().Changed("output") || f.output == ""
 
 		if needSelectEditor || needInput || needOutput {
-			if err := runExportForm(pluginRegistry, toFlag, exportInput, exportOutput, onekeymapPlaceholder, needSelectEditor, needInput, needOutput); err != nil {
+			if err := runExportForm(pluginRegistry, &f.to, &f.input, &f.output, onekeymapPlaceholder, needSelectEditor, needInput, needOutput); err != nil {
 				return err
 			}
 		}
 	} else {
-		if *toFlag == "" {
+		if f.to == "" {
 			return errors.New("flag --to is required")
 		}
 		if !cmd.Flags().Changed("input") && onekeymapPlaceholder != "" {
-			*exportInput = onekeymapPlaceholder
+			f.input = onekeymapPlaceholder
 		}
 	}
 
 	// Validate selected editor plugin exists
-	p, ok := pluginRegistry.Get(pluginapi.EditorType(*toFlag))
+	p, ok := pluginRegistry.Get(pluginapi.EditorType(f.to))
 	if !ok {
-		logger.Error("Editor not found", "editor", *toFlag)
-		return fmt.Errorf("editor %s not found", *toFlag)
+		logger.Error("Editor not found", "editor", f.to)
+		return fmt.Errorf("editor %s not found", f.to)
 	}
 
 	// Determine input
-	if *exportInput == "" {
+	if f.input == "" {
 		// Fallback to config default in case it wasn't provided
-		*exportInput = onekeymapPlaceholder
+		f.input = onekeymapPlaceholder
 	}
 	// Determine output path
-	if *exportOutput == "" {
-		configPath := viper.GetString(fmt.Sprintf("editors.%s.keymap_path", *toFlag))
+	if f.output == "" {
+		configPath := viper.GetString(fmt.Sprintf("editors.%s.keymap_path", f.to))
 		if configPath != "" {
-			*exportOutput = configPath
-			logger.Info("Using keymap path from config", "editor", *toFlag, "path", configPath)
+			f.output = configPath
+			logger.Info("Using keymap path from config", "editor", f.to, "path", configPath)
 		} else {
 			if v, err := p.DefaultConfigPath(); err == nil {
-				*exportOutput = v[0]
+				f.output = v[0]
 			}
 		}
 	}
@@ -201,18 +232,4 @@ func runExportForm(pluginRegistry *plugins.Registry, to, input, output *string, 
 		return err
 	}
 	return nil
-}
-
-func init() {
-	rootCmd.AddCommand(exportCmd)
-	toFlag = exportCmd.Flags().String("to", "", "Target editor to export to")
-	exportInput = exportCmd.Flags().String("input", "", "Path to the source onekeymap.json file")
-	exportOutput = exportCmd.Flags().String("output", "", "Optional: Path to the target editor's config file")
-
-	_ = exportCmd.RegisterFlagCompletionFunc(
-		"to",
-		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return pluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
-		},
-	)
 }

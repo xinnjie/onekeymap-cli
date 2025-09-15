@@ -41,7 +41,12 @@ func (e *helixExporter) Export(
 	if opts.ExistingConfig != nil {
 		// Parse as generic map to preserve all sections
 		if err := toml.NewDecoder(opts.ExistingConfig).Decode(&existingFullConfig); err != nil {
-			e.logger.Warn("Failed to parse existing config, proceeding with destructive export", "error", err)
+			e.logger.WarnContext(
+				ctx,
+				"Failed to parse existing config, proceeding with destructive export",
+				"error",
+				err,
+			)
 		} else {
 			// Extract keys section if it exists
 			if keysSection, ok := existingFullConfig["keys"]; ok {
@@ -59,10 +64,10 @@ func (e *helixExporter) Export(
 	}
 
 	// Generate managed keybindings from current setting
-	managedKeys := e.generateManagedKeybindings(setting)
+	managedKeys := e.generateManagedKeybindings(ctx, setting)
 
 	// Merge managed and unmanaged keybindings
-	finalKeys := e.mergeKeybindings(managedKeys, unmanagedKeys)
+	finalKeys := e.mergeKeybindings(ctx, managedKeys, unmanagedKeys)
 
 	// Create final configuration preserving other sections
 	finalConfig := make(map[string]interface{})
@@ -154,7 +159,7 @@ func (e *helixExporter) isManagedKeybinding(key, command string, mode HelixMode)
 }
 
 // generateManagedKeybindings generates Helix keybindings from KeymapSetting.
-func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetting) helixKeys {
+func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting *keymapv1.KeymapSetting) helixKeys {
 	keysByMode := helixKeys{}
 
 	for _, km := range setting.GetKeybindings() {
@@ -172,9 +177,9 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 			if err != nil {
 				// TODO(xinnjie): Add doc about this behavior: because helix do not recognize numpad keys(numpad1 is recognized as "1"), to avoid conflict with other keybindings, we skip these keybindings
 				if errors.Is(err, ErrNotSupportKeyChords) {
-					e.logger.Debug("Skipping keybinding with unsupported key chords", "action", km.GetId())
+					e.logger.DebugContext(ctx, "Skipping keybinding with unsupported key chords", "action", km.GetId())
 				} else {
-					e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetId(), "error", err)
+					e.logger.WarnContext(ctx, "Skipping keybinding with un-formattable key", "action", km.GetId(), "error", err)
 				}
 				continue
 			}
@@ -208,7 +213,14 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 					}
 					dest = &keysByMode.Select
 				default:
-					e.logger.Warn("Unsupported Helix mode; skipping", "mode", string(m), "action", km.GetId())
+					e.logger.WarnContext(
+						ctx,
+						"Unsupported Helix mode; skipping",
+						"mode",
+						string(m),
+						"action",
+						km.GetId(),
+					)
 					continue
 				}
 				(*dest)[keyStr] = hconf.Command
@@ -220,7 +232,7 @@ func (e *helixExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetti
 }
 
 // mergeKeybindings merges managed and unmanaged keybindings, with managed taking priority.
-func (e *helixExporter) mergeKeybindings(managed, unmanaged helixKeys) helixKeys {
+func (e *helixExporter) mergeKeybindings(ctx context.Context, managed, unmanaged helixKeys) helixKeys {
 	result := helixKeys{}
 
 	// Start with managed keybindings
@@ -252,7 +264,7 @@ func (e *helixExporter) mergeKeybindings(managed, unmanaged helixKeys) helixKeys
 			if _, exists := result.Normal[key]; !exists {
 				result.Normal[key] = command
 			} else {
-				e.logger.Debug("Conflict resolved: managed keybinding takes priority",
+				e.logger.DebugContext(ctx, "Conflict resolved: managed keybinding takes priority",
 					"mode", "normal", "key", key, "unmanaged_command", command)
 			}
 		}
@@ -266,7 +278,7 @@ func (e *helixExporter) mergeKeybindings(managed, unmanaged helixKeys) helixKeys
 			if _, exists := result.Insert[key]; !exists {
 				result.Insert[key] = command
 			} else {
-				e.logger.Debug("Conflict resolved: managed keybinding takes priority",
+				e.logger.DebugContext(ctx, "Conflict resolved: managed keybinding takes priority",
 					"mode", "insert", "key", key, "unmanaged_command", command)
 			}
 		}
@@ -280,7 +292,7 @@ func (e *helixExporter) mergeKeybindings(managed, unmanaged helixKeys) helixKeys
 			if _, exists := result.Select[key]; !exists {
 				result.Select[key] = command
 			} else {
-				e.logger.Debug("Conflict resolved: managed keybinding takes priority",
+				e.logger.DebugContext(ctx, "Conflict resolved: managed keybinding takes priority",
 					"mode", "select", "key", key, "unmanaged_command", command)
 			}
 		}

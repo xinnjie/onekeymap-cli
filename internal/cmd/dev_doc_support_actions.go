@@ -10,13 +10,26 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 )
 
-// docSupportActionsCmd represents the docSupportActions command.
-var docSupportActionsCmd = &cobra.Command{
-	Use:   "docSupportActions",
-	Short: "Generate markdown table showing action support across editors",
-	Long: `Reads all action mappings and generates a markdown table showing which editors
+type devDocSupportActionsFlags struct {
+	// No flags for this command currently
+}
+
+func NewCmdDevDocSupportActions() *cobra.Command {
+	f := devDocSupportActionsFlags{}
+	cmd := &cobra.Command{
+		Use:   "docSupportActions",
+		Short: "Generate markdown table showing action support across editors",
+		Long: `Reads all action mappings and generates a markdown table showing which editors
 support each action. The table includes columns for VSCode, Zed, IntelliJ, and Helix.`,
-	Run: func(cmd *cobra.Command, args []string) {
+		Run:  devDocSupportActionsRun(&f),
+		Args: cobra.ExactArgs(0),
+	}
+
+	return cmd
+}
+
+func devDocSupportActionsRun(f *devDocSupportActionsFlags) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
 		// Load all mappings
 		mappingConfig, err := mappings.NewMappingConfig()
 		if err != nil {
@@ -62,7 +75,7 @@ support each action. The table includes columns for VSCode, Zed, IntelliJ, and H
 				id,
 			)
 		}
-	},
+	}
 }
 
 func checkVSCodeSupport(mapping mappings.ActionMappingConfig) (bool, string) {
@@ -119,8 +132,4 @@ func formatSupport(supported bool, reason string) string {
 		return fmt.Sprintf("❌ (%s)", reason)
 	}
 	return "N/A"
-}
-
-func init() {
-	devCmd.AddCommand(docSupportActionsCmd)
 }

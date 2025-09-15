@@ -13,18 +13,31 @@ import (
 
 const validZedActionsPath = "onekeymap/onekeymap-cli/chore/zed-valid-action.json"
 
-// doctorCmd represents the doctor command.
-var doctorCmd = &cobra.Command{
-	Use:   "doctor",
-	Short: "Runs diagnostic checks on mapping configurations.",
-	Long: `The doctor command runs a series of diagnostic checks on the action mapping configurations.
+type devDoctorFlags struct {
+	// No flags for this command currently
+}
+
+func NewCmdDevDoctor() *cobra.Command {
+	f := devDoctorFlags{}
+	cmd := &cobra.Command{
+		Use:   "doctor",
+		Short: "Runs diagnostic checks on mapping configurations.",
+		Long: `The doctor command runs a series of diagnostic checks on the action mapping configurations.
 
 It currently performs two main checks:
 1. Description Check: Verifies that all mappings have a 'description' and 'name'.
 2. Zed Action Validation: Ensures that all 'zed.action' entries correspond to valid, known actions.
 
 This command is essential for maintaining the quality, consistency, and correctness of the keymap configurations.`,
-	Run: func(cmd *cobra.Command, args []string) {
+		Run:  devDoctorRun(&f),
+		Args: cobra.ExactArgs(0),
+	}
+
+	return cmd
+}
+
+func devDoctorRun(f *devDoctorFlags) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
 		cmd.Println("Running mapping configuration diagnostics...")
 		var hasErrors bool
 
@@ -44,7 +57,7 @@ This command is essential for maintaining the quality, consistency, and correctn
 		} else {
 			cmd.Println("\n✅ All doctor checks passed successfully.")
 		}
-	},
+	}
 }
 
 func checkDescriptions(cmd *cobra.Command) error {
@@ -130,8 +143,4 @@ func validateZedActions(cmd *cobra.Command) error {
 
 	cmd.Println("  => ✅ All Zed actions in mappings are valid.")
 	return nil
-}
-
-func init() {
-	devCmd.AddCommand(doctorCmd)
 }

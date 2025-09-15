@@ -15,26 +15,42 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 )
 
-var (
-	migrateFrom   *string
-	migrateTo     *string
-	migrateInput  *string
-	migrateOutput *string
-)
+type migrateFlags struct {
+	from        string
+	to          string
+	input       string
+	output      string
+	interactive bool
+	backup      bool
+}
 
-var migrateCmd = &cobra.Command{
-	Use:   "migrate",
-	Short: "Migrate keymaps from one editor to another",
-	RunE: func(cmd *cobra.Command, args []string) error {
+func NewCmdMigrate() *cobra.Command {
+	f := migrateFlags{}
+	cmd := &cobra.Command{
+		Use:   "migrate",
+		Short: "Migrate keymaps from one editor to another",
+		RunE:  migrateRun(&f),
+		Args:  cobra.ExactArgs(0),
+	}
 
-		interactive, _ := cmd.Flags().GetBool("interactive")
-		backup, _ := cmd.Flags().GetBool("backup")
+	cmd.Flags().StringVar(&f.from, "from", "", "Source editor, valid values: vscode, zed")
+	cmd.Flags().StringVar(&f.to, "to", "", "Target editor, valid values: vscode, zed")
+	cmd.Flags().StringVar(&f.input, "input", "", "Path to source editor config")
+	cmd.Flags().StringVar(&f.output, "output", "", "Path to target editor config")
+	cmd.Flags().BoolVar(&f.interactive, "interactive", true, "Run in interactive mode")
+	cmd.Flags().BoolVar(&f.backup, "backup", false, "Create a backup of the target editor's keymap")
+
+	return cmd
+}
+
+func migrateRun(f *migrateFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
 
-		if interactive {
+		if f.interactive {
 			// In interactive mode, we can use the form to get missing values.
-			if *migrateFrom == "" || *migrateTo == "" {
-				model := views.NewMigrateFormModel(pluginRegistry, migrateFrom, migrateTo, migrateInput, migrateOutput)
+			if f.from == "" || f.to == "" {
+				model := views.NewMigrateFormModel(pluginRegistry, &f.from, &f.to, &f.input, &f.output)
 				p := tea.NewProgram(model)
 				if _, err := p.Run(); err != nil {
 					logger.Error("failed to run interactive form", "error", err)
@@ -44,42 +60,42 @@ var migrateCmd = &cobra.Command{
 		}
 
 		// After potentially running the form, `from` and `to` must be set.
-		if *migrateFrom == "" || *migrateTo == "" {
+		if f.from == "" || f.to == "" {
 			return errors.New("required flags 'from' and 'to' not set")
 		}
 
-		logger.Info("Migrating keymaps", "from", *migrateFrom, "to", *migrateTo)
+		logger.Info("Migrating keymaps", "from", f.from, "to", f.to)
 
-		inputPlugin, ok := pluginRegistry.Get(pluginapi.EditorType(*migrateFrom))
+		inputPlugin, ok := pluginRegistry.Get(pluginapi.EditorType(f.from))
 		if !ok {
-			logger.Error("failed to get input plugin", "from", *migrateFrom)
+			logger.Error("failed to get input plugin", "from", f.from)
 			return errors.New("failed to get input plugin")
 		}
-		outputPlugin, ok := pluginRegistry.Get(pluginapi.EditorType(*migrateTo))
+		outputPlugin, ok := pluginRegistry.Get(pluginapi.EditorType(f.to))
 		if !ok {
-			logger.Error("failed to get output plugin", "to", *migrateTo)
+			logger.Error("failed to get output plugin", "to", f.to)
 			return errors.New("failed to get output plugin")
 		}
 
-		if *migrateInput == "" {
+		if f.input == "" {
 			v, err := inputPlugin.DefaultConfigPath()
 			if err != nil {
 				logger.Error("failed to get default config path", "error", err)
 				return err
 			}
-			*migrateInput = v[0]
+			f.input = v[0]
 		}
 
-		if *migrateOutput == "" {
+		if f.output == "" {
 			v, err := outputPlugin.DefaultConfigPath()
 			if err != nil {
 				logger.Error("failed to get default config path", "error", err)
 				return err
 			}
-			*migrateOutput = v[0]
+			f.output = v[0]
 		}
 
-		inputStream, err := os.Open(*migrateInput)
+		inputStream, err := os.Open(f.input)
 		if err != nil {
 			logger.Error("failed to open input file", "error", err)
 			return err
@@ -87,7 +103,7 @@ var migrateCmd = &cobra.Command{
 		defer func() { _ = inputStream.Close() }()
 
 		importOpts := importapi.ImportOptions{
-			EditorType:  pluginapi.EditorType(*migrateFrom),
+			EditorType:  pluginapi.EditorType(f.from),
 			InputStream: inputStream,
 		}
 		importResult, err := importService.Import(ctx, importOpts)
@@ -108,16 +124,16 @@ var migrateCmd = &cobra.Command{
 
 		// Prepare base reader from existing output file if present for diff calculation
 		var base io.Reader
-		if f, err := os.Open(*migrateOutput); err == nil {
-			defer func() { _ = f.Close() }()
-			base = f
+		if file, err := os.Open(f.output); err == nil {
+			defer func() { _ = file.Close() }()
+			base = file
 		} else if !os.IsNotExist(err) {
 			logger.Warn("Failed to open existing output as base", "error", err)
 		}
 
 		// Export to memory buffer first for preview, optional confirmation, and then write
 		var mem bytes.Buffer
-		exportOpts := exportapi.ExportOptions{EditorType: pluginapi.EditorType(*migrateTo), Base: base}
+		exportOpts := exportapi.ExportOptions{EditorType: pluginapi.EditorType(f.to), Base: base}
 		exportReport, err := exportService.Export(ctx, &mem, importResult.Setting, exportOpts)
 		if err != nil {
 			logger.Error("migrate failed during export step", "error", err)
@@ -134,24 +150,24 @@ var migrateCmd = &cobra.Command{
 		cmd.Println("=====================================================")
 
 		// Confirm before writing only when interactive
-		if interactive {
-			if !confirm(cmd, *migrateOutput) {
+		if f.interactive {
+			if !confirm(cmd, f.output) {
 				logger.Info("Migration canceled; no changes were written.")
 				return nil
 			}
 		}
 
 		// Backup existing file if requested
-		if backup {
-			if backupPath, err := backupIfExists(*migrateOutput); err != nil {
-				logger.Warn("Failed to backup existing file", "path", *migrateOutput, "error", err)
+		if f.backup {
+			if backupPath, err := backupIfExists(f.output); err != nil {
+				logger.Warn("Failed to backup existing file", "path", f.output, "error", err)
 			} else if backupPath != "" {
 				logger.Info("Created backup of existing config", "backup", backupPath)
 			}
 		}
 
 		// Write buffer to the target file
-		outputStream, err := os.OpenFile(*migrateOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+		outputStream, err := os.OpenFile(f.output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 		if err != nil {
 			logger.Error("failed to create output file", "error", err)
 			return err
@@ -165,15 +181,5 @@ var migrateCmd = &cobra.Command{
 		logger.Info("Migration complete!")
 
 		return nil
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(migrateCmd)
-	migrateFrom = migrateCmd.Flags().String("from", "", "Source editor, valid values: vscode, zed")
-	migrateTo = migrateCmd.Flags().String("to", "", "Target editor, valid values: vscode, zed")
-	migrateInput = migrateCmd.Flags().String("input", "", "Path to source editor config")
-	migrateOutput = migrateCmd.Flags().String("output", "", "Path to target editor config")
-
-	migrateCmd.Flags().Bool("backup", false, "Create a backup of the target editor's keymap")
+	}
 }

@@ -29,23 +29,70 @@ var (
 	buildTime = "unknown"
 	gitCommit = "unknown"
 
-	pluginRegistry  *plugins.Registry
-	importService   importapi.Importer
-	exportService   exportapi.Exporter
-	logger          *slog.Logger
-	interactive     *bool
-	backup          *bool
-	enableTelemetry *bool
-	recorder        metrics.Recorder
-	mappingConfig   *mappings.MappingConfig
+	// TODO(xinnjie): Stop using these global variables. But for now I can not think of a better way.
+	// Global shared state that needs to be accessed across commands
+	pluginRegistry *plugins.Registry
+	importService  importapi.Importer
+	exportService  exportapi.Exporter
+	logger         *slog.Logger
+	recorder       metrics.Recorder
+	mappingConfig  *mappings.MappingConfig
 )
 
-// rootCmd represents the base command when called without any subcommands.
-var rootCmd = &cobra.Command{
-	Use:     "onekeymap",
-	Short:   "A tool to import, export, and synchronize keyboard shortcuts between editors.",
-	Version: fmt.Sprintf("%s (built %s, commit %s)", version, buildTime, gitCommit),
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+type rootFlags struct {
+	verbose         bool
+	quiet           bool
+	logJSON         bool
+	backup          bool
+	interactive     bool
+	enableTelemetry bool
+}
+
+func NewCmdRoot() *cobra.Command {
+	f := rootFlags{}
+
+	cmd := &cobra.Command{
+		Use:              "onekeymap",
+		Short:            "A tool to import, export, and synchronize keyboard shortcuts between editors.",
+		Version:          fmt.Sprintf("%s (built %s, commit %s)", version, buildTime, gitCommit),
+		PersistentPreRun: rootPersistentPreRun(&f),
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
+			if recorder != nil {
+				if err := recorder.Shutdown(context.Background()); err != nil {
+					logger.Error("failed to shutdown telemetry", "error", err)
+				}
+			}
+		},
+	}
+
+	// Define persistent flags
+	cmd.PersistentFlags().BoolVarP(&f.verbose, "verbose", "v", false, "Enable verbose output")
+	cmd.PersistentFlags().BoolVarP(&f.quiet, "quiet", "q", false, "Suppress all output except for errors")
+	cmd.PersistentFlags().BoolVar(&f.logJSON, "log-json", false, "Output logs in JSON format")
+	cmd.PersistentFlags().BoolVarP(&f.backup, "backup", "b", true, "Create a backup of the target editor's keymap")
+	cmd.PersistentFlags().BoolVarP(&f.interactive, "interactive", "i", true, "Run in interactive mode")
+	cmd.PersistentFlags().
+		BoolVar(&f.enableTelemetry, "telemetry", false, "Enable OpenTelemetry to help improve onekeymap")
+
+	// Bind cobra flags to viper.
+	if err := viper.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose")); err != nil {
+		cmd.PrintErrf("Error binding verbose flag: %v\n", err)
+		os.Exit(1)
+	}
+	if err := viper.BindPFlag("quiet", cmd.PersistentFlags().Lookup("quiet")); err != nil {
+		cmd.PrintErrf("Error binding quiet flag: %v\n", err)
+		os.Exit(1)
+	}
+	if err := viper.BindPFlag("log-json", cmd.PersistentFlags().Lookup("log-json")); err != nil {
+		cmd.PrintErrf("Error binding log-json flag: %v\n", err)
+		os.Exit(1)
+	}
+
+	return cmd
+}
+
+func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
 		// Initialize mapping config
 		var err error
 		mappingConfig, err = mappings.NewMappingConfig()
@@ -55,7 +102,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		recorder = metrics.NewNoop()
-		if *enableTelemetry {
+		if f.enableTelemetry {
 			if viper.GetString("otel.exporter.otlp.endpoint") == "" {
 				// Maybe print a warning that endpoint is not set
 				fmt.Fprintln(
@@ -120,54 +167,32 @@ var rootCmd = &cobra.Command{
 
 		importService = onekeymap.NewImportService(pluginRegistry, mappingConfig, logger, recorder)
 		exportService = onekeymap.NewExportService(pluginRegistry, mappingConfig, logger)
-	},
-	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		if recorder != nil {
-			if err := recorder.Shutdown(context.Background()); err != nil {
-				logger.Error("failed to shutdown telemetry", "error", err)
-			}
-		}
-	},
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
-	}
-}
-
-func init() {
-	// Define persistent flags for verbose and quiet modes.
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose output")
-	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Suppress all output except for errors")
-	rootCmd.PersistentFlags().Bool("log-json", false, "Output logs in JSON format")
-	backup = rootCmd.PersistentFlags().BoolP("backup", "b", true, "Create a backup of the target editor's keymap")
-	interactive = rootCmd.PersistentFlags().BoolP("interactive", "i", true, "Run in interactive mode")
-	enableTelemetry = rootCmd.PersistentFlags().
-		Bool("telemetry", false, "Enable OpenTelemetry to help improve onekeymap")
-
-	// Bind cobra flags to viper.
-	if err := viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose")); err != nil {
-		rootCmd.PrintErrf("Error binding verbose flag: %v\n", err)
-		os.Exit(1)
-	}
-	if err := viper.BindPFlag("quiet", rootCmd.PersistentFlags().Lookup("quiet")); err != nil {
-		rootCmd.PrintErrf("Error binding quiet flag: %v\n", err)
-		os.Exit(1)
-	}
-	if err := viper.BindPFlag("log-json", rootCmd.PersistentFlags().Lookup("log-json")); err != nil {
-		rootCmd.PrintErrf("Error binding log-json flag: %v\n", err)
-		os.Exit(1)
-	}
-
+	rootCmd := NewCmdRoot()
 	// Init viper config
-	var err error
-	_, err = cliconfig.NewConfig()
+	_, err := cliconfig.NewConfig(rootCmd)
 	if err != nil {
 		rootCmd.PrintErrf("Error initializing configuration: %v\n", err)
+		os.Exit(1)
+	}
+
+	devCmd := NewCmdDev()
+	rootCmd.AddCommand(devCmd)
+	devCmd.AddCommand(NewCmdDevDocSupportActions())
+	devCmd.AddCommand(NewCmdDevDoctor())
+	devCmd.AddCommand(NewCmdDevListUnmappedActions())
+	rootCmd.AddCommand(NewCmdView())
+	rootCmd.AddCommand(NewCmdServe())
+	rootCmd.AddCommand(NewCmdMigrate())
+	rootCmd.AddCommand(NewCmdImport())
+	rootCmd.AddCommand(NewCmdExport())
+	err = rootCmd.Execute()
+	if err != nil {
 		os.Exit(1)
 	}
 }

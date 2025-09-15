@@ -11,25 +11,37 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/views"
 )
 
-var (
-	viewFile *string
-)
+type viewFlags struct {
+	file string
+}
 
-var viewCmd = &cobra.Command{
-	Use:   "view",
-	Short: "View current OneKeymapSetting in a read-only TUI",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		path := *viewFile
+func NewCmdView() *cobra.Command {
+	f := viewFlags{}
+	cmd := &cobra.Command{
+		Use:   "view",
+		Short: "View current OneKeymapSetting in a read-only TUI",
+		RunE:  viewRun(&f),
+		Args:  cobra.ExactArgs(0),
+	}
+
+	cmd.Flags().StringVar(&f.file, "file", "", "Path to onekeymap.json (defaults to config value)")
+
+	return cmd
+}
+
+func viewRun(f *viewFlags) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		path := f.file
 		if path == "" {
 			path = viper.GetString("onekeymap")
 		}
-		f, err := os.Open(path)
+		file, err := os.Open(path)
 		if err != nil {
 			return fmt.Errorf("failed to open onekeymap config: %w", err)
 		}
-		defer func() { _ = f.Close() }()
+		defer func() { _ = file.Close() }()
 
-		setting, err := keymap.Load(f)
+		setting, err := keymap.Load(file)
 		if err != nil {
 			return fmt.Errorf("failed to parse onekeymap config: %w", err)
 		}
@@ -37,10 +49,5 @@ var viewCmd = &cobra.Command{
 		m := views.NewKeymapViewModel(setting, mappingConfig)
 		_, err = tea.NewProgram(m).Run()
 		return err
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(viewCmd)
-	viewFile = viewCmd.Flags().String("file", "", "Path to onekeymap.json (defaults to config value)")
+	}
 }

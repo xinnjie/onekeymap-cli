@@ -12,15 +12,28 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 )
 
-var editor string
+type devListUnmappedActionsFlags struct {
+	editor string
+}
 
-// listUnmappedActionsCmd represents the generic unmapped actions command.
-var listUnmappedActionsCmd = &cobra.Command{
-	Use:     "listUnmappedActions",
-	Aliases: []string{"vscodeListUnmappedCommands"},
-	Short:   "List action IDs without mappings for a given editor.",
-	Long:    `Reads all action mappings and prints the list of action IDs that do not have a mapping for the specified editor (vscode|intellij|zed|vim|helix).`,
-	Run: func(cmd *cobra.Command, args []string) {
+func NewCmdDevListUnmappedActions() *cobra.Command {
+	f := devListUnmappedActionsFlags{}
+	cmd := &cobra.Command{
+		Use:     "listUnmappedActions",
+		Aliases: []string{"vscodeListUnmappedCommands"},
+		Short:   "List action IDs without mappings for a given editor.",
+		Long:    `Reads all action mappings and prints the list of action IDs that do not have a mapping for the specified editor (vscode|intellij|zed|vim|helix).`,
+		Run:     devListUnmappedActionsRun(&f),
+		Args:    cobra.ExactArgs(0),
+	}
+
+	cmd.Flags().StringVar(&f.editor, "editor", "vscode", "Editor to check: vscode|intellij|zed|vim|helix")
+
+	return cmd
+}
+
+func devListUnmappedActionsRun(f *devListUnmappedActionsFlags) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
 		// Load all mappings
 		mappingConfig, err := mappings.NewMappingConfig()
 		if err != nil {
@@ -31,7 +44,7 @@ var listUnmappedActionsCmd = &cobra.Command{
 		for id, m := range mappingConfig.Mappings {
 			mapped := false
 			// Skip entries explicitly marked as notSupported for the selected editor
-			switch editor {
+			switch f.editor {
 			case "vscode":
 				skip := false
 				for _, vc := range m.VSCode {
@@ -66,10 +79,10 @@ var listUnmappedActionsCmd = &cobra.Command{
 					continue
 				}
 			default:
-				log.Fatalf("Unknown editor: %s (valid: vscode|intellij|zed|vim|helix)", editor)
+				log.Fatalf("Unknown editor: %s (valid: vscode|intellij|zed|vim|helix)", f.editor)
 			}
 
-			switch editor {
+			switch f.editor {
 			case "vscode":
 				for _, vc := range m.VSCode {
 					if vc.Command != "" {
@@ -105,15 +118,9 @@ var listUnmappedActionsCmd = &cobra.Command{
 			}
 		}
 		sort.Strings(unmapped)
-		cmd.Println("Unmapped action IDs for editor", editor)
+		cmd.Println("Unmapped action IDs for editor", f.editor)
 		for _, id := range unmapped {
 			cmd.Println(id)
 		}
-	},
-}
-
-func init() {
-	devCmd.AddCommand(listUnmappedActionsCmd)
-	listUnmappedActionsCmd.Flags().
-		StringVar(&editor, "editor", "vscode", "Editor to check: vscode|intellij|zed|vim|helix")
+	}
 }

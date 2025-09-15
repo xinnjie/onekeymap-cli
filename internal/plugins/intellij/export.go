@@ -38,7 +38,12 @@ func (e *intellijExporter) Export(
 	var existingDoc KeymapXML
 	if opts.ExistingConfig != nil {
 		if err := xml.NewDecoder(opts.ExistingConfig).Decode(&existingDoc); err != nil {
-			e.logger.WarnContext(ctx, "Failed to parse existing config, proceeding with destructive export", "error", err)
+			e.logger.WarnContext(
+				ctx,
+				"Failed to parse existing config, proceeding with destructive export",
+				"error",
+				err,
+			)
 		}
 	}
 

@@ -16,17 +16,38 @@ import (
 	"google.golang.org/grpc"
 )
 
-var serveCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "Start the gRPC server",
-	Run: func(cmd *cobra.Command, args []string) {
+type serveFlags struct {
+	port   int
+	listen string
+}
+
+func NewCmdServe() *cobra.Command {
+	f := serveFlags{}
+	cmd := &cobra.Command{
+		Use:   "serve",
+		Short: "Start the gRPC server",
+		Run:   serveRun(&f),
+		Args:  cobra.ExactArgs(0),
+	}
+
+	cmd.Flags().IntVarP(&f.port, "port", "p", 50051, "Port to listen on")
+	cmd.Flags().
+		StringVar(&f.listen, "listen", "", "Listen address, e.g., tcp://127.0.0.1:50051 or unix:///tmp/onekeymap.sock")
+
+	// Bind listen flag to config key server.listen
+	_ = viper.BindPFlag("server.listen", cmd.Flags().Lookup("listen"))
+
+	return cmd
+}
+
+func serveRun(f *serveFlags) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
 		// Prefer explicit listen address from config/flag; fallback to --port
 		addr := viper.GetString("server.listen")
 		if addr == "" {
-			port, _ := cmd.Flags().GetInt("port")
-			addr = fmt.Sprintf(":%d", port)
+			addr = fmt.Sprintf(":%d", f.port)
 		}
-
+		ctx := cmd.Context()
 		var (
 			lis        net.Listener
 			err        error
@@ -45,9 +66,10 @@ var serveCmd = &cobra.Command{
 			if _, statErr := os.Stat(socketPath); statErr == nil {
 				_ = os.Remove(socketPath)
 			}
-			lis, err = net.Listen("unix", socketPath)
+			lc := net.ListenConfig{}
+			lis, err = lc.Listen(ctx, "unix", socketPath)
 			if err != nil {
-				logger.Error("failed to listen on unix socket", "path", socketPath, "err", err.Error())
+				logger.ErrorContext(ctx, "failed to listen on unix socket", "path", socketPath, "err", err)
 				os.Exit(1)
 			}
 			// Best-effort restrict permissions
@@ -56,7 +78,7 @@ var serveCmd = &cobra.Command{
 			defer func() {
 				_ = os.Remove(socketPath)
 			}()
-			logger.Info("server listening", "address", "unix://"+socketPath)
+			logger.InfoContext(ctx, "server listening", "address", "unix://"+socketPath)
 		} else {
 			// TCP (allow optional tcp:// prefix)
 			if after, ok := strings.CutPrefix(addr, "tcp://"); ok {
@@ -64,16 +86,17 @@ var serveCmd = &cobra.Command{
 			}
 
 			if addr == "" {
-				logger.Error("empty listen address")
+				logger.ErrorContext(ctx, "empty listen address")
 				os.Exit(1)
 			}
 
-			lis, err = net.Listen("tcp", addr)
+			lc := net.ListenConfig{}
+			lis, err = lc.Listen(ctx, "tcp", addr)
 			if err != nil {
-				logger.Error("failed to listen on tcp", "address", addr, "err", err.Error())
+				logger.ErrorContext(ctx, "failed to listen on tcp", "address", addr, "err", err)
 				os.Exit(1)
 			}
-			logger.Info("server listening", "address", "tcp://"+lis.Addr().String())
+			logger.InfoContext(ctx, "server listening", "address", "tcp://"+lis.Addr().String())
 		}
 
 		logEvents := func() []grpc_logging.LoggableEvent {
@@ -117,18 +140,10 @@ var serveCmd = &cobra.Command{
 			service.NewServer(pluginRegistry, importService, exportService, mappingConfig, logger),
 		)
 		if err := s.Serve(lis); err != nil {
-			logger.Error("failed to serve", "err", err.Error())
+			logger.ErrorContext(ctx, "failed to serve", "err", err)
 			os.Exit(1)
 		}
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(serveCmd)
-	serveCmd.Flags().IntP("port", "p", 50051, "Port to listen on")
-	serveCmd.Flags().String("listen", "", "Listen address, e.g., tcp://127.0.0.1:50051 or unix:///tmp/onekeymap.sock")
-	// Bind listen flag to config key server.listen
-	_ = viper.BindPFlag("server.listen", serveCmd.Flags().Lookup("listen"))
+	}
 }
 
 // grpcLogger adapts slog to grpc_logging.Logger.

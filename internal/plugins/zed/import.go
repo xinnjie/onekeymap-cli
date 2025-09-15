@@ -57,7 +57,7 @@ func (p *zedImporter) Import(
 			action := zk.Bindings[key]
 			kb, err := parseZedKeybind(key)
 			if err != nil {
-				p.logger.Warn("failed to parse keychord", "key", key, "error", err)
+				p.logger.WarnContext(ctx, "failed to parse keychord", "key", key, "error", err)
 				continue
 			}
 
@@ -66,7 +66,7 @@ func (p *zedImporter) Import(
 			actionArgs := action.Args
 			if actionStr == "" {
 				// Unsupported or empty action; skip
-				p.logger.Warn("unsupported or empty action", "key", key)
+				p.logger.WarnContext(ctx, "unsupported or empty action", "key", key)
 				continue
 			}
 
@@ -74,7 +74,8 @@ func (p *zedImporter) Import(
 			if err != nil {
 				// If a mapping is not found, we simply skip it for now.
 				// In the future, this could be logged or added to a report.
-				p.logger.Warn(
+				p.logger.WarnContext(
+					ctx,
 					"failed to find action",
 					"action",
 					actionStr,

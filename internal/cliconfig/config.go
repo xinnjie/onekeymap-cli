@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -49,7 +50,7 @@ type Config struct {
 
 // NewConfig initializes and returns a new Config object.
 // It sets defaults, binds environment variables, reads config files, and unmarshals the result.
-func NewConfig() (*Config, error) {
+func NewConfig(cmd *cobra.Command) (*Config, error) {
 	// Set default values
 	viper.SetDefault("verbose", false)
 	viper.SetDefault("quiet", false)
@@ -77,9 +78,7 @@ func NewConfig() (*Config, error) {
 	if err := viper.ReadInConfig(); err != nil {
 		var configFileNotFoundError viper.ConfigFileNotFoundError
 		if errors.As(err, &configFileNotFoundError) {
-			// TODO(xinnjie): Low priority, may be use cobra.command to log
-			//nolint:forbidigo
-			fmt.Printf("Config file not found: %v\n", err)
+			cmd.Printf("Config file not found: %v\n", err)
 		} else {
 			return nil, fmt.Errorf("failed to read config file: %w", err)
 		}
