@@ -161,7 +161,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	}
 
 	if setting == nil {
-		return nil, nil
+		return nil, errors.New("failed to import config: no keybindings found")
 	}
 
 	// Validate
@@ -188,10 +188,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	}
 
 	// With baseline: compute changes via helper.
-	changes, err := s.calculateChanges(opts.Base, setting)
-	if err != nil {
-		return nil, err
-	}
+	changes := s.calculateChanges(opts.Base, setting)
 
 	// Safety: ensure dedup on output as well
 	setting.Keybindings = dedupKeyBindings(setting.GetKeybindings())
@@ -221,9 +218,9 @@ func (s *importService) validate(
 func (s *importService) calculateChanges(
 	base *keymapv1.KeymapSetting,
 	setting *keymapv1.KeymapSetting,
-) (*importapi.KeymapChanges, error) {
+) *importapi.KeymapChanges {
 	if base == nil || setting == nil {
-		return &importapi.KeymapChanges{}, nil
+		return &importapi.KeymapChanges{}
 	}
 
 	type kmList []*keymapv1.ActionBinding
@@ -340,5 +337,5 @@ func (s *importService) calculateChanges(
 		decorate(changes.Update[i].After)
 	}
 
-	return changes, nil
+	return changes
 }

@@ -122,20 +122,22 @@ func (i *vscodeImporter) FindByVSCodeActionWithArgs(
 		}
 		var explicitForImport, implicitForImport, others []*candidate
 		for _, c := range cands {
-			if c.forImport && c.explicit {
+			switch {
+			case c.forImport && c.explicit:
 				explicitForImport = append(explicitForImport, c)
-			} else if c.forImport {
+			case c.forImport:
 				implicitForImport = append(implicitForImport, c)
-			} else {
+			default:
 				others = append(others, c)
 			}
 		}
 		chooseFrom := cands
-		if len(explicitForImport) > 0 {
+		switch {
+		case len(explicitForImport) > 0:
 			chooseFrom = explicitForImport
-		} else if len(implicitForImport) > 0 {
+		case len(implicitForImport) > 0:
 			chooseFrom = implicitForImport
-		} else {
+		default:
 			chooseFrom = others
 		}
 		sort.Slice(chooseFrom, func(i, j int) bool { return chooseFrom[i].m.ID < chooseFrom[j].m.ID })

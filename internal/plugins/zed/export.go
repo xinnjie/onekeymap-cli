@@ -207,7 +207,7 @@ func (p *zedExporter) mergeKeybindings(managed, existing zedKeymapConfig) zedKey
 		// Override with managed bindings (managed takes priority)
 		if managedBindings, exists := managedByContext[context]; exists {
 			for key, action := range managedBindings {
-				if existingAction, exists := mergedBindings[key]; exists {
+				if existingAction, actionExists := mergedBindings[key]; actionExists {
 					p.logger.Debug(
 						"Conflict resolved: managed keybinding takes priority",
 						"context",

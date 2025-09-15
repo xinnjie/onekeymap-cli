@@ -10,22 +10,56 @@ import (
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
+const (
+	blue   = lipgloss.Color("12")
+	white  = lipgloss.Color("7")
+	red    = lipgloss.Color("9")
+	yellow = lipgloss.Color("11")
+	cyan   = lipgloss.Color("14")
+	green  = lipgloss.Color("10")
+	gray   = lipgloss.Color("8")
+)
+
 var (
-	blue          = lipgloss.Color("12")
-	white         = lipgloss.Color("7")
-	red           = lipgloss.Color("9")
-	yellow        = lipgloss.Color("11")
-	cyan          = lipgloss.Color("14")
-	green         = lipgloss.Color("10")
-	gray          = lipgloss.Color("8")
-	titleStyle    = lipgloss.NewStyle().Bold(true).Foreground(blue).Padding(0, 1)
-	summaryStyle  = lipgloss.NewStyle().Foreground(white).Padding(0, 1)
-	errorHeader   = lipgloss.NewStyle().Bold(true).Foreground(red).Padding(1, 1)
-	warningHeader = lipgloss.NewStyle().Bold(true).Foreground(yellow).Padding(1, 1)
-	issueStyle    = lipgloss.NewStyle().PaddingLeft(2)
-	keyStyle      = lipgloss.NewStyle().Foreground(cyan)
-	actionStyle   = lipgloss.NewStyle().Foreground(green)
-	helpStyle     = lipgloss.NewStyle().Foreground(gray).Padding(1, 1)
+	//nolint:gochecknoglobals // style reused across TUI
+	titleStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(blue).
+			Padding(0, 1)
+
+	//nolint:gochecknoglobals // style reused across TUI
+	summaryStyle = lipgloss.NewStyle().
+			Foreground(white).
+			Padding(0, 1)
+
+	//nolint:gochecknoglobals // style reused across TUI
+	errorHeader = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(red).
+			Padding(1, 1)
+
+	//nolint:gochecknoglobals // style reused across TUI
+	warningHeader = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(yellow).
+			Padding(1, 1)
+
+	//nolint:gochecknoglobals // style reused across TUI
+	issueStyle = lipgloss.NewStyle().
+			PaddingLeft(2)
+
+	//nolint:gochecknoglobals // style reused across TUI
+	keyStyle = lipgloss.NewStyle().
+			Foreground(cyan)
+
+	//nolint:gochecknoglobals // style reused across TUI
+	actionStyle = lipgloss.NewStyle().
+			Foreground(green)
+
+	//nolint:gochecknoglobals // style reused across TUI
+	helpStyle = lipgloss.NewStyle().
+			Foreground(gray).
+			Padding(1, 1)
 )
 
 type ValidationReportModel struct {
@@ -52,6 +86,7 @@ func (m ValidationReportModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		//nolint:goconst // key strings for TUI input are clearer inline here
 		switch msg.String() {
 		case "q", "esc", "enter", "ctrl+c":
 			return m, tea.Quit

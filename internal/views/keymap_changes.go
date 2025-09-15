@@ -75,9 +75,8 @@ func (m keymapChangesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.confirming {
 		// When confirming, delegate to the form
-		switch msg := msg.(type) {
-		case tea.KeyMsg:
-			switch msg.String() {
+		if km, ok := msg.(tea.KeyMsg); ok {
+			switch km.String() {
 			case "ctrl+c", "esc", "q":
 				if m.confirm != nil {
 					*m.confirm = false
@@ -85,7 +84,8 @@ func (m keymapChangesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 		}
-		form, cmd := m.form.Update(msg)
+		var form tea.Model
+		form, cmd = m.form.Update(msg)
 		if f, ok := form.(*huh.Form); ok {
 			m.form = f
 		}

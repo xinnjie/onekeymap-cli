@@ -17,6 +17,7 @@ import (
 // Our normalized side uses lower-case names or single-character symbols.
 // Source: https://github.com/kasecato/vscode-intellij-idea-keybindings/blob/master/resource/KeystrokeKeyMapping.json
 var (
+	//nolint:gochecknoglobals // shared lookup table; initialized once and read-only at runtime; mirrors external IntelliJ naming tokens
 	modifierMapping = bimap.NewBiMapFromMap(map[string]string{
 		"control": "ctrl",
 		"shift":   "shift",
@@ -24,6 +25,7 @@ var (
 		"meta":    "meta",
 	})
 
+	//nolint:gochecknoglobals // shared key mapping table; initialized once and read-only; values reflect upstream key names
 	strokeMapping = bimap.NewBiMapFromMap(map[string]keymapv1.KeyCode{
 		// Alphanumeric and punctuation
 		"BACK_QUOTE":    keymapv1.KeyCode_BACKTICK,

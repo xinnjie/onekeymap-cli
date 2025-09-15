@@ -210,9 +210,10 @@ func TestImportService_Import(t *testing.T) {
 			},
 		},
 		{
-			name:       "handles nil setting from plugin",
-			importData: nil,
-			expect:     nil,
+			name:        "handles nil setting from plugin",
+			importData:  nil,
+			expect:      nil,
+			expectError: true,
 		},
 		{
 			name: "calculates no change",

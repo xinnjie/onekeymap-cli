@@ -150,9 +150,8 @@ func (m *importFormModel) GetImporterNames() []string {
 func (m *importFormModel) Init() tea.Cmd { return m.form.Init() }
 
 func (m *importFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
+	if km, ok := msg.(tea.KeyMsg); ok {
+		switch km.String() {
 		case "ctrl+c", "esc", "q":
 			return m, tea.Interrupt
 		}

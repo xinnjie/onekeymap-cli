@@ -49,11 +49,12 @@ func (d *jsonASCIIDiffer) Diff(before, after any) (asciiDiff string, err error) 
 	objectAfter, objectAfterOk := na.(map[string]any)
 	arrayBefore, arrayBeforeOk := nb.([]any)
 	arrayAfter, arrayAfterOk := na.([]any)
-	if objectBeforeOk && objectAfterOk {
+	switch {
+	case objectBeforeOk && objectAfterOk:
 		diff = differ.CompareObjects(objectBefore, objectAfter)
-	} else if arrayBeforeOk && arrayAfterOk {
+	case arrayBeforeOk && arrayAfterOk:
 		diff = differ.CompareArrays(arrayBefore, arrayAfter)
-	} else {
+	default:
 		return "", errors.New("type mismatch: before and after are not both objects or arrays")
 	}
 

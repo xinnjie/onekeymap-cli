@@ -12,6 +12,7 @@ import (
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
+//nolint:gochecknoglobals // static lookup tables shared across parse/format functions; initialized once and read-only
 var (
 	helixModifierMapping = bimap.NewBiMapFromMap(map[string]keymapv1.KeyModifier{
 		"C": keymapv1.KeyModifier_KEY_MODIFIER_CTRL,

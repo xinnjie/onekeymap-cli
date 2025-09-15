@@ -102,7 +102,7 @@ func (e *helixExporter) identifyUnmanagedKeybindings(existingKeys helixKeys) hel
 	if existingKeys.Normal != nil {
 		unmanaged.Normal = make(map[string]string)
 		for key, command := range existingKeys.Normal {
-			if !e.isManagedKeybinding(key, command, HelixModeNormal) {
+			if !e.isManagedKeybinding(command, HelixModeNormal) {
 				unmanaged.Normal[key] = command
 			}
 		}
@@ -114,7 +114,7 @@ func (e *helixExporter) identifyUnmanagedKeybindings(existingKeys helixKeys) hel
 	if existingKeys.Insert != nil {
 		unmanaged.Insert = make(map[string]string)
 		for key, command := range existingKeys.Insert {
-			if !e.isManagedKeybinding(key, command, HelixModeInsert) {
+			if !e.isManagedKeybinding(command, HelixModeInsert) {
 				unmanaged.Insert[key] = command
 			}
 		}
@@ -126,7 +126,7 @@ func (e *helixExporter) identifyUnmanagedKeybindings(existingKeys helixKeys) hel
 	if existingKeys.Select != nil {
 		unmanaged.Select = make(map[string]string)
 		for key, command := range existingKeys.Select {
-			if !e.isManagedKeybinding(key, command, HelixModeSelect) {
+			if !e.isManagedKeybinding(command, HelixModeSelect) {
 				unmanaged.Select[key] = command
 			}
 		}
@@ -139,7 +139,7 @@ func (e *helixExporter) identifyUnmanagedKeybindings(existingKeys helixKeys) hel
 }
 
 // isManagedKeybinding checks if a keybinding is managed by onekeymap.
-func (e *helixExporter) isManagedKeybinding(key, command string, mode HelixMode) bool {
+func (e *helixExporter) isManagedKeybinding(command string, mode HelixMode) bool {
 	for _, mapping := range e.mappingConfig.Mappings {
 		for _, hconf := range mapping.Helix {
 			if hconf.Command == command {

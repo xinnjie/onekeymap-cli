@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"log"
+	"os"
 	"sort"
 	"strings"
 
@@ -30,10 +30,12 @@ support each action. The table includes columns for VSCode, Zed, IntelliJ, and H
 
 func devDocSupportActionsRun(f *devDocSupportActionsFlags) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
 		// Load all mappings
 		mappingConfig, err := mappings.NewMappingConfig()
 		if err != nil {
-			log.Fatalf("Error loading mapping config: %v", err)
+			logger.ErrorContext(ctx, "Error loading mapping config", "error", err)
+			os.Exit(1)
 		}
 
 		// Collect all action IDs and sort them

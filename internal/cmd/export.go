@@ -28,7 +28,7 @@ type exportFlags struct {
 	backup      bool
 }
 
-// nolint:dupl
+//nolint:dupl // Import/Export command constructors are intentionally symmetrical; limited duplication keeps each isolated and clearer
 func NewCmdExport() *cobra.Command {
 	f := exportFlags{}
 	cmd := &cobra.Command{
@@ -64,18 +64,18 @@ func exportRun(f *exportFlags) func(cmd *cobra.Command, args []string) error {
 		}
 		logger.Info("Exporting config", "to", f.to, "from", f.input)
 
-		file, err := os.Open(f.input)
+		inputFile, err := os.Open(f.input)
 		if err != nil {
 			logger.Error("Failed to open input file", "error", err)
 			return err
 		}
 		defer func() {
-			if err := file.Close(); err != nil {
+			if err := inputFile.Close(); err != nil {
 				logger.Error("Failed to close input file", "error", err)
 			}
 		}()
 
-		setting, err := keymap.Load(file)
+		setting, err := keymap.Load(inputFile)
 		if err != nil {
 			logger.Error("Failed to load config file", "error", err)
 			return err
@@ -91,9 +91,9 @@ func exportRun(f *exportFlags) func(cmd *cobra.Command, args []string) error {
 
 		// Prepare base reader from existing output file if present for diff calculation
 		var base io.Reader
-		if file, err := os.Open(f.output); err == nil {
-			defer func() { _ = file.Close() }()
-			base = file
+		if outputFile, err := os.Open(f.output); err == nil {
+			defer func() { _ = outputFile.Close() }()
+			base = outputFile
 		} else if !os.IsNotExist(err) {
 			// Non-ENOENT error opening base file; log and continue without base
 			logger.Warn("Failed to open existing output as base", "error", err)

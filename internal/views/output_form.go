@@ -152,9 +152,8 @@ func (m *outputFormModel) GetExporterNames() []string {
 func (m *outputFormModel) Init() tea.Cmd { return m.form.Init() }
 
 func (m *outputFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
+	if km, ok := msg.(tea.KeyMsg); ok {
+		switch km.String() {
 		case "ctrl+c", "esc", "q":
 			return m, tea.Interrupt
 		}

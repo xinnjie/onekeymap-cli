@@ -12,6 +12,7 @@ import (
 
 // vscode key doc: https://github.com/microsoft/vscode/blob/main/src/vs/base/common/keyCodes.ts
 
+//nolint:gochecknoglobals // modifier lookup table is initialized once and used read-only at runtime
 var modifierMap = map[string]keymapv1.KeyModifier{
 	"shift": keymapv1.KeyModifier_KEY_MODIFIER_SHIFT,
 	"ctrl":  keymapv1.KeyModifier_KEY_MODIFIER_CTRL,

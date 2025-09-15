@@ -19,7 +19,7 @@ package helix
 // See also: export.go/import.go for usage.
 // TODO(xinnjie): Strong type config type
 //
-//nolint:unused
+//nolint:unused // strong-typed TOML model kept for future import/export functionality
 type helixConfig struct {
 	Keys helixKeys `toml:"keys,omitempty"`
 	// Extra holds all other top-level TOML fields we don't model explicitly.

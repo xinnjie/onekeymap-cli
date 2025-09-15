@@ -25,8 +25,7 @@ type importFlags struct {
 	backup      bool
 }
 
-// NewCmdImport is reported as duplicate of NewCmdExport, but it is necessary duplication
-// nolint:dupl
+//nolint:dupl // Import/Export command constructors are intentionally symmetrical; limited duplication keeps each isolated and clearer
 func NewCmdImport() *cobra.Command {
 	f := importFlags{}
 	cmd := &cobra.Command{

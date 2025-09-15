@@ -7,6 +7,7 @@ import (
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
+//nolint:gochecknoglobals // static keycode lookup table; initialized once and read-only
 var keyCodeMap = bimap.NewBiMapFromMap(map[string]keymapv1.KeyCode{
 	"a":              keymapv1.KeyCode_A,
 	"b":              keymapv1.KeyCode_B,

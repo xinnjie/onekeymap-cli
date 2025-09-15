@@ -1,10 +1,7 @@
-/*
-Copyright 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
-	"log"
+	"os"
 	"slices"
 	"sort"
 
@@ -34,10 +31,12 @@ func NewCmdDevListUnmappedActions() *cobra.Command {
 
 func devListUnmappedActionsRun(f *devListUnmappedActionsFlags) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
 		// Load all mappings
 		mappingConfig, err := mappings.NewMappingConfig()
 		if err != nil {
-			log.Fatalf("Error loading mapping config: %v", err)
+			logger.ErrorContext(ctx, "Error loading mapping config", "error", err)
+			os.Exit(1)
 		}
 
 		unmapped := make([]string, 0)
@@ -79,7 +78,7 @@ func devListUnmappedActionsRun(f *devListUnmappedActionsFlags) func(cmd *cobra.C
 					continue
 				}
 			default:
-				log.Fatalf("Unknown editor: %s (valid: vscode|intellij|zed|vim|helix)", f.editor)
+				logger.WarnContext(ctx, "Unknown editor", "editor", f.editor)
 			}
 
 			switch f.editor {

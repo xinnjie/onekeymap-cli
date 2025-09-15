@@ -23,13 +23,15 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/metrics"
 )
 
-var (
+const (
 	// Version information set by build system.
 	version   = "dev"
 	buildTime = "unknown"
 	gitCommit = "unknown"
+)
 
-	// TODO(xinnjie): Stop using these global variables. But for now I can not think of a better way.
+//nolint:gochecknoglobals // TODO(xinnjie): Stop using these global variables. But for now I can not think of a better way.
+var (
 	// Global shared state that needs to be accessed across commands
 	pluginRegistry *plugins.Registry
 	importService  importapi.Importer
@@ -123,11 +125,12 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 
 		// Set up logger based on the final configuration.
 		var logLevel slog.Level
-		if verbose {
+		switch {
+		case verbose:
 			logLevel = slog.LevelDebug
-		} else if quiet {
+		case quiet:
 			logLevel = slog.LevelError
-		} else {
+		default:
 			logLevel = slog.LevelWarn
 		}
 

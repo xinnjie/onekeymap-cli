@@ -97,9 +97,8 @@ func (m *MigrateFormModel) Init() tea.Cmd {
 }
 
 func (m *MigrateFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
+	if km, ok := msg.(tea.KeyMsg); ok {
+		switch km.String() {
 		case "ctrl+c", "esc", "q":
 			return m, tea.Interrupt
 		}
