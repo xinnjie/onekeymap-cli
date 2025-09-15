@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -126,17 +125,17 @@ var migrateCmd = &cobra.Command{
 		}
 
 		// Show diff preview
-		fmt.Println("================ Migrate Diff Preview ================")
+		cmd.Println("================ Migrate Diff Preview ================")
 		if exportReport != nil && strings.TrimSpace(exportReport.Diff) != "" {
-			fmt.Println(exportReport.Diff)
+			cmd.Println(exportReport.Diff)
 		} else {
-			fmt.Println("(no changes)")
+			cmd.Println("(no changes)")
 		}
-		fmt.Println("=====================================================")
+		cmd.Println("=====================================================")
 
 		// Confirm before writing only when interactive
 		if interactive {
-			if !confirm(*migrateOutput) {
+			if !confirm(cmd, *migrateOutput) {
 				logger.Info("Migration canceled; no changes were written.")
 				return nil
 			}
@@ -152,7 +151,7 @@ var migrateCmd = &cobra.Command{
 		}
 
 		// Write buffer to the target file
-		outputStream, err := os.OpenFile(*migrateOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+		outputStream, err := os.OpenFile(*migrateOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 		if err != nil {
 			logger.Error("failed to create output file", "error", err)
 			return err

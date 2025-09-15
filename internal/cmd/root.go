@@ -50,7 +50,7 @@ var rootCmd = &cobra.Command{
 		var err error
 		mappingConfig, err = mappings.NewMappingConfig()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to initialize mapping config: %v\n", err)
+			cmd.PrintErrf("failed to initialize mapping config: %v\n", err)
 			os.Exit(1)
 		}
 
@@ -66,7 +66,7 @@ var rootCmd = &cobra.Command{
 
 			recorder, err = metrics.New(context.Background(), version, logger, mappingConfig)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to initialize telemetry: %v\n", err)
+				cmd.PrintErrf("failed to initialize telemetry: %v\n", err)
 				os.Exit(1)
 			}
 		}
@@ -151,15 +151,15 @@ func init() {
 
 	// Bind cobra flags to viper.
 	if err := viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose")); err != nil {
-		fmt.Fprintf(os.Stderr, "Error binding verbose flag: %v\n", err)
+		rootCmd.PrintErrf("Error binding verbose flag: %v\n", err)
 		os.Exit(1)
 	}
 	if err := viper.BindPFlag("quiet", rootCmd.PersistentFlags().Lookup("quiet")); err != nil {
-		fmt.Fprintf(os.Stderr, "Error binding quiet flag: %v\n", err)
+		rootCmd.PrintErrf("Error binding quiet flag: %v\n", err)
 		os.Exit(1)
 	}
 	if err := viper.BindPFlag("log-json", rootCmd.PersistentFlags().Lookup("log-json")); err != nil {
-		fmt.Fprintf(os.Stderr, "Error binding log-json flag: %v\n", err)
+		rootCmd.PrintErrf("Error binding log-json flag: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -167,7 +167,7 @@ func init() {
 	var err error
 	_, err = cliconfig.NewConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error initializing configuration: %v\n", err)
+		rootCmd.PrintErrf("Error initializing configuration: %v\n", err)
 		os.Exit(1)
 	}
 }

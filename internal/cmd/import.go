@@ -97,11 +97,11 @@ var importCmd = &cobra.Command{
 		}
 
 		// Ensure parent directory exists, then create/truncate output file
-		if err := os.MkdirAll(filepath.Dir(*importOutput), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(*importOutput), 0o750); err != nil {
 			logger.Error("Failed to create output directory", "dir", filepath.Dir(*importOutput), "error", err)
 			return err
 		}
-		file, err := os.OpenFile(*importOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+		file, err := os.OpenFile(*importOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 		if err != nil {
 			logger.Error("Failed to create output file", "error", err)
 			return err

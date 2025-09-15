@@ -4,7 +4,6 @@ Copyright 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"slices"
 	"sort"
@@ -106,9 +105,9 @@ var listUnmappedActionsCmd = &cobra.Command{
 			}
 		}
 		sort.Strings(unmapped)
-		fmt.Printf("Unmapped action IDs for editor %q:\n", editor)
+		cmd.Println("Unmapped action IDs for editor", editor)
 		for _, id := range unmapped {
-			fmt.Println(id)
+			cmd.Println(id)
 		}
 	},
 }

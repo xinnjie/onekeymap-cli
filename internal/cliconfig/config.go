@@ -77,8 +77,11 @@ func NewConfig() (*Config, error) {
 	if err := viper.ReadInConfig(); err != nil {
 		var configFileNotFoundError viper.ConfigFileNotFoundError
 		if errors.As(err, &configFileNotFoundError) {
-			// Config file was found but another error was produced
-			fmt.Printf("Warning: Error reading config file: %v\n", err)
+			// TODO(xinnjie): Low priority, may be use cobra.command to log
+			//nolint:forbidigo
+			fmt.Printf("Config file not found: %v\n", err)
+		} else {
+			return nil, fmt.Errorf("failed to read config file: %w", err)
 		}
 	}
 

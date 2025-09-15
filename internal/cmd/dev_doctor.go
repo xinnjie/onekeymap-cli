@@ -25,50 +25,50 @@ It currently performs two main checks:
 
 This command is essential for maintaining the quality, consistency, and correctness of the keymap configurations.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Running mapping configuration diagnostics...")
+		cmd.Println("Running mapping configuration diagnostics...")
 		var hasErrors bool
 
-		if err := checkDescriptions(); err != nil {
-			fmt.Fprintf(os.Stderr, "\n[FAIL] Description check failed: %v\n", err)
+		if err := checkDescriptions(cmd); err != nil {
+			cmd.PrintErrf("\n[FAIL] Description check failed: %v\n", err)
 			hasErrors = true
 		}
 
-		if err := validateZedActions(); err != nil {
-			fmt.Fprintf(os.Stderr, "\n[FAIL] Zed action validation failed: %v\n", err)
+		if err := validateZedActions(cmd); err != nil {
+			cmd.PrintErrf("\n[FAIL] Zed action validation failed: %v\n", err)
 			hasErrors = true
 		}
 
 		if hasErrors {
-			fmt.Fprintf(os.Stderr, "\nDoctor checks completed with errors.\n")
+			cmd.PrintErrf("\nDoctor checks completed with errors.\n")
 			os.Exit(1)
 		} else {
-			fmt.Println("\n✅ All doctor checks passed successfully.")
+			cmd.Println("\n✅ All doctor checks passed successfully.")
 		}
 	},
 }
 
-func checkDescriptions() error {
+func checkDescriptions(cmd *cobra.Command) error {
 	config, err := mappings.NewMappingConfig()
 	if err != nil {
 		return fmt.Errorf("could not load mapping config: %w", err)
 	}
 
 	var foundMissing bool
-	fmt.Println("\nRunning Description and Short Description check...")
+	cmd.Println("\nRunning Description and Short Description check...")
 
 	for id, mapping := range config.Mappings {
 		if mapping.Description == "" {
-			fmt.Printf("  - [Missing Description] Action ID: %s\n", id)
+			cmd.Printf("  - [Missing Description] Action ID: %s\n", id)
 			foundMissing = true
 		}
 		if mapping.Name == "" {
-			fmt.Printf("  - [Missing Short Description] Action ID: %s\n", id)
+			cmd.Printf("  - [Missing Short Description] Action ID: %s\n", id)
 			foundMissing = true
 		}
 	}
 
 	if !foundMissing {
-		fmt.Println("  => ✅ All mappings have descriptions and short descriptions.")
+		cmd.Println("  => ✅ All mappings have descriptions and short descriptions.")
 	} else {
 		return errors.New("found mappings with missing descriptions")
 	}
@@ -76,8 +76,8 @@ func checkDescriptions() error {
 	return nil
 }
 
-func validateZedActions() error {
-	fmt.Println("\nRunning Zed Action Validation check...")
+func validateZedActions(cmd *cobra.Command) error {
+	cmd.Println("\nRunning Zed Action Validation check...")
 	// 1. Read and parse the valid actions JSON file
 	jsonFile, err := os.Open(validZedActionsPath)
 	if err != nil {
@@ -113,8 +113,7 @@ func validateZedActions() error {
 				continue // Skip if no zed action is defined for this entry
 			}
 			if _, ok := validActionsSet[zconf.Action]; !ok {
-				fmt.Fprintf(
-					os.Stderr,
+				cmd.PrintErrf(
 					"  - [Invalid Zed Action] Action: '%s', Context: '%s', Mapping ID: '%s'\n",
 					zconf.Action,
 					zconf.Context,
@@ -129,7 +128,7 @@ func validateZedActions() error {
 		return errors.New("invalid zed actions were found")
 	}
 
-	fmt.Println("  => ✅ All Zed actions in mappings are valid.")
+	cmd.Println("  => ✅ All Zed actions in mappings are valid.")
 	return nil
 }
 

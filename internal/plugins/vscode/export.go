@@ -198,9 +198,9 @@ func (e *vscodeExporter) mergeKeybindings(managed, unmanaged []vscodeKeybinding)
 		managedKeys[kb.Key] = true
 	}
 
-	// Start with all managed keybindings
-	result := make([]vscodeKeybinding, len(managed))
-	copy(result, managed)
+	// Start with all managed keybindings; initialize with zero length to satisfy makezero lint
+	result := make([]vscodeKeybinding, 0, len(managed)+len(unmanaged))
+	result = append(result, managed...)
 
 	// Add unmanaged keybindings that don't conflict with managed ones
 	for _, kb := range unmanaged {

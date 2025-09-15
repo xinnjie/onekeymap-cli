@@ -57,7 +57,7 @@ var exportCmd = &cobra.Command{
 		opts := exportapi.ExportOptions{EditorType: pluginapi.EditorType(*toFlag)}
 
 		// Ensure parent directory exists
-		if err := os.MkdirAll(filepath.Dir(*exportOutput), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(*exportOutput), 0o750); err != nil {
 			logger.Error("Failed to create output directory", "dir", filepath.Dir(*exportOutput), "error", err)
 			return err
 		}
@@ -84,20 +84,20 @@ var exportCmd = &cobra.Command{
 		}
 
 		// Show diff preview
-		fmt.Println("================ Export Diff Preview ================")
+		cmd.Println("================ Export Diff Preview ================")
 		if report != nil && strings.TrimSpace(report.Diff) != "" {
-			fmt.Println(report.Diff)
+			cmd.Println(report.Diff)
 		} else {
-			fmt.Println("(no diff available)")
+			cmd.Println("(no diff available)")
 		}
-		fmt.Println("=====================================================")
+		cmd.Println("=====================================================")
 
 		// TODO(xinnjie): optimize skip writing when output is the same. Whether same or not should not rely on report.Diff
 
 		// Confirm before writing only when interactive
 		if *interactive {
-			if !confirm(*exportOutput) {
-				fmt.Println("Export canceled; no changes were written.")
+			if !confirm(cmd, *exportOutput) {
+				cmd.Println("Export canceled; no changes were written.")
 				return nil
 			}
 		}
@@ -112,7 +112,7 @@ var exportCmd = &cobra.Command{
 		}
 
 		// Write buffer to the target file
-		outputFile, err := os.OpenFile(*exportOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+		outputFile, err := os.OpenFile(*exportOutput, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 		if err != nil {
 			logger.Error("Failed to create output file", "error", err)
 			return err

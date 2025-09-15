@@ -31,10 +31,10 @@ support each action. The table includes columns for VSCode, Zed, IntelliJ, and H
 		sort.Strings(actionIDs)
 
 		// Generate markdown table
-		fmt.Println("# Action Support Matrix")
-		fmt.Println()
-		fmt.Println("| Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |")
-		fmt.Println("|--------|--------|-----|----------|-------|-------------|-----------|")
+		cmd.Println("# Action Support Matrix")
+		cmd.Println()
+		cmd.Println("| Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |")
+		cmd.Println("|--------|--------|-----|----------|-------|-------------|-----------|")
 
 		for _, id := range actionIDs {
 			mapping := mappingConfig.Mappings[id]
@@ -52,7 +52,7 @@ support each action. The table includes columns for VSCode, Zed, IntelliJ, and H
 				description = "-"
 			}
 
-			fmt.Printf("| %s | %s | %s | %s | %s | %s | %s |\n",
+			cmd.Printf("| %s | %s | %s | %s | %s | %s | %s |\n",
 				mapping.Name,
 				formatSupport(vscodeSupport, vscodeReason),
 				formatSupport(zedSupport, zedReason),

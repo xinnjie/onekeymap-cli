@@ -2,6 +2,8 @@ package validateapi
 
 import (
 	"context"
+	"errors"
+	"math"
 
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
@@ -25,10 +27,14 @@ func (v *Validator) Validate(
 	setting *keymapv1.KeymapSetting,
 	opts importapi.ImportOptions,
 ) (*keymapv1.ValidationReport, error) {
+	processed := len(setting.GetKeybindings())
+	if processed > math.MaxInt32 || processed < 0 {
+		return nil, errors.New("keybindings count out of range")
+	}
 	report := &keymapv1.ValidationReport{
 		SourceEditor: string(opts.EditorType),
 		Summary: &keymapv1.Summary{
-			MappingsProcessed: int32(len(setting.GetKeybindings())),
+			MappingsProcessed: int32(processed),
 			MappingsSucceeded: 0, // Will be updated by rules
 		},
 		Issues:   make([]*keymapv1.ValidationIssue, 0),
@@ -49,8 +55,11 @@ func (v *Validator) Validate(
 	}
 
 	// Update succeeded count (total - issues)
-	issueCount := len(report.GetIssues())
-	report.Summary.MappingsSucceeded = report.GetSummary().GetMappingsProcessed() - int32(issueCount)
+	success := max(int(report.GetSummary().GetMappingsProcessed())-len(report.GetIssues()), 0)
+	if success > math.MaxInt32 || success < 0 {
+		return nil, errors.New("keybindings count out of range")
+	}
+	report.Summary.MappingsSucceeded = int32(success)
 
 	return report, nil
 }

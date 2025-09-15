@@ -178,9 +178,8 @@ func (e *intellijExporter) mergeActions(managed, unmanaged []ActionXML) []Action
 		managedIDs[action.ID] = true
 	}
 
-	// Start with all managed actions
-	result := make([]ActionXML, len(managed))
-	copy(result, managed)
+	result := make([]ActionXML, 0, len(managed)+len(unmanaged))
+	result = append(result, managed...)
 
 	// Add unmanaged actions that don't conflict with managed ones
 	for _, action := range unmanaged {

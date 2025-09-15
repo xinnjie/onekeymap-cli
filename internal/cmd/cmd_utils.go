@@ -8,13 +8,15 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
-func confirm(path string) bool {
+func confirm(cmd *cobra.Command, path string) bool {
 	if path == "" {
 		panic("path is empty")
 	}
-	fmt.Printf("Write config to %s? [y/N]: ", path)
+	cmd.Printf("Write config to %s? [y/N]: ", path)
 	reader := bufio.NewReader(os.Stdin)
 	answer, _ := reader.ReadString('\n')
 	answer = strings.ToLower(strings.TrimSpace(answer))
@@ -52,7 +54,7 @@ func backupIfExists(path string) (string, error) {
 	}
 	defer func() { _ = in.Close() }()
 
-	out, err := os.OpenFile(backup, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
+	out, err := os.OpenFile(backup, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0o600)
 	if err != nil {
 		return "", err
 	}
