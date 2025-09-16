@@ -10,9 +10,12 @@ import (
 
 // ImportOptions provides configuration for an import operation.
 type ImportOptions struct {
-	EditorType  pluginapi.EditorType
-	InputStream io.Reader               // Required: input stream, contains the keymap config for different editors
-	Base        *keymapv1.KeymapSetting // Optional: base keymap setting
+	// Required, editor type
+	EditorType pluginapi.EditorType
+	// Required, input stream, contains the keymap config for different editors
+	InputStream io.Reader
+	// Optional, existing onekeymap base setting
+	Base *keymapv1.KeymapSetting
 }
 
 // ImportResult represents the result of an import operation.

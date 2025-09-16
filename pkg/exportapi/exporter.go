@@ -10,11 +10,12 @@ import (
 
 // ExportOptions provides configuration for an export operation.
 type ExportOptions struct {
+	// Editor type
 	EditorType pluginapi.EditorType
-	Base       io.Reader // Optional base keymap for specific editor
+	// Optional, existing base keymap for specific editor
+	Base io.Reader
 	// TODO(xinnjie): export api level enum is not a good idea
 	DiffType keymapv1.ExportKeymapRequest_DiffType
-
 	// file path for the keymap config
 	FilePath string
 }
