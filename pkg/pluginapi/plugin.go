@@ -52,6 +52,8 @@ type PluginExportReport struct {
 	// If base is nil or diff is not supported, this field will be nil.
 	Diff *string
 
+	// BaseEditorConfig and ExportEditorConfig type depends on plugin, should set by plugin
+
 	// If BaseEditorConfig and ExportEditorConfig set, and Diff is not set, export exportService will calculate diff for plugin by using json diff
 	// BaseEditorConfig contains the original editor-specific configuration before export.
 	BaseEditorConfig any

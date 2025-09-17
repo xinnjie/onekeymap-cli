@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/spf13/cobra"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
@@ -45,12 +46,18 @@ func devDocSupportActionsRun(f *devDocSupportActionsFlags) func(cmd *cobra.Comma
 		}
 		sort.Strings(actionIDs)
 
-		// Generate markdown table
-		cmd.Println("# Action Support Matrix")
-		cmd.Println()
-		cmd.Println("| Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |")
-		cmd.Println("|--------|--------|-----|----------|-------|-------------|-----------|")
+		// Prepare data rows for template rendering
+		type supportRow struct {
+			Action      string
+			VSCode      string
+			Zed         string
+			IntelliJ    string
+			Helix       string
+			Description string
+			ActionID    string
+		}
 
+		rows := make([]supportRow, 0, len(actionIDs))
 		for _, id := range actionIDs {
 			mapping := mappingConfig.Mappings[id]
 
@@ -67,15 +74,30 @@ func devDocSupportActionsRun(f *devDocSupportActionsFlags) func(cmd *cobra.Comma
 				description = "-"
 			}
 
-			cmd.Printf("| %s | %s | %s | %s | %s | %s | %s |\n",
-				mapping.Name,
-				formatSupport(vscodeSupport, vscodeReason),
-				formatSupport(zedSupport, zedReason),
-				formatSupport(intellijSupport, intellijReason),
-				formatSupport(helixSupport, helixReason),
-				description,
-				id,
-			)
+			rows = append(rows, supportRow{
+				Action:      mapping.Name,
+				VSCode:      formatSupport(vscodeSupport, vscodeReason),
+				Zed:         formatSupport(zedSupport, zedReason),
+				IntelliJ:    formatSupport(intellijSupport, intellijReason),
+				Helix:       formatSupport(helixSupport, helixReason),
+				Description: description,
+				ActionID:    id,
+			})
+		}
+
+		const supportMatrixTmpl = `# Action Support Matrix
+
+| Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |
+|--------|--------|-----|----------|-------|-------------|-----------|
+{{- range . }}
+| {{ .Action }} | {{ .VSCode }} | {{ .Zed }} | {{ .IntelliJ }} | {{ .Helix }} | {{ .Description }} | {{ .ActionID }} |
+{{- end }}
+`
+
+		t := template.Must(template.New("support-matrix").Parse(supportMatrixTmpl))
+		if err := t.Execute(cmd.OutOrStdout(), rows); err != nil {
+			logger.ErrorContext(ctx, "Error executing template", "error", err)
+			os.Exit(1)
 		}
 	}
 }

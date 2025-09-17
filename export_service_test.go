@@ -117,7 +117,7 @@ func TestExportService_Diff_FallbackFromPlugin(t *testing.T) {
 	var out bytes.Buffer
 	report, err := service.Export(context.Background(), &out, &keymapv1.KeymapSetting{}, exportapi.ExportOptions{
 		EditorType: pluginapi.EditorType("test"),
-		DiffType:   keymapv1.ExportKeymapRequest_ASCII_DIFF,
+		DiffType:   keymapv1.ExportKeymapRequest_DIFF_TYPE_UNSPECIFIED,
 	})
 	require.NoError(t, err)
 	require.NotNil(t, report)

@@ -53,41 +53,47 @@ func (s *exportService) Export(
 	}
 
 	var newConfigBuf bytes.Buffer
-	writer := destination
+	writer := io.MultiWriter(destination, &newConfigBuf)
 
 	// If unified diff is requested and a base is provided, buffer the base once and
 	// use duplicated readers so that the plugin can consume its copy without
 	// affecting our diff generation.
-	var pluginBase = opts.Base
-	var diffBase = opts.Base
+	var baseReadForPlugin io.Reader
 	var baseBuf bytes.Buffer
-	if opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF && opts.Base != nil {
-		// Stream Base to plugin while teeing into baseBuf for later diff computation.
-		pluginBase = io.TeeReader(opts.Base, &baseBuf)
-		// Defer setting diffBase until after plugin export completes so baseBuf is fully populated.
-		writer = io.MultiWriter(destination, &newConfigBuf)
+	if opts.Base != nil {
+		baseReadForPlugin = io.TeeReader(opts.Base, &baseBuf)
 	}
 
-	report, err := exporter.Export(ctx, writer, setting, pluginapi.PluginExportOption{ExistingConfig: pluginBase})
+	report, err := exporter.Export(
+		ctx,
+		writer,
+		setting,
+		pluginapi.PluginExportOption{ExistingConfig: baseReadForPlugin},
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to export config: %w", err)
 	}
 
 	// If we used TeeReader above, ensure we drain any remaining bytes from opts.Base
 	// (in case the plugin didn't read to EOF), then use the full buffered Base for diff now.
-	if opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF && opts.Base != nil {
-		drainBase := func() error {
-			if _, err := io.Copy(&baseBuf, opts.Base); err != nil {
-				return fmt.Errorf("failed to drain base for unified diff: %w", err)
-			}
+	drainBase := func() error {
+		if baseReadForPlugin == nil {
 			return nil
 		}
-		if err := drainBase(); err != nil {
-			return nil, err
+		if _, err := io.Copy(io.Discard, baseReadForPlugin); err != nil {
+			return fmt.Errorf("failed to drain base for unified diff: %w", err)
 		}
-		diffBase = bytes.NewReader(baseBuf.Bytes())
+		return nil
 	}
-	diffStr, err := s.computeDiff(opts, diffBase, &newConfigBuf, report)
+	if err := drainBase(); err != nil {
+		return nil, err
+	}
+	// Now that we've fully buffered the base, create a fresh reader for diffing
+	var baseReadForDiff io.Reader
+	if opts.Base != nil {
+		baseReadForDiff = bytes.NewReader(baseBuf.Bytes())
+	}
+	diffStr, err := s.computeDiff(opts, baseReadForDiff, &newConfigBuf, report)
 	if err != nil {
 		return nil, err
 	}
@@ -98,19 +104,25 @@ func (s *exportService) Export(
 func (s *exportService) computeDiff(
 	opts exportapi.ExportOptions,
 	originalConfig io.Reader,
-	updateConfig *bytes.Buffer,
+	updatedConfig io.Reader,
 	report *pluginapi.PluginExportReport,
 ) (string, error) {
 	switch {
-	case opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF && originalConfig != nil:
+	case opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF:
 		// Unified diff over raw editor configs
 		ud := diff.NewUnifiedDiffFormatDiffer()
-		d, err := ud.Diff(originalConfig, updateConfig, opts.FilePath)
+		if originalConfig == nil {
+			originalConfig = bytes.NewReader([]byte(""))
+		}
+		if updatedConfig == nil {
+			updatedConfig = bytes.NewReader([]byte(""))
+		}
+		d, err := ud.Diff(originalConfig, updatedConfig, opts.FilePath)
 		if err != nil {
 			return "", fmt.Errorf("failed to compute unified diff: %w", err)
 		}
 		return d, nil
-	case report != nil && report.BaseEditorConfig != nil && report.ExportEditorConfig != nil:
+	case opts.DiffType == keymapv1.ExportKeymapRequest_ASCII_DIFF:
 		// JSON ASCII diff over structured editor configs supplied by plugin
 		jd := diff.NewJSONASCIIDiffer()
 		d, err := jd.Diff(report.BaseEditorConfig, report.ExportEditorConfig)
