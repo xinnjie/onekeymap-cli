@@ -24,7 +24,7 @@ mappings:
     intellij:
       action: "GotoClass"
   - id: "actions.go.symbolFinderInEditor"
-    name: "Find in editor"
+    name: "Find symbol in editor"
     description: "Go to Symbol in Editor"
     category: "Navigation"
     vscode:
