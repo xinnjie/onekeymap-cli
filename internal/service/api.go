@@ -137,21 +137,16 @@ func (s *Server) LoadKeymap(
 ) (*keymapv1.LoadKeymapResponse, error) {
 	km, err := keymap.Load(strings.NewReader(req.GetConfig()))
 	if err != nil {
-		if !req.GetReturnAll() {
-			return nil, status.Errorf(codes.InvalidArgument, "failed to parse keymap config: %v", err)
-		}
-		// If the config is empty, we can still proceed if return_all is true.
-		km = &keymapv1.KeymapSetting{}
+		return nil, status.Errorf(codes.InvalidArgument, "failed to parse keymap config: %v", err)
 	}
 
+	// If return_all is true, we will return all mappings in the config.
 	if req.GetReturnAll() {
-		// Create a map for quick lookup of existing bindings.
 		existingBindings := make(map[string]*keymapv1.ActionBinding)
 		for _, binding := range km.GetKeybindings() {
 			existingBindings[binding.GetId()] = binding
 		}
 
-		// Iterate through all available mappings and add them if they don't exist.
 		for id, mapping := range s.mappingConfig.Mappings {
 			if _, exists := existingBindings[id]; !exists {
 				km.Keybindings = append(km.Keybindings, &keymapv1.ActionBinding{
