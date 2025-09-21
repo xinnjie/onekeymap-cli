@@ -2,7 +2,7 @@ mappings:
   - id: "actions.edit.toggleLineComment"
     name: "Toggle line comment"
     description: "Toggle line comment"
-    category: "Editor"
+    category: "Editor.Comment"
     vscode:
       command: "editor.action.commentLine"
       when: "editorTextFocus && !editorReadonly"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.edit.toggleBlockComment"
     name: "Toggle block comment"
     description: "Toggle block comment"
-    category: "Editor"
+    category: "Editor.Comment"
     vscode:
       command: "editor.action.blockComment"
       when: "editorTextFocus && !editorReadonly"

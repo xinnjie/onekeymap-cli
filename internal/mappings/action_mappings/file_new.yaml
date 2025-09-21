@@ -11,15 +11,3 @@ mappings:
       context: "Workspace"
     intellij:
       action: "NewScratchFile"
-  - id: "actions.file.newWindow"
-    name: "New window"
-    description: "Open a new window"
-    category: "View Management"
-    vscode:
-      command: "workbench.action.newWindow"
-      when: ""
-    zed:
-      action: "workspace::NewWindow"
-      context: "Workspace"
-    intellij:
-      notSupported: true

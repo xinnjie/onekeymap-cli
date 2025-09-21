@@ -2,7 +2,7 @@ mappings:
   - id: "actions.view.focusNextSplit"
     name: "Focus next split"
     description: "Focus next editor split"
-    category: "View Management"
+    category: "View Management.Split"
     vscode:
       command: "workbench.action.focusNextGroup"
       when: "editorFocus"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.view.focusPreviousSplit"
     name: "Focus previous split"
     description: "Focus previous editor split"
-    category: "View Management"
+    category: "View Management.Split"
     vscode:
       command: "workbench.action.focusPreviousGroup"
       when: "editorFocus"
@@ -29,4 +29,57 @@ mappings:
     helix:
       command: "rotate_view_reverse"
       mode: "insert"
-# TODO split right
+  - id: "actions.view.splitRight"
+    name: "Split right"
+    description: "Split editor to right"
+    category: "View Management.Split"
+    vscode:
+      - command: "workbench.action.splitEditorRight"
+        when: "editorFocus"
+      - command: "workbench.action.terminal.split"
+        when: "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
+    zed:
+     # split editor
+     - action: "pane::SplitRight"
+       context: "Editor"
+     # split terminal
+     - action: "pane::SplitRight"
+       context: "Terminal"
+    intellij:
+      action: "OpenInRightSplit"
+  - id: "actions.view.splitLeft"
+    name: "Split left"
+    description: "Split editor to left"
+    category: "View Management.Split"
+    vscode:
+      command: "workbench.action.splitEditorLeft"
+      when: "editorFocus"
+    zed:
+      - action: "pane::SplitLeft"
+        context: "Editor"
+      - action: "pane::SplitLeft"
+        context: "Terminal"
+  - id: "actions.view.splitUp"
+    name: "Split up"
+    description: "Split editor to up"
+    category: "View Management.Split"
+    vscode:
+      command: "workbench.action.splitEditorUp"
+      when: "editorFocus"
+    zed:
+      - action: "pane::SplitUp"
+        context: "Editor"
+      - action: "pane::SplitUp"
+        context: "Terminal"
+  - id: "actions.view.splitDown"
+    name: "Split down"
+    description: "Split editor to down"
+    category: "View Management.Split"
+    vscode:
+      command: "workbench.action.splitEditorDown"
+      when: "editorFocus"
+    zed:
+      - action: "pane::SplitDown"
+        context: "Editor"
+      - action: "pane::SplitDown"
+        context: "Terminal"

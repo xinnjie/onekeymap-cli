@@ -2,7 +2,7 @@ mappings:
   - id: "actions.selection.copyLineUp"
     name: "Copy line up"
     description: "Copy current line up"
-    category: "Editor"
+    category: "Editor.Line"
     vscode:
       command: "editor.action.copyLinesUpAction"
       when: "editorTextFocus && !editorReadonly"
@@ -18,7 +18,7 @@ mappings:
   - id: "actions.selection.copyLineDown"
     name: "Copy line down"
     description: "Copy current line down"
-    category: "Editor"
+    category: "Editor.Line"
     vscode:
       command: "editor.action.copyLinesDownAction"
       when: "editorTextFocus && !editorReadonly"
@@ -33,7 +33,7 @@ mappings:
   - id: "actions.selection.moveLineUp"
     name: "Move line up"
     description: "Move current line up"
-    category: "Editor"
+    category: "Editor.Line"
     vscode:
       command: "editor.action.moveLinesUpAction"
       when: "editorTextFocus && !editorReadonly"
@@ -48,7 +48,7 @@ mappings:
   - id: "actions.selection.moveLineDown"
     name: "Move line down"
     description: "Move current line down"
-    category: "Editor"
+    category: "Editor.Line"
     vscode:
       command: "editor.action.moveLinesDownAction"
       when: "editorTextFocus && !editorReadonly"

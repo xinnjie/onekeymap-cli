@@ -2,7 +2,7 @@ mappings:
   - id: "actions.selection.selectAll"
     name: "Select all"
     description: "Select all text in the editor"
-    category: "Editor"
+    category: "Editor.Selection"
     vscode:
       command: "editor.action.selectAll"
       when: "textInputFocus"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.selection.expand"
     name: "Expand selection"
     description: "Expand selection"
-    category: "Editor"
+    category: "Editor.Selection"
     vscode:
       command: "editor.action.smartSelect.expand"
       when: "editorTextFocus"
@@ -32,7 +32,7 @@ mappings:
   - id: "actions.selection.shrink"
     name: "Shrink selection"
     description: "Shrink selection"
-    category: "Editor"
+    category: "Editor.Selection"
     vscode:
       command: "editor.action.smartSelect.shrink"
       when: "editorTextFocus"

@@ -2,7 +2,7 @@ mappings:
   - id: "actions.view.maximizeEditor"
     name: "Maximize editor"
     description: "Maximize editor (hide other windows)"
-    category: "View Management"
+    category: "View Management.Window"
     vscode:
       command: "workbench.action.maximizeEditor"
       when: ""
@@ -15,7 +15,7 @@ mappings:
   - id: "actions.view.toggleFullScreen"
     name: "Toggle full screen"
     description: "Toggle full screen"
-    category: "View Management"
+    category: "View Management.Window"
     vscode:
       command: "workbench.action.toggleFullScreen"
       when: ""
@@ -24,4 +24,31 @@ mappings:
     zed:
       action: "zed::ToggleFullScreen"
     helix:
+      notSupported: true
+  - id: "actions.file.closeWindow"
+    name: "Close window"
+    description: "Close the current window"
+    category: "View Management.Window"
+    vscode:
+      command: "workbench.action.closeWindow"
+      when: "!editorIsOpen && !multipleEditorGroups"
+    zed:
+      action: "workspace::CloseWindow"
+      context: "Workspace"
+    intellij:
+      action: "HideActiveWindow"
+    helix:
+      command: ":quit-all"
+      mode: "insert"
+  - id: "actions.file.newWindow"
+    name: "New window"
+    description: "Open a new window"
+    category: "View Management.Window"
+    vscode:
+      command: "workbench.action.newWindow"
+      when: ""
+    zed:
+      action: "workspace::NewWindow"
+      context: "Workspace"
+    intellij:
       notSupported: true

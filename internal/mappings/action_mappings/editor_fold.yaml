@@ -1,8 +1,8 @@
 mappings:
   - id: "actions.fold.fold"
-    name: "Fold code"
+    name: "Fold"
     description: "Collapse the current code block"
-    category: "Editor"
+    category: "Editor.Folding"
     vscode:
       command: "editor.fold"
       when: "editorTextFocus && foldingEnabled"
@@ -12,9 +12,9 @@ mappings:
     intellij:
       action: "CollapseRegion"
   - id: "actions.fold.unfold"
-    name: "Unfold code"
+    name: "Unfold"
     description: "Expand the current code block"
-    category: "Editor"
+    category: "Editor.Folding"
     vscode:
       command: "editor.unfold"
       when: "editorTextFocus && foldingEnabled"
@@ -26,7 +26,7 @@ mappings:
   - id: "actions.fold.foldRecursively"
     name: "Fold recursively"
     description: "Collapse the current code block and its children recursively"
-    category: "Editor"
+    category: "Editor.Folding"
     vscode:
       command: "editor.foldRecursively"
       when: "editorTextFocus && foldingEnabled"
@@ -38,7 +38,7 @@ mappings:
   - id: "actions.fold.unfoldRecursively"
     name: "Unfold recursively"
     description: "Expand the current code block and its children recursively"
-    category: "Editor"
+    category: "Editor.Folding"
     vscode:
       command: "editor.unfoldRecursively"
       when: "editorTextFocus && foldingEnabled"
@@ -50,7 +50,7 @@ mappings:
   - id: "actions.fold.toggleFold"
     name: "Toggle fold"
     description: "Toggle Fold"
-    category: "Editor"
+    category: "Editor.Folding"
     vscode:
       command: "editor.toggleFold"
       when: "editorTextFocus && foldingEnabled"
@@ -62,7 +62,7 @@ mappings:
   - id: "actions.fold.foldAll"
     name: "Fold all"
     description: "Collapse all code blocks in the editor"
-    category: "Editor"
+    category: "Editor.Folding"
     vscode:
       command: "editor.foldAll"
       when: "editorTextFocus && foldingEnabled"
@@ -74,7 +74,7 @@ mappings:
   - id: "actions.fold.unfoldAll"
     name: "Unfold all"
     description: "Expand all code blocks in the editor"
-    category: "Editor"
+    category: "Editor.Folding"
     vscode:
       command: "editor.unfoldAll"
       when: "editorTextFocus && foldingEnabled"

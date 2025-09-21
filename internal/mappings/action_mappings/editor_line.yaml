@@ -2,7 +2,7 @@ mappings:
   - id: "actions.edit.insertLineBefore"
     name: "Insert line before"
     description: "Insert a new line before the current line"
-    category: "Editor"
+    category: "Editor.Line"
     vscode:
       command: "editor.action.insertLineBefore"
       when: "editorTextFocus && !editorReadonly"
@@ -14,7 +14,7 @@ mappings:
   - id: "actions.edit.joinLines"
     name: "Join lines"
     description: "Join lines"
-    category: "Editor"
+    category: "Editor.Line"
     vscode:
       command: "editor.action.joinLines"
       when: "editorTextFocus && !editorReadonly"
@@ -26,7 +26,7 @@ mappings:
   - id: "actions.edit.lineBreakInsert"
     name: "Insert line break"
     description: "Insert line break"
-    category: "Editor"
+    category: "Editor.Line"
     vscode:
       command: "lineBreakInsert"
       when: "textInputFocus && !editorReadonly"
@@ -38,7 +38,7 @@ mappings:
   - id: "actions.edit.insertLineAfter"
     name: "Insert line after"
     description: "Insert a new line after the current line"
-    category: "Editor"
+    category: "Editor.Line"
     vscode:
       command: "editor.action.insertLineAfter"
       when: "editorTextFocus && !editorReadonly"
@@ -47,3 +47,15 @@ mappings:
       context: "Editor"
     intellij:
       action: "EditorStartNewLine"
+  - id: "actions.edit.deleteLines"
+    name: "Delete line"
+    description: "Delete line"
+    category: "Editor.Line"
+    vscode:
+      command: "editor.action.deleteLines"
+      when: "textInputFocus && !editorReadonly"
+    intellij:
+      action: "EditorDeleteLine"
+    zed:
+      action: "editor::DeleteLine"
+      context: "Editor"

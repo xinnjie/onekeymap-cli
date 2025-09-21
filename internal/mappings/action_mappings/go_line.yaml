@@ -11,15 +11,3 @@ mappings:
       context: "Editor"
     intellij:
       action: "GotoLine"
-  - id: "actions.go.bracket"
-    name: "Go to bracket"
-    description: "Go to Bracket"
-    category: "Navigation"
-    vscode:
-      command: "editor.action.jumpToBracket"
-      when: "editorTextFocus"
-    zed:
-      action: "editor::MoveToEnclosingBracket"
-      context: "Editor"
-    intellij:
-      action: "EditorMatchBrace"

@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.run.selectionToRepl"
-    name: "Send to REPL"
+    name: "Evaluate selection"
     description: "Send selection to REPL"
     category: "Debug"
     vscode:

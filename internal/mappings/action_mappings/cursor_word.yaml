@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.cursor.wordRight"
-    name: "Next word"
+    name: "Move to next word"
     description: "Move cursor to the end of the next word"
     category: "Editor.Cursor.Word"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "move_next_word_end"
       mode: "insert"
   - id: "actions.cursor.wordPartRight"
-    name: "Next subword"
+    name: "Move to next subword"
     description: "Move cursor to the end of the next subword (hump)"
     category: "Editor.Cursor.Word"
     vscode:
@@ -31,7 +31,7 @@ mappings:
       command: "move_next_sub_word_start"
       mode: "insert"
   - id: "actions.cursor.wordLeft"
-    name: "Previous word"
+    name: "Move to previous word"
     description: "Move cursor to the start of the previous word"
     category: "Editor.Cursor.Word"
     vscode:
@@ -46,7 +46,7 @@ mappings:
       command: "move_prev_word_start"
       mode: "insert"
   - id: "actions.cursor.wordPartLeft"
-    name: "Previous subword"
+    name: "Move to previous subword"
     description: "Move cursor to the start of the previous subword (hump)"
     category: "Editor.Cursor.Word"
     vscode:

@@ -2,7 +2,7 @@ mappings:
   - id: "actions.run.stepOver"
     name: "Step over"
     description: "Step Over"
-    category: "Debug"
+    category: "Debug.Step"
     vscode:
       command: "workbench.action.debug.stepOver"
       when: "debugState == 'stopped'"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.run.stepInto"
     name: "Step into"
     description: "Step Into"
-    category: "Debug"
+    category: "Debug.Step"
     vscode:
       command: "workbench.action.debug.stepInto"
       when: "debugState != 'inactive'"
@@ -32,7 +32,7 @@ mappings:
   - id: "actions.run.stepOut"
     name: "Step out"
     description: "Step Out"
-    category: "Debug"
+    category: "Debug.Step"
     vscode:
       command: "workbench.action.debug.stepOut"
       when: "debugState == 'stopped'"
@@ -47,7 +47,7 @@ mappings:
   - id: "actions.run.continue"
     name: "Continue"
     description: "Continue"
-    category: "Debug"
+    category: "Debug.Step"
     vscode:
       command: "workbench.action.debug.continue"
       when: "debugState == 'stopped'"
@@ -62,7 +62,7 @@ mappings:
   - id: "actions.run.runToCursor"
     name: "Run to cursor"
     description: "Run to Cursor"
-    category: "Debug"
+    category: "Debug.Step"
     vscode:
       command: "editor.debug.action.runToCursor"
       when: "inDebugMode && debugState == 'stopped'"

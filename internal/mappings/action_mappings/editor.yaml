@@ -2,13 +2,12 @@ mappings:
   - id: "actions.view.toggleWordWrap"
     name: "Toggle word wrap"
     description: "Toggle word wrap in the editor"
-    category: "View Management"
+    category: "Editor"
     vscode:
       command: "editor.action.toggleWordWrap"
-      when: ""
     zed:
       action: "editor::ToggleSoftWrap"
       context: "Editor"
-    # intellij need configure in settings
     intellij:
       notSupported: true
+      notSupportedReason: "intellij need configure in settings"

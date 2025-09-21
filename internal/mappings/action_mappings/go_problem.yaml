@@ -2,7 +2,7 @@ mappings:
   - id: "actions.go.nextProblem"
     name: "Next problem"
     description: "Go to Next Problem (Error, Warning, Info)"
-    category: "Navigation"
+    category: "Navigation.Problems"
     vscode:
       command: "editor.action.marker.next"
       when: "editorFocus"
@@ -15,7 +15,7 @@ mappings:
   - id: "actions.go.previousProblem"
     name: "Previous problem"
     description: "Go to Previous Problem (Error, Warning, Info)"
-    category: "Navigation"
+    category: "Navigation.Problems"
     vscode:
       command: "editor.action.marker.prev"
       when: "editorFocus"

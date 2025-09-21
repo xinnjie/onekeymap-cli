@@ -2,7 +2,7 @@ mappings:
   - id: "actions.notebook.cell.edit"
     name: "Edit cell"
     description: "Edit Cell"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.edit"
       when: "notebookCellListFocused && !editorHoverFocused && !inputFocus && !notebookOutputInputFocused"
@@ -14,7 +14,7 @@ mappings:
   - id: "actions.notebook.cell.execute"
     name: "Execute cell"
     description: "Execute Cell"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.execute"
       when: "notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
@@ -26,7 +26,7 @@ mappings:
   - id: "actions.notebook.cell.executeAndInsertBelow"
     name: "Execute and insert"
     description: "Execute Cell and Insert Below"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.executeAndInsertBelow"
       when: "notebookCellListFocused && notebookCellType == 'markup' || notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
@@ -38,7 +38,7 @@ mappings:
   - id: "actions.notebook.cell.executeAndSelectBelow"
     name: "Execute and select"
     description: "Execute Cell and Select Below"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.executeAndSelectBelow"
       when: "notebookCellListFocused && !interactiveEditorFocused && notebookCellType == 'code' || editorTextFocus && inputFocus && notebookEditorFocused && !interactiveEditorFocused"
@@ -50,7 +50,7 @@ mappings:
   - id: "actions.notebook.cell.insertCodeCellAbove"
     name: "Insert above"
     description: "Insert Code Cell Above"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.insertCodeCellAbove"
       when: "notebookCellListFocused && !inputFocus"
@@ -62,7 +62,7 @@ mappings:
   - id: "actions.notebook.cell.insertCodeCellBelow"
     name: "Insert below"
     description: "Insert Code Cell Below"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.insertCodeCellBelow"
       when: "notebookCellListFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
@@ -74,7 +74,7 @@ mappings:
   - id: "actions.notebook.cell.moveDown"
     name: "Move down"
     description: "Move Cell Down"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.moveDown"
       when: "notebookEditorFocused && !inputFocus"
@@ -86,7 +86,7 @@ mappings:
   - id: "actions.notebook.cell.moveUp"
     name: "Move up"
     description: "Move Cell Up"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.moveUp"
       when: "notebookEditorFocused && !inputFocus"
@@ -98,7 +98,7 @@ mappings:
   - id: "actions.notebook.cell.quitEdit"
     name: "Quit edit"
     description: "Stop Editing Cell"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.cell.quitEdit"
       when: "notebookEditorFocused && notebookOutputFocused"
@@ -110,7 +110,7 @@ mappings:
   - id: "actions.notebook.focusBottom"
     name: "Focus bottom"
     description: "Focus Bottom"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.focusBottom"
       when: "notebookEditorFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
@@ -122,7 +122,7 @@ mappings:
   - id: "actions.notebook.focusTop"
     name: "Focus top"
     description: "Focus Top"
-    category: "Jupyter Notebook"
+    category: "Tools.Jupyter Notebook"
     vscode:
       command: "notebook.focusTop"
       when: "notebookEditorFocused && !inputFocus && notebookChatOuterFocusPosition == ''"

@@ -2,7 +2,7 @@ mappings:
   - id: "actions.view.toggleExplorer"
     name: "Toggle file explorer"
     description: "Toggle file explorer view"
-    category: "View Management"
+    category: "View Management.Pannels"
     vscode:
       - command: "workbench.view.explorer"
         when: "viewContainer.workbench.view.explorer.enabled"
@@ -21,7 +21,7 @@ mappings:
   - id: "actions.view.toggleSearch"
     name: "Toggle search"
     description: "Toggle Search view"
-    category: "View Management"
+    category: "View Management.Pannels"
     vscode:
       - command: "workbench.view.search"
         when: "workbench.view.search.active && neverMatch =~ /doesNotMatch/"
@@ -40,7 +40,7 @@ mappings:
   - id: "actions.view.toggleSourceControl"
     name: "Toggle source control"
     description: "Toggle Source Control view"
-    category: "View Management"
+    category: "View Management.Pannels"
     vscode:
       - command: "workbench.view.scm"
         when: "workbench.scm.active"
@@ -59,7 +59,7 @@ mappings:
   - id: "actions.view.showExtensions"
     name: "Show extensions"
     description: "Show Extensions view"
-    category: "View Management"
+    category: "View Management.Pannels"
     vscode:
       command: "workbench.view.extensions"
       when: "viewContainer.workbench.view.extensions.enabled"
@@ -73,7 +73,7 @@ mappings:
   - id: "actions.view.showTesting"
     name: "Show testing"
     description: "Show Testing view"
-    category: "View Management"
+    category: "View Management.Pannels"
     vscode:
       command: "workbench.view.testing"
       when: ""
@@ -86,7 +86,7 @@ mappings:
   - id: "actions.view.toggleProblems"
     name: "Toggle problems"
     description: "Toggle Problems view"
-    category: "View Management"
+    category: "View Management.Pannels"
     vscode:
       command: "workbench.actions.view.problems"
       when: ""
@@ -102,7 +102,7 @@ mappings:
   - id: "actions.view.toggleOutput"
     name: "Toggle output"
     description: "Toggle Output view"
-    category: "View Management"
+    category: "View Management.Pannels"
     vscode:
       command: "workbench.action.output.toggleOutput"
       when: "workbench.panel.output.active"
@@ -116,7 +116,7 @@ mappings:
   - id: "actions.view.toggleTerminal"
     name: "Toggle terminal"
     description: "Toggle Terminal view"
-    category: "View Management"
+    category: "View Management.Pannels"
     vscode:
       command: "workbench.action.terminal.toggleTerminal"
       when: "terminal.active"
@@ -125,5 +125,38 @@ mappings:
       context: "Workspace"
     intellij:
       action: "ActivateTerminalToolWindow"
+    helix:
+      notSupported: true
+  - id: "actions.view.toggleDebugPanel"
+    name: "Toggle debug panel"
+    description: "Toggle Debug Panel"
+    category: "View Management.Pannels"
+    vscode:
+      - command: "workbench.view.debug"
+        when: "viewContainer.workbench.view.debug.enabled"
+        forImport: true
+      - command: "workbench.action.toggleSidebarVisibility"
+        when: "activeViewlet == 'workbench.view.debug'"
+        forImport: false
+    zed:
+      action: "debug_panel::ToggleFocus"
+      context: "Workspace"
+    intellij:
+      action: "ActivateDebugToolWindow"
+    helix:
+      notSupported: true
+  - id: "actions.view.showDebugOutputConsole"
+    name: "Show debug console"
+    description: "Show Debug Output Console view"
+    category: "View Management.Pannels"
+    vscode:
+      command: "workbench.debug.action.toggleRepl"
+      when: "workbench.panel.repl.view.active"
+    # zed do not have debug console
+    zed:
+      notSupported: true
+    intellij:
+      notSupported: true
+      notSupportedReason: "intellij have debug output with DebugPanel"
     helix:
       notSupported: true

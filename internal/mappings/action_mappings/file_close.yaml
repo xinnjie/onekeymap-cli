@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.file.closeEditor"
-    name: "Close editor"
+    name: "Close file"
     description: "Close the active editor"
     category: "File"
     vscode:
@@ -13,19 +13,4 @@ mappings:
       action: "CloseContent"
     helix:
       command: ":buffer-close"
-      mode: "insert"
-  - id: "actions.file.closeWindow"
-    name: "Close window"
-    description: "Close the current window"
-    category: "View Management"
-    vscode:
-      command: "workbench.action.closeWindow"
-      when: "!editorIsOpen && !multipleEditorGroups"
-    zed:
-      action: "workspace::CloseWindow"
-      context: "Workspace"
-    intellij:
-      action: "HideActiveWindow"
-    helix:
-      command: ":quit-all"
       mode: "insert"

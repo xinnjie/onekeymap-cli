@@ -2,7 +2,7 @@ mappings:
   - id: "actions.go.back"
     name: "Go back"
     description: "Go to previous cursor location"
-    category: "Navigation"
+    category: "Navigation.History"
     vscode:
       command: "workbench.action.navigateBack"
       when: "canNavigateBack"
@@ -13,7 +13,7 @@ mappings:
   - id: "actions.go.forward"
     name: "Go forward"
     description: "Go to next cursor location"
-    category: "Navigation"
+    category: "Navigation.History"
     vscode:
       command: "workbench.action.navigateForward"
       when: "canNavigateForward"
@@ -24,10 +24,9 @@ mappings:
   - id: "actions.go.lastEditLocation"
     name: "Last edit"
     description: "Go to last edit location"
-    category: "Navigation"
+    category: "Navigation.History"
     vscode:
       command: "workbench.action.navigateToLastEditLocation"
-      when: ""
     zed:
       notSupported: true
     intellij:

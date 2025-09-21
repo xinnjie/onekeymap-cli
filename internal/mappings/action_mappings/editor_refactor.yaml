@@ -1,8 +1,8 @@
 mappings:
-  - id: "actions.edit.rename"
+  - id: "actions.refactor.rename"
     name: "Rename symbol"
     description: "Rename"
-    category: "Editor"
+    category: "Code.Refactor"
     vscode:
       - command: "editor.action.rename"
         when: "editorHasRenameProvider && editorTextFocus && !editorReadonly"
@@ -19,10 +19,10 @@ mappings:
     helix:
       command: "rename_symbol"
       mode: "insert"
-  - id: "actions.edit.refactor"
+  - id: "actions.refactor.refactor"
     name: "Refactor code"
     description: "Refactor This..."
-    category: "Editor"
+    category: "Code.Refactor"
     vscode:
       command: "editor.action.refactor"
       when: "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
@@ -36,7 +36,7 @@ mappings:
   - id: "actions.refactor.organizeImports"
     name: "Organize imports"
     description: "Organize Imports"
-    category: "Editor"
+    category: "Code.Refactor"
     vscode:
       command: "editor.action.organizeImports"
       when: "textInputFocus && !editorReadonly && supportedCodeAction =~ /(\\s|^)source\\.organizeImports\\b/"
@@ -47,3 +47,32 @@ mappings:
       context: "Editor"
     helix:
       notSupported: true
+  - id: "actions.refactor.quickFix"
+    name: "Quick fix"
+    description: "Quick Fix..."
+    category: "Code.Refactor"
+    vscode:
+      command: "editor.action.quickFix"
+      when: "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
+    intellij:
+      notSupported: true
+    # zed do not support yet
+    zed:
+      notSupported: true
+    helix:
+      notSupported: true
+  - id: "actions.refactor.codeAction"
+    name: "Code action"
+    description: "Code Action..."
+    category: "Code.Refactor"
+    vscode:
+      command: "editor.action.codeAction"
+      when: "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
+    intellij:
+      action: "ShowIntentionActions"
+    zed:
+      action: "editor::ToggleCodeActions"
+      context: "Editor"
+    helix:
+      command: "code_action"
+      mode: "insert"

@@ -12,16 +12,3 @@ mappings:
       context: "Workspace"
     intellij:
       action: "Terminal.NewTab"
-  # TODO(xinnjie): Unify split operation.
-  - id: "actions.terminal.split"
-    name: "Split terminal"
-    description: "Split the active terminal"
-    category: "Terminal"
-    vscode:
-      command: "workbench.action.terminal.split"
-      when: "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
-    zed:
-      action: "pane::SplitDown"
-      context: "Terminal"
-    intellij:
-      action: "OpenInRightSplit"

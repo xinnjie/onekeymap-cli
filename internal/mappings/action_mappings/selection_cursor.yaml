@@ -2,7 +2,7 @@ mappings:
   - id: "actions.selection.addCursorAbove"
     name: "Add cursor above"
     description: "Add cursor above current line"
-    category: "Editor"
+    category: "Editor.Cursor.Multi"
     vscode:
       command: "editor.action.insertCursorAbove"
       when: "editorTextFocus"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.selection.addCursorBelow"
     name: "Add cursor below"
     description: "Add cursor below current line"
-    category: "Editor"
+    category: "Editor.Cursor.Multi"
     vscode:
       command: "editor.action.insertCursorBelow"
       when: "editorTextFocus"
@@ -32,7 +32,7 @@ mappings:
   - id: "actions.selection.addCursorsToLineEnds"
     name: "Add cursors to ends"
     description: "Add cursors to the end of selected lines"
-    category: "Editor"
+    category: "Editor.Cursor.Multi"
     vscode:
       command: "editor.action.insertCursorAtEndOfEachLineSelected"
       when: "editorTextFocus"
@@ -46,7 +46,7 @@ mappings:
   - id: "actions.selection.addNextOccurrence"
     name: "Add next occurrence"
     description: "Add next occurrence of selection to multicursor"
-    category: "Editor"
+    category: "Editor.Cursor.Multi"
     vscode:
       command: "editor.action.addSelectionToNextFindMatch"
       when: "editorFocus"
@@ -61,7 +61,7 @@ mappings:
   - id: "actions.selection.addPreviousOccurrence"
     name: "Add previous occurrence"
     description: "Add previous occurrence of selection to multicursor"
-    category: "Editor"
+    category: "Editor.Cursor.Multi"
     vscode:
       command: "editor.action.addSelectionToPreviousFindMatch"
       when: "editorFocus"
@@ -76,13 +76,13 @@ mappings:
   - id: "actions.selection.selectAllOccurrences"
     name: "Select all occurrences"
     description: "Select all occurrences of current selection"
-    category: "Editor"
+    category: "Editor.Cursor.Multi"
     vscode:
       command: "editor.action.selectHighlights"
       when: "editorFocus"
     zed:
       action: "editor::SelectAllMatches"
-      context: "Editor"
+      context: "Editor.Cursor.Multi"
     intellij:
       action: "SelectAllOccurrences"
     helix:

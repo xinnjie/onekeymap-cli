@@ -1,6 +1,6 @@
 mappings:
   - id: "actions.cursor.lineStart"
-    name: "Line start"
+    name: "Move to line start"
     description: "Move cursor to the beginning of the line"
     category: "Editor.Cursor.Line"
     vscode:
@@ -15,7 +15,7 @@ mappings:
       command: "goto_line_start"
       mode: "insert"
   - id: "actions.cursor.lineEnd"
-    name: "Line end"
+    name: "Move to line end"
     description: "Move cursor to the end of the line"
     category: "Editor.Cursor.Line"
     vscode:

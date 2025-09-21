@@ -1,0 +1,15 @@
+mappings:
+  - id: "actions.edit.cursorUndo"
+    name: "Undo cursor"
+    description: "Undo last cursor operation"
+    category: "Editor.Cursor"
+    vscode:
+      command: "cursorUndo"
+      when: "textInputFocus"
+    intellij:
+      action: "UnselectPreviousOccurrence"
+    zed:
+      action: "editor::UndoSelection"
+      context: "Editor"
+    helix:
+      notSupported: true

@@ -16,7 +16,7 @@ mappings:
   - id: "actions.file.showOpenedFileInNewWindow"
     name: "Show in new window"
     description: "Show opened file in new window"
-    category: "View Management"
+    category: "File"
     vscode:
       command: "workbench.action.files.showOpenedFileInNewWindow"
       when: "emptyWorkspaceSupport"
