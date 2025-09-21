@@ -2,7 +2,7 @@ mappings:
   - id: "actions.notebook.cell.edit"
     name: "Edit cell"
     description: "Edit Cell"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.edit"
       when: "notebookCellListFocused && !editorHoverFocused && !inputFocus && !notebookOutputInputFocused"
@@ -14,7 +14,7 @@ mappings:
   - id: "actions.notebook.cell.execute"
     name: "Execute cell"
     description: "Execute Cell"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.execute"
       when: "notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
@@ -22,10 +22,11 @@ mappings:
       action: "NotebookRunCell"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.cell.executeAndInsertBelow"
     name: "Execute and insert"
     description: "Execute Cell and Insert Below"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.executeAndInsertBelow"
       when: "notebookCellListFocused && notebookCellType == 'markup' || notebookCellListFocused && notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || notebookCellListFocused && !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
@@ -33,10 +34,11 @@ mappings:
       action: "RunCellAndInsertBelowAction"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.cell.executeAndSelectBelow"
     name: "Execute and select"
     description: "Execute Cell and Select Below"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.executeAndSelectBelow"
       when: "notebookCellListFocused && !interactiveEditorFocused && notebookCellType == 'code' || editorTextFocus && inputFocus && notebookEditorFocused && !interactiveEditorFocused"
@@ -44,10 +46,11 @@ mappings:
       action: "NotebookRunCellAndSelectBelow"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.cell.insertCodeCellAbove"
     name: "Insert above"
     description: "Insert Code Cell Above"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.insertCodeCellAbove"
       when: "notebookCellListFocused && !inputFocus"
@@ -55,10 +58,11 @@ mappings:
       action: "NotebookInsertCodeCellAbove"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.cell.insertCodeCellBelow"
     name: "Insert below"
     description: "Insert Code Cell Below"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.insertCodeCellBelow"
       when: "notebookCellListFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
@@ -66,10 +70,11 @@ mappings:
       action: "NotebookInsertCodeCellBelow"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.cell.moveDown"
     name: "Move down"
     description: "Move Cell Down"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.moveDown"
       when: "notebookEditorFocused && !inputFocus"
@@ -77,10 +82,11 @@ mappings:
       action: "MoveStatementDown"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.cell.moveUp"
     name: "Move up"
     description: "Move Cell Up"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.moveUp"
       when: "notebookEditorFocused && !inputFocus"
@@ -88,10 +94,11 @@ mappings:
       action: "MoveStatementUp"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.cell.quitEdit"
     name: "Quit edit"
     description: "Stop Editing Cell"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.cell.quitEdit"
       when: "notebookEditorFocused && notebookOutputFocused"
@@ -99,10 +106,11 @@ mappings:
       action: "NotebookExitEditMode"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.focusBottom"
     name: "Focus bottom"
     description: "Focus Bottom"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.focusBottom"
       when: "notebookEditorFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
@@ -110,10 +118,11 @@ mappings:
       action: "NotebookSelectLastCell"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"
   - id: "actions.notebook.focusTop"
     name: "Focus top"
     description: "Focus Top"
-    category: "Editor"
+    category: "Jupyter Notebook"
     vscode:
       command: "notebook.focusTop"
       when: "notebookEditorFocused && !inputFocus && notebookChatOuterFocusPosition == ''"
@@ -121,3 +130,4 @@ mappings:
       action: "NotebookSelectFirstCell"
     zed:
       notSupported: true
+      notSupportedReason: "jupyter notebook yet"

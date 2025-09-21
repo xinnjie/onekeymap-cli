@@ -2,7 +2,7 @@ mappings:
   - id: "actions.cursor.wordRight"
     name: "Next word"
     description: "Move cursor to the end of the next word"
-    category: "Editor"
+    category: "Editor.Cursor.Word"
     vscode:
       command: "cursorWordRight"
       when: "editorTextFocus"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.cursor.wordPartRight"
     name: "Next subword"
     description: "Move cursor to the end of the next subword (hump)"
-    category: "Editor"
+    category: "Editor.Cursor.Word"
     vscode:
       command: "cursorWordPartRight"
       when: "textInputFocus"
@@ -33,7 +33,7 @@ mappings:
   - id: "actions.cursor.wordLeft"
     name: "Previous word"
     description: "Move cursor to the start of the previous word"
-    category: "Editor"
+    category: "Editor.Cursor.Word"
     vscode:
       command: "cursorWordLeft"
       when: "textInputFocus"
@@ -48,23 +48,23 @@ mappings:
   - id: "actions.cursor.wordPartLeft"
     name: "Previous subword"
     description: "Move cursor to the start of the previous subword (hump)"
-    category: "Editor"
+    category: "Editor.Cursor.Word"
     vscode:
       command: "cursorWordPartStartLeft"
       when: "editorTextFocus"
     zed:
       action: "editor::MoveToPreviousSubwordStart"
       context: "Editor"
-    # intellij need to turn on `CamelHumps` setting
     intellij:
       notSupported: true
+      notSupportedReason: "intellij need to turn on `CamelHumps` setting"
     helix:
       command: "move_prev_sub_word_start"
       mode: "insert"
   - id: "actions.cursor.wordRightSelect"
     name: "Select next word"
     description: "Select to the end of the next word"
-    category: "Editor"
+    category: "Editor.Cursor.Word"
     vscode:
       command: "cursorWordRightSelect"
       when: "editorTextFocus"
@@ -73,13 +73,13 @@ mappings:
       context: "Editor"
     intellij:
       action: "EditorNextWordWithSelection"
-    # helix move cursor with selection by default
     helix:
       notSupported: true
+      notSupportedReason: "helix move cursor with selection by default"
   - id: "actions.cursor.wordPartRightSelect"
     name: "Select next subword"
     description: "Select to the end of the next subword (hump)"
-    category: "Editor"
+    category: "Editor.Cursor.Word"
     vscode:
       command: "cursorWordPartRightSelect"
       when: "textInputFocus"
@@ -93,7 +93,7 @@ mappings:
   - id: "actions.cursor.wordLeftSelect"
     name: "Select previous word"
     description: "Select to the start of the previous word"
-    category: "Editor"
+    category: "Editor.Cursor.Word"
     vscode:
       command: "cursorWordLeftSelect"
       when: "textInputFocus"
@@ -102,13 +102,13 @@ mappings:
       context: "Editor"
     intellij:
       action: "EditorPreviousWordWithSelection"
-    # helix move cursor with selection by default
     helix:
       notSupported: true
+      notSupportedReason: "helix move cursor with selection by default"
   - id: "actions.cursor.wordPartLeftSelect"
     name: "Select previous subword"
     description: "Select to the start of the previous subword (hump)"
-    category: "Editor"
+    category: "Editor.Cursor.Word"
     vscode:
       command: "cursorWordPartStartLeftSelect"
       when: "editorTextFocus"
@@ -117,5 +117,7 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
+      notSupportedReason: "intellij need to turn on `CamelHumps` setting"
     helix:
       notSupported: true
+      notSupportedReason: "helix move cursor with selection by default"

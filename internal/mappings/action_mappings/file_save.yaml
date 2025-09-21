@@ -2,7 +2,7 @@ mappings:
   - id: "actions.file.save"
     name: "Save file"
     description: "Save current file"
-    category: "File Management"
+    category: "File"
     vscode:
       command: "workbench.action.files.save"
       when: ""
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.file.saveAs"
     name: "Save as"
     description: "Save current file with a new name"
-    category: "File Management"
+    category: "File"
     vscode:
       command: "workbench.action.files.saveAs"
       when: ""
@@ -31,7 +31,7 @@ mappings:
   - id: "actions.file.saveAll"
     name: "Save all"
     description: "Save all open files"
-    category: "File Management"
+    category: "File"
     vscode:
       command: "workbench.action.files.saveAll"
       when: ""

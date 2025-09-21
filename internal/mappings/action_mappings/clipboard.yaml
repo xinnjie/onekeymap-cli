@@ -1,8 +1,8 @@
 mappings:
-  - id: "actions.cut"
+  - id: "actions.clipboard.cut"
     name: "Cut text"
     description: "Cut selected text/file"
-    category: "Editor"
+    category: "Editor.Clipboard"
     vscode:
       - command: "editor.action.clipboardCutAction"
         when: "editorTextFocus"
@@ -22,10 +22,10 @@ mappings:
     helix:
       command: "delete_selection"
       mode: "insert"
-  - id: "actions.copy"
+  - id: "actions.clipboard.copy"
     name: "Copy text"
     description: "Copy selected text/file"
-    category: "Editor"
+    category: "Editor.Clipboard"
     vscode:
       - command: "editor.action.clipboardCopyAction"
         when: "editorTextFocus"
@@ -54,10 +54,10 @@ mappings:
     helix:
       command: "yank_to_clipboard"
       mode: "insert"
-  - id: "actions.paste"
+  - id: "actions.clipboard.paste"
     name: "Paste text"
     description: "Paste text/file"
-    category: "Editor"
+    category: "Editor.Clipboard"
     vscode:
       - command: "editor.action.clipboardPasteAction"
         when: "editorTextFocus && !editorReadonly"
@@ -80,10 +80,10 @@ mappings:
     helix:
       command: "paste_clipboard_after"
       mode: "insert"
-  - id: "actions.edit.copyFilePath"
+  - id: "actions.clipboard.copyFilePath"
     name: "Copy file path"
     description: "Copy file path"
-    category: "Editor"
+    category: "Editor.Clipboard"
     vscode:
       command: "copyFilePath"
       when: "filesExplorerFocus"

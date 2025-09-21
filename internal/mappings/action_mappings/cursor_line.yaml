@@ -2,7 +2,7 @@ mappings:
   - id: "actions.cursor.lineStart"
     name: "Line start"
     description: "Move cursor to the beginning of the line"
-    category: "Navigation"
+    category: "Editor.Cursor.Line"
     vscode:
       command: "cursorLineStart"
       when: "textInputFocus"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.cursor.lineEnd"
     name: "Line end"
     description: "Move cursor to the end of the line"
-    category: "Navigation"
+    category: "Editor.Cursor.Line"
     vscode:
       command: "cursorLineEnd"
       when: "textInputFocus"
@@ -32,7 +32,7 @@ mappings:
   - id: "actions.cursor.lineStartSelect"
     name: "Select line start"
     description: "Select from cursor to the beginning of the line"
-    category: "Navigation"
+    category: "Editor.Cursor.Line"
     vscode:
       command: "cursorLineStartSelect"
       when: "textInputFocus"
@@ -47,7 +47,7 @@ mappings:
   - id: "actions.cursor.lineEndSelect"
     name: "Select line end"
     description: "Select from cursor to the end of the line"
-    category: "Navigation"
+    category: "Editor.Cursor.Line"
     vscode:
       command: "cursorLineEndSelect"
       when: "textInputFocus"

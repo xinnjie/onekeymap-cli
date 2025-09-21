@@ -2,7 +2,7 @@ mappings:
   - id: "actions.cursor.moveToTop"
     name: "Move to top"
     description: "Move caret to text start"
-    category: "Navigation"
+    category: "Editor.Cursor.File"
     vscode:
       command: "cursorTop"
       when: "textInputFocus"
@@ -17,7 +17,7 @@ mappings:
   - id: "actions.cursor.moveToBottom"
     name: "Move to bottom"
     description: "Move caret to text end"
-    category: "Navigation"
+    category: "Editor.Cursor.File"
     vscode:
       command: "cursorBottom"
       when: "textInputFocus"
@@ -32,7 +32,7 @@ mappings:
   - id: "actions.cursor.moveToTopSelect"
     name: "Select to top"
     description: "Select from cursor to text start"
-    category: "Navigation"
+    category: "Editor.Cursor.File"
     vscode:
       command: "cursorTopSelect"
       when: "textInputFocus"
@@ -47,7 +47,7 @@ mappings:
   - id: "actions.cursor.moveToBottomSelect"
     name: "Select to bottom"
     description: "Select from cursor to text end"
-    category: "Navigation"
+    category: "Editor.Cursor.File"
     vscode:
       command: "cursorBottomSelect"
       when: "textInputFocus"
@@ -62,7 +62,7 @@ mappings:
   - id: "actions.cursor.pageDown"
     name: "Page down"
     description: "Move cursor down by one page"
-    category: "Navigation"
+    category: "Editor.Cursor.File"
     vscode:
       command: "cursorPageDown"
       when: "textInputFocus"
@@ -77,7 +77,7 @@ mappings:
   - id: "actions.cursor.pageDownSelect"
     name: "Select page down"
     description: "Select down by one page"
-    category: "Navigation"
+    category: "Editor.Cursor.File"
     vscode:
       command: "cursorPageDownSelect"
       when: "textInputFocus"
@@ -91,7 +91,7 @@ mappings:
   - id: "actions.cursor.pageUp"
     name: "Page up"
     description: "Move cursor up by one page"
-    category: "Navigation"
+    category: "Editor.Cursor.File"
     vscode:
       command: "cursorPageUp"
       when: "textInputFocus"
@@ -106,7 +106,7 @@ mappings:
   - id: "actions.cursor.pageUpSelect"
     name: "Select page up"
     description: "Select up by one page"
-    category: "Navigation"
+    category: "Editor.Cursor.File"
     vscode:
       command: "cursorPageUpSelect"
       when: "textInputFocus"

@@ -2,7 +2,7 @@ mappings:
   - id: "actions.file.closeEditor"
     name: "Close editor"
     description: "Close the active editor"
-    category: "File Management"
+    category: "File"
     vscode:
       command: "workbench.action.closeActiveEditor"
       when: ""

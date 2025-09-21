@@ -2,7 +2,7 @@ mappings:
   - id: "actions.file.newFile"
     name: "New file"
     description: "Create a new file"
-    category: "File Management"
+    category: "File"
     vscode:
       command: "workbench.action.files.newUntitledFile"
       when: ""

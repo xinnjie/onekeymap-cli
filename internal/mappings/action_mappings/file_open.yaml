@@ -2,7 +2,7 @@ mappings:
   - id: "actions.file.openFile"
     name: "Open file"
     description: "Open file dialog"
-    category: "File Management"
+    category: "File"
     vscode:
       command: "workbench.action.files.openFile"
       when: "false"
@@ -30,7 +30,7 @@ mappings:
   - id: "actions.file.openRecent"
     name: "Open recent"
     description: "Open Recent"
-    category: "File Management"
+    category: "File"
     vscode:
       - command: "workbench.action.openRecent"
         when: "!inQuickOpen"
