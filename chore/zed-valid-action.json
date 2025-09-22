@@ -442,5 +442,14 @@
   "zeta::PreviewCompletion",
   "zeta::PreviousEdit",
   "zeta::ThumbsDownActiveCompletion",
-  "zeta::ThumbsUpActiveCompletion"
+  "zeta::ThumbsUpActiveCompletion",
+  "project_panel::CompareMarkedFiles",
+  "git::blame",
+  "editor::OpenFile",
+  "workspace::ActivateNextPane",
+  "debugger::RunToCursor",
+  "task::Run",
+  "zed::OpenTasks",
+  "debugger::EvaluateSelectedText",
+  "workspace::ActivatePreviousPane"
 ]

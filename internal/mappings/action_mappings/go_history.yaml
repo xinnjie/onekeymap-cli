@@ -22,7 +22,7 @@ mappings:
     intellij:
       action: "Forward"
   - id: "actions.go.lastEditLocation"
-    name: "Last edit"
+    name: "Go to last edit location"
     description: "Go to last edit location"
     category: "Navigation.History"
     vscode:

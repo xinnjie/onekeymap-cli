@@ -2,7 +2,7 @@ mappings:
   - id: "actions.go.goToDeclaration"
     name: "Go to declaration"
     description: "Go to Declaration or Usages"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "editor.action.goToDeclaration"
       when: "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !peekViewVisible"
@@ -14,7 +14,7 @@ mappings:
   - id: "actions.go.peekDeclaration"
     name: "Peek declaration"
     description: "Peek Declaration"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "editor.action.previewDeclaration"
       when: "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !peekViewVisible"
@@ -26,7 +26,7 @@ mappings:
   - id: "actions.go.implementations"
     name: "Go to implementations"
     description: "Go to Implementations"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "editor.action.goToImplementation"
       when: "editorHasImplementationProvider && editorTextFocus"
@@ -38,7 +38,7 @@ mappings:
   - id: "actions.go.goToTest"
     name: "Go to test"
     description: "Go to Test"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "java.test.goToTest"
       when: "editorTextFocus && java:testRunnerActivated"
@@ -49,7 +49,7 @@ mappings:
   - id: "actions.go.goToSuper"
     name: "Go to super"
     description: "Go to Super Class/Super Method"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "dart.goToSuper"
       when: "editorTextFocus && dart.isTestFile != true && dart.isTestFile != true"
@@ -60,7 +60,7 @@ mappings:
   - id: "actions.go.typeDefinition"
     name: "Go to type definition"
     description: "Go to Type Definition"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "editor.action.goToTypeDefinition"
       when: "editorTextFocus"
@@ -72,7 +72,7 @@ mappings:
   - id: "actions.go.references"
     name: "Go to references"
     description: "Go to References"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "references-view.findReferences"
       when: "editorHasReferenceProvider"
@@ -84,7 +84,7 @@ mappings:
   - id: "actions.go.referencePeek"
     name: "Reference peek"
     description: "Show Usages / Reference Search"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "editor.action.referenceSearch.trigger"
       when: "editorHasReferenceProvider && editorTextFocus && !inReferenceSearchEditor"
@@ -96,7 +96,7 @@ mappings:
   - id: "actions.go.callHierarchy"
     name: "Call hierarchy"
     description: "Show Call Hierarchy"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "references-view.showCallHierarchy"
       when: "editorHasCallHierarchyProvider && editorTextFocus"
@@ -108,7 +108,7 @@ mappings:
   - id: "actions.go.typeHierarchy"
     name: "Type hierarchy"
     description: "Show Type Hierarchy"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "java.action.showTypeHierarchy"
       when: "editorLangId == java && javaLSReady && editorTextFocus"
@@ -119,7 +119,7 @@ mappings:
   - id: "actions.go.bracket"
     name: "Go to bracket"
     description: "Go to Bracket"
-    category: "Navigation.Code"
+    category: "Code.Go"
     vscode:
       command: "editor.action.jumpToBracket"
       when: "editorTextFocus"

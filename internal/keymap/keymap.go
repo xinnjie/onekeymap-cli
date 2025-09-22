@@ -11,6 +11,10 @@ import (
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
+const (
+	configVersion = "1.0"
+)
+
 // OneKeymapConfig is a struct that matches the user config file format.
 type OneKeymapConfig struct {
 	ID          string            `json:"id,omitempty"`
@@ -150,7 +154,7 @@ func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
 // in the user config file format.
 func Save(writer io.Writer, setting *keymapv1.KeymapSetting) error {
 	friendlyData := OneKeymapSetting{}
-	friendlyData.Version = "1.0"
+	friendlyData.Version = configVersion
 	// Group keybindings by a composite key of Id and Comment.
 	type groupKey struct {
 		ID          string
