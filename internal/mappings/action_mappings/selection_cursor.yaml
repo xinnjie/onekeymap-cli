@@ -82,7 +82,7 @@ mappings:
       when: "editorFocus"
     zed:
       action: "editor::SelectAllMatches"
-      context: "Editor.Cursor.Multi"
+      context: "Editor"
     intellij:
       action: "SelectAllOccurrences"
     helix:
