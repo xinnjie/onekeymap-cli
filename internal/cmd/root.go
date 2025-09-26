@@ -48,6 +48,7 @@ type rootFlags struct {
 	backup          bool
 	interactive     bool
 	enableTelemetry bool
+	sandbox         bool
 }
 
 func NewCmdRoot() *cobra.Command {
@@ -75,6 +76,8 @@ func NewCmdRoot() *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&f.interactive, "interactive", "i", true, "Run in interactive mode")
 	cmd.PersistentFlags().
 		BoolVar(&f.enableTelemetry, "telemetry", false, "Enable OpenTelemetry to help improve onekeymap")
+	cmd.PersistentFlags().
+		BoolVar(&f.sandbox, "sandbox", false, "Enable sandbox mode for macOS, restricting file access")
 
 	// Bind cobra flags to viper.
 	if err := viper.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose")); err != nil {
@@ -89,14 +92,24 @@ func NewCmdRoot() *cobra.Command {
 		cmd.PrintErrf("Error binding log-json flag: %v\n", err)
 		os.Exit(1)
 	}
+	if err := viper.BindPFlag("sandbox", cmd.PersistentFlags().Lookup("sandbox")); err != nil {
+		cmd.PrintErrf("Error binding sandbox flag: %v\n", err)
+		os.Exit(1)
+	}
 
 	return cmd
 }
 
 func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		// Init viper config
+		_, err := cliconfig.NewConfig(cmd)
+		if err != nil {
+			cmd.PrintErrf("Error initializing configuration: %v\n", err)
+			os.Exit(1)
+		}
+
 		// Initialize mapping config
-		var err error
 		mappingConfig, err = mappings.NewMappingConfig()
 		if err != nil {
 			cmd.PrintErrf("failed to initialize mapping config: %v\n", err)
@@ -177,12 +190,6 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	rootCmd := NewCmdRoot()
-	// Init viper config
-	_, err := cliconfig.NewConfig(rootCmd)
-	if err != nil {
-		rootCmd.PrintErrf("Error initializing configuration: %v\n", err)
-		os.Exit(1)
-	}
 
 	devCmd := NewCmdDev()
 	rootCmd.AddCommand(devCmd)
@@ -194,8 +201,7 @@ func Execute() {
 	rootCmd.AddCommand(NewCmdMigrate())
 	rootCmd.AddCommand(NewCmdImport())
 	rootCmd.AddCommand(NewCmdExport())
-	err = rootCmd.Execute()
-	if err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }

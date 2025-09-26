@@ -25,6 +25,8 @@ type Config struct {
 	Verbose bool `mapstructure:"verbose"`
 	// Quiet suppresses all output except for errors.
 	Quiet bool `mapstructure:"quiet"`
+	// Sandbox enables macOS sandbox mode, which restricts file access.
+	Sandbox bool `mapstructure:"sandbox"`
 	// OneKeyMap is the path to the main onekeymap configuration file.
 	OneKeyMap string `mapstructure:"onekeymap"`
 	// OtelExporterOtlpEndpoint is the OpenTelemetry OTLP exporter endpoint.
@@ -51,36 +53,47 @@ type Config struct {
 // NewConfig initializes and returns a new Config object.
 // It sets defaults, binds environment variables, reads config files, and unmarshals the result.
 func NewConfig(cmd *cobra.Command) (*Config, error) {
+	sandbox, err := cmd.Flags().GetBool("sandbox")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get sandbox flag: %w", err)
+	}
+
 	// Set default values
 	viper.SetDefault("verbose", false)
 	viper.SetDefault("quiet", false)
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return nil, fmt.Errorf("unable to get home directory: %w", err)
+	viper.SetDefault("sandbox", false)
+
+	if !sandbox {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return nil, fmt.Errorf("unable to get home directory: %w", err)
+		}
+		viper.SetDefault("onekeymap", filepath.Join(homeDir, ".config", "onekeymap", "onekeymap.json"))
 	}
-	viper.SetDefault("onekeymap", filepath.Join(homeDir, ".config", "onekeymap", "onekeymap.json"))
 	viper.SetDefault("otel.exporter.otlp.endpoint", "")
 	viper.SetDefault("server.listen", "")
-
-	// Set configuration file name and paths
-	viper.SetConfigName("onekeymap")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("${HOME}/.config/onekeymap")
-	viper.AddConfigPath("/etc/onekeymap")
 
 	// Set environment variable handling
 	viper.SetEnvPrefix("ONEKEYMAP")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
-	// Read configuration file if it exists
-	if err := viper.ReadInConfig(); err != nil {
-		var configFileNotFoundError viper.ConfigFileNotFoundError
-		if errors.As(err, &configFileNotFoundError) {
-			cmd.Printf("Config file not found: %v\n", err)
-		} else {
-			return nil, fmt.Errorf("failed to read config file: %w", err)
+	if !sandbox {
+		// Set configuration file name and paths
+		viper.SetConfigName("onekeymap")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(".")
+		viper.AddConfigPath("${HOME}/.config/onekeymap")
+		viper.AddConfigPath("/etc/onekeymap")
+
+		// Read configuration file if it exists
+		if err := viper.ReadInConfig(); err != nil {
+			var configFileNotFoundError viper.ConfigFileNotFoundError
+			if errors.As(err, &configFileNotFoundError) {
+				// Config file not found is ignored
+			} else {
+				return nil, fmt.Errorf("failed to read config file: %w", err)
+			}
 		}
 	}
 
