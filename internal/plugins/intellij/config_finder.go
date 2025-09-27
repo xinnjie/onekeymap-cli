@@ -2,6 +2,7 @@ package intellij
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -14,19 +15,17 @@ import (
 // ConfigDetect returns default keymap config path for IntelliJ.
 // NOTE: IntelliJ family has multiple editions/versions; precise discovery will
 // be implemented later. For now, we return a not-supported error placeholder.
-func (p *intellijPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
-	options := &pluginapi.ConfigDetectOptions{}
-	for _, opt := range opts {
-		opt(options)
-	}
-
+func (p *intellijPlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	if runtime.GOOS != "darwin" {
-		return nil, errors.New("automatic path discovery is only supported on macOS for IntelliJ")
+		return nil, false, fmt.Errorf(
+			"automatic path discovery is only supported on macOS for IntelliJ, %w",
+			pluginapi.ErrNotSupported,
+		)
 	}
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	candidates := []string{
@@ -43,7 +42,7 @@ func (p *intellijPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]s
 		}
 	}
 	if len(keymapDirs) == 0 {
-		return nil, errors.New("could not locate JetBrains keymaps directory; please specify --output")
+		return nil, false, errors.New("could not locate JetBrains keymaps directory; please specify --output")
 	}
 
 	sort.Slice(keymapDirs, func(i, j int) bool {
@@ -61,5 +60,10 @@ func (p *intellijPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]s
 
 	configPath := filepath.Join(keymapDirs[0], "Onekeymap.xml")
 
-	return []string{configPath}, nil
+	installed, err = isIntelliJInstalled()
+	if err != nil {
+		return nil, false, err
+	}
+
+	return []string{configPath}, installed, nil
 }

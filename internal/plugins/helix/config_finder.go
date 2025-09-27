@@ -1,8 +1,9 @@
 package helix
 
 import (
-	"errors"
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 
@@ -11,15 +12,10 @@ import (
 
 // ConfigDetect returns the default path for Helix's config.toml file.
 // On macOS, this is typically ~/.config/helix/config.toml.
-func (p *helixPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
-	options := &pluginapi.ConfigDetectOptions{}
-	for _, opt := range opts {
-		opt(options)
-	}
-
+func (p *helixPlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	var configPath string
@@ -28,8 +24,14 @@ func (p *helixPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]stri
 		configPath = filepath.Join(home, ".config", "helix", "config.toml")
 	default:
 		// For now, we only support macOS as requested.
-		return nil, errors.New("automatic path discovery is only supported on macOS")
+		return nil, false, fmt.Errorf(
+			"automatic path discovery is only supported on macOS, %w",
+			pluginapi.ErrNotSupported,
+		)
 	}
 
-	return []string{configPath}, nil
+	_, err = exec.LookPath("hx")
+	installed = err == nil
+
+	return []string{configPath}, installed, nil
 }

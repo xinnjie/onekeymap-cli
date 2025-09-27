@@ -11,15 +11,10 @@ import (
 
 // ConfigDetect returns a reasonable default config path for the demo plugin.
 // It does not correspond to a real editor, but provides a stable location for testing.
-func (p *demoPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
-	options := &pluginapi.ConfigDetectOptions{}
-	for _, opt := range opts {
-		opt(options)
-	}
-
+func (p *demoPlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	var configPath string
@@ -29,8 +24,8 @@ func (p *demoPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]strin
 	case "windows":
 		configPath = filepath.Join(os.Getenv("APPDATA"), "onekeymap", "demo.keybindings.json")
 	default:
-		return nil, errors.New("unsupported operating system")
+		return nil, false, errors.New("unsupported operating system")
 	}
 
-	return []string{configPath}, nil
+	return []string{configPath}, true, nil
 }

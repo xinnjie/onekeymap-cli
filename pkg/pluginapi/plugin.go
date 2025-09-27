@@ -61,10 +61,11 @@ type PluginExportReport struct {
 	ExportEditorConfig any
 }
 
+// ConfigDetectOptions provides configuration for a config detect operation.
 type ConfigDetectOptions struct {
+	// Whether to in sandbox mode, in sandbox mode, shell command lookup is not effective, like `code` command for vscode can not be found
+	Sandbox bool
 }
-
-type ConfigDetectOption func(*ConfigDetectOptions)
 
 // Plugin is the core interface that all editor plugins must implement.
 // It defines the contract for importing and exporting keymaps.
@@ -74,7 +75,7 @@ type Plugin interface {
 
 	// ConfigDetect returns the default path to the editor's configuration file based on the platform.
 	// Return multiple paths if the editor has multiple configuration files.
-	ConfigDetect(opts ...ConfigDetectOption) ([]string, error)
+	ConfigDetect(opts ConfigDetectOptions) (paths []string, installed bool, err error)
 
 	// Importer returns an instance of PluginImporter for the plugin.
 	// Return ErrNotSupported if the plugin does not support importing.

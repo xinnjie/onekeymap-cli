@@ -115,7 +115,7 @@ func (s *Server) ConfigDetect(
 		if !ok {
 			return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
 		}
-		v, err := plugin.ConfigDetect()
+		v, _, err := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{Sandbox: s.opt.Sandbox})
 		if err != nil || len(v) == 0 {
 			return nil, status.Errorf(codes.NotFound, "no default config paths found for editor: %s", et)
 		}

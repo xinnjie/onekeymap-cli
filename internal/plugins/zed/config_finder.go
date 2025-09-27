@@ -2,7 +2,9 @@ package zed
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 
@@ -13,15 +15,10 @@ var ErrConfigNotFound = errors.New("configuration file not found")
 
 // ConfigDetect returns the default path for Zed's keymap.json file.
 // On macOS, this is typically ~/.config/zed/keymap.json.
-func (p *zedPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
-	options := &pluginapi.ConfigDetectOptions{}
-	for _, opt := range opts {
-		opt(options)
-	}
-
+func (p *zedPlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	var configPath string
@@ -30,8 +27,14 @@ func (p *zedPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string
 		configPath = filepath.Join(home, ".config", "zed", "keymap.json")
 	default:
 		// For now, we only support macOS as requested.
-		return nil, errors.New("automatic path discovery is only supported on macOS")
+		return nil, false, fmt.Errorf(
+			"automatic path discovery is only supported on macOS, %w",
+			pluginapi.ErrNotSupported,
+		)
 	}
 
-	return []string{configPath}, nil
+	_, err = exec.LookPath("zed")
+	installed = err == nil
+
+	return []string{configPath}, installed, nil
 }

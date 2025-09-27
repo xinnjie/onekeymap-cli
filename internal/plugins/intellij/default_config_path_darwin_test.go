@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 )
 
 func TestConfigDetect_Darwin(t *testing.T) {
@@ -27,7 +28,7 @@ func TestConfigDetect_Darwin(t *testing.T) {
 		home := t.TempDir()
 		t.Setenv("HOME", home)
 
-		_, err := plugin.ConfigDetect()
+		_, _, err := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "could not locate JetBrains keymaps directory")
 	})
@@ -55,7 +56,7 @@ func TestConfigDetect_Darwin(t *testing.T) {
 			t.Fatalf("chtimes newDir: %v", err)
 		}
 
-		p, err := plugin.ConfigDetect()
+		p, _, err := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
 		require.NoError(t, err)
 		expected := []string{filepath.Join(newDir, "Onekeymap.xml")}
 		assert.Equal(t, expected, p)

@@ -16,6 +16,11 @@ var (
 	_ tea.Model = (*importFormModel)(nil)
 )
 
+type editorOption struct {
+	name      string
+	installed bool
+}
+
 type importFormModel struct {
 	form *huh.Form
 
@@ -60,21 +65,38 @@ func (m *importFormModel) build() error {
 	var groups []*huh.Group
 
 	if m.needSelectEditor {
-		names := m.GetImporterNames()
-		sort.Strings(names)
-		opts := make([]huh.Option[string], 0, len(names))
-		for _, n := range names {
-			opts = append(opts, huh.NewOption(n, n))
+		editorOpts := m.getImporterOptions()
+
+		installed := make([]huh.Option[string], 0)
+		uninstalled := make([]huh.Option[string], 0)
+
+		for _, opt := range editorOpts {
+			label := opt.name
+			if !opt.installed {
+				label = fmt.Sprintf("%s (uninstalled)", opt.name)
+			}
+			huhOpt := huh.NewOption(label, opt.name)
+			if opt.installed {
+				installed = append(installed, huhOpt)
+			} else {
+				uninstalled = append(uninstalled, huhOpt)
+			}
 		}
-		if len(opts) == 0 {
+
+		finalOpts := make([]huh.Option[string], 0, len(installed)+len(uninstalled))
+		finalOpts = append(finalOpts, installed...)
+		finalOpts = append(finalOpts, uninstalled...)
+
+		if len(finalOpts) == 0 {
 			return errors.New("no editor plugins available")
 		}
+
 		groups = append(groups,
 			huh.NewGroup(
 				huh.NewSelect[string]().
 					Key("editor").
 					Title("Select source editor").
-					Options(opts...).
+					Options(finalOpts...).
 					Value(m.Editor),
 			),
 		)
@@ -91,7 +113,7 @@ func (m *importFormModel) build() error {
 					}, &m.Editor).
 					PlaceholderFunc(func() string {
 						if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-							if v, err := p.ConfigDetect(); err == nil {
+							if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
 								placeholderInput = v[0]
 							}
 						}
@@ -129,21 +151,28 @@ func (m *importFormModel) build() error {
 	return nil
 }
 
-func (m *importFormModel) GetImporterNames() []string {
-	importerNames := make([]string, 0)
+func (m *importFormModel) getImporterOptions() []editorOption {
+	var options []editorOption
 	for _, name := range m.pluginRegistry.GetNames() {
 		plugin, ok := m.pluginRegistry.Get(pluginapi.EditorType(name))
 		if !ok {
 			continue
 		}
 
-		_, err := plugin.Importer()
-		if err != nil {
+		if _, err := plugin.Importer(); err != nil {
 			continue
 		}
-		importerNames = append(importerNames, name)
+
+		_, installed, _ := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
+		options = append(options, editorOption{name: name, installed: installed})
 	}
-	return importerNames
+
+	// Sort by name for consistent order
+	sort.Slice(options, func(i, j int) bool {
+		return options[i].name < options[j].name
+	})
+
+	return options
 }
 
 // tea.Model minimal implementations (not used directly, kept for future extension).
@@ -160,7 +189,7 @@ func (m *importFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Fill placeholder if user input is empty
 		if m.needInput && *m.EditorKeymapConfigInput == "" {
 			if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-				if v, err := p.ConfigDetect(); err == nil {
+				if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
 					*m.EditorKeymapConfigInput = v[0]
 				}
 			}

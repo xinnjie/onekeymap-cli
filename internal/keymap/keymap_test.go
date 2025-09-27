@@ -127,12 +127,6 @@ func TestLoad(t *testing.T) {
 		errorContains string
 	}{
 		{
-			name:      "Empty input",
-			jsonInput: "",
-			expected:  &keymapv1.KeymapSetting{},
-			expectErr: false,
-		},
-		{
 			name: "Valid configuration with comment",
 			jsonInput: `
 {
@@ -231,10 +225,26 @@ func TestLoad(t *testing.T) {
 			expectErr: false,
 		},
 		{
+			name:      "Empty input",
+			jsonInput: "",
+			expected:  &keymapv1.KeymapSetting{},
+			expectErr: false,
+		},
+		{
 			name:      "Empty keymaps array",
 			jsonInput: `{"keymaps": []}`,
 			expected:  &keymapv1.KeymapSetting{},
 			expectErr: false,
+		},
+		{
+			name:      "Empty keymaps array",
+			jsonInput: `{"keymaps": null }`,
+			expectErr: true,
+		},
+		{
+			name:      "Unknown field",
+			jsonInput: `{"keybinding": null }`,
+			expectErr: true,
 		},
 		{
 			name:      "Malformed JSON",

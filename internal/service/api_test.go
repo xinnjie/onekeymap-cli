@@ -26,7 +26,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 		},
 	}
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	server := NewServer(nil, nil, nil, mockMappingConfig, logger)
+	server := NewServer(nil, nil, nil, mockMappingConfig, logger, ServerOption{Sandbox: false})
 
 	tests := []struct {
 		name          string

@@ -78,7 +78,7 @@ func migrateRun(f *migrateFlags) func(cmd *cobra.Command, args []string) error {
 		}
 
 		if f.input == "" {
-			v, err := inputPlugin.ConfigDetect()
+			v, _, err := inputPlugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
 			if err != nil {
 				logger.Error("failed to get default config path", "error", err)
 				return err
@@ -87,7 +87,7 @@ func migrateRun(f *migrateFlags) func(cmd *cobra.Command, args []string) error {
 		}
 
 		if f.output == "" {
-			v, err := outputPlugin.ConfigDetect()
+			v, _, err := outputPlugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
 			if err != nil {
 				logger.Error("failed to get default config path", "error", err)
 				return err

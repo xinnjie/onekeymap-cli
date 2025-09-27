@@ -58,7 +58,8 @@ func (m *MigrateFormModel) buildForm() {
 				Description("The path to the source editor's keymap config file.").
 				PlaceholderFunc(func() string {
 					if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.EditorFrom)); ok {
-						if paths, err := p.ConfigDetect(); err == nil && len(paths) > 0 {
+						if paths, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil &&
+							len(paths) > 0 {
 							m.fromPlaceholder = paths[0]
 							return paths[0]
 						}
@@ -80,7 +81,8 @@ func (m *MigrateFormModel) buildForm() {
 				Description("The path to the target editor's keymap config file.").
 				PlaceholderFunc(func() string {
 					if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.EditorTo)); ok {
-						if paths, err := p.ConfigDetect(); err == nil && len(paths) > 0 {
+						if paths, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil &&
+							len(paths) > 0 {
 							m.toPlaceholder = paths[0]
 							return paths[0]
 						}

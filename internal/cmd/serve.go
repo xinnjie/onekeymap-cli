@@ -44,6 +44,7 @@ func serveRun(f *serveFlags) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		// Prefer explicit listen address from config/flag; fallback to --port
 		addr := viper.GetString("server.listen")
+		sandbox := viper.GetBool("sandbox")
 		if addr == "" {
 			addr = fmt.Sprintf(":%d", f.port)
 		}
@@ -137,7 +138,14 @@ func serveRun(f *serveFlags) func(cmd *cobra.Command, args []string) {
 		)
 		keymapv1.RegisterOnekeymapServiceServer(
 			s,
-			service.NewServer(pluginRegistry, importService, exportService, mappingConfig, logger),
+			service.NewServer(
+				pluginRegistry,
+				importService,
+				exportService,
+				mappingConfig,
+				logger,
+				service.ServerOption{Sandbox: sandbox},
+			),
 		)
 		if err := s.Serve(lis); err != nil {
 			logger.ErrorContext(ctx, "failed to serve", "err", err)

@@ -10,6 +10,10 @@ import (
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
 )
 
+type ServerOption struct {
+	Sandbox bool
+}
+
 type Server struct {
 	keymapv1.UnimplementedOnekeymapServiceServer
 
@@ -18,6 +22,8 @@ type Server struct {
 	registry      *plugins.Registry
 	mappingConfig *mappings.MappingConfig
 	logger        *slog.Logger
+
+	opt ServerOption
 }
 
 func NewServer(
@@ -26,6 +32,7 @@ func NewServer(
 	exporter exportapi.Exporter,
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
+	opt ServerOption,
 ) *Server {
 	return &Server{
 		importer:      importer,
@@ -33,5 +40,6 @@ func NewServer(
 		registry:      registry,
 		mappingConfig: mappingConfig,
 		logger:        logger,
+		opt:           opt,
 	}
 }

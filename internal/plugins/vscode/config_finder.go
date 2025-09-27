@@ -2,7 +2,9 @@ package vscode
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 
@@ -12,15 +14,10 @@ import (
 var ErrConfigNotFound = errors.New("configuration file not found")
 
 // ConfigDetect returns the default path for VSCode's keybindings.json file.
-func (p *vsCodePlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
-	options := &pluginapi.ConfigDetectOptions{}
-	for _, opt := range opts {
-		opt(options)
-	}
-
+func (p *vsCodePlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	var configPath string
@@ -32,8 +29,19 @@ func (p *vsCodePlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]str
 	case "windows":
 		configPath = filepath.Join(os.Getenv("APPDATA"), "Code", "User", "keybindings.json")
 	default:
-		return nil, errors.New("unsupported operating system")
+		return nil, false, fmt.Errorf(
+			"automatic path discovery is only supported on macOS, %w",
+			pluginapi.ErrNotSupported,
+		)
 	}
 
-	return []string{configPath}, nil
+	if opt.Sandbox {
+		installed = false
+	} else {
+		// Outside of sandbox, `exec.LookPath` is the most reliable way to see if `code` is in the user's PATH.
+		_, err := exec.LookPath("code")
+		installed = err == nil
+	}
+
+	return []string{configPath}, installed, nil
 }
