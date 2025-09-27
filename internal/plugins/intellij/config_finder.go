@@ -11,11 +11,11 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 )
 
-// DefaultConfigPath returns default keymap config path for IntelliJ.
+// ConfigDetect returns default keymap config path for IntelliJ.
 // NOTE: IntelliJ family has multiple editions/versions; precise discovery will
 // be implemented later. For now, we return a not-supported error placeholder.
-func (p *intellijPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
-	options := &pluginapi.DefaultConfigPathOptions{}
+func (p *intellijPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
+	options := &pluginapi.ConfigDetectOptions{}
 	for _, opt := range opts {
 		opt(options)
 	}

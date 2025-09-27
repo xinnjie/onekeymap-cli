@@ -61,10 +61,10 @@ type PluginExportReport struct {
 	ExportEditorConfig any
 }
 
-type DefaultConfigPathOptions struct {
+type ConfigDetectOptions struct {
 }
 
-type DefaultConfigPathOption func(*DefaultConfigPathOptions)
+type ConfigDetectOption func(*ConfigDetectOptions)
 
 // Plugin is the core interface that all editor plugins must implement.
 // It defines the contract for importing and exporting keymaps.
@@ -72,9 +72,9 @@ type Plugin interface {
 	// EditorType returns the unique identifier for the plugin (e.g., "vscode", "zed").
 	EditorType() EditorType
 
-	// DefaultConfigPath returns the default path to the editor's configuration file based on the platform.
+	// ConfigDetect returns the default path to the editor's configuration file based on the platform.
 	// Return multiple paths if the editor has multiple configuration files.
-	DefaultConfigPath(opts ...DefaultConfigPathOption) ([]string, error)
+	ConfigDetect(opts ...ConfigDetectOption) ([]string, error)
 
 	// Importer returns an instance of PluginImporter for the plugin.
 	// Return ErrNotSupported if the plugin does not support importing.

@@ -188,7 +188,7 @@ func prepareImportInputFlags(cmd *cobra.Command, f *importFlags, onekeymapConfig
 			f.input = configPath
 			logger.Info("Using keymap path from config", "editor", f.from, "path", configPath)
 		} else {
-			v, err := p.DefaultConfigPath()
+			v, err := p.ConfigDetect()
 			if err != nil {
 				logger.Error("Failed to get default config path", "error", err)
 				return err

@@ -11,9 +11,9 @@ import (
 
 var ErrConfigNotFound = errors.New("configuration file not found")
 
-// DefaultConfigPath returns the default path for VSCode's keybindings.json file.
-func (p *vsCodePlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
-	options := &pluginapi.DefaultConfigPathOptions{}
+// ConfigDetect returns the default path for VSCode's keybindings.json file.
+func (p *vsCodePlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
+	options := &pluginapi.ConfigDetectOptions{}
 	for _, opt := range opts {
 		opt(options)
 	}

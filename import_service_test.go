@@ -46,7 +46,7 @@ func (p *testPlugin) EditorType() pluginapi.EditorType {
 	return p.editorType
 }
 
-func (p *testPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
+func (p *testPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
 	return []string{p.configPath}, nil
 }
 

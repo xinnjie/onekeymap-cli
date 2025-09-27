@@ -11,10 +11,10 @@ import (
 
 var ErrConfigNotFound = errors.New("configuration file not found")
 
-// DefaultConfigPath returns the default path for Zed's keymap.json file.
+// ConfigDetect returns the default path for Zed's keymap.json file.
 // On macOS, this is typically ~/.config/zed/keymap.json.
-func (p *zedPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
-	options := &pluginapi.DefaultConfigPathOptions{}
+func (p *zedPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
+	options := &pluginapi.ConfigDetectOptions{}
 	for _, opt := range opts {
 		opt(options)
 	}

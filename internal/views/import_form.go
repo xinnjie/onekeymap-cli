@@ -91,7 +91,7 @@ func (m *importFormModel) build() error {
 					}, &m.Editor).
 					PlaceholderFunc(func() string {
 						if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-							if v, err := p.DefaultConfigPath(); err == nil {
+							if v, err := p.ConfigDetect(); err == nil {
 								placeholderInput = v[0]
 							}
 						}
@@ -160,7 +160,7 @@ func (m *importFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Fill placeholder if user input is empty
 		if m.needInput && *m.EditorKeymapConfigInput == "" {
 			if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-				if v, err := p.DefaultConfigPath(); err == nil {
+				if v, err := p.ConfigDetect(); err == nil {
 					*m.EditorKeymapConfigInput = v[0]
 				}
 			}

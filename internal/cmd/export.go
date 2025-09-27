@@ -202,7 +202,7 @@ func prepareExportInputFlags(
 			f.output = configPath
 			logger.Info("Using keymap path from config", "editor", f.to, "path", configPath)
 		} else {
-			if v, err := p.DefaultConfigPath(); err == nil {
+			if v, err := p.ConfigDetect(); err == nil {
 				f.output = v[0]
 			}
 		}

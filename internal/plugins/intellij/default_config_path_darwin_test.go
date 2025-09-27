@@ -15,7 +15,7 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
 )
 
-func TestDefaultConfigPath_Darwin(t *testing.T) {
+func TestConfigDetect_Darwin(t *testing.T) {
 	mappingConfig, err := mappings.NewTestMappingConfig()
 	if err != nil {
 		t.Fatal(err)
@@ -27,7 +27,7 @@ func TestDefaultConfigPath_Darwin(t *testing.T) {
 		home := t.TempDir()
 		t.Setenv("HOME", home)
 
-		_, err := plugin.DefaultConfigPath()
+		_, err := plugin.ConfigDetect()
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "could not locate JetBrains keymaps directory")
 	})
@@ -55,7 +55,7 @@ func TestDefaultConfigPath_Darwin(t *testing.T) {
 			t.Fatalf("chtimes newDir: %v", err)
 		}
 
-		p, err := plugin.DefaultConfigPath()
+		p, err := plugin.ConfigDetect()
 		require.NoError(t, err)
 		expected := []string{filepath.Join(newDir, "Onekeymap.xml")}
 		assert.Equal(t, expected, p)

@@ -24,7 +24,7 @@ type testExportPlugin struct {
 }
 
 func (p *testExportPlugin) EditorType() pluginapi.EditorType { return p.editorType }
-func (p *testExportPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
+func (p *testExportPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
 	return nil, pluginapi.ErrNotSupported
 }
 func (p *testExportPlugin) Importer() (pluginapi.PluginImporter, error) {

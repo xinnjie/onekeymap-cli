@@ -9,10 +9,10 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 )
 
-// DefaultConfigPath returns a reasonable default config path for the demo plugin.
+// ConfigDetect returns a reasonable default config path for the demo plugin.
 // It does not correspond to a real editor, but provides a stable location for testing.
-func (p *demoPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
-	options := &pluginapi.DefaultConfigPathOptions{}
+func (p *demoPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
+	options := &pluginapi.ConfigDetectOptions{}
 	for _, opt := range opts {
 		opt(options)
 	}

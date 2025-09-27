@@ -103,10 +103,10 @@ func toProtoKeymapDiff(diffs []importapi.KeymapDiff) []*keymapv1.ActionDiff {
 	return result
 }
 
-func (s *Server) DefaultConfigPath(
+func (s *Server) ConfigDetect(
 	ctx context.Context,
-	req *keymapv1.DefaultConfigPathRequest,
-) (*keymapv1.DefaultConfigPathResponse, error) {
+	req *keymapv1.ConfigDetectRequest,
+) (*keymapv1.ConfigDetectResponse, error) {
 	// For now, plugins resolve path by runtime.GOOS. We only support macOS requests on this server currently.
 	switch req.GetPlatform() {
 	case keymapv1.Platform_MACOS:
@@ -115,11 +115,11 @@ func (s *Server) DefaultConfigPath(
 		if !ok {
 			return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
 		}
-		v, err := plugin.DefaultConfigPath()
+		v, err := plugin.ConfigDetect()
 		if err != nil || len(v) == 0 {
 			return nil, status.Errorf(codes.NotFound, "no default config paths found for editor: %s", et)
 		}
-		return &keymapv1.DefaultConfigPathResponse{Paths: v}, nil
+		return &keymapv1.ConfigDetectResponse{Paths: v}, nil
 	default:
 		return nil, status.Errorf(codes.Unimplemented, "platform %s not supported yet", req.GetPlatform().String())
 	}

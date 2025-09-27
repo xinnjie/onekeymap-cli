@@ -9,10 +9,10 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
 )
 
-// DefaultConfigPath returns the default path for Helix's config.toml file.
+// ConfigDetect returns the default path for Helix's config.toml file.
 // On macOS, this is typically ~/.config/helix/config.toml.
-func (p *helixPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOption) ([]string, error) {
-	options := &pluginapi.DefaultConfigPathOptions{}
+func (p *helixPlugin) ConfigDetect(opts ...pluginapi.ConfigDetectOption) ([]string, error) {
+	options := &pluginapi.ConfigDetectOptions{}
 	for _, opt := range opts {
 		opt(options)
 	}
