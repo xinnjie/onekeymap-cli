@@ -62,16 +62,9 @@ type PluginExportReport struct {
 }
 
 type DefaultConfigPathOptions struct {
-	RelativeToHome bool
 }
 
 type DefaultConfigPathOption func(*DefaultConfigPathOptions)
-
-func WithRelativeToHome(relative bool) DefaultConfigPathOption {
-	return func(o *DefaultConfigPathOptions) {
-		o.RelativeToHome = relative
-	}
-}
 
 // Plugin is the core interface that all editor plugins must implement.
 // It defines the contract for importing and exporting keymaps.

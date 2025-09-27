@@ -127,6 +127,12 @@ func TestLoad(t *testing.T) {
 		errorContains string
 	}{
 		{
+			name:      "Empty input",
+			jsonInput: "",
+			expected:  &keymapv1.KeymapSetting{},
+			expectErr: false,
+		},
+		{
 			name: "Valid configuration with comment",
 			jsonInput: `
 {

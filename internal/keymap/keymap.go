@@ -1,6 +1,7 @@
 package keymap
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,6 +14,10 @@ import (
 
 const (
 	configVersion = "1.0"
+)
+
+var (
+	errInvalidConfig = errors.New("invalid config format: 'keymaps' field is missing or null")
 )
 
 // OneKeymapConfig is a struct that matches the user config file format.
@@ -95,10 +100,22 @@ func (ks KeybindingStrings) MarshalJSON() ([]byte, error) {
 // Load reads from the given reader, parses the user config file format,
 // and converts it into the internal KeymapSetting proto message.
 func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
-	decoder := json.NewDecoder(reader)
-	var friendlyData OneKeymapSetting
-	if err := decoder.Decode(&friendlyData); err != nil {
+	data, err := io.ReadAll(reader)
+	if err != nil {
 		return nil, err
+	}
+
+	if len(bytes.TrimSpace(data)) == 0 {
+		return &keymapv1.KeymapSetting{}, nil
+	}
+
+	var friendlyData OneKeymapSetting
+	if err := json.Unmarshal(data, &friendlyData); err != nil {
+		return nil, err
+	}
+
+	if friendlyData.Keymaps == nil {
+		return nil, errInvalidConfig
 	}
 
 	setting := &keymapv1.KeymapSetting{}

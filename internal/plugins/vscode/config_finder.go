@@ -35,13 +35,5 @@ func (p *vsCodePlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOpti
 		return nil, errors.New("unsupported operating system")
 	}
 
-	if options.RelativeToHome {
-		relPath, err := filepath.Rel(home, configPath)
-		if err == nil {
-			return []string{relPath}, nil
-		}
-		// Fallback to absolute path if relative path fails
-	}
-
 	return []string{configPath}, nil
 }

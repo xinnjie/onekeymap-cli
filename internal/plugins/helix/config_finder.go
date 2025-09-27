@@ -31,13 +31,5 @@ func (p *helixPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOptio
 		return nil, errors.New("automatic path discovery is only supported on macOS")
 	}
 
-	if options.RelativeToHome {
-		relPath, err := filepath.Rel(home, configPath)
-		if err == nil {
-			return []string{relPath}, nil
-		}
-		// Fallback to absolute path if relative path fails
-	}
-
 	return []string{configPath}, nil
 }

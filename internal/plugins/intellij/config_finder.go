@@ -61,13 +61,5 @@ func (p *intellijPlugin) DefaultConfigPath(opts ...pluginapi.DefaultConfigPathOp
 
 	configPath := filepath.Join(keymapDirs[0], "Onekeymap.xml")
 
-	if options.RelativeToHome {
-		relPath, err := filepath.Rel(home, configPath)
-		if err == nil {
-			return []string{relPath}, nil
-		}
-		// Fallback to absolute path if relative path fails
-	}
-
 	return []string{configPath}, nil
 }
