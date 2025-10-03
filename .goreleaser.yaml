@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: onekeymap-cli
+    main: ./cmd/onekeymap-cli
+    binary: onekeymap
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: onekeymap-cli
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    files:
+      - LICENSE*
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - "^refactor:"
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: xinnjie
+    name: watchbeats
+  draft: false
+  prerelease: auto
+  name_template: "onekeymap-cli {{.Version}}"
+  footer: |
+    ## Installation
+
+    ### macOS
+    ```bash
+    brew install xinnjie/tap/onekeymap
+    ```
+
+    ### Linux/macOS (manual)
+    ```bash
+    tar -xzf onekeymap-cli_*.tar.gz
+    sudo mv onekeymap /usr/local/bin/
+    ```
+
+    ### Windows
+    Extract the zip file and add the directory to your PATH.
+
+homebrew_casks:
+  - name: onekeymap-cli
+    repository:
+      owner: xinnjie
+      name: homebrew-onekeymap
+    homepage: https://github.com/xinnjie/homebrew-onekeymap
+    description: "Universal keymap configuration tool for VSCode, Zed, IntelliJ and more"
+    binary: onekeymap-cli
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr",
+              args: ["-dr", "com.apple.quarantine", "#{staged_path}/onekeymap"]
+          end
