@@ -30,7 +30,7 @@ type importService struct {
 
 // unionWithBase merges baseline and imported settings per action id,
 // preserving baseline bindings and adding new imported bindings. Metadata from Decorate is preserved.
-func unionWithBase(base *keymapv1.KeymapSetting, imported *keymapv1.KeymapSetting) *keymapv1.KeymapSetting {
+func unionWithBase(base *keymapv1.Keymap, imported *keymapv1.Keymap) *keymapv1.Keymap {
 	if imported == nil {
 		return base
 	}
@@ -38,7 +38,7 @@ func unionWithBase(base *keymapv1.KeymapSetting, imported *keymapv1.KeymapSettin
 		return imported
 	}
 	// index existing results by action id
-	out := &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{}}
+	out := &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{}}
 	byID := make(map[string]*keymapv1.ActionBinding)
 
 	// start with baseline (so Before reflects baseline order/first occurrence)
@@ -197,7 +197,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 
 func (s *importService) validate(
 	ctx context.Context,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts importapi.ImportOptions,
 ) (*keymapv1.ValidationReport, error) {
 	if setting == nil {
@@ -216,8 +216,8 @@ func (s *importService) validate(
 }
 
 func (s *importService) calculateChanges(
-	base *keymapv1.KeymapSetting,
-	setting *keymapv1.KeymapSetting,
+	base *keymapv1.Keymap,
+	setting *keymapv1.Keymap,
 ) *importapi.KeymapChanges {
 	if base == nil || setting == nil {
 		return &importapi.KeymapChanges{}

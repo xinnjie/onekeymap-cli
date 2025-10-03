@@ -32,7 +32,7 @@ func (p *zedImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	opts pluginapi.PluginImportOption,
-) (*keymapv1.KeymapSetting, error) {
+) (*keymapv1.Keymap, error) {
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from reader: %w", err)
@@ -45,7 +45,7 @@ func (p *zedImporter) Import(
 		return nil, fmt.Errorf("failed to parse zed keymap json: %w", err)
 	}
 
-	setting := &keymapv1.KeymapSetting{}
+	setting := &keymapv1.Keymap{}
 	for _, zk := range zedKeymaps {
 		// ensure deterministic order: iterate bindings by sorted keys
 		keys := make([]string, 0, len(zk.Bindings))

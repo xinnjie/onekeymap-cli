@@ -32,7 +32,7 @@ func newExporter(
 func (e *helixExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	// Read existing configuration if provided for non-destructive export
@@ -159,7 +159,7 @@ func (e *helixExporter) isManagedKeybinding(command string, mode HelixMode) bool
 }
 
 // generateManagedKeybindings generates Helix keybindings from KeymapSetting.
-func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting *keymapv1.KeymapSetting) helixKeys {
+func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting *keymapv1.Keymap) helixKeys {
 	keysByMode := helixKeys{}
 
 	for _, km := range setting.GetKeybindings() {

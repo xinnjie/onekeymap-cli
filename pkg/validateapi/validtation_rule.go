@@ -13,7 +13,7 @@ type ValidationRule interface {
 
 // ValidationContext holds all the necessary data for a validation rule to execute.
 type ValidationContext struct {
-	Setting *keymapv1.KeymapSetting
+	Setting *keymapv1.Keymap
 	Report  *keymapv1.ValidationReport
 	Options importapi.ImportOptions
 }

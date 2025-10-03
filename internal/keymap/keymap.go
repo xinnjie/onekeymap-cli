@@ -33,9 +33,9 @@ type OneKeymapConfig struct {
 // KeyBinding in the provided KeymapSetting using the given MappingConfig.
 // It also fills the KeyChordsReadable field when chords are present.
 func DecorateSetting(
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	config *mappings.MappingConfig,
-) *keymapv1.KeymapSetting {
+) *keymapv1.Keymap {
 	if setting == nil || config == nil {
 		return setting
 	}
@@ -99,14 +99,14 @@ func (ks KeybindingStrings) MarshalJSON() ([]byte, error) {
 
 // Load reads from the given reader, parses the user config file format,
 // and converts it into the internal KeymapSetting proto message.
-func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
+func Load(reader io.Reader) (*keymapv1.Keymap, error) {
 	data, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(bytes.TrimSpace(data)) == 0 {
-		return &keymapv1.KeymapSetting{}, nil
+		return &keymapv1.Keymap{}, nil
 	}
 
 	var friendlyData OneKeymapSetting
@@ -118,7 +118,7 @@ func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
 		return nil, errInvalidConfig
 	}
 
-	setting := &keymapv1.KeymapSetting{}
+	setting := &keymapv1.Keymap{}
 	// Group keybindings by Id ONLY. Preserve insertion order of first appearance.
 	grouped := make(map[string]*keymapv1.ActionBinding)
 	order := make([]string, 0)
@@ -169,7 +169,7 @@ func Load(reader io.Reader) (*keymapv1.KeymapSetting, error) {
 
 // Save takes a KeymapSetting proto message and writes it to the given writer
 // in the user config file format.
-func Save(writer io.Writer, setting *keymapv1.KeymapSetting) error {
+func Save(writer io.Writer, setting *keymapv1.Keymap) error {
 	friendlyData := OneKeymapSetting{}
 	friendlyData.Version = configVersion
 	// Group keybindings by a composite key of Id and Comment.

@@ -43,7 +43,7 @@ type testExporter struct {
 func (e *testExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	if e.writeContent != "" {
@@ -79,7 +79,7 @@ func TestExportService_Diff_Unified(t *testing.T) {
 	service := newTestExportService(t, exp, pluginapi.EditorType("test"))
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.KeymapSetting{}, exportapi.ExportOptions{
+	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
 		EditorType: pluginapi.EditorType("test"),
 		Base:       strings.NewReader(before),
 		DiffType:   keymapv1.ExportKeymapRequest_UNIFIED_DIFF,
@@ -99,7 +99,7 @@ func TestExportService_Diff_JSONASCII_FromStructuredConfigs(t *testing.T) {
 	service := newTestExportService(t, exp, pluginapi.EditorType("test"))
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.KeymapSetting{}, exportapi.ExportOptions{
+	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
 		EditorType: pluginapi.EditorType("test"),
 		DiffType:   keymapv1.ExportKeymapRequest_ASCII_DIFF,
 	})
@@ -115,7 +115,7 @@ func TestExportService_Diff_FallbackFromPlugin(t *testing.T) {
 	service := newTestExportService(t, exp, pluginapi.EditorType("test"))
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.KeymapSetting{}, exportapi.ExportOptions{
+	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
 		EditorType: pluginapi.EditorType("test"),
 		DiffType:   keymapv1.ExportKeymapRequest_DIFF_TYPE_UNSPECIFIED,
 	})

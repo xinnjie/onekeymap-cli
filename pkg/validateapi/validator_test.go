@@ -15,7 +15,7 @@ import (
 func TestValidator_Validate_EmptyKeymaps(t *testing.T) {
 	validator := NewValidator()
 
-	setting := &keymapv1.KeymapSetting{
+	setting := &keymapv1.Keymap{
 		Keybindings: []*keymapv1.ActionBinding{},
 	}
 
@@ -42,7 +42,7 @@ func TestValidator_Validate_ChainOfRules(t *testing.T) {
 	validator := NewValidator(NewKeybindConflictRule(), NewDanglingActionRule(mappingConfig))
 
 	// Create keymaps with both conflicts and dangling actions
-	setting := &keymapv1.KeymapSetting{
+	setting := &keymapv1.Keymap{
 		Keybindings: []*keymapv1.ActionBinding{
 			keymap.NewActioinBinding("valid.action", "ctrl+c"),
 			keymap.NewActioinBinding("invalid.action", "ctrl+c"), // This will cause dangling action

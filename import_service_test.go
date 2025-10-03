@@ -24,14 +24,14 @@ import (
 type testPlugin struct {
 	editorType  pluginapi.EditorType
 	configPath  string
-	importData  *keymapv1.KeymapSetting
+	importData  *keymapv1.Keymap
 	importError error
 }
 
 func newTestPlugin(
 	editorType pluginapi.EditorType,
 	configPath string,
-	importData *keymapv1.KeymapSetting,
+	importData *keymapv1.Keymap,
 	importError error,
 ) *testPlugin {
 	return &testPlugin{
@@ -63,7 +63,7 @@ func (p *testPlugin) Exporter() (pluginapi.PluginExporter, error) {
 
 // testPluginImporter implements pluginapi.PluginImporter interface for testing.
 type testPluginImporter struct {
-	importData  *keymapv1.KeymapSetting
+	importData  *keymapv1.Keymap
 	importError error
 }
 
@@ -71,7 +71,7 @@ func (i *testPluginImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	opts pluginapi.PluginImportOption,
-) (*keymapv1.KeymapSetting, error) {
+) (*keymapv1.Keymap, error) {
 	return i.importData, i.importError
 }
 
@@ -81,7 +81,7 @@ type testPluginExporter struct{}
 func (e *testPluginExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	return &pluginapi.PluginExportReport{}, nil
@@ -90,22 +90,22 @@ func (e *testPluginExporter) Export(
 func TestImportService_Import(t *testing.T) {
 	testCases := []struct {
 		name        string
-		importData  *keymapv1.KeymapSetting
-		baseData    *keymapv1.KeymapSetting
+		importData  *keymapv1.Keymap
+		baseData    *keymapv1.Keymap
 		importError error
 		expectError bool
 		expect      *importapi.ImportResult
 	}{
 		{
 			name: "sorts imported keymaps by action ID",
-			importData: &keymapv1.KeymapSetting{
+			importData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:          "actions.editor.copy",
 						Name:        "Copy",
@@ -157,7 +157,7 @@ func TestImportService_Import(t *testing.T) {
 		},
 		{
 			name: "empty keybindings add",
-			baseData: &keymapv1.KeymapSetting{
+			baseData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:       "actions.editor.paste",
@@ -165,13 +165,13 @@ func TestImportService_Import(t *testing.T) {
 					},
 				},
 			},
-			importData: &keymapv1.KeymapSetting{
+			importData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:          "actions.editor.paste",
 						Name:        "Paste",
@@ -203,9 +203,9 @@ func TestImportService_Import(t *testing.T) {
 
 		{
 			name:       "handles empty keymap list",
-			importData: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{}},
+			importData: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{}},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{}},
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{}},
 				Changes: &importapi.KeymapChanges{},
 			},
 		},
@@ -217,18 +217,18 @@ func TestImportService_Import(t *testing.T) {
 		},
 		{
 			name: "calculates no change",
-			baseData: &keymapv1.KeymapSetting{
+			baseData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
-			importData: &keymapv1.KeymapSetting{
+			importData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:          "actions.editor.paste",
 						Name:        "Paste",
@@ -244,18 +244,18 @@ func TestImportService_Import(t *testing.T) {
 		},
 		{
 			name: "deduplicate",
-			baseData: &keymapv1.KeymapSetting{
+			baseData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
-			importData: &keymapv1.KeymapSetting{
+			importData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v", "ctrl+v"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:          "actions.editor.paste",
 						Name:        "Paste",
@@ -271,16 +271,16 @@ func TestImportService_Import(t *testing.T) {
 		},
 		{
 			name: "calculates added keybindings",
-			baseData: &keymapv1.KeymapSetting{
+			baseData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{},
 			},
-			importData: &keymapv1.KeymapSetting{
+			importData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:          "actions.editor.paste",
 						Name:        "Paste",
@@ -311,19 +311,19 @@ func TestImportService_Import(t *testing.T) {
 		},
 		{
 			name: "calculates not removed keybindings",
-			baseData: &keymapv1.KeymapSetting{
+			baseData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
-			importData: &keymapv1.KeymapSetting{
+			importData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					// According to import semantics, unchanged keybindings should not be removed.
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:          "actions.editor.copy",
 						Name:        "Copy",
@@ -339,18 +339,18 @@ func TestImportService_Import(t *testing.T) {
 		},
 		{
 			name: "calculates updated keybindings",
-			baseData: &keymapv1.KeymapSetting{
+			baseData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
-			importData: &keymapv1.KeymapSetting{
+			importData: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.editor.copy", "cmd+c", "alt+c"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:          "actions.editor.copy",
 						Name:        "Copy",

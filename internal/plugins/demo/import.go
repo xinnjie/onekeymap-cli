@@ -33,7 +33,7 @@ func (i *demoImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	_ pluginapi.PluginImportOption,
-) (*keymapv1.KeymapSetting, error) {
+) (*keymapv1.Keymap, error) {
 	data, err := io.ReadAll(source)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from reader: %w", err)
@@ -48,7 +48,7 @@ func (i *demoImporter) Import(
 		return nil, fmt.Errorf("failed to unmarshal demo keybindings: %w", err)
 	}
 
-	setting := &keymapv1.KeymapSetting{}
+	setting := &keymapv1.Keymap{}
 	for _, b := range bindings {
 		if b.Keys == "" || b.Action == "" {
 			continue

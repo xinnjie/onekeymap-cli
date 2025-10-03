@@ -30,7 +30,7 @@ const (
 
 // Recorder is the interface for recording metrics.
 type Recorder interface {
-	RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.KeymapSetting)
+	RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.Keymap)
 	Shutdown(ctx context.Context) error
 }
 
@@ -46,7 +46,7 @@ type recorder struct {
 type noopRecorder struct{}
 
 // RecordCommandProcessed is a no-op.
-func (r *noopRecorder) RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.KeymapSetting) {
+func (r *noopRecorder) RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.Keymap) {
 }
 
 // Shutdown is a no-op.
@@ -106,7 +106,7 @@ func New(
 }
 
 // RecordCommandProcessed records that a command has been processed.
-func (r *recorder) RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.KeymapSetting) {
+func (r *recorder) RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.Keymap) {
 	if r.commandCounter == nil || setting == nil {
 		return
 	}

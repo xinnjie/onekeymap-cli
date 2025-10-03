@@ -18,7 +18,7 @@ var _ tea.Model = (*KeymapViewModel)(nil)
 
 // KeymapViewModel is a read-only TUI model to present current OneKeymapSetting.
 type KeymapViewModel struct {
-	setting *keymapv1.KeymapSetting
+	setting *keymapv1.Keymap
 	mc      *mappings.MappingConfig
 
 	// derived state
@@ -31,7 +31,7 @@ type KeymapViewModel struct {
 	width, height int
 }
 
-func NewKeymapViewModel(setting *keymapv1.KeymapSetting, mc *mappings.MappingConfig) tea.Model {
+func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) tea.Model {
 	m := &KeymapViewModel{
 		setting: setting,
 		mc:      mc,

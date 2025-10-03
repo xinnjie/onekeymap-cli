@@ -22,14 +22,14 @@ func TestExporter_Export(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		keymapSetting  *keymapv1.KeymapSetting
+		keymapSetting  *keymapv1.Keymap
 		expectedJSON   string
 		existingConfig string
 	}{
 		// Basic destructive export tests
 		{
 			name: "correctly exports a standard action",
-			keymapSetting: &keymapv1.KeymapSetting{
+			keymapSetting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -44,7 +44,7 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "correctly exports multiple actions",
-			keymapSetting: &keymapv1.KeymapSetting{
+			keymapSetting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
@@ -65,7 +65,7 @@ func TestExporter_Export(t *testing.T) {
 		// Non-destructive export tests
 		{
 			name: "non-destructive export preserves user keybindings",
-			keymapSetting: &keymapv1.KeymapSetting{
+			keymapSetting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -92,7 +92,7 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
-			keymapSetting: &keymapv1.KeymapSetting{
+			keymapSetting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -114,7 +114,7 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "multiple user keybindings with mixed conflicts",
-			keymapSetting: &keymapv1.KeymapSetting{
+			keymapSetting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
@@ -164,7 +164,7 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "empty existing config behaves as destructive export",
-			keymapSetting: &keymapv1.KeymapSetting{
+			keymapSetting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -181,7 +181,7 @@ func TestExporter_Export(t *testing.T) {
 		// Base order preservation tests
 		{
 			name: "preserves order by base config using command as key",
-			keymapSetting: &keymapv1.KeymapSetting{
+			keymapSetting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),

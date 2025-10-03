@@ -15,13 +15,13 @@ type ImportOptions struct {
 	// Required, input stream, contains the keymap config for different editors
 	InputStream io.Reader
 	// Optional, existing onekeymap base setting
-	Base *keymapv1.KeymapSetting
+	Base *keymapv1.Keymap
 }
 
 // ImportResult represents the result of an import operation.
 type ImportResult struct {
 	// The converted keymap setting.
-	Setting *keymapv1.KeymapSetting
+	Setting *keymapv1.Keymap
 	// Any issues that arose during the import process.
 	Report *keymapv1.ValidationReport
 

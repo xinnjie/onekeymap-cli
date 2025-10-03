@@ -29,14 +29,14 @@ func TestExportHelixKeymap(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		setting        *keymapv1.KeymapSetting
+		setting        *keymapv1.Keymap
 		wantTOML       string
 		existingConfig string
 	}{
 		// Basic destructive export tests
 		{
 			name: "export copy keymap",
-			setting: &keymapv1.KeymapSetting{
+			setting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -49,7 +49,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		// Non-destructive export tests
 		{
 			name: "non-destructive export preserves user keybindings",
-			setting: &keymapv1.KeymapSetting{
+			setting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -72,7 +72,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		},
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
-			setting: &keymapv1.KeymapSetting{
+			setting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -90,7 +90,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		},
 		{
 			name: "multiple modes with mixed conflicts",
-			setting: &keymapv1.KeymapSetting{
+			setting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -122,7 +122,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		},
 		{
 			name: "empty existing config behaves as destructive export",
-			setting: &keymapv1.KeymapSetting{
+			setting: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 				},
@@ -177,7 +177,7 @@ normal = "block"
 "C-x" = "extend_line_below"`
 
 	// Managed keymap setting to apply
-	setting := &keymapv1.KeymapSetting{
+	setting := &keymapv1.Keymap{
 		Keybindings: []*keymapv1.ActionBinding{
 			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 		},

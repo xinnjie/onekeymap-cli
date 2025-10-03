@@ -26,7 +26,7 @@ func (p *intellijImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	opts pluginapi.PluginImportOption,
-) (*keymapv1.KeymapSetting, error) {
+) (*keymapv1.Keymap, error) {
 	_ = ctx
 	_ = opts
 
@@ -40,7 +40,7 @@ func (p *intellijImporter) Import(
 		return nil, fmt.Errorf("failed to parse intellij keymap xml: %w", err)
 	}
 
-	setting := &keymapv1.KeymapSetting{}
+	setting := &keymapv1.Keymap{}
 
 	for _, act := range doc.Actions {
 		actionID, err := p.ActionIDFromIntelliJ(act.ID)

@@ -64,7 +64,7 @@ func (s *Server) ImportKeymap(
 		return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
 	}
 
-	var baseSetting *keymapv1.KeymapSetting
+	var baseSetting *keymapv1.Keymap
 	if req.GetBase() != "" {
 		km, err := keymap.Load(strings.NewReader(req.GetBase()))
 		if err != nil {
@@ -127,8 +127,8 @@ func (s *Server) ConfigDetect(
 
 func (s *Server) LoadKeymap(
 	ctx context.Context,
-	req *keymapv1.LoadKeymapRequest,
-) (*keymapv1.LoadKeymapResponse, error) {
+	req *keymapv1.GetKeymapRequest,
+) (*keymapv1.GetKeymapResponse, error) {
 	km, err := keymap.Load(strings.NewReader(req.GetConfig()))
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to parse keymap config: %v", err)
@@ -155,7 +155,7 @@ func (s *Server) LoadKeymap(
 
 	km = keymap.DecorateSetting(km, s.mappingConfig)
 
-	return &keymapv1.LoadKeymapResponse{Keymap: km}, nil
+	return &keymapv1.GetKeymapResponse{Keymap: km}, nil
 }
 
 func (s *Server) SaveKeymap(

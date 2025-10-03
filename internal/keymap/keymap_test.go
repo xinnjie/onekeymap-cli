@@ -16,13 +16,13 @@ import (
 func TestSave(t *testing.T) {
 	testCases := []struct {
 		name               string
-		input              *keymapv1.KeymapSetting
+		input              *keymapv1.Keymap
 		expectedKeymaps    []OneKeymapConfig
 		expectedNumKeymaps int
 	}{
 		{
 			name: "Single keybinding",
-			input: &keymapv1.KeymapSetting{
+			input: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					NewActionBindingWithDescription("actions.copy", "ctrl+c", "copy"),
 				},
@@ -34,7 +34,7 @@ func TestSave(t *testing.T) {
 		},
 		{
 			name: "Single keybinding with comment",
-			input: &keymapv1.KeymapSetting{
+			input: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					NewActionBindingWithComment("actions.find", "shift+f", "with comment"),
 				},
@@ -46,7 +46,7 @@ func TestSave(t *testing.T) {
 		},
 		{
 			name: "Multiple keybindings for the same action",
-			input: &keymapv1.KeymapSetting{
+			input: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					NewActioinBinding("actions.find", "ctrl+f"),
 					NewActioinBinding("actions.find", "cmd+f"),
@@ -59,7 +59,7 @@ func TestSave(t *testing.T) {
 		},
 		{
 			name: "Multiple keybindings for the same action",
-			input: &keymapv1.KeymapSetting{
+			input: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:       "actions.find",
@@ -74,7 +74,7 @@ func TestSave(t *testing.T) {
 		},
 		{
 			name: "Multiple keybindings for different actions",
-			input: &keymapv1.KeymapSetting{
+			input: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					NewActioinBinding("actions.copy", "ctrl+c"),
 					NewActioinBinding("actions.find", "ctrl+f"),
@@ -122,7 +122,7 @@ func TestLoad(t *testing.T) {
 	testCases := []struct {
 		name          string
 		jsonInput     string
-		expected      *keymapv1.KeymapSetting
+		expected      *keymapv1.Keymap
 		expectErr     bool
 		errorContains string
 	}{
@@ -143,7 +143,7 @@ func TestLoad(t *testing.T) {
   ]
 }
 `,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:      "actions.copy",
@@ -178,7 +178,7 @@ func TestLoad(t *testing.T) {
   ]
 }
 `,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:      "actions.copy",
@@ -210,7 +210,7 @@ func TestLoad(t *testing.T) {
   ]
 }
 `,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					{
 						Id:      "actions.copy",
@@ -227,13 +227,13 @@ func TestLoad(t *testing.T) {
 		{
 			name:      "Empty input",
 			jsonInput: "",
-			expected:  &keymapv1.KeymapSetting{},
+			expected:  &keymapv1.Keymap{},
 			expectErr: false,
 		},
 		{
 			name:      "Empty keymaps array",
 			jsonInput: `{"keymaps": []}`,
-			expected:  &keymapv1.KeymapSetting{},
+			expected:  &keymapv1.Keymap{},
 			expectErr: false,
 		},
 		{

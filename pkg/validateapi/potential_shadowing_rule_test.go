@@ -17,7 +17,7 @@ func TestPotentialShadowingRule_Validate_WithCriticalKeybinding(t *testing.T) {
 	validator := NewValidator(NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS))
 
 	// Create keymaps with critical system shortcuts
-	setting := &keymapv1.KeymapSetting{
+	setting := &keymapv1.Keymap{
 		Keybindings: []*keymapv1.ActionBinding{
 			keymap.NewActioinBinding("actions.format.document", "cmd+q"), // Critical: quit on macOS
 			keymap.NewActioinBinding("actions.edit.copy", "cmd+c"),       // Critical: copy on macOS
@@ -48,7 +48,7 @@ func TestPotentialShadowingRule_Validate_WithCriticalKeybinding(t *testing.T) {
 func TestPotentialShadowingRule_Validate_NoCriticalKeybindings(t *testing.T) {
 	validator := NewValidator(NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS))
 
-	setting := &keymapv1.KeymapSetting{
+	setting := &keymapv1.Keymap{
 		Keybindings: []*keymapv1.ActionBinding{
 			keymap.NewActioinBinding("actions.custom.action", "ctrl+shift+f12"),
 			keymap.NewActioinBinding("actions.another.action", "alt+shift+g"),
@@ -67,7 +67,7 @@ func TestPotentialShadowingRule_Validate_NoCriticalKeybindings(t *testing.T) {
 func TestPotentialShadowingRule_Validate_WindowsCriticalShortcuts(t *testing.T) {
 	validator := NewValidator(NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformWindows))
 
-	setting := &keymapv1.KeymapSetting{
+	setting := &keymapv1.Keymap{
 		Keybindings: []*keymapv1.ActionBinding{
 			keymap.NewActioinBinding("actions.close.app", "alt+f4"),   // Critical: close app on Windows
 			keymap.NewActioinBinding("actions.switch.app", "alt+tab"), // Critical: app switching
@@ -94,7 +94,7 @@ func TestPotentialShadowingRule_Validate_CaseInsensitive(t *testing.T) {
 	validator := NewValidator(NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS))
 
 	// Test that case variations are still detected
-	setting := &keymapv1.KeymapSetting{
+	setting := &keymapv1.Keymap{
 		Keybindings: []*keymapv1.ActionBinding{
 			keymap.NewActioinBinding("actions.test", "CMD+Q"), // Uppercase should still match
 		},

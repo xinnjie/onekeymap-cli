@@ -22,7 +22,7 @@ type PluginImportOption struct {
 type PluginImporter interface {
 	// Import reads the editor's configuration source and converts it into the
 	// universal onekeymap KeymapSetting format.
-	Import(ctx context.Context, source io.Reader, opts PluginImportOption) (*keymapv1.KeymapSetting, error)
+	Import(ctx context.Context, source io.Reader, opts PluginImportOption) (*keymapv1.Keymap, error)
 }
 
 type PluginExporter interface {
@@ -31,7 +31,7 @@ type PluginExporter interface {
 	Export(
 		ctx context.Context,
 		destination io.Writer,
-		setting *keymapv1.KeymapSetting,
+		setting *keymapv1.Keymap,
 		opts PluginExportOption,
 	) (*PluginExportReport, error)
 }

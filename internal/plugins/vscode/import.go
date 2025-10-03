@@ -31,7 +31,7 @@ func (i *vscodeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	option pluginapi.PluginImportOption,
-) (*keymapv1.KeymapSetting, error) {
+) (*keymapv1.Keymap, error) {
 	// VSCode's keybindings.json can contain comments, so we need to strip them.
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
@@ -45,7 +45,7 @@ func (i *vscodeImporter) Import(
 		return nil, fmt.Errorf("failed to unmarshal vscode keybindings: %w", err)
 	}
 
-	setting := &keymapv1.KeymapSetting{}
+	setting := &keymapv1.Keymap{}
 	for _, binding := range vscodeKeybindings {
 		mapping := i.FindByVSCodeActionWithArgs(binding.Command, binding.When, binding.Args)
 		if mapping == nil {

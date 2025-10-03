@@ -28,7 +28,7 @@ type Exporter interface {
 	Export(
 		ctx context.Context,
 		destination io.Writer,
-		setting *keymapv1.KeymapSetting,
+		setting *keymapv1.Keymap,
 		opts ExportOptions,
 	) (*ExportReport, error)
 }

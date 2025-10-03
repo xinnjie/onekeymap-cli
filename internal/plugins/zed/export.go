@@ -34,7 +34,7 @@ func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, dif
 func (p *zedExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	// Parse existing configuration if provided
@@ -115,7 +115,7 @@ func orderByBaseContext(final zedKeymapConfig, base zedKeymapConfig) zedKeymapCo
 }
 
 // generateManagedKeybindings creates keybindings from the current setting.
-func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetting) zedKeymapConfig {
+func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.Keymap) zedKeymapConfig {
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
 	for _, km := range setting.GetKeybindings() {

@@ -30,15 +30,15 @@ func TestServer_LoadKeymap(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		req           *keymapv1.LoadKeymapRequest
-		want          *keymapv1.LoadKeymapResponse
+		req           *keymapv1.GetKeymapRequest
+		want          *keymapv1.GetKeymapResponse
 		wantErrCode   codes.Code
 		wantErr       bool
 		expectNoOrder bool
 	}{
 		{
 			name: "Invalid config with keys field, ReturnAll=false",
-			req: &keymapv1.LoadKeymapRequest{
+			req: &keymapv1.GetKeymapRequest{
 				Config: `{"keybindings":[{"id":"action1","keys":["ctrl+a"]}]}`,
 			},
 			wantErr:     true,
@@ -46,11 +46,11 @@ func TestServer_LoadKeymap(t *testing.T) {
 		},
 		{
 			name: "Valid config, ReturnAll=false",
-			req: &keymapv1.LoadKeymapRequest{
+			req: &keymapv1.GetKeymapRequest{
 				Config: `{"version":"1.0","keymaps":[{"id":"action1","keybinding":"ctrl+a"}]}`,
 			},
-			want: &keymapv1.LoadKeymapResponse{
-				Keymap: &keymapv1.KeymapSetting{
+			want: &keymapv1.GetKeymapResponse{
+				Keymap: &keymapv1.Keymap{
 					Keybindings: []*keymapv1.ActionBinding{
 						{
 							Id:          "action1",
@@ -77,7 +77,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 		},
 		{
 			name: "Invalid config with keys field, ReturnAll=true",
-			req: &keymapv1.LoadKeymapRequest{
+			req: &keymapv1.GetKeymapRequest{
 				Config:    `{"keybindings":[{"id":"action1","keys":["ctrl+a"]}]}`,
 				ReturnAll: true,
 			},
@@ -86,12 +86,12 @@ func TestServer_LoadKeymap(t *testing.T) {
 		},
 		{
 			name: "Valid config, ReturnAll=true",
-			req: &keymapv1.LoadKeymapRequest{
+			req: &keymapv1.GetKeymapRequest{
 				Config:    `{"version":"1.0","keymaps":[{"id":"action1","keybinding":"ctrl+a"}]}`,
 				ReturnAll: true,
 			},
-			want: &keymapv1.LoadKeymapResponse{
-				Keymap: &keymapv1.KeymapSetting{
+			want: &keymapv1.GetKeymapResponse{
+				Keymap: &keymapv1.Keymap{
 					Keybindings: []*keymapv1.ActionBinding{
 						{
 							Id:          "action1",
@@ -121,21 +121,21 @@ func TestServer_LoadKeymap(t *testing.T) {
 		},
 		{
 			name: "Empty config, ReturnAll=false",
-			req: &keymapv1.LoadKeymapRequest{
+			req: &keymapv1.GetKeymapRequest{
 				Config: "",
 			},
-			want: &keymapv1.LoadKeymapResponse{
-				Keymap: &keymapv1.KeymapSetting{},
+			want: &keymapv1.GetKeymapResponse{
+				Keymap: &keymapv1.Keymap{},
 			},
 		},
 		{
 			name: "Empty config, ReturnAll=true",
-			req: &keymapv1.LoadKeymapRequest{
+			req: &keymapv1.GetKeymapRequest{
 				Config:    "",
 				ReturnAll: true,
 			},
-			want: &keymapv1.LoadKeymapResponse{
-				Keymap: &keymapv1.KeymapSetting{
+			want: &keymapv1.GetKeymapResponse{
+				Keymap: &keymapv1.Keymap{
 					Keybindings: []*keymapv1.ActionBinding{
 						{Id: "action1", Description: "Description 1"},
 						{Id: "action2", Description: "Description 2"},
@@ -147,7 +147,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 		},
 		{
 			name: "Invalid config, ReturnAll=false",
-			req: &keymapv1.LoadKeymapRequest{
+			req: &keymapv1.GetKeymapRequest{
 				Config: "invalid json",
 			},
 			wantErr:     true,
@@ -155,7 +155,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 		},
 		{
 			name: "Invalid config, ReturnAll=true",
-			req: &keymapv1.LoadKeymapRequest{
+			req: &keymapv1.GetKeymapRequest{
 				Config:    "invalid json",
 				ReturnAll: true,
 			},
@@ -176,7 +176,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				if tt.expectNoOrder {
-					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform(), protocmp.SortRepeatedFields(&keymapv1.KeymapSetting{}, "keybindings")))
+					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform(), protocmp.SortRepeatedFields(&keymapv1.Keymap{}, "keybindings")))
 				} else {
 					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform()))
 				}

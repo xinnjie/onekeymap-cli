@@ -71,7 +71,7 @@ func importRun(f *importFlags) func(cmd *cobra.Command, args []string) error {
 			defer func() { _ = file.Close() }()
 		}
 
-		baseConfig := func() *keymapv1.KeymapSetting {
+		baseConfig := func() *keymapv1.Keymap {
 			if f.output != "" {
 				baseConfigFile, err := os.Open(f.output)
 				if err != nil {

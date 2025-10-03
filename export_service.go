@@ -39,7 +39,7 @@ func NewExportService(
 func (s *exportService) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts exportapi.ExportOptions,
 ) (*exportapi.ExportReport, error) {
 	plugin, ok := s.registry.Get(opts.EditorType)

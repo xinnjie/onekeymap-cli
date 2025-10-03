@@ -29,7 +29,7 @@ func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, dif
 func (e *intellijExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	_ = ctx
@@ -109,7 +109,7 @@ func (e *intellijExporter) isManagedAction(actionID string) bool {
 }
 
 // generateManagedActions generates IntelliJ actions from KeymapSetting.
-func (e *intellijExporter) generateManagedActions(setting *keymapv1.KeymapSetting) []ActionXML {
+func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap) []ActionXML {
 	// Group keybindings by IntelliJ action ID while preserving order of first appearance.
 	actionsMap := make(map[string]*ActionXML)
 	var actionOrder []string

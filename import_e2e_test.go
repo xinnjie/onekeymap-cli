@@ -63,7 +63,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 ]`)
 
 	// Base config has the same binding (order of modifiers irrelevant; parser normalizes)
-	base := &keymapv1.KeymapSetting{
+	base := &keymapv1.Keymap{
 		Keybindings: []*keymapv1.ActionBinding{
 			keymap.NewActioinBinding("actions.edit.formatSelection", "ctrl+shift+alt+l"),
 		},
@@ -80,7 +80,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 	require.NotNil(t, res)
 
 	expected := &importapi.ImportResult{
-		Setting: &keymapv1.KeymapSetting{Keybindings: []*keymapv1.ActionBinding{
+		Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
 			{
 				Id:          "actions.edit.formatSelection",
 				Name:        "Format selection",

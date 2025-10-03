@@ -26,7 +26,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
 	testCases := []struct {
 		name      string
 		input     string
-		expected  *keymapv1.KeymapSetting
+		expected  *keymapv1.Keymap
 		expectErr bool
 	}{
 		{
@@ -36,7 +36,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="meta C"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
@@ -57,7 +57,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="shift HOME"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+k ctrl+c"),
@@ -74,7 +74,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="control alt S"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
@@ -89,7 +89,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="alt UNKNOWN"/>
   </action>
 </keymap>`,
-			expected:  &keymapv1.KeymapSetting{},
+			expected:  &keymapv1.Keymap{},
 			expectErr: false,
 		},
 		{
@@ -99,7 +99,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="control K" second-keystroke=""/>
   </action>
 </keymap>`,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+k"),
 				},
@@ -113,7 +113,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="control K" second-keystroke="  "/>
   </action>
 </keymap>`,
-			expected:  &keymapv1.KeymapSetting{},
+			expected:  &keymapv1.Keymap{},
 			expectErr: false,
 		},
 		{
@@ -125,7 +125,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="control shift OPEN_BRACKET"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "f5"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+numpad3"),
@@ -141,7 +141,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="CTRL ALt s"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.KeymapSetting{
+			expected: &keymapv1.Keymap{
 				Keybindings: []*keymapv1.ActionBinding{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 				},

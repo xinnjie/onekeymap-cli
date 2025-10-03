@@ -78,7 +78,7 @@ func newExporter(
 func (e *vscodeExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	// Decode existing config for non-destructive merge
@@ -149,7 +149,7 @@ func (e *vscodeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) *map
 }
 
 // generateManagedKeybindings generates VSCode keybindings from KeymapSetting.
-func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.KeymapSetting) []vscodeKeybinding {
+func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []vscodeKeybinding {
 	var vscodeKeybindings []vscodeKeybinding
 
 	for _, km := range setting.GetKeybindings() {

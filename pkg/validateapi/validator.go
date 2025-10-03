@@ -24,7 +24,7 @@ func NewValidator(rules ...ValidationRule) *Validator {
 // Validate executes all validation rules in the chain.
 func (v *Validator) Validate(
 	ctx context.Context,
-	setting *keymapv1.KeymapSetting,
+	setting *keymapv1.Keymap,
 	opts importapi.ImportOptions,
 ) (*keymapv1.ValidationReport, error) {
 	processed := len(setting.GetKeybindings())
