@@ -40,7 +40,7 @@ func TestImporter_Import(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -60,7 +60,7 @@ func TestImporter_Import(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 					keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 				},
@@ -78,7 +78,7 @@ func TestImporter_Import(t *testing.T) {
 			    }
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+k up"),
 				},
 			},
@@ -95,7 +95,7 @@ func TestImporter_Import(t *testing.T) {
 			    }
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "shift shift"),
 				},
 			},
@@ -125,7 +125,7 @@ func TestImporter_Import(t *testing.T) {
         }
     ]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
@@ -147,7 +147,7 @@ func TestImporter_Import(t *testing.T) {
 			}
 	]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+1"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
@@ -165,7 +165,7 @@ func TestImporter_Import(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.withArgs", "meta+end"),
 				},
 			},
@@ -187,7 +187,7 @@ func TestImporter_Import(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 					keymap.NewActioinBinding("actions.test.withArgs", "meta+end"),
 				},
@@ -205,7 +205,7 @@ func TestImporter_Import(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.forimport.withArgs.B", "alt+4"),
 				},
 			},
@@ -220,7 +220,7 @@ func TestImporter_Import(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.forimport.cmdOnly.B", "alt+5"),
 				},
 			},
@@ -235,7 +235,7 @@ func TestImporter_Import(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.forimport.singleImplicit", "alt+6"),
 				},
 			},

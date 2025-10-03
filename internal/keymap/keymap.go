@@ -41,10 +41,13 @@ func DecorateSetting(
 	}
 
 	for _, ab := range setting.GetKeybindings() {
-		if cfg := config.FindByUniversalAction(ab.GetId()); cfg != nil {
-			ab.Description = cfg.Description
-			ab.Name = cfg.Name
-			ab.Category = cfg.Category
+		if cfg := config.FindByUniversalAction(ab.GetName()); cfg != nil {
+			if ab.GetActionConfig() == nil {
+				ab.ActionConfig = &keymapv1.ActionConfig{}
+			}
+			ab.ActionConfig.Description = cfg.Description
+			ab.ActionConfig.DisplayName = cfg.Name
+			ab.ActionConfig.Category = cfg.Category
 		}
 
 		for _, b := range ab.GetBindings() {
@@ -120,18 +123,23 @@ func Load(reader io.Reader) (*keymapv1.Keymap, error) {
 
 	setting := &keymapv1.Keymap{}
 	// Group keybindings by Id ONLY. Preserve insertion order of first appearance.
-	grouped := make(map[string]*keymapv1.ActionBinding)
+	grouped := make(map[string]*keymapv1.Action)
 	order := make([]string, 0)
 
 	for _, fk := range friendlyData.Keymaps {
 		key := fk.ID
 		ab, ok := grouped[key]
 		if !ok {
-			ab = &keymapv1.ActionBinding{
-				Id:          fk.ID,
-				Comment:     fk.Comment,
-				Description: fk.Description,
-				Name:        fk.Name,
+			ab = &keymapv1.Action{
+				Name:    fk.ID,
+				Comment: fk.Comment,
+			}
+			// Only create ActionConfig if there's actual data
+			if fk.Description != "" || fk.Name != "" {
+				ab.ActionConfig = &keymapv1.ActionConfig{
+					Description: fk.Description,
+					DisplayName: fk.Name,
+				}
 			}
 			grouped[key] = ab
 			order = append(order, key)
@@ -140,11 +148,16 @@ func Load(reader io.Reader) (*keymapv1.Keymap, error) {
 			if ab.GetComment() == "" && fk.Comment != "" {
 				ab.Comment = fk.Comment
 			}
-			if ab.GetDescription() == "" && fk.Description != "" {
-				ab.Description = fk.Description
-			}
-			if ab.GetName() == "" && fk.Name != "" {
-				ab.Name = fk.Name
+			if fk.Description != "" || fk.Name != "" {
+				if ab.GetActionConfig() == nil {
+					ab.ActionConfig = &keymapv1.ActionConfig{}
+				}
+				if ab.GetActionConfig().GetDescription() == "" && fk.Description != "" {
+					ab.ActionConfig.Description = fk.Description
+				}
+				if ab.GetActionConfig().GetDisplayName() == "" && fk.Name != "" {
+					ab.ActionConfig.DisplayName = fk.Name
+				}
 			}
 		}
 
@@ -181,14 +194,19 @@ func Save(writer io.Writer, setting *keymapv1.Keymap) error {
 	groupedKeybindings := make(map[groupKey]*OneKeymapConfig)
 
 	for _, k := range setting.GetKeybindings() {
-		key := groupKey{ID: k.GetId(), Comment: k.GetComment(), Description: k.GetDescription()}
+		var description, displayName string
+		if k.GetActionConfig() != nil {
+			description = k.GetActionConfig().GetDescription()
+			displayName = k.GetActionConfig().GetDisplayName()
+		}
+		key := groupKey{ID: k.GetName(), Comment: k.GetComment(), Description: description}
 		config, ok := groupedKeybindings[key]
 		if !ok {
 			config = &OneKeymapConfig{
-				ID:          k.GetId(),
+				ID:          k.GetName(),
 				Comment:     k.GetComment(),
-				Description: k.GetDescription(),
-				Name:        k.GetName(),
+				Description: description,
+				Name:        displayName,
 			}
 			groupedKeybindings[key] = config
 		}

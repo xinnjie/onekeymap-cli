@@ -43,10 +43,10 @@ func (e *demoExporter) Export(
 			binding := keymap.NewKeyBinding(b)
 			keys, err := binding.Format(platform.PlatformMacOS, "+")
 			if err != nil {
-				e.logger.WarnContext(ctx, "Skipping un-formattable keybinding", "action", km.GetId(), "error", err)
+				e.logger.WarnContext(ctx, "Skipping un-formattable keybinding", "action", km.GetName(), "error", err)
 				continue
 			}
-			out = append(out, demoBinding{Keys: keys, Action: km.GetId()})
+			out = append(out, demoBinding{Keys: keys, Action: km.GetName()})
 		}
 	}
 

@@ -41,17 +41,17 @@ func NewKeymapChangesModel(changes *importapi.KeymapChanges, confirm *bool) tea.
 	var rows []table.Row
 	if changes != nil {
 		for _, kb := range changes.Remove {
-			rows = append(rows, table.Row{"Remove", redMinus(kb.GetId()), redMinus(formatKeyBinding(kb)), ""})
+			rows = append(rows, table.Row{"Remove", redMinus(kb.GetName()), redMinus(formatKeyBinding(kb)), ""})
 		}
 		for _, kb := range changes.Add {
-			rows = append(rows, table.Row{"Add", greenPlus(kb.GetId()), "", greenPlus(formatKeyBinding(kb))})
+			rows = append(rows, table.Row{"Add", greenPlus(kb.GetName()), "", greenPlus(formatKeyBinding(kb))})
 		}
 		for _, diff := range changes.Update {
 			action := ""
 			if diff.Before != nil {
-				action = diff.Before.GetId()
+				action = diff.Before.GetName()
 			} else if diff.After != nil {
-				action = diff.After.GetId()
+				action = diff.After.GetName()
 			}
 			rows = append(
 				rows,
@@ -148,7 +148,7 @@ func redMinus(s string) string {
 	return fmt.Sprintf("\x1b[31m-\x1b[0m %s", s)
 }
 
-func formatKeyBinding(kb *keymapv1.ActionBinding) string {
+func formatKeyBinding(kb *keymapv1.Action) string {
 	if kb == nil {
 		return ""
 	}

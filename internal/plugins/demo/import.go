@@ -60,7 +60,7 @@ func (i *demoImporter) Import(
 		}
 		setting.Keybindings = append(
 			setting.Keybindings,
-			&keymapv1.ActionBinding{Id: b.Action, Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}}},
+			&keymapv1.Action{Name: b.Action, Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}}},
 		)
 	}
 	return setting, nil

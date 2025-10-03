@@ -153,7 +153,7 @@ func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []
 	var vscodeKeybindings []vscodeKeybinding
 
 	for _, km := range setting.GetKeybindings() {
-		mapping := e.mappingConfig.FindByUniversalAction(km.GetId())
+		mapping := e.mappingConfig.FindByUniversalAction(km.GetName())
 		if mapping == nil {
 			continue
 		}
@@ -170,7 +170,7 @@ func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []
 			binding := keymap.NewKeyBinding(b)
 			keys, err := formatKeybinding(binding)
 			if err != nil {
-				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetId(), "error", err)
+				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
 				continue
 			}
 			for _, vscodeConfig := range vscodeConfigs {

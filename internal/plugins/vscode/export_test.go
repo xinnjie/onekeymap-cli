@@ -30,7 +30,7 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "correctly exports a standard action",
 			keymapSetting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -45,7 +45,7 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "correctly exports multiple actions",
 			keymapSetting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
 			},
@@ -66,7 +66,7 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "non-destructive export preserves user keybindings",
 			keymapSetting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -93,7 +93,7 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
 			keymapSetting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -115,7 +115,7 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "multiple user keybindings with mixed conflicts",
 			keymapSetting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
@@ -165,7 +165,7 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "empty existing config behaves as destructive export",
 			keymapSetting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -182,7 +182,7 @@ func TestExporter_Export(t *testing.T) {
 		{
 			name: "preserves order by base config using command as key",
 			keymapSetting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},

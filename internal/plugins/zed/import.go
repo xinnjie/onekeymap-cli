@@ -88,8 +88,8 @@ func (p *zedImporter) Import(
 				)
 				continue
 			}
-			keymapEntry := &keymapv1.ActionBinding{
-				Id: actionID,
+			keymapEntry := &keymapv1.Action{
+				Name: actionID,
 				Bindings: []*keymapv1.Binding{
 					{KeyChords: kb.KeyChords},
 				},

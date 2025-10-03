@@ -125,7 +125,7 @@ func (s *Server) ConfigDetect(
 	}
 }
 
-func (s *Server) LoadKeymap(
+func (s *Server) GetKeymap(
 	ctx context.Context,
 	req *keymapv1.GetKeymapRequest,
 ) (*keymapv1.GetKeymapResponse, error) {
@@ -136,18 +136,20 @@ func (s *Server) LoadKeymap(
 
 	// If return_all is true, we will return all mappings in the config.
 	if req.GetReturnAll() {
-		existingBindings := make(map[string]*keymapv1.ActionBinding)
+		existingBindings := make(map[string]*keymapv1.Action)
 		for _, binding := range km.GetKeybindings() {
-			existingBindings[binding.GetId()] = binding
+			existingBindings[binding.GetName()] = binding
 		}
 
 		for id, mapping := range s.mappingConfig.Mappings {
 			if _, exists := existingBindings[id]; !exists {
-				km.Keybindings = append(km.Keybindings, &keymapv1.ActionBinding{
-					Id:          id,
-					Description: mapping.Description,
-					Name:        mapping.Name,
-					Category:    mapping.Category,
+				km.Keybindings = append(km.Keybindings, &keymapv1.Action{
+					Name: id,
+					ActionConfig: &keymapv1.ActionConfig{
+						Description: mapping.Description,
+						DisplayName: mapping.Name,
+						Category:    mapping.Category,
+					},
 				})
 			}
 		}

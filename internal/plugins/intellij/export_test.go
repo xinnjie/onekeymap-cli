@@ -31,7 +31,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "basic single-chord export ($Copy)",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -60,7 +60,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "multi entries and multi-chord export (command1)",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					// single chord ctrl+alt+s
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 					// two-chord ctrl+k ctrl+c
@@ -88,7 +88,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "unmapped actions skipped",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.unknown", "meta+x"),
 				},
 			},
@@ -100,7 +100,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "dedup identical shortcuts for an action",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 				},
@@ -124,7 +124,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "special keys are formatted correctly",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "f5"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+numpad3"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+shift+["),
@@ -151,7 +151,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "non-destructive export preserves user actions",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -192,7 +192,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "managed action takes priority over conflicting user action",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -237,7 +237,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		{
 			name: "empty existing config behaves as destructive export",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},

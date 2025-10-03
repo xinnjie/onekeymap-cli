@@ -34,12 +34,12 @@ func (r *DuplicateMappingRule) Validate(ctx context.Context, validationContext *
 			}
 			kb := keymap.NewKeyBinding(b)
 			key := keymap.MustFormatKeyBinding(kb, platform.PlatformMacOS)
-			composite := ab.GetId() + "\x00" + key
+			composite := ab.GetName() + "\x00" + key
 			if _, exists := seen[composite]; exists {
 				warning := &keymapv1.ValidationIssue{
 					Issue: &keymapv1.ValidationIssue_DuplicateMapping{
 						DuplicateMapping: &keymapv1.DuplicateMapping{
-							Action:     ab.GetId(),
+							Action:     ab.GetName(),
 							Keybinding: key,
 							Message:    "This keymap is defined multiple times in the source configuration.",
 						},

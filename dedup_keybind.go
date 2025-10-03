@@ -4,14 +4,15 @@ import (
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"google.golang.org/protobuf/proto"
 )
 
 // pairKey builds a stable identifier for a keymap by action and normalized key bindings.
 // For multi-binding actions, it sorts the formatted bindings and joins them to create a
 // deterministic signature per action.
-func pairKey(km *keymapv1.ActionBinding) string {
+func pairKey(km *keymapv1.Action) string {
 	if km == nil || len(km.GetBindings()) == 0 {
-		return km.GetId() + "\x00"
+		return km.GetName() + "\x00"
 	}
 	// Format each binding
 	parts := make([]string, 0, len(km.GetBindings()))
@@ -30,7 +31,7 @@ func pairKey(km *keymapv1.ActionBinding) string {
 		}
 	}
 	// Join with NUL to avoid ambiguity
-	sig := km.GetId() + "\x00"
+	sig := km.GetName() + "\x00"
 	for _, p := range parts {
 		sig += p + "\x00"
 	}
@@ -39,19 +40,19 @@ func pairKey(km *keymapv1.ActionBinding) string {
 
 // dedupKeyBindings removes duplicate keybindings based on (Action, KeyChords)
 // using a deterministic signature. The first occurrence is kept and order is preserved.
-func dedupKeyBindings(keybindings []*keymapv1.ActionBinding) []*keymapv1.ActionBinding {
+func dedupKeyBindings(keybindings []*keymapv1.Action) []*keymapv1.Action {
 	if len(keybindings) == 0 {
 		return keybindings
 	}
 	// Merge by action ID, concatenating unique bindings while preserving first metadata and order
 	idxByID := make(map[string]int, len(keybindings))
-	out := make([]*keymapv1.ActionBinding, 0, len(keybindings))
+	out := make([]*keymapv1.Action, 0, len(keybindings))
 
 	for _, kb := range keybindings {
 		if kb == nil {
 			continue
 		}
-		id := kb.GetId()
+		id := kb.GetName()
 		if pos, ok := idxByID[id]; ok {
 			// Merge bindings into existing
 			existing := out[pos]
@@ -77,20 +78,29 @@ func dedupKeyBindings(keybindings []*keymapv1.ActionBinding) []*keymapv1.ActionB
 			if existing.GetName() == "" && kb.GetName() != "" {
 				existing.Name = kb.GetName()
 			}
-			if existing.GetDescription() == "" && kb.GetDescription() != "" {
-				existing.Description = kb.GetDescription()
-			}
-			if existing.GetCategory() == "" && kb.GetCategory() != "" {
-				existing.Category = kb.GetCategory()
+			if kb.GetActionConfig() != nil {
+				if existing.GetActionConfig() == nil {
+					existing.ActionConfig = &keymapv1.ActionConfig{}
+				}
+				if existing.GetActionConfig().GetDescription() == "" && kb.GetActionConfig().GetDescription() != "" {
+					existing.ActionConfig.Description = kb.GetActionConfig().GetDescription()
+				}
+				if existing.GetActionConfig().GetCategory() == "" && kb.GetActionConfig().GetCategory() != "" {
+					existing.ActionConfig.Category = kb.GetActionConfig().GetCategory()
+				}
 			}
 			continue
 		}
 		// First occurrence: create a fresh ActionBinding and deduplicate its own bindings
-		fresh := &keymapv1.ActionBinding{
-			Id:          kb.GetId(),
-			Name:        kb.GetName(),
-			Description: kb.GetDescription(),
-			Category:    kb.GetCategory(),
+		fresh := &keymapv1.Action{
+			Name: kb.GetName(),
+		}
+		// Only clone ActionConfig if it exists
+		if kb.GetActionConfig() != nil {
+			cloned := proto.Clone(kb.GetActionConfig())
+			if ac, ok := cloned.(*keymapv1.ActionConfig); ok {
+				fresh.ActionConfig = ac
+			}
 		}
 		hadBindings := len(kb.GetBindings()) > 0
 		for _, b := range kb.GetBindings() {

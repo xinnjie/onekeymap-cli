@@ -34,24 +34,27 @@ func newBindingProto(keyChords ...string) []*keymapv1.Binding {
 }
 
 // NewActioinBinding creates an ActionBinding with a single Binding.
-func NewActioinBinding(action string, keyChords ...string) *keymapv1.ActionBinding {
-	return &keymapv1.ActionBinding{
-		Id:       action,
+// Note: Does not create ActionConfig to keep test expectations simple.
+func NewActioinBinding(action string, keyChords ...string) *keymapv1.Action {
+	return &keymapv1.Action{
+		Name:     action,
 		Bindings: newBindingProto(keyChords...),
 	}
 }
 
 // NewActionBindingWithComment creates an ActionBinding with one Binding and a comment.
-func NewActionBindingWithComment(action, keyChords, comment string) *keymapv1.ActionBinding {
+func NewActionBindingWithComment(action, keyChords, comment string) *keymapv1.Action {
 	ab := NewActioinBinding(action, keyChords)
 	ab.Comment = comment
 	return ab
 }
 
 // NewActionBindingWithDescription creates an ActionBinding with one Binding and a description.
-func NewActionBindingWithDescription(action, keyChords, description string) *keymapv1.ActionBinding {
+func NewActionBindingWithDescription(action, keyChords, description string) *keymapv1.Action {
 	ab := NewActioinBinding(action, keyChords)
-	ab.Description = description
+	ab.ActionConfig = &keymapv1.ActionConfig{
+		Description: description,
+	}
 	return ab
 }
 

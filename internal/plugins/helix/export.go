@@ -163,7 +163,7 @@ func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting 
 	keysByMode := helixKeys{}
 
 	for _, km := range setting.GetKeybindings() {
-		mapping := e.mappingConfig.FindByUniversalAction(km.GetId())
+		mapping := e.mappingConfig.FindByUniversalAction(km.GetName())
 		if mapping == nil || len(mapping.Helix) == 0 {
 			continue
 		}
@@ -177,9 +177,14 @@ func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting 
 			if err != nil {
 				// TODO(xinnjie): Add doc about this behavior: because helix do not recognize numpad keys(numpad1 is recognized as "1"), to avoid conflict with other keybindings, we skip these keybindings
 				if errors.Is(err, ErrNotSupportKeyChords) {
-					e.logger.DebugContext(ctx, "Skipping keybinding with unsupported key chords", "action", km.GetId())
+					e.logger.DebugContext(
+						ctx,
+						"Skipping keybinding with unsupported key chords",
+						"action",
+						km.GetName(),
+					)
 				} else {
-					e.logger.WarnContext(ctx, "Skipping keybinding with un-formattable key", "action", km.GetId(), "error", err)
+					e.logger.WarnContext(ctx, "Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
 				}
 				continue
 			}
@@ -219,7 +224,7 @@ func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting 
 						"mode",
 						string(m),
 						"action",
-						km.GetId(),
+						km.GetName(),
 					)
 					continue
 				}

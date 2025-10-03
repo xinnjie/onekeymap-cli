@@ -99,39 +99,45 @@ func TestImportService_Import(t *testing.T) {
 		{
 			name: "sorts imported keymaps by action ID",
 			importData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{
 					{
-						Id:          "actions.editor.copy",
-						Name:        "Copy",
-						Description: "Copy",
-						Category:    "Editor",
+						Name: "actions.editor.copy",
+						ActionConfig: &keymapv1.ActionConfig{
+							DisplayName: "Copy",
+							Description: "Copy",
+							Category:    "Editor",
+						},
 						Bindings: []*keymapv1.Binding{
 							{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "ctrl+c"},
 						},
 					},
 					{
-						Id:          "actions.editor.paste",
-						Name:        "Paste",
-						Description: "Paste",
-						Category:    "Editor",
+						Name: "actions.editor.paste",
+						ActionConfig: &keymapv1.ActionConfig{
+							DisplayName: "Paste",
+							Description: "Paste",
+							Category:    "Editor",
+						},
 						Bindings: []*keymapv1.Binding{
 							{KeyChords: keymap.MustParseKeyBinding("ctrl+v").KeyChords, KeyChordsReadable: "ctrl+v"},
 						},
 					},
 				}},
 				Changes: &importapi.KeymapChanges{
-					Add: []*keymapv1.ActionBinding{
+					Add: []*keymapv1.Action{
 						{
-							Id:          "actions.editor.copy",
-							Name:        "Copy",
-							Description: "Copy",
-							Category:    "Editor",
+							Name: "actions.editor.copy",
+							ActionConfig: &keymapv1.ActionConfig{
+								DisplayName: "Copy",
+								Description: "Copy",
+								Category:    "Editor",
+							},
 							Bindings: []*keymapv1.Binding{
 								{
 									KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
@@ -140,10 +146,12 @@ func TestImportService_Import(t *testing.T) {
 							},
 						},
 						{
-							Id:          "actions.editor.paste",
-							Name:        "Paste",
-							Description: "Paste",
-							Category:    "Editor",
+							Name: "actions.editor.paste",
+							ActionConfig: &keymapv1.ActionConfig{
+								DisplayName: "Paste",
+								Description: "Paste",
+								Category:    "Editor",
+							},
 							Bindings: []*keymapv1.Binding{
 								{
 									KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
@@ -158,37 +166,41 @@ func TestImportService_Import(t *testing.T) {
 		{
 			name: "empty keybindings add",
 			baseData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					{
-						Id:       "actions.editor.paste",
+						Name:     "actions.editor.paste",
 						Bindings: []*keymapv1.Binding{},
 					},
 				},
 			},
 			importData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{
 					{
-						Id:          "actions.editor.paste",
-						Name:        "Paste",
-						Description: "Paste",
-						Category:    "Editor",
+						Name: "actions.editor.paste",
+						ActionConfig: &keymapv1.ActionConfig{
+							DisplayName: "Paste",
+							Description: "Paste",
+							Category:    "Editor",
+						},
 						Bindings: []*keymapv1.Binding{
 							{KeyChords: keymap.MustParseKeyBinding("ctrl+v").KeyChords, KeyChordsReadable: "ctrl+v"},
 						},
 					},
 				}},
 				Changes: &importapi.KeymapChanges{
-					Add: []*keymapv1.ActionBinding{
+					Add: []*keymapv1.Action{
 						{
-							Id:          "actions.editor.paste",
-							Name:        "Paste",
-							Description: "Paste",
-							Category:    "Editor",
+							Name: "actions.editor.paste",
+							ActionConfig: &keymapv1.ActionConfig{
+								DisplayName: "Paste",
+								Description: "Paste",
+								Category:    "Editor",
+							},
 							Bindings: []*keymapv1.Binding{
 								{
 									KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
@@ -203,9 +215,9 @@ func TestImportService_Import(t *testing.T) {
 
 		{
 			name:       "handles empty keymap list",
-			importData: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{}},
+			importData: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{}},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{}},
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{}},
 				Changes: &importapi.KeymapChanges{},
 			},
 		},
@@ -218,22 +230,24 @@ func TestImportService_Import(t *testing.T) {
 		{
 			name: "calculates no change",
 			baseData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
 			importData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{
 					{
-						Id:          "actions.editor.paste",
-						Name:        "Paste",
-						Description: "Paste",
-						Category:    "Editor",
+						Name: "actions.editor.paste",
+						ActionConfig: &keymapv1.ActionConfig{
+							DisplayName: "Paste",
+							Description: "Paste",
+							Category:    "Editor",
+						},
 						Bindings: []*keymapv1.Binding{
 							{KeyChords: keymap.MustParseKeyBinding("ctrl+v").KeyChords, KeyChordsReadable: "ctrl+v"},
 						},
@@ -245,22 +259,24 @@ func TestImportService_Import(t *testing.T) {
 		{
 			name: "deduplicate",
 			baseData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
 			importData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v", "ctrl+v"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{
 					{
-						Id:          "actions.editor.paste",
-						Name:        "Paste",
-						Description: "Paste",
-						Category:    "Editor",
+						Name: "actions.editor.paste",
+						ActionConfig: &keymapv1.ActionConfig{
+							DisplayName: "Paste",
+							Description: "Paste",
+							Category:    "Editor",
+						},
 						Bindings: []*keymapv1.Binding{
 							{KeyChords: keymap.MustParseKeyBinding("ctrl+v").KeyChords, KeyChordsReadable: "ctrl+v"},
 						},
@@ -272,32 +288,36 @@ func TestImportService_Import(t *testing.T) {
 		{
 			name: "calculates added keybindings",
 			baseData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{},
+				Keybindings: []*keymapv1.Action{},
 			},
 			importData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{
 					{
-						Id:          "actions.editor.paste",
-						Name:        "Paste",
-						Description: "Paste",
-						Category:    "Editor",
+						Name: "actions.editor.paste",
+						ActionConfig: &keymapv1.ActionConfig{
+							DisplayName: "Paste",
+							Description: "Paste",
+							Category:    "Editor",
+						},
 						Bindings: []*keymapv1.Binding{
 							{KeyChords: keymap.MustParseKeyBinding("ctrl+v").KeyChords, KeyChordsReadable: "ctrl+v"},
 						},
 					},
 				}},
 				Changes: &importapi.KeymapChanges{
-					Add: []*keymapv1.ActionBinding{
+					Add: []*keymapv1.Action{
 						{
-							Id:          "actions.editor.paste",
-							Name:        "Paste",
-							Description: "Paste",
-							Category:    "Editor",
+							Name: "actions.editor.paste",
+							ActionConfig: &keymapv1.ActionConfig{
+								DisplayName: "Paste",
+								Description: "Paste",
+								Category:    "Editor",
+							},
 							Bindings: []*keymapv1.Binding{
 								{
 									KeyChords:         keymap.MustParseKeyBinding("ctrl+v").KeyChords,
@@ -312,23 +332,25 @@ func TestImportService_Import(t *testing.T) {
 		{
 			name: "calculates not removed keybindings",
 			baseData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
 			importData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					// According to import semantics, unchanged keybindings should not be removed.
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{
 					{
-						Id:          "actions.editor.copy",
-						Name:        "Copy",
-						Description: "Copy",
-						Category:    "Editor",
+						Name: "actions.editor.copy",
+						ActionConfig: &keymapv1.ActionConfig{
+							DisplayName: "Copy",
+							Description: "Copy",
+							Category:    "Editor",
+						},
 						Bindings: []*keymapv1.Binding{
 							{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "ctrl+c"},
 						},
@@ -340,22 +362,24 @@ func TestImportService_Import(t *testing.T) {
 		{
 			name: "calculates updated keybindings",
 			baseData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
 			importData: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.ActionBinding{
+				Keybindings: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.editor.copy", "cmd+c", "alt+c"),
 				},
 			},
 			expect: &importapi.ImportResult{
-				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.ActionBinding{
+				Setting: &keymapv1.Keymap{Keybindings: []*keymapv1.Action{
 					{
-						Id:          "actions.editor.copy",
-						Name:        "Copy",
-						Description: "Copy",
-						Category:    "Editor",
+						Name: "actions.editor.copy",
+						ActionConfig: &keymapv1.ActionConfig{
+							DisplayName: "Copy",
+							Description: "Copy",
+							Category:    "Editor",
+						},
 						Bindings: []*keymapv1.Binding{
 							{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "ctrl+c"},
 							{KeyChords: keymap.MustParseKeyBinding("cmd+c").KeyChords, KeyChordsReadable: "cmd+c"},
@@ -365,11 +389,13 @@ func TestImportService_Import(t *testing.T) {
 				}},
 				Changes: &importapi.KeymapChanges{
 					Update: []importapi.KeymapDiff{{
-						Before: &keymapv1.ActionBinding{
-							Id:          "actions.editor.copy",
-							Name:        "Copy",
-							Description: "Copy",
-							Category:    "Editor",
+						Before: &keymapv1.Action{
+							Name: "actions.editor.copy",
+							ActionConfig: &keymapv1.ActionConfig{
+								DisplayName: "Copy",
+								Description: "Copy",
+								Category:    "Editor",
+							},
 							Bindings: []*keymapv1.Binding{
 								{
 									KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,
@@ -377,11 +403,13 @@ func TestImportService_Import(t *testing.T) {
 								},
 							},
 						},
-						After: &keymapv1.ActionBinding{
-							Id:          "actions.editor.copy",
-							Name:        "Copy",
-							Description: "Copy",
-							Category:    "Editor",
+						After: &keymapv1.Action{
+							Name: "actions.editor.copy",
+							ActionConfig: &keymapv1.ActionConfig{
+								DisplayName: "Copy",
+								Description: "Copy",
+								Category:    "Editor",
+							},
 							Bindings: []*keymapv1.Binding{
 								{
 									KeyChords:         keymap.MustParseKeyBinding("ctrl+c").KeyChords,

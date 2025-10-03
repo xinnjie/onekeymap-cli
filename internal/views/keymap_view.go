@@ -49,7 +49,7 @@ func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) te
 func (m *KeymapViewModel) initCategories() {
 	catSet := map[string]struct{}{}
 	for _, kb := range m.setting.GetKeybindings() {
-		if mapping := m.mc.FindByUniversalAction(kb.GetId()); mapping != nil {
+		if mapping := m.mc.FindByUniversalAction(kb.GetName()); mapping != nil {
 			if mapping.Category != "" {
 				catSet[mapping.Category] = struct{}{}
 			}
@@ -148,7 +148,7 @@ func (m *KeymapViewModel) rebuildRows() {
 	// Aggregate keybindings by action id
 	agg := map[string][]string{}
 	for _, ab := range m.setting.GetKeybindings() {
-		if !m.includeByCategory(ab.GetId()) {
+		if !m.includeByCategory(ab.GetName()) {
 			continue
 		}
 		for _, b := range ab.GetBindings() {
@@ -156,7 +156,7 @@ func (m *KeymapViewModel) rebuildRows() {
 			if k == "" {
 				continue
 			}
-			agg[ab.GetId()] = append(agg[ab.GetId()], k)
+			agg[ab.GetName()] = append(agg[ab.GetName()], k)
 		}
 	}
 	ids := make([]string, 0, len(agg))

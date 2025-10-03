@@ -119,9 +119,9 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.Keymap) zedKe
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
 	for _, km := range setting.GetKeybindings() {
-		actionConfig, err := p.actionIDToZed(km.GetId())
+		actionConfig, err := p.actionIDToZed(km.GetName())
 		if err != nil {
-			p.logger.Info("no mapping found for action", "action", km.GetId())
+			p.logger.Info("no mapping found for action", "action", km.GetName())
 			continue
 		}
 

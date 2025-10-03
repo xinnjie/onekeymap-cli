@@ -115,7 +115,7 @@ func (r *PotentialShadowingRule) Validate(ctx context.Context, validationContext
 					Issue: &keymapv1.ValidationIssue_PotentialShadowing{
 						PotentialShadowing: &keymapv1.PotentialShadowing{
 							Keybinding:   formattedKeys,
-							Action:       ab.GetId(),
+							Action:       ab.GetName(),
 							TargetEditor: string(r.targetEditor),
 							Message:      "This key chord is the default for " + description + ".",
 						},

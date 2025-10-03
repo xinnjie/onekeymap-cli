@@ -33,7 +33,7 @@ func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *V
 
 	// Group keybindings by their formatted key combination
 	keybindingMap := make(
-		map[string][]*keymapv1.ActionBinding,
+		map[string][]*keymapv1.Action,
 	) // key: formatted keybinding, value: list of action bindings having it
 
 	for _, ab := range validationContext.Setting.GetKeybindings() {
@@ -61,12 +61,12 @@ func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *V
 			var actions []*keymapv1.KeybindConflict_Action
 			for _, kb := range keybindings {
 				action := &keymapv1.KeybindConflict_Action{
-					Action: kb.GetId(),
+					Action: kb.GetName(),
 				}
 
 				// Try to get editor command from mapping config
 				if mappingConfig != nil {
-					if mapping := mappingConfig.FindByUniversalAction(kb.GetId()); mapping != nil {
+					if mapping := mappingConfig.FindByUniversalAction(kb.GetName()); mapping != nil {
 						// Get editor command based on source editor from report
 						editorCommand := getEditorCommand(mapping, validationContext.Report.GetSourceEditor())
 						action.EditorCommand = editorCommand

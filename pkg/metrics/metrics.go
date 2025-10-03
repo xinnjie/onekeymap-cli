@@ -111,10 +111,10 @@ func (r *recorder) RecordCommandProcessed(ctx context.Context, editor string, se
 		return
 	}
 	for _, binding := range setting.GetKeybindings() {
-		isMapped := r.mappingConfig.IsActionMapped(binding.GetId())
+		isMapped := r.mappingConfig.IsActionMapped(binding.GetName())
 		r.commandCounter.Add(ctx, 1, metric.WithAttributes(
 			attribute.String(attrKeyEditor, editor),
-			attribute.String(attrKeyCommand, binding.GetId()),
+			attribute.String(attrKeyCommand, binding.GetName()),
 			attribute.Bool(attrKeyMapped, isMapped),
 		))
 	}

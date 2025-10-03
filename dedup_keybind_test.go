@@ -13,63 +13,63 @@ import (
 func TestDedupKeyBindings_Table(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    []*keymapv1.ActionBinding
-		expected []*keymapv1.ActionBinding
+		input    []*keymapv1.Action
+		expected []*keymapv1.Action
 	}{
 		{
 			name: "EmptyChords",
-			input: []*keymapv1.ActionBinding{
+			input: []*keymapv1.Action{
 				{
-					Id: "actions.copy",
+					Name: "actions.copy",
 					Bindings: []*keymapv1.Binding{
 						{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{}}},
 					},
 				},
 			},
-			expected: []*keymapv1.ActionBinding{},
+			expected: []*keymapv1.Action{},
 		},
 		{
 			name: "DuplicatesByActionAndChords",
-			input: []*keymapv1.ActionBinding{
+			input: []*keymapv1.Action{
 				keymap.NewActioinBinding("actions.copy", "k"),
 				keymap.NewActioinBinding("actions.copy", "k"),
 			},
-			expected: []*keymapv1.ActionBinding{
+			expected: []*keymapv1.Action{
 				keymap.NewActioinBinding("actions.copy", "k"),
 			},
 		},
 		{
 			name: "KeepsOrderAndSkipsNil",
-			input: []*keymapv1.ActionBinding{
+			input: []*keymapv1.Action{
 				keymap.NewActioinBinding("actions.open", "o"),
 				keymap.NewActioinBinding("actions.open", "o"),
 				keymap.NewActioinBinding("actions.save", "o"),
 			},
-			expected: []*keymapv1.ActionBinding{
+			expected: []*keymapv1.Action{
 				keymap.NewActioinBinding("actions.open", "o"),
 				keymap.NewActioinBinding("actions.save", "o"),
 			},
 		},
 		{
 			name: "AggregatesByIDForDifferentChords",
-			input: []*keymapv1.ActionBinding{
+			input: []*keymapv1.Action{
 				keymap.NewActioinBinding("actions.find", "f"),
 				keymap.NewActioinBinding("actions.replace", "f", "f", "f"),
 				keymap.NewActioinBinding("actions.find", "g"),
 			},
-			expected: []*keymapv1.ActionBinding{
+			expected: []*keymapv1.Action{
 				keymap.NewActioinBinding("actions.find", "f", "g"),
 				keymap.NewActioinBinding("actions.replace", "f"),
 			},
 		},
 		{
 			name: "NilVsEmptyChordsConsideredEqual",
-			input: []*keymapv1.ActionBinding{
-				{Id: "actions.nochord"},
-				{Id: "actions.nochord", Bindings: []*keymapv1.Binding{}},
+			input: []*keymapv1.Action{
+				{Name: "actions.nochord"},
+				{Name: "actions.nochord", Bindings: []*keymapv1.Binding{}},
 			},
-			expected: []*keymapv1.ActionBinding{
-				{Id: "actions.nochord"},
+			expected: []*keymapv1.Action{
+				{Name: "actions.nochord"},
 			},
 		},
 	}

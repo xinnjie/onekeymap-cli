@@ -16,7 +16,7 @@ func TestDuplicateMappingRule_Validate_WithDuplicates(t *testing.T) {
 
 	// Create keymaps with duplicate mappings
 	setting := &keymapv1.Keymap{
-		Keybindings: []*keymapv1.ActionBinding{
+		Keybindings: []*keymapv1.Action{
 			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"), // Duplicate
 			keymap.NewActioinBinding("actions.edit.paste", "ctrl+v"),
@@ -41,7 +41,7 @@ func TestDuplicateMappingRule_Validate_NoDuplicates(t *testing.T) {
 	validator := NewValidator(NewDuplicateMappingRule())
 
 	setting := &keymapv1.Keymap{
-		Keybindings: []*keymapv1.ActionBinding{
+		Keybindings: []*keymapv1.Action{
 			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 			keymap.NewActioinBinding("actions.edit.paste", "ctrl+v"),
 			keymap.NewActioinBinding("actions.edit.cut", "ctrl+x"),
@@ -62,7 +62,7 @@ func TestDuplicateMappingRule_Validate_SameActionDifferentKeys(t *testing.T) {
 
 	// Same action with different keys should not be flagged as duplicate
 	setting := &keymapv1.Keymap{
-		Keybindings: []*keymapv1.ActionBinding{
+		Keybindings: []*keymapv1.Action{
 			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 			keymap.NewActioinBinding("actions.edit.copy", "cmd+c"), // Different keys
 		},

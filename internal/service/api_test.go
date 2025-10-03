@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestServer_LoadKeymap(t *testing.T) {
+func TestServer_GetKeymap(t *testing.T) {
 	ctx := context.Background()
 	mockMappingConfig := &mappings.MappingConfig{
 		Mappings: map[string]mappings.ActionMappingConfig{
@@ -51,10 +51,12 @@ func TestServer_LoadKeymap(t *testing.T) {
 			},
 			want: &keymapv1.GetKeymapResponse{
 				Keymap: &keymapv1.Keymap{
-					Keybindings: []*keymapv1.ActionBinding{
+					Keybindings: []*keymapv1.Action{
 						{
-							Id:          "action1",
-							Description: "Description 1",
+							Name: "action1",
+							ActionConfig: &keymapv1.ActionConfig{
+								Description: "Description 1",
+							},
 							Bindings: []*keymapv1.Binding{
 								{
 									KeyChords: &keymapv1.KeyChordSequence{
@@ -92,10 +94,12 @@ func TestServer_LoadKeymap(t *testing.T) {
 			},
 			want: &keymapv1.GetKeymapResponse{
 				Keymap: &keymapv1.Keymap{
-					Keybindings: []*keymapv1.ActionBinding{
+					Keybindings: []*keymapv1.Action{
 						{
-							Id:          "action1",
-							Description: "Description 1",
+							Name: "action1",
+							ActionConfig: &keymapv1.ActionConfig{
+								Description: "Description 1",
+							},
 							Bindings: []*keymapv1.Binding{
 								{
 									KeyChords: &keymapv1.KeyChordSequence{
@@ -112,8 +116,8 @@ func TestServer_LoadKeymap(t *testing.T) {
 								},
 							},
 						},
-						{Id: "action2", Description: "Description 2"},
-						{Id: "action3", Description: "Description 3"},
+						{Name: "action2", ActionConfig: &keymapv1.ActionConfig{Description: "Description 2"}},
+						{Name: "action3", ActionConfig: &keymapv1.ActionConfig{Description: "Description 3"}},
 					},
 				},
 			},
@@ -136,10 +140,10 @@ func TestServer_LoadKeymap(t *testing.T) {
 			},
 			want: &keymapv1.GetKeymapResponse{
 				Keymap: &keymapv1.Keymap{
-					Keybindings: []*keymapv1.ActionBinding{
-						{Id: "action1", Description: "Description 1"},
-						{Id: "action2", Description: "Description 2"},
-						{Id: "action3", Description: "Description 3"},
+					Keybindings: []*keymapv1.Action{
+						{Name: "action1", ActionConfig: &keymapv1.ActionConfig{Description: "Description 1"}},
+						{Name: "action2", ActionConfig: &keymapv1.ActionConfig{Description: "Description 2"}},
+						{Name: "action3", ActionConfig: &keymapv1.ActionConfig{Description: "Description 3"}},
 					},
 				},
 			},
@@ -166,7 +170,7 @@ func TestServer_LoadKeymap(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := server.LoadKeymap(ctx, tt.req)
+			got, err := server.GetKeymap(ctx, tt.req)
 
 			if tt.wantErr {
 				require.Error(t, err)
