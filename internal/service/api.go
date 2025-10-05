@@ -6,11 +6,11 @@ import (
 	"io"
 	"strings"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

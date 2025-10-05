@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 )
 
 // FindByVSCodeActionWithArgs searches for a mapping by VSCode command, when clause, and args.

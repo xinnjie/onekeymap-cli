@@ -6,10 +6,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/bimap"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keycode"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/bimap"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap/keycode"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 //nolint:gochecknoglobals // static lookup tables shared across parse/format functions; initialized once and read-only

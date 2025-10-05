@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
 // ConfigDetect returns a reasonable default config path for the demo plugin.

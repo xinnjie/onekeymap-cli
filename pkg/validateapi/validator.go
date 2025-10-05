@@ -5,8 +5,8 @@ import (
 	"errors"
 	"math"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // Validator is a chain of responsibility container for validation rules.

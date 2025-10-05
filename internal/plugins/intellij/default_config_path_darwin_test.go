@@ -12,8 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
 func TestConfigDetect_Darwin(t *testing.T) {

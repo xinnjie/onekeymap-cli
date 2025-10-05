@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type EditorType string

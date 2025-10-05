@@ -3,9 +3,9 @@ package validateapi
 import (
 	"context"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // DuplicateMappingRule detects duplicate mappings (same action and keys combination).

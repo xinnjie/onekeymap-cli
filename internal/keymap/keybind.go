@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keychord"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap/keychord"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 const oneKeymapDefaultKeyChordSeparator = "+"

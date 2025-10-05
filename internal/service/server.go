@@ -3,11 +3,11 @@ package service
 import (
 	"log/slog"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins"
+	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type ServerOption struct {

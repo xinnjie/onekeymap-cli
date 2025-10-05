@@ -1,8 +1,8 @@
 package zed
 
 import (
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
 )
 
 const zedKeyChordSeparator = "-"

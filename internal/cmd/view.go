@@ -7,8 +7,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/views"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/internal/views"
 )
 
 type viewFlags struct {

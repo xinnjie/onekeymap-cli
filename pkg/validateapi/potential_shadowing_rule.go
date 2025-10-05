@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // PotentialShadowingRule detects keybindings that might shadow critical system or editor shortcuts.

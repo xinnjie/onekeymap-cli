@@ -1,7 +1,7 @@
 package plugins
 
 import (
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
 // Registry holds a collection of all available editor plugins.

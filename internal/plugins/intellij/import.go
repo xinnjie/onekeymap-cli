@@ -7,9 +7,9 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type intellijImporter struct {

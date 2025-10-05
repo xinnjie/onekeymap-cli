@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keycode"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/platform"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap/keycode"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // vscode key doc: https://github.com/microsoft/vscode/blob/main/src/vs/base/common/keyCodes.ts

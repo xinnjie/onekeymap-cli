@@ -3,8 +3,8 @@ package validateapi
 import (
 	"context"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type ValidationRule interface {

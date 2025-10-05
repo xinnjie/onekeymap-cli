@@ -1,4 +1,4 @@
-package onekeymap
+package internal
 
 import (
 	"bytes"
@@ -7,12 +7,12 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/diff"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/diff"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins"
+	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // exportService is the default implementation of the Exporter interface.

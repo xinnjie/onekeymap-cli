@@ -1,4 +1,4 @@
-package onekeymap
+package internal
 
 import (
 	"bytes"
@@ -10,11 +10,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins"
+	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // testExportPlugin is a minimal plugin implementation for export tests.

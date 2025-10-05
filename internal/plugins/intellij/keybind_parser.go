@@ -7,9 +7,9 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/bimap"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/keymap/keycode"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/bimap"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap/keycode"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // Shared well-known key name mappings between IntelliJ naming and our normalized names.

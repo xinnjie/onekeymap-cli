@@ -1,8 +1,6 @@
-package internal
+package jsonutil
 
-import (
-	"github.com/tailscale/hujson"
-)
+import "github.com/tailscale/hujson"
 
 // StripJSONComments converts JSONC (with //, /* */ comments and trailing commas)
 // into standard JSON to make it safe for encoding/json.

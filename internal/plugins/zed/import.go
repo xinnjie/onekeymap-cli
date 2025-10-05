@@ -8,10 +8,10 @@ import (
 	"log/slog"
 	"sort"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/jsonutil"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type zedImporter struct {
@@ -38,7 +38,7 @@ func (p *zedImporter) Import(
 		return nil, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
-	cleanedJSON := internal.StripJSONComments(jsonData)
+	cleanedJSON := jsonutil.StripJSONComments(jsonData)
 
 	var zedKeymaps zedKeymapConfig
 	if err := json.Unmarshal(cleanedJSON, &zedKeymaps); err != nil {

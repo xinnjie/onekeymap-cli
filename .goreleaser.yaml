@@ -59,7 +59,7 @@ changelog:
 release:
   github:
     owner: xinnjie
-    name: watchbeats
+    name: onekeymap-cli
   draft: false
   prerelease: auto
   name_template: "onekeymap-cli {{.Version}}"

@@ -1,6 +1,6 @@
 package keycode
 
-import keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+import keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 
 // IsNumpad checks if a given key code is a numpad key.
 func IsNumpad(kc keymapv1.KeyCode) bool {

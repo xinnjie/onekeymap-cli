@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 )
 
 const validZedActionsPath = "onekeymap/onekeymap-cli/chore/zed-valid-action.json"

@@ -12,8 +12,8 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 
-	mappings "github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	mappings "github.com/xinnjie/onekeymap-cli/internal/mappings"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // Metric names.

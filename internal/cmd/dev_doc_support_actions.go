@@ -8,7 +8,7 @@ import (
 	"text/template"
 
 	"github.com/spf13/cobra"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 )
 
 type devDocSupportActionsFlags struct {

@@ -7,10 +7,10 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/pluginapi"
-	keymapv1 "github.com/xinnjie/watchbeats/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/jsonutil"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // vscodeImporter handles importing keybindings from VSCode.
@@ -38,7 +38,7 @@ func (i *vscodeImporter) Import(
 		return nil, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
-	cleanedJSON := internal.StripJSONComments(jsonData)
+	cleanedJSON := jsonutil.StripJSONComments(jsonData)
 
 	var vscodeKeybindings []vscodeKeybinding
 	if err := json.Unmarshal(cleanedJSON, &vscodeKeybindings); err != nil {

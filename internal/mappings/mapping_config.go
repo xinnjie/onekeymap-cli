@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	actionmappings "github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings/action_mappings"
+	actionmappings "github.com/xinnjie/onekeymap-cli/internal/mappings/action_mappings"
 	"gopkg.in/yaml.v3"
 )
 

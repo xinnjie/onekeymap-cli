@@ -9,18 +9,18 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/cliconfig"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins/helix"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins/intellij"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins/vscode"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/internal/plugins/zed"
+	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/cliconfig"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/helix"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/watchbeats/onekeymap/onekeymap-cli/pkg/metrics"
+	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 )
 
 const (
@@ -181,8 +181,8 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 		pluginRegistry.Register(intellij.New(mappingConfig, logger))
 		pluginRegistry.Register(helix.New(mappingConfig, logger))
 
-		importService = onekeymap.NewImportService(pluginRegistry, mappingConfig, logger, recorder)
-		exportService = onekeymap.NewExportService(pluginRegistry, mappingConfig, logger)
+		importService = internal.NewImportService(pluginRegistry, mappingConfig, logger, recorder)
+		exportService = internal.NewExportService(pluginRegistry, mappingConfig, logger)
 	}
 }
 
