@@ -68,7 +68,7 @@ release:
 
     ### macOS
     ```bash
-    brew install xinnjie/tap/onekeymap
+    brew install xinnjie/homebrew-onekeymap/onekeymap-cli
     ```
 
     ### Linux/macOS (manual)
@@ -85,6 +85,7 @@ homebrew_casks:
     repository:
       owner: xinnjie
       name: homebrew-onekeymap
+      token: "{{ .Env.HOMEBREW_GITHUB_TOKEN }}"
     homepage: https://github.com/xinnjie/homebrew-onekeymap
     description: "Universal keymap configuration tool for VSCode, Zed, IntelliJ and more"
     binary: onekeymap-cli
