@@ -1,4 +1,4 @@
-name: onekeymap-cli release
+name: Release
 
 on:
   push:
