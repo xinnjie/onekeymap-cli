@@ -68,7 +68,7 @@ release:
 
     ### macOS
     ```bash
-    brew install xinnjie/homebrew-onekeymap/onekeymap-cli 
+    brew install xinnjie/homebrew-onekeymap/onekeymap-cli
     ```
 
     ### Linux/macOS (manual)
