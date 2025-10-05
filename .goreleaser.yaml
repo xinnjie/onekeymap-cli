@@ -11,7 +11,7 @@ before:
 builds:
   - id: onekeymap-cli
     main: ./cmd/onekeymap-cli
-    binary: onekeymap
+    binary: onekeymap-cli
     env:
       - CGO_ENABLED=0
     goos:
@@ -43,7 +43,7 @@ checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  version_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ .Tag }}-next"
 
 changelog:
   sort: asc
@@ -89,10 +89,8 @@ homebrew_casks:
     homepage: https://github.com/xinnjie/homebrew-onekeymap
     description: "Universal keymap configuration tool for VSCode, Zed, IntelliJ and more"
     binary: onekeymap-cli
-    hooks:
-      post:
-        install: |
-          if OS.mac?
-            system_command "/usr/bin/xattr",
-              args: ["-dr", "com.apple.quarantine", "#{staged_path}/onekeymap"]
-          end
+
+# generate universal binaries for osx, see https://goreleaser.com/customization/universalbinaries/
+universal_binaries:
+- replace: true
+  name_template: 'onekeymap-cli'
