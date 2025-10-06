@@ -10,6 +10,10 @@ build:
 	lipo -create -output .bin/onekeymap-cli .bin/onekeymap-cli-arm64 .bin/onekeymap-cli-amd64
 	rm .bin/onekeymap-cli-arm64 .bin/onekeymap-cli-amd64
 	./.bin/onekeymap-cli dev docSupportActions &> ./action-support-matrix.md
+	mkdir -p completions
+	./.bin/onekeymap-cli completion bash > completions/onekeymap-cli.bash
+	./.bin/onekeymap-cli completion zsh > completions/onekeymap-cli.zsh
+	./.bin/onekeymap-cli completion fish > completions/onekeymap-cli.fish
 
 format:
 	@$(GO_ENV) go fmt ./...
