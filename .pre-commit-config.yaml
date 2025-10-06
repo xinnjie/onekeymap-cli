@@ -1,0 +1,33 @@
+# Doc: https://pre-commit.com/#pre-commit-configyaml---hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: |
+          (?x)^(
+              protogen/.*
+          )$
+      - id: end-of-file-fixer
+        exclude: |
+          (?x)^(
+              protogen/.*
+          )$
+      - id: check-added-large-files
+      - id: forbid-submodules
+  - repo: local
+    hooks:
+      # Go
+      - id: golangci-lint
+        name: "Run golangci lint"
+        entry: golangci-lint
+        args: ["run", "--fix", "--config", ".golangci.yaml"]
+        language: system
+        pass_filenames: false
+      - id: go-fmt
+        name: "Run go fmt"
+        entry: go
+        args: ["fmt", "./..."]
+        language: system
+        types: [go]
+        pass_filenames: false

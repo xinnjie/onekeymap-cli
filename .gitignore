@@ -1,1 +1,7 @@
 .bin
+
+# goreleaser output directory
+dist
+
+# secret files
+secret

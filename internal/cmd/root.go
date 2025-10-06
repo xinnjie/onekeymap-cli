@@ -24,10 +24,8 @@ import (
 )
 
 const (
-	// Version information set by build system.
-	version   = "dev"
-	buildTime = "unknown"
-	gitCommit = "unknown"
+	// NOTE: use go build -ldflags "-X github.com/xinnjie/onekeymap-cli/internal/cmd/version=$(git describe)"
+	version = "dev"
 )
 
 //nolint:gochecknoglobals // TODO(xinnjie): Stop using these global variables. But for now I can not think of a better way.
@@ -57,7 +55,7 @@ func NewCmdRoot() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:              "onekeymap",
 		Short:            "A tool to import, export, and synchronize keyboard shortcuts between editors.",
-		Version:          fmt.Sprintf("%s (built %s, commit %s)", version, buildTime, gitCommit),
+		Version:          version,
 		PersistentPreRun: rootPersistentPreRun(&f),
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {
 			if recorder != nil {

@@ -3,10 +3,21 @@
 
 version: 2
 
-before:
-  hooks:
-    - go mod tidy
-    - go generate ./...
+notarize:
+  macos:
+    - enabled: '{{ isEnvSet "MACOS_SIGN_P12" }}'
+      ids:
+        - onekeymap-cli
+      sign:
+        certificate: "{{.Env.MACOS_SIGN_P12}}"
+        password: "{{.Env.MACOS_SIGN_PASSWORD}}"
+
+      notarize:
+        issuer_id: "{{.Env.MACOS_NOTARY_ISSUER_ID}}"
+        key_id: "{{.Env.MACOS_NOTARY_KEY_ID}}"
+        key: "{{.Env.MACOS_NOTARY_KEY}}"
+        wait: true
+        timeout: 10m
 
 builds:
   - id: onekeymap-cli
@@ -23,9 +34,7 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X main.version={{.Version}}
-      - -X main.commit={{.Commit}}
-      - -X main.date={{.Date}}
+      - -X github.com/xinnjie/onekeymap-cli/internal/cmd/version={{.Version}}
 
 archives:
   - id: onekeymap-cli
@@ -37,7 +46,9 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     files:
-      - LICENSE*
+      - README.md
+      - LICENSE.md
+      - completions/*
 
 checksum:
   name_template: 'checksums.txt'
@@ -89,6 +100,10 @@ homebrew_casks:
     homepage: https://github.com/xinnjie/homebrew-onekeymap
     description: "Universal keymap configuration tool for VSCode, Zed, IntelliJ and more"
     binary: onekeymap-cli
+    completions:
+      bash: completions/onekeymap-cli.bash
+      zsh: completions/onekeymap-cli.zsh
+      fish: completions/onekeymap-cli.fish
 
 # generate universal binaries for osx, see https://goreleaser.com/customization/universalbinaries/
 universal_binaries:
