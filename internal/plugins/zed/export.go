@@ -3,6 +3,7 @@ package zed
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -41,7 +42,11 @@ func (p *zedExporter) Export(
 	var existingConfig zedKeymapConfig
 	if opts.ExistingConfig != nil {
 		if err := json.NewDecoder(opts.ExistingConfig).Decode(&existingConfig); err != nil {
-			return nil, fmt.Errorf("failed to decode existing config: %w", err)
+			if errors.Is(err, io.EOF) {
+				existingConfig = nil
+			} else {
+				return nil, fmt.Errorf("failed to decode existing config: %w", err)
+			}
 		}
 	}
 

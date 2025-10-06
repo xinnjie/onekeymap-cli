@@ -12,7 +12,7 @@ build:
 	./.bin/onekeymap-cli dev docSupportActions &> ./action-support-matrix.md
 	mkdir -p completions
 	./.bin/onekeymap-cli completion bash > completions/onekeymap-cli.bash
-	./.bin/onekeymap-cli completion zsh > completions/onekeymap-cli.zsh
+	./.bin/onekeymap-cli completion zsh > completions/_onekeymap-cli
 	./.bin/onekeymap-cli completion fish > completions/onekeymap-cli.fish
 
 format:
