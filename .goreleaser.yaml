@@ -102,7 +102,7 @@ homebrew_casks:
     binary: onekeymap-cli
     completions:
       bash: completions/onekeymap-cli.bash
-      zsh: completions/onekeymap-cli.zsh
+      zsh: completions/_onekeymap-cli
       fish: completions/onekeymap-cli.fish
 
 # generate universal binaries for osx, see https://goreleaser.com/customization/universalbinaries/
