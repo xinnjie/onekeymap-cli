@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"log/slog"
 	"os"
-
-	"context"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -53,20 +50,17 @@ func NewCmdRoot() *cobra.Command {
 	f := rootFlags{}
 
 	cmd := &cobra.Command{
-		Use:              "onekeymap",
+		Use:              "onekeymap-cli",
 		Short:            "A tool to import, export, and synchronize keyboard shortcuts between editors.",
 		Version:          version,
 		PersistentPreRun: rootPersistentPreRun(&f),
 		PersistentPostRun: func(cmd *cobra.Command, args []string) {
-			if recorder != nil {
-				if err := recorder.Shutdown(context.Background()); err != nil {
-					logger.Error("failed to shutdown telemetry", "error", err)
-				}
+			if err := recorder.Shutdown(cmd.Context()); err != nil {
+				logger.Error("failed to shutdown telemetry", "error", err)
 			}
 		},
 	}
 
-	// Define persistent flags
 	cmd.PersistentFlags().BoolVarP(&f.verbose, "verbose", "v", false, "Enable verbose output")
 	cmd.PersistentFlags().BoolVarP(&f.quiet, "quiet", "q", false, "Suppress all output except for errors")
 	cmd.PersistentFlags().BoolVar(&f.logJSON, "log-json", false, "Output logs in JSON format")
@@ -77,7 +71,6 @@ func NewCmdRoot() *cobra.Command {
 	cmd.PersistentFlags().
 		BoolVar(&f.sandbox, "sandbox", false, "Enable sandbox mode for macOS, restricting file access")
 
-	// Bind cobra flags to viper.
 	if err := viper.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose")); err != nil {
 		cmd.PrintErrf("Error binding verbose flag: %v\n", err)
 		os.Exit(1)
@@ -100,14 +93,16 @@ func NewCmdRoot() *cobra.Command {
 
 func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		// Init viper config
 		_, err := cliconfig.NewConfig(cmd)
 		if err != nil {
 			cmd.PrintErrf("Error initializing configuration: %v\n", err)
 			os.Exit(1)
 		}
 
-		// Initialize mapping config
+		verbose := viper.GetBool("verbose")
+		quiet := viper.GetBool("quiet")
+		logJSON := viper.GetBool("log-json")
+
 		mappingConfig, err = mappings.NewMappingConfig()
 		if err != nil {
 			cmd.PrintErrf("failed to initialize mapping config: %v\n", err)
@@ -117,42 +112,32 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 		recorder = metrics.NewNoop()
 		if f.enableTelemetry {
 			if viper.GetString("otel.exporter.otlp.endpoint") == "" {
-				// Maybe print a warning that endpoint is not set
-				fmt.Fprintln(
-					os.Stderr,
+				cmd.PrintErrln(
 					"Warning: --telemetry is enabled, but otel.exporter.otlp.endpoint is not set. Telemetry data will not be sent.",
 				)
 			}
 
-			recorder, err = metrics.New(context.Background(), version, logger, mappingConfig)
+			recorder, err = metrics.New(cmd.Context(), version, logger, mappingConfig)
 			if err != nil {
 				cmd.PrintErrf("failed to initialize telemetry: %v\n", err)
 				os.Exit(1)
 			}
 		}
 
-		verbose := viper.GetBool("verbose")
-		quiet := viper.GetBool("quiet")
-
 		// Set up logger based on the final configuration.
-		var logLevel slog.Level
+		var logLevel = slog.LevelWarn
 		switch {
 		case verbose:
 			logLevel = slog.LevelDebug
 		case quiet:
 			logLevel = slog.LevelError
-		default:
-			logLevel = slog.LevelWarn
 		}
 
-		var output *os.File
+		var output = os.Stdout
 		if quiet {
-			output = os.Stderr // Only errors go to stderr in quiet mode
-		} else {
-			output = os.Stdout
+			output = os.Stderr
 		}
 
-		logJSON := viper.GetBool("log-json")
 		var handler slog.Handler
 		handlerOpts := &slog.HandlerOptions{
 			Level: logLevel,
@@ -172,7 +157,6 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 
 		logger = slog.New(handler)
 
-		// Initialize plugin registry and services
 		pluginRegistry = plugins.NewRegistry()
 		pluginRegistry.Register(vscode.New(mappingConfig, logger))
 		pluginRegistry.Register(zed.New(mappingConfig, logger))
@@ -184,8 +168,6 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 	}
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	rootCmd := NewCmdRoot()
 

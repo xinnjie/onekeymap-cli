@@ -1,6 +1,6 @@
-# bash completion V2 for onekeymap                            -*- shell-script -*-
+# bash completion V2 for onekeymap-cli                        -*- shell-script -*-
 
-__onekeymap_debug()
+__onekeymap-cli_debug()
 {
     if [[ -n ${BASH_COMP_DEBUG_FILE-} ]]; then
         echo "$*" >> "${BASH_COMP_DEBUG_FILE}"
@@ -9,41 +9,41 @@ __onekeymap_debug()
 
 # Macs have bash3 for which the bash-completion package doesn't include
 # _init_completion. This is a minimal version of that function.
-__onekeymap_init_completion()
+__onekeymap-cli_init_completion()
 {
     COMPREPLY=()
     _get_comp_words_by_ref "$@" cur prev words cword
 }
 
-# This function calls the onekeymap program to obtain the completion
+# This function calls the onekeymap-cli program to obtain the completion
 # results and the directive.  It fills the 'out' and 'directive' vars.
-__onekeymap_get_completion_results() {
+__onekeymap-cli_get_completion_results() {
     local requestComp lastParam lastChar args
 
     # Prepare the command to request completions for the program.
-    # Calling ${words[0]} instead of directly onekeymap allows handling aliases
+    # Calling ${words[0]} instead of directly onekeymap-cli allows handling aliases
     args=("${words[@]:1}")
     requestComp="${words[0]} __complete ${args[*]}"
 
     lastParam=${words[$((${#words[@]}-1))]}
     lastChar=${lastParam:$((${#lastParam}-1)):1}
-    __onekeymap_debug "lastParam ${lastParam}, lastChar ${lastChar}"
+    __onekeymap-cli_debug "lastParam ${lastParam}, lastChar ${lastChar}"
 
     if [[ -z ${cur} && ${lastChar} != = ]]; then
         # If the last parameter is complete (there is a space following it)
         # We add an extra empty parameter so we can indicate this to the go method.
-        __onekeymap_debug "Adding extra empty parameter"
+        __onekeymap-cli_debug "Adding extra empty parameter"
         requestComp="${requestComp} ''"
     fi
 
-    # When completing a flag with an = (e.g., onekeymap -n=<TAB>)
+    # When completing a flag with an = (e.g., onekeymap-cli -n=<TAB>)
     # bash focuses on the part after the =, so we need to remove
     # the flag part from $cur
     if [[ ${cur} == -*=* ]]; then
         cur="${cur#*=}"
     fi
 
-    __onekeymap_debug "Calling ${requestComp}"
+    __onekeymap-cli_debug "Calling ${requestComp}"
     # Use eval to handle any environment variables and such
     out=$(eval "${requestComp}" 2>/dev/null)
 
@@ -55,11 +55,11 @@ __onekeymap_get_completion_results() {
         # There is not directive specified
         directive=0
     fi
-    __onekeymap_debug "The completion directive is: ${directive}"
-    __onekeymap_debug "The completions are: ${out}"
+    __onekeymap-cli_debug "The completion directive is: ${directive}"
+    __onekeymap-cli_debug "The completions are: ${out}"
 }
 
-__onekeymap_process_completion_results() {
+__onekeymap-cli_process_completion_results() {
     local shellCompDirectiveError=1
     local shellCompDirectiveNoSpace=2
     local shellCompDirectiveNoFileComp=4
@@ -69,36 +69,36 @@ __onekeymap_process_completion_results() {
 
     if (((directive & shellCompDirectiveError) != 0)); then
         # Error code.  No completion.
-        __onekeymap_debug "Received error from custom completion go code"
+        __onekeymap-cli_debug "Received error from custom completion go code"
         return
     else
         if (((directive & shellCompDirectiveNoSpace) != 0)); then
             if [[ $(type -t compopt) == builtin ]]; then
-                __onekeymap_debug "Activating no space"
+                __onekeymap-cli_debug "Activating no space"
                 compopt -o nospace
             else
-                __onekeymap_debug "No space directive not supported in this version of bash"
+                __onekeymap-cli_debug "No space directive not supported in this version of bash"
             fi
         fi
         if (((directive & shellCompDirectiveKeepOrder) != 0)); then
             if [[ $(type -t compopt) == builtin ]]; then
                 # no sort isn't supported for bash less than < 4.4
                 if [[ ${BASH_VERSINFO[0]} -lt 4 || ( ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -lt 4 ) ]]; then
-                    __onekeymap_debug "No sort directive not supported in this version of bash"
+                    __onekeymap-cli_debug "No sort directive not supported in this version of bash"
                 else
-                    __onekeymap_debug "Activating keep order"
+                    __onekeymap-cli_debug "Activating keep order"
                     compopt -o nosort
                 fi
             else
-                __onekeymap_debug "No sort directive not supported in this version of bash"
+                __onekeymap-cli_debug "No sort directive not supported in this version of bash"
             fi
         fi
         if (((directive & shellCompDirectiveNoFileComp) != 0)); then
             if [[ $(type -t compopt) == builtin ]]; then
-                __onekeymap_debug "Activating no file completion"
+                __onekeymap-cli_debug "Activating no file completion"
                 compopt +o default
             else
-                __onekeymap_debug "No file completion directive not supported in this version of bash"
+                __onekeymap-cli_debug "No file completion directive not supported in this version of bash"
             fi
         fi
     fi
@@ -106,7 +106,7 @@ __onekeymap_process_completion_results() {
     # Separate activeHelp from normal completions
     local completions=()
     local activeHelp=()
-    __onekeymap_extract_activeHelp
+    __onekeymap-cli_extract_activeHelp
 
     if (((directive & shellCompDirectiveFilterFileExt) != 0)); then
         # File extension filtering
@@ -119,7 +119,7 @@ __onekeymap_process_completion_results() {
         done
 
         filteringCmd="_filedir $fullFilter"
-        __onekeymap_debug "File filtering command: $filteringCmd"
+        __onekeymap-cli_debug "File filtering command: $filteringCmd"
         $filteringCmd
     elif (((directive & shellCompDirectiveFilterDirs) != 0)); then
         # File completion for directories only
@@ -127,24 +127,24 @@ __onekeymap_process_completion_results() {
         local subdir
         subdir=${completions[0]}
         if [[ -n $subdir ]]; then
-            __onekeymap_debug "Listing directories in $subdir"
+            __onekeymap-cli_debug "Listing directories in $subdir"
             pushd "$subdir" >/dev/null 2>&1 && _filedir -d && popd >/dev/null 2>&1 || return
         else
-            __onekeymap_debug "Listing directories in ."
+            __onekeymap-cli_debug "Listing directories in ."
             _filedir -d
         fi
     else
-        __onekeymap_handle_completion_types
+        __onekeymap-cli_handle_completion_types
     fi
 
-    __onekeymap_handle_special_char "$cur" :
-    __onekeymap_handle_special_char "$cur" =
+    __onekeymap-cli_handle_special_char "$cur" :
+    __onekeymap-cli_handle_special_char "$cur" =
 
     # Print the activeHelp statements before we finish
-    __onekeymap_handle_activeHelp
+    __onekeymap-cli_handle_activeHelp
 }
 
-__onekeymap_handle_activeHelp() {
+__onekeymap-cli_handle_activeHelp() {
     # Print the activeHelp statements
     if ((${#activeHelp[*]} != 0)); then
         if [ -z $COMP_TYPE ]; then
@@ -152,7 +152,7 @@ __onekeymap_handle_activeHelp() {
             printf "\n";
             printf "%s\n" "${activeHelp[@]}"
             printf "\n"
-            __onekeymap_reprint_commandLine
+            __onekeymap-cli_reprint_commandLine
             return
         fi
 
@@ -169,7 +169,7 @@ __onekeymap_handle_activeHelp() {
                 # To find out, we actually trigger the file completion ourselves;
                 # the call to _filedir will fill COMPREPLY if files match.
                 if (((directive & shellCompDirectiveNoFileComp) == 0)); then
-                    __onekeymap_debug "Listing files"
+                    __onekeymap-cli_debug "Listing files"
                     _filedir
                 fi
             fi
@@ -183,7 +183,7 @@ __onekeymap_handle_activeHelp() {
                 # When there are no completion choices at all, we need
                 # to re-print the command-line since the shell will
                 # not be doing it itself.
-                __onekeymap_reprint_commandLine
+                __onekeymap-cli_reprint_commandLine
             fi
         elif [ $COMP_TYPE -eq 37 ] || [ $COMP_TYPE -eq 42 ]; then
             # For completion type: menu-complete/menu-complete-backward and insert-completions
@@ -192,12 +192,12 @@ __onekeymap_handle_activeHelp() {
             printf "\n"
             printf "%s\n" "${activeHelp[@]}"
 
-            __onekeymap_reprint_commandLine
+            __onekeymap-cli_reprint_commandLine
         fi
     fi
 }
 
-__onekeymap_reprint_commandLine() {
+__onekeymap-cli_reprint_commandLine() {
     # The prompt format is only available from bash 4.4.
     # We test if it is available before using it.
     if (x=${PS1@P}) 2> /dev/null; then
@@ -211,7 +211,7 @@ __onekeymap_reprint_commandLine() {
 
 # Separate activeHelp lines from real completions.
 # Fills the $activeHelp and $completions arrays.
-__onekeymap_extract_activeHelp() {
+__onekeymap-cli_extract_activeHelp() {
     local activeHelpMarker="_activeHelp_ "
     local endIndex=${#activeHelpMarker}
 
@@ -220,7 +220,7 @@ __onekeymap_extract_activeHelp() {
 
         if [[ ${comp:0:endIndex} == $activeHelpMarker ]]; then
             comp=${comp:endIndex}
-            __onekeymap_debug "ActiveHelp found: $comp"
+            __onekeymap-cli_debug "ActiveHelp found: $comp"
             if [[ -n $comp ]]; then
                 activeHelp+=("$comp")
             fi
@@ -231,8 +231,8 @@ __onekeymap_extract_activeHelp() {
     done <<<"${out}"
 }
 
-__onekeymap_handle_completion_types() {
-    __onekeymap_debug "__onekeymap_handle_completion_types: COMP_TYPE is $COMP_TYPE"
+__onekeymap-cli_handle_completion_types() {
+    __onekeymap-cli_debug "__onekeymap-cli_handle_completion_types: COMP_TYPE is $COMP_TYPE"
 
     case $COMP_TYPE in
     37|42)
@@ -259,12 +259,12 @@ __onekeymap_handle_completion_types() {
 
     *)
         # Type: complete (normal completion)
-        __onekeymap_handle_standard_completion_case
+        __onekeymap-cli_handle_standard_completion_case
         ;;
     esac
 }
 
-__onekeymap_handle_standard_completion_case() {
+__onekeymap-cli_handle_standard_completion_case() {
     local tab=$'\t'
 
     # If there are no completions, we don't need to do anything
@@ -320,16 +320,16 @@ __onekeymap_handle_standard_completion_case() {
 
     # If there is a single completion left, remove the description text and escape any special characters
     if ((${#COMPREPLY[*]} == 1)); then
-        __onekeymap_debug "COMPREPLY[0]: ${COMPREPLY[0]}"
+        __onekeymap-cli_debug "COMPREPLY[0]: ${COMPREPLY[0]}"
         COMPREPLY[0]=$(printf "%q" "${COMPREPLY[0]%%$tab*}")
-        __onekeymap_debug "Removed description from single completion, which is now: ${COMPREPLY[0]}"
+        __onekeymap-cli_debug "Removed description from single completion, which is now: ${COMPREPLY[0]}"
     else
         # Format the descriptions
-        __onekeymap_format_comp_descriptions $longest
+        __onekeymap-cli_format_comp_descriptions $longest
     fi
 }
 
-__onekeymap_handle_special_char()
+__onekeymap-cli_handle_special_char()
 {
     local comp="$1"
     local char=$2
@@ -342,7 +342,7 @@ __onekeymap_handle_special_char()
     fi
 }
 
-__onekeymap_format_comp_descriptions()
+__onekeymap-cli_format_comp_descriptions()
 {
     local tab=$'\t'
     local comp desc maxdesclength
@@ -353,7 +353,7 @@ __onekeymap_format_comp_descriptions()
         comp=${COMPREPLY[ci]}
         # Properly format the description string which follows a tab character if there is one
         if [[ "$comp" == *$tab* ]]; then
-            __onekeymap_debug "Original comp: $comp"
+            __onekeymap-cli_debug "Original comp: $comp"
             desc=${comp#*$tab}
             comp=${comp%%$tab*}
 
@@ -383,12 +383,12 @@ __onekeymap_format_comp_descriptions()
                 comp+="  ($desc)"
             fi
             COMPREPLY[ci]=$comp
-            __onekeymap_debug "Final comp: $comp"
+            __onekeymap-cli_debug "Final comp: $comp"
         fi
     done
 }
 
-__start_onekeymap()
+__start_onekeymap-cli()
 {
     local cur prev words cword split
 
@@ -399,28 +399,28 @@ __start_onekeymap()
     if declare -F _init_completion >/dev/null 2>&1; then
         _init_completion -n =: || return
     else
-        __onekeymap_init_completion -n =: || return
+        __onekeymap-cli_init_completion -n =: || return
     fi
 
-    __onekeymap_debug
-    __onekeymap_debug "========= starting completion logic =========="
-    __onekeymap_debug "cur is ${cur}, words[*] is ${words[*]}, #words[@] is ${#words[@]}, cword is $cword"
+    __onekeymap-cli_debug
+    __onekeymap-cli_debug "========= starting completion logic =========="
+    __onekeymap-cli_debug "cur is ${cur}, words[*] is ${words[*]}, #words[@] is ${#words[@]}, cword is $cword"
 
     # The user could have moved the cursor backwards on the command-line.
     # We need to trigger completion from the $cword location, so we need
     # to truncate the command-line ($words) up to the $cword location.
     words=("${words[@]:0:$cword+1}")
-    __onekeymap_debug "Truncated words[*]: ${words[*]},"
+    __onekeymap-cli_debug "Truncated words[*]: ${words[*]},"
 
     local out directive
-    __onekeymap_get_completion_results
-    __onekeymap_process_completion_results
+    __onekeymap-cli_get_completion_results
+    __onekeymap-cli_process_completion_results
 }
 
 if [[ $(type -t compopt) = "builtin" ]]; then
-    complete -o default -F __start_onekeymap onekeymap
+    complete -o default -F __start_onekeymap-cli onekeymap-cli
 else
-    complete -o default -o nospace -F __start_onekeymap onekeymap
+    complete -o default -o nospace -F __start_onekeymap-cli onekeymap-cli
 fi
 
 # ex: ts=4 sw=4 et filetype=sh
