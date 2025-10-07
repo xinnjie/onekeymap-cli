@@ -7,6 +7,7 @@
   </a>
   <h1>OneKeymap CLI</h1>
 </div>
+
 [![Go Version](https://img.shields.io/github/go-mod/go-version/xinnjie/onekeymap-cli)](https://go.dev/)[![License](https://img.shields.io/github/license/xinnjie/onekeymap-cli)](LICENSE.md)[![Release](https://img.shields.io/github/v/release/xinnjie/onekeymap-cli)](https://github.com/xinnjie/onekeymap-cli/releases)
 
 ---
@@ -51,66 +52,6 @@ onekeymap-cli import
 ```bash
 onekeymap-cli export
 ```
-
----
-
-## How It Works
-
-OneKeymap uses a **universal keymap format** that represents keyboard shortcuts in an editor-agnostic way. Here's the workflow:
-
-```
-┌─────────────┐
-│   VSCode    │──┐
-│  Keybindings│  │
-└─────────────┘  │
-                 │  Import
-┌─────────────┐  │    ↓
-│  IntelliJ   │──┼──────────────┐
-│   Keymap    │  │              │
-└─────────────┘  │    ┌─────────▼──────────┐
-                 │    │  Universal Keymap  │
-┌─────────────┐  │    │   (onekeymap.json) │
-│     Zed     │──┘    └─────────┬──────────┘
-│   Keymap    │                 │
-└─────────────┘       Export    ↓
-                 ┌───────────────────────┐
-                 │  Any Supported Editor │
-                 └───────────────────────┘
-```
-
-### Universal Keymap Format
-
-Your keymap is stored in a clean, human-readable JSON format:
-
-```json
-{
-  "keymaps": [
-    {
-      "action": "actions.edit.copy",
-      "keys": "ctrl+c"
-    },
-    {
-      "action": "actions.view.showCommandPalette",
-      "keys": "ctrl+shift+p"
-    },
-    {
-      "action": "actions.editor.quickFix",
-      "keys": "ctrl+."
-    }
-  ]
-}
-```
-
-### Action Mappings
-
-OneKeymap maintains a comprehensive mapping that translates between editor-specific commands and universal actions. For example:
-
-- `actions.edit.copy` maps to:
-  - VSCode: `editor.action.clipboardCopyAction`
-  - IntelliJ: `$Copy`
-  - Zed: `editor::Copy`
-
-This mapping layer handles context-specific behaviors, stateful toggles, and editor quirks automatically.
 
 ---
 
@@ -179,6 +120,68 @@ Contributions are welcome! Check out the [Contributing Guide](CONTRIBUTING.md) f
 
 ---
 
+## How It Works
+
+OneKeymap uses a **universal keymap format** that represents keyboard shortcuts in an editor-agnostic way. Here's the workflow:
+
+```
+┌─────────────┐
+│   VSCode    │──┐
+│  Keybindings│  │
+└─────────────┘  │
+                 │  Import
+┌─────────────┐  │    ↓
+│  IntelliJ   │──┼──────────────┐
+│   Keymap    │  │              │
+└─────────────┘  │    ┌─────────▼──────────┐
+                 │    │  Universal Keymap  │
+┌─────────────┐  │    │   (onekeymap.json) │
+│     Zed     │──┘    └─────────┬──────────┘
+│   Keymap    │                 │
+└─────────────┘       Export    ↓
+                 ┌───────────────────────┐
+                 │  Any Supported Editor │
+                 └───────────────────────┘
+```
+
+### Universal Keymap Format
+
+Your keymap is stored in a clean, human-readable JSON format:
+
+```json
+{
+  "keymaps": [
+    {
+      "action": "actions.edit.copy",
+      "keys": "ctrl+c"
+    },
+    {
+      "action": "actions.view.showCommandPalette",
+      "keys": "ctrl+shift+p"
+    },
+    {
+      "action": "actions.editor.quickFix",
+      "keys": "ctrl+."
+    }
+  ]
+}
+```
+
+### Action Mappings
+
+OneKeymap maintains a comprehensive mapping that translates between editor-specific commands and universal actions. For example:
+
+- `actions.edit.copy` maps to:
+  - VSCode: `editor.action.clipboardCopyAction`
+  - IntelliJ: `$Copy`
+  - Zed: `editor::Copy`
+
+This mapping layer handles context-specific behaviors, stateful toggles, and editor quirks automatically.
+
+---
+
 ## ✨ Companion App: OneKeymap GUI
 
 Prefer a polished interface? Take a look at [OneKeymap.app](https://onekeymap-landing-page.vercel.app/)—a paid GUI companion built on top of the CLI. `onekeymap-cli` will always remain free and open; the app is simply an optional bonus for those who enjoy visual workflows.
+
+---
