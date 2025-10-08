@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -70,49 +71,14 @@ func serveRun(
 			socketPath string
 		)
 
-		if strings.HasPrefix(addr, "unix://") || strings.HasPrefix(addr, "unix:") {
-			// Unix domain socket
-			socketPath = addr
-			if strings.HasPrefix(socketPath, "unix://") {
-				socketPath = strings.TrimPrefix(socketPath, "unix://")
-			} else {
-				socketPath = strings.TrimPrefix(socketPath, "unix:")
-			}
-			// Remove stale file if exists
-			if _, statErr := os.Stat(socketPath); statErr == nil {
-				_ = os.Remove(socketPath)
-			}
-			lc := net.ListenConfig{}
-			lis, err = lc.Listen(ctx, "unix", socketPath)
-			if err != nil {
-				logger.ErrorContext(ctx, "failed to listen on unix socket", "path", socketPath, "err", err)
-				os.Exit(1)
-			}
-			// Best-effort restrict permissions
-			_ = os.Chmod(socketPath, 0o600)
-			// Ensure cleanup on exit
+		lis, socketPath, err = setupListener(ctx, addr, logger)
+		if err != nil {
+			os.Exit(1)
+		}
+		if socketPath != "" {
 			defer func() {
 				_ = os.Remove(socketPath)
 			}()
-			logger.InfoContext(ctx, "server listening", "address", "unix://"+socketPath)
-		} else {
-			// TCP (allow optional tcp:// prefix)
-			if after, ok := strings.CutPrefix(addr, "tcp://"); ok {
-				addr = after
-			}
-
-			if addr == "" {
-				logger.ErrorContext(ctx, "empty listen address")
-				os.Exit(1)
-			}
-
-			lc := net.ListenConfig{}
-			lis, err = lc.Listen(ctx, "tcp", addr)
-			if err != nil {
-				logger.ErrorContext(ctx, "failed to listen on tcp", "address", addr, "err", err)
-				os.Exit(1)
-			}
-			logger.InfoContext(ctx, "server listening", "address", "tcp://"+lis.Addr().String())
 		}
 
 		logEvents := func() []grpc_logging.LoggableEvent {
@@ -167,6 +133,62 @@ func serveRun(
 			os.Exit(1)
 		}
 	}
+}
+
+func setupListener(ctx context.Context, addr string, logger *slog.Logger) (net.Listener, string, error) {
+	if strings.HasPrefix(addr, "unix://") || strings.HasPrefix(addr, "unix:") {
+		return setupUnixSocketListener(ctx, addr, logger)
+	}
+	return setupTCPListener(ctx, addr, logger)
+}
+
+func setupUnixSocketListener(ctx context.Context, addr string, logger *slog.Logger) (net.Listener, string, error) {
+	socketPath := addr
+	if strings.HasPrefix(socketPath, "unix://") {
+		socketPath = strings.TrimPrefix(socketPath, "unix://")
+	} else {
+		socketPath = strings.TrimPrefix(socketPath, "unix:")
+	}
+
+	// Remove stale file if exists
+	if _, statErr := os.Stat(socketPath); statErr == nil {
+		_ = os.Remove(socketPath)
+	}
+
+	lc := net.ListenConfig{}
+	lis, err := lc.Listen(ctx, "unix", socketPath)
+	if err != nil {
+		logger.ErrorContext(ctx, "failed to listen on unix socket", "path", socketPath, "err", err)
+		return nil, "", err
+	}
+
+	// Best-effort restrict permissions
+	_ = os.Chmod(socketPath, 0o600)
+	logger.InfoContext(ctx, "server listening", "address", "unix://"+socketPath)
+
+	return lis, socketPath, nil
+}
+
+func setupTCPListener(ctx context.Context, addr string, logger *slog.Logger) (net.Listener, string, error) {
+	// TCP (allow optional tcp:// prefix)
+	if after, ok := strings.CutPrefix(addr, "tcp://"); ok {
+		addr = after
+	}
+
+	if addr == "" {
+		logger.ErrorContext(ctx, "empty listen address")
+		return nil, "", errors.New("empty listen address")
+	}
+
+	lc := net.ListenConfig{}
+	lis, err := lc.Listen(ctx, "tcp", addr)
+	if err != nil {
+		logger.ErrorContext(ctx, "failed to listen on tcp", "address", addr, "err", err)
+		return nil, "", err
+	}
+	logger.InfoContext(ctx, "server listening", "address", "tcp://"+lis.Addr().String())
+
+	return lis, "", nil
 }
 
 // grpcLogger adapts slog to grpc_logging.Logger.

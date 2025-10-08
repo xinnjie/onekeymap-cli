@@ -160,17 +160,7 @@ func (m *OutputFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.form.State == huh.StateCompleted {
-		// Apply placeholders if user left fields empty
-		if m.needInput && *m.OnekeymapConfigInput == "" {
-			*m.OnekeymapConfigInput = m.OnekeymapConfigPlaceHolder
-		}
-		if m.needOutput && *m.EditorKeymapConfigOutput == "" {
-			if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-				if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
-					*m.EditorKeymapConfigOutput = v[0]
-				}
-			}
-		}
+		m.applyPlaceholders()
 		return m, tea.Quit
 	}
 
@@ -183,4 +173,18 @@ func (m *OutputFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *OutputFormModel) View() string {
 	return m.form.View()
+}
+
+func (m *OutputFormModel) applyPlaceholders() {
+	// Apply placeholders if user left fields empty
+	if m.needInput && *m.OnekeymapConfigInput == "" {
+		*m.OnekeymapConfigInput = m.OnekeymapConfigPlaceHolder
+	}
+	if m.needOutput && *m.EditorKeymapConfigOutput == "" {
+		if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
+			if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
+				*m.EditorKeymapConfigOutput = v[0]
+			}
+		}
+	}
 }

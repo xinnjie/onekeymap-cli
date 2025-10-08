@@ -163,6 +163,37 @@ func importRun(
 	}
 }
 
+func handleInteractiveImportFlags(
+	cmd *cobra.Command,
+	f *importFlags,
+	onekeymapConfig string,
+	pluginRegistry *plugins.Registry,
+) error {
+	needSelectEditor := !cmd.Flags().Changed("from") || f.from == ""
+	needInput := !cmd.Flags().Changed("input") || f.input == ""
+	needOutput := !cmd.Flags().Changed("output") || f.output == ""
+
+	if needSelectEditor || needInput || needOutput {
+		if err := runImportForm(pluginRegistry, &f.from, &f.input, &f.output, onekeymapConfig, needSelectEditor, needInput, needOutput); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func handleNonInteractiveImportFlags(
+	f *importFlags,
+	onekeymapConfig string,
+) error {
+	if f.from == "" {
+		return errors.New("flag --from is required")
+	}
+	if onekeymapConfig != "" {
+		f.output = onekeymapConfig
+	}
+	return nil
+}
+
 func prepareImportInputFlags(
 	cmd *cobra.Command,
 	f *importFlags,
@@ -171,21 +202,12 @@ func prepareImportInputFlags(
 	logger *slog.Logger,
 ) error {
 	if f.interactive {
-		needSelectEditor := !cmd.Flags().Changed("from") || f.from == ""
-		needInput := !cmd.Flags().Changed("input") || f.input == ""
-		needOutput := !cmd.Flags().Changed("output") || f.output == ""
-
-		if needSelectEditor || needInput || needOutput {
-			if err := runImportForm(pluginRegistry, &f.from, &f.input, &f.output, onekeymapConfig, needSelectEditor, needInput, needOutput); err != nil {
-				return err
-			}
+		if err := handleInteractiveImportFlags(cmd, f, onekeymapConfig, pluginRegistry); err != nil {
+			return err
 		}
 	} else {
-		if f.from == "" {
-			return errors.New("flag --from is required")
-		}
-		if onekeymapConfig != "" {
-			f.output = onekeymapConfig
+		if err := handleNonInteractiveImportFlags(f, onekeymapConfig); err != nil {
+			return err
 		}
 	}
 

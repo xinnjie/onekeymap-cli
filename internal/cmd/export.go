@@ -166,6 +166,38 @@ func exportRun(
 	}
 }
 
+func handleInteractiveExportFlags(
+	cmd *cobra.Command,
+	f *exportFlags,
+	onekeymapPlaceholder string,
+	pluginRegistry *plugins.Registry,
+) error {
+	needSelectEditor := !cmd.Flags().Changed("to") || f.to == ""
+	needInput := !cmd.Flags().Changed("input") || f.input == ""
+	needOutput := !cmd.Flags().Changed("output") || f.output == ""
+
+	if needSelectEditor || needInput || needOutput {
+		if err := runExportForm(pluginRegistry, &f.to, &f.input, &f.output, onekeymapPlaceholder, needSelectEditor, needInput, needOutput); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func handleNonInteractiveExportFlags(
+	cmd *cobra.Command,
+	f *exportFlags,
+	onekeymapPlaceholder string,
+) error {
+	if f.to == "" {
+		return errors.New("flag --to is required")
+	}
+	if !cmd.Flags().Changed("input") && onekeymapPlaceholder != "" {
+		f.input = onekeymapPlaceholder
+	}
+	return nil
+}
+
 func prepareExportInputFlags(
 	cmd *cobra.Command,
 	f *exportFlags,
@@ -174,21 +206,12 @@ func prepareExportInputFlags(
 	logger *slog.Logger,
 ) error {
 	if f.interactive {
-		needSelectEditor := !cmd.Flags().Changed("to") || f.to == ""
-		needInput := !cmd.Flags().Changed("input") || f.input == ""
-		needOutput := !cmd.Flags().Changed("output") || f.output == ""
-
-		if needSelectEditor || needInput || needOutput {
-			if err := runExportForm(pluginRegistry, &f.to, &f.input, &f.output, onekeymapPlaceholder, needSelectEditor, needInput, needOutput); err != nil {
-				return err
-			}
+		if err := handleInteractiveExportFlags(cmd, f, onekeymapPlaceholder, pluginRegistry); err != nil {
+			return err
 		}
 	} else {
-		if f.to == "" {
-			return errors.New("flag --to is required")
-		}
-		if !cmd.Flags().Changed("input") && onekeymapPlaceholder != "" {
-			f.input = onekeymapPlaceholder
+		if err := handleNonInteractiveExportFlags(cmd, f, onekeymapPlaceholder); err != nil {
+			return err
 		}
 	}
 

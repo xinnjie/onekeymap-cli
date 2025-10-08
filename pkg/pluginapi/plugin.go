@@ -13,6 +13,7 @@ const (
 	EditorTypeVSCode   EditorType = "vscode"
 	EditorTypeZed      EditorType = "zed"
 	EditorTypeIntelliJ EditorType = "intellij"
+	EditorTypeVim      EditorType = "vim"
 	EditorTypeHelix    EditorType = "helix"
 )
 

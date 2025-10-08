@@ -38,6 +38,43 @@ func pairKey(km *keymapv1.Action) string {
 	return sig
 }
 
+func mergeIntoExistingAction(existing, kb *keymapv1.Action) {
+	// Merge bindings into existing
+	for _, b := range kb.GetBindings() {
+		if len(b.GetKeyChords().GetChords()) == 0 {
+			continue
+		}
+		dup := false
+		nb := keymap.NewKeyBinding(b)
+		nbf := keymap.MustFormatKeyBinding(nb, platform.PlatformMacOS)
+		for _, eb := range existing.GetBindings() {
+			ebf := keymap.MustFormatKeyBinding(keymap.NewKeyBinding(eb), platform.PlatformMacOS)
+			if ebf == nbf {
+				dup = true
+				break
+			}
+		}
+		if !dup {
+			existing.Bindings = append(existing.Bindings, b)
+		}
+	}
+	// Optionally fill missing metadata from later entries
+	if existing.GetName() == "" && kb.GetName() != "" {
+		existing.Name = kb.GetName()
+	}
+	if kb.GetActionConfig() != nil {
+		if existing.GetActionConfig() == nil {
+			existing.ActionConfig = &keymapv1.ActionConfig{}
+		}
+		if existing.GetActionConfig().GetDescription() == "" && kb.GetActionConfig().GetDescription() != "" {
+			existing.ActionConfig.Description = kb.GetActionConfig().GetDescription()
+		}
+		if existing.GetActionConfig().GetCategory() == "" && kb.GetActionConfig().GetCategory() != "" {
+			existing.ActionConfig.Category = kb.GetActionConfig().GetCategory()
+		}
+	}
+}
+
 // dedupKeyBindings removes duplicate keybindings based on (Action, KeyChords)
 // using a deterministic signature. The first occurrence is kept and order is preserved.
 func dedupKeyBindings(keybindings []*keymapv1.Action) []*keymapv1.Action {
@@ -54,41 +91,7 @@ func dedupKeyBindings(keybindings []*keymapv1.Action) []*keymapv1.Action {
 		}
 		id := kb.GetName()
 		if pos, ok := idxByID[id]; ok {
-			// Merge bindings into existing
-			existing := out[pos]
-			for _, b := range kb.GetBindings() {
-				if len(b.GetKeyChords().GetChords()) == 0 {
-					continue
-				}
-				dup := false
-				nb := keymap.NewKeyBinding(b)
-				nbf := keymap.MustFormatKeyBinding(nb, platform.PlatformMacOS)
-				for _, eb := range existing.GetBindings() {
-					ebf := keymap.MustFormatKeyBinding(keymap.NewKeyBinding(eb), platform.PlatformMacOS)
-					if ebf == nbf {
-						dup = true
-						break
-					}
-				}
-				if !dup {
-					existing.Bindings = append(existing.Bindings, b)
-				}
-			}
-			// Optionally fill missing metadata from later entries
-			if existing.GetName() == "" && kb.GetName() != "" {
-				existing.Name = kb.GetName()
-			}
-			if kb.GetActionConfig() != nil {
-				if existing.GetActionConfig() == nil {
-					existing.ActionConfig = &keymapv1.ActionConfig{}
-				}
-				if existing.GetActionConfig().GetDescription() == "" && kb.GetActionConfig().GetDescription() != "" {
-					existing.ActionConfig.Description = kb.GetActionConfig().GetDescription()
-				}
-				if existing.GetActionConfig().GetCategory() == "" && kb.GetActionConfig().GetCategory() != "" {
-					existing.ActionConfig.Category = kb.GetActionConfig().GetCategory()
-				}
-			}
+			mergeIntoExistingAction(out[pos], kb)
 			continue
 		}
 		// First occurrence: create a fresh ActionBinding and deduplicate its own bindings

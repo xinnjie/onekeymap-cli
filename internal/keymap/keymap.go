@@ -100,6 +100,39 @@ func (ks KeybindingStrings) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]string(ks))
 }
 
+func newAction(fk OneKeymapConfig) *keymapv1.Action {
+	ab := &keymapv1.Action{
+		Name:    fk.ID,
+		Comment: fk.Comment,
+	}
+	// Only create ActionConfig if there's actual data
+	if fk.Description != "" || fk.Name != "" {
+		ab.ActionConfig = &keymapv1.ActionConfig{
+			Description: fk.Description,
+			DisplayName: fk.Name,
+		}
+	}
+	return ab
+}
+
+func mergeActionMetadata(ab *keymapv1.Action, fk OneKeymapConfig) {
+	// Preserve first non-empty metadata.
+	if ab.GetComment() == "" && fk.Comment != "" {
+		ab.Comment = fk.Comment
+	}
+	if fk.Description != "" || fk.Name != "" {
+		if ab.GetActionConfig() == nil {
+			ab.ActionConfig = &keymapv1.ActionConfig{}
+		}
+		if ab.GetActionConfig().GetDescription() == "" && fk.Description != "" {
+			ab.ActionConfig.Description = fk.Description
+		}
+		if ab.GetActionConfig().GetDisplayName() == "" && fk.Name != "" {
+			ab.ActionConfig.DisplayName = fk.Name
+		}
+	}
+}
+
 // Load reads from the given reader, parses the user config file format,
 // and converts it into the internal KeymapSetting proto message.
 func Load(reader io.Reader) (*keymapv1.Keymap, error) {
@@ -130,35 +163,11 @@ func Load(reader io.Reader) (*keymapv1.Keymap, error) {
 		key := fk.ID
 		ab, ok := grouped[key]
 		if !ok {
-			ab = &keymapv1.Action{
-				Name:    fk.ID,
-				Comment: fk.Comment,
-			}
-			// Only create ActionConfig if there's actual data
-			if fk.Description != "" || fk.Name != "" {
-				ab.ActionConfig = &keymapv1.ActionConfig{
-					Description: fk.Description,
-					DisplayName: fk.Name,
-				}
-			}
+			ab = newAction(fk)
 			grouped[key] = ab
 			order = append(order, key)
 		} else {
-			// Preserve first non-empty metadata.
-			if ab.GetComment() == "" && fk.Comment != "" {
-				ab.Comment = fk.Comment
-			}
-			if fk.Description != "" || fk.Name != "" {
-				if ab.GetActionConfig() == nil {
-					ab.ActionConfig = &keymapv1.ActionConfig{}
-				}
-				if ab.GetActionConfig().GetDescription() == "" && fk.Description != "" {
-					ab.ActionConfig.Description = fk.Description
-				}
-				if ab.GetActionConfig().GetDisplayName() == "" && fk.Name != "" {
-					ab.ActionConfig.DisplayName = fk.Name
-				}
-			}
+			mergeActionMetadata(ab, fk)
 		}
 
 		for _, keybindingStr := range fk.Keybinding {

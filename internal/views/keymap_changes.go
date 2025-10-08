@@ -88,25 +88,7 @@ func (m keymapChangesModel) Init() tea.Cmd { return nil }
 func (m keymapChangesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.confirming {
-		// When confirming, delegate to the form
-		if km, ok := msg.(tea.KeyMsg); ok {
-			switch km.String() {
-			case "ctrl+c", "esc", "q":
-				if m.confirm != nil {
-					*m.confirm = false
-				}
-				return m, tea.Quit
-			}
-		}
-		var form tea.Model
-		form, cmd = m.form.Update(msg)
-		if f, ok := form.(*huh.Form); ok {
-			m.form = f
-		}
-		if m.form.State == huh.StateCompleted {
-			return m, tea.Quit
-		}
-		return m, cmd
+		return m.handleConfirmingState(msg)
 	}
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -138,6 +120,29 @@ func (m keymapChangesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	m.table, cmd = m.table.Update(msg)
 
+	return m, cmd
+}
+
+func (m keymapChangesModel) handleConfirmingState(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// When confirming, delegate to the form
+	if km, ok := msg.(tea.KeyMsg); ok {
+		switch km.String() {
+		case "ctrl+c", "esc", "q":
+			if m.confirm != nil {
+				*m.confirm = false
+			}
+			return m, tea.Quit
+		}
+	}
+	var form tea.Model
+	var cmd tea.Cmd
+	form, cmd = m.form.Update(msg)
+	if f, ok := form.(*huh.Form); ok {
+		m.form = f
+	}
+	if m.form.State == huh.StateCompleted {
+		return m, tea.Quit
+	}
 	return m, cmd
 }
 

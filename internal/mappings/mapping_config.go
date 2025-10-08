@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 
 	actionmappings "github.com/xinnjie/onekeymap-cli/internal/mappings/action_mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	"gopkg.in/yaml.v3"
 )
 
@@ -40,6 +42,50 @@ type ActionMappingConfig struct {
 	IntelliJ    IntelliJMappingConfig `yaml:"intellij"`
 	Vim         VimMappingConfig      `yaml:"vim"`
 	Helix       HelixConfig           `yaml:"helix"`
+}
+
+func (am *ActionMappingConfig) IsSupported(editorType pluginapi.EditorType) bool {
+	switch editorType {
+	case pluginapi.EditorTypeVSCode:
+		if slices.ContainsFunc(am.VSCode, func(vc VscodeMappingConfig) bool {
+			return vc.NotSupported
+		}) {
+			return false
+		}
+		return slices.ContainsFunc(am.VSCode, func(vc VscodeMappingConfig) bool {
+			return vc.Command != ""
+		})
+	case pluginapi.EditorTypeIntelliJ:
+		if am.IntelliJ.NotSupported {
+			return false
+		}
+		return am.IntelliJ.Action != ""
+	case pluginapi.EditorTypeZed:
+		if slices.ContainsFunc(am.Zed, func(zc ZedMappingConfig) bool {
+			return zc.NotSupported
+		}) {
+			return false
+		}
+		return slices.ContainsFunc(am.Zed, func(zc ZedMappingConfig) bool {
+			return zc.Action != ""
+		})
+	case pluginapi.EditorTypeVim:
+		if am.Vim.NotSupported {
+			return false
+		}
+		return am.Vim.Command != ""
+	case pluginapi.EditorTypeHelix:
+		if slices.ContainsFunc(am.Helix, func(hc HelixMappingConfig) bool {
+			return hc.NotSupported
+		}) {
+			return false
+		}
+		return slices.ContainsFunc(am.Helix, func(hc HelixMappingConfig) bool {
+			return hc.Command != ""
+		})
+	default:
+		return false
+	}
 }
 
 // EditorActionMapping provides extra flags for editor-specific configurations.

@@ -52,27 +52,30 @@ func (z *zedActionValue) UnmarshalJSON(data []byte) error {
 	// Try array format: [action, args]
 	var arr []json.RawMessage
 	if err := json.Unmarshal(data, &arr); err == nil {
-		if len(arr) == 0 {
-			// empty array => ignore
-
-			return nil
-		}
-		var act string
-		if err := json.Unmarshal(arr[0], &act); err != nil {
-			// invalid first element => ignore
-			//nolint:nilerr // tolerate malformed entry; treat as zero value to keep importer resilient
-			return nil
-		}
-		z.Action = act
-		if len(arr) > 1 {
-			var args map[string]interface{}
-			if err := json.Unmarshal(arr[1], &args); err == nil {
-				z.Args = args
-			}
-		}
-		return nil
+		return z.parseArrayFormat(arr)
 	}
 
 	// Unsupported JSON shape => ignore
+	return nil
+}
+
+func (z *zedActionValue) parseArrayFormat(arr []json.RawMessage) error {
+	if len(arr) == 0 {
+		// empty array => ignore
+		return nil
+	}
+	var act string
+	if err := json.Unmarshal(arr[0], &act); err != nil {
+		// invalid first element => ignore
+		//nolint:nilerr // tolerate malformed entry; treat as zero value to keep importer resilient
+		return nil
+	}
+	z.Action = act
+	if len(arr) > 1 {
+		var args map[string]interface{}
+		if err := json.Unmarshal(arr[1], &args); err == nil {
+			z.Args = args
+		}
+	}
 	return nil
 }

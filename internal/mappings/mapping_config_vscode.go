@@ -3,6 +3,7 @@ package mappings
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"gopkg.in/yaml.v3"
 )
@@ -46,6 +47,12 @@ func (v *VscodeConfigs) UnmarshalYAML(node *yaml.Node) error {
 		)
 	}
 	return nil
+}
+
+func (v *VscodeConfigs) HasExplicitForImport() bool {
+	return slices.ContainsFunc(*v, func(cfg VscodeMappingConfig) bool {
+		return cfg.ForImport
+	})
 }
 
 func checkVscodeDuplicateConfig(mappings map[string]ActionMappingConfig) error {

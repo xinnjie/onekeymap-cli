@@ -121,16 +121,10 @@ linters:
     - whitespace # detects leading and trailing whitespace
 
   disable:
-    # TODO(xinnjie): Temporarily disable 'cyclop' due to many violations; fix and re-enable
-    - cyclop
     # TODO(xinnjie): Temporarily disable 'exhaustive' due to many violations; fix and re-enable
     - exhaustive
     # TODO(xinnjie): Temporarily disable 'funlen' due to many violations; fix and re-enable
     - funlen
-    # TODO(xinnjie): Temporarily disable 'gocyclo' due to many violations; fix and re-enable
-    - gocyclo
-    # TODO(xinnjie): Temporarily disable 'nestif' due to many violations; fix and re-enable
-    - nestif
     # TODO(xinnjie): Temporarily disable 'nonamedreturns' due to many violations; fix and re-enable
     - nonamedreturns
     # TODO(xinnjie): Temporarily disable 'testpackage' due to many violations; fix and re-enable

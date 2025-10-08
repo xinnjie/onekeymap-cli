@@ -132,20 +132,24 @@ func (m *KeymapViewModel) View() string {
 	// Detail of selected row
 	selectedID := m.selectedActionID()
 	if selectedID != "" {
-		b.WriteString("\n")
-		b.WriteString(fmt.Sprintf("Action: %s\n", selectedID))
-		if mapping := m.mc.FindByUniversalAction(selectedID); mapping != nil {
-			if mapping.Name != "" {
-				b.WriteString(fmt.Sprintf("Description: %s\n", mapping.Name))
-			} else if mapping.Description != "" {
-				b.WriteString(fmt.Sprintf("Description: %s\n", mapping.Description))
-			}
-			if mapping.Category != "" {
-				b.WriteString(fmt.Sprintf("Category: %s\n", mapping.Category))
-			}
-		}
+		m.appendSelectedActionDetails(&b, selectedID)
 	}
 	return b.String()
+}
+
+func (m *KeymapViewModel) appendSelectedActionDetails(b *strings.Builder, selectedID string) {
+	b.WriteString("\n")
+	fmt.Fprintf(b, "Action: %s\n", selectedID)
+	if mapping := m.mc.FindByUniversalAction(selectedID); mapping != nil {
+		if mapping.Name != "" {
+			fmt.Fprintf(b, "Description: %s\n", mapping.Name)
+		} else if mapping.Description != "" {
+			fmt.Fprintf(b, "Description: %s\n", mapping.Description)
+		}
+		if mapping.Category != "" {
+			fmt.Fprintf(b, "Category: %s\n", mapping.Category)
+		}
+	}
 }
 
 func (m *KeymapViewModel) selectedActionID() string {

@@ -9,166 +9,192 @@ import (
 )
 
 // FindByVSCodeActionWithArgs searches for a mapping by VSCode command, when clause, and args.
-// strict exact matching for both `command` and `when` clauses
-// if strict matching fails, it will try to find a matching action by `command` only, return the command if only one action matches the `command`, else return nil.
+// strict exact matching for both `command` and `when` clauses.
+// If strict matching fails, fall back progressively to wildcard `when`, mismatched `when`, and command-only matches.
 func (i *vscodeImporter) FindByVSCodeActionWithArgs(
 	command, when string,
 	args map[string]interface{},
 ) *mappings.ActionMappingConfig {
-	// We collect candidates first, then decide deterministically to avoid
-	// any map-iteration induced non-determinism.
-	type candidate struct {
-		m         *mappings.ActionMappingConfig
-		forImport bool // effective: explicit ForImport or single VSCode config in that action
-		explicit  bool // true only if explicitly set by config
-	}
-
-	var exactWhenArgs []*candidate     // command + args match, when exactly equals (non-empty)
-	var wildcardWhenArgs []*candidate  // command + args match, when is empty in config (wildcard)
-	var cmdArgsIgnoreWhen []*candidate // command + args match, but when differs (ignore when)
-	var cmdOnly []*candidate           // command only (used when args == nil)
-
-	seenExact := make(map[string]struct{})
-	seenWildcard := make(map[string]struct{})
-	seenCmdArgs := make(map[string]struct{})
-	seenCmdOnly := make(map[string]struct{})
-
+	buckets := newCandidateBuckets()
 	for _, mapping := range i.mappingConfig.Mappings {
-		// If this action mapping has any explicit ForImport entries, we will
-		// only consider those entries for import selection and ignore others.
-		hasExplicitForImport := false
-		for _, vc := range mapping.VSCode {
-			if vc.ForImport {
-				hasExplicitForImport = true
-				break
-			}
-		}
-
-		for _, vc := range mapping.VSCode {
-			if vc.Command != command {
-				continue
-			}
-
-			effectiveForImport := vc.ForImport || len(mapping.VSCode) == 1
-			explicitForImport := vc.ForImport
-
-			// Gating: if any entry within the same action mapping is marked
-			// forImport=true, then non-forImport entries from the same mapping
-			// are not eligible for import.
-			if hasExplicitForImport && !explicitForImport {
-				continue
-			}
-
-			argsBothNil := (vc.Args == nil && args == nil)
-			argsBothNonNilAndEqual := (vc.Args != nil && args != nil && equalArgs(vc.Args, args))
-			argsMatch := argsBothNil || argsBothNonNilAndEqual
-
-			whenExact := (vc.When != "" && vc.When == when)
-			whenWildcard := (vc.When == "")
-
-			if argsMatch {
-				if whenExact {
-					if _, ok := seenExact[mapping.ID]; !ok {
-						m := mapping
-						exactWhenArgs = append(
-							exactWhenArgs,
-							&candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport},
-						)
-						seenExact[mapping.ID] = struct{}{}
-					}
-					continue
-				}
-				if whenWildcard {
-					if _, ok := seenWildcard[mapping.ID]; !ok {
-						m := mapping
-						wildcardWhenArgs = append(
-							wildcardWhenArgs,
-							&candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport},
-						)
-						seenWildcard[mapping.ID] = struct{}{}
-					}
-					continue
-				}
-				// args match but when doesn't — keep as command+args ignoring when
-				if _, ok := seenCmdArgs[mapping.ID]; !ok {
-					m := mapping
-					cmdArgsIgnoreWhen = append(
-						cmdArgsIgnoreWhen,
-						&candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport},
-					)
-					seenCmdArgs[mapping.ID] = struct{}{}
-				}
-				continue
-			}
-
-			// If args are not provided by incoming binding, allow command-only fallback.
-			if args == nil {
-				if _, ok := seenCmdOnly[mapping.ID]; !ok {
-					m := mapping
-					cmdOnly = append(
-						cmdOnly,
-						&candidate{m: &m, forImport: effectiveForImport, explicit: explicitForImport},
-					)
-					seenCmdOnly[mapping.ID] = struct{}{}
-				}
-			}
-		}
+		i.appendMappingCandidates(buckets, mapping, command, when, args)
 	}
 
-	// Helper to pick deterministically with ForImport preference (explicit over implicit), then by ID
-	pick := func(cands []*candidate) *mappings.ActionMappingConfig {
-		if len(cands) == 0 {
-			return nil
-		}
-		var explicitForImport, implicitForImport, others []*candidate
-		for _, c := range cands {
-			switch {
-			case c.forImport && c.explicit:
-				explicitForImport = append(explicitForImport, c)
-			case c.forImport:
-				implicitForImport = append(implicitForImport, c)
-			default:
-				others = append(others, c)
-			}
-		}
-		chooseFrom := cands
-		switch {
-		case len(explicitForImport) > 0:
-			chooseFrom = explicitForImport
-		case len(implicitForImport) > 0:
-			chooseFrom = implicitForImport
-		default:
-			chooseFrom = others
-		}
-		sort.Slice(chooseFrom, func(i, j int) bool { return chooseFrom[i].m.ID < chooseFrom[j].m.ID })
-		return chooseFrom[0].m
-	}
-
-	if m := pick(exactWhenArgs); m != nil {
+	if m := pickCandidate(buckets.exactWhen); m != nil {
 		return m
 	}
-	if m := pick(wildcardWhenArgs); m != nil {
+	if m := pickCandidate(buckets.wildcard); m != nil {
 		return m
 	}
-	if m := pick(cmdArgsIgnoreWhen); m != nil {
+	if m := pickCandidate(buckets.ignoreWhen); m != nil {
 		i.logger.Debug(
 			"Falling back to command+args match (ignoring when)",
-			"command",
-			command,
-			"when",
-			when,
-			"args",
-			args,
+			"command", command,
+			"when", when,
+			"args", args,
 		)
 		return m
 	}
 	if args == nil {
-		if m := pick(cmdOnly); m != nil {
+		if m := pickCandidate(buckets.commandOnly); m != nil {
 			i.logger.Debug("Falling back to command only match", "command", command, "when", when)
 			return m
 		}
 	}
 	return nil
+}
+
+type candidate struct {
+	mapping   *mappings.ActionMappingConfig
+	forImport bool
+	explicit  bool
+}
+
+func newCandidate(mapping mappings.ActionMappingConfig, effective bool, explicit bool) *candidate {
+	mCopy := mapping
+	return &candidate{mapping: &mCopy, forImport: effective, explicit: explicit}
+}
+
+type bucketKind int
+
+const (
+	bucketNone bucketKind = iota
+	bucketExactWhen
+	bucketWildcard
+	bucketIgnoreWhen
+	bucketCommandOnly
+)
+
+type candidateBuckets struct {
+	exactWhen   []*candidate
+	wildcard    []*candidate
+	ignoreWhen  []*candidate
+	commandOnly []*candidate
+
+	seenExact       map[string]struct{}
+	seenWildcard    map[string]struct{}
+	seenIgnoreWhen  map[string]struct{}
+	seenCommandOnly map[string]struct{}
+}
+
+func newCandidateBuckets() *candidateBuckets {
+	return &candidateBuckets{
+		seenExact:       make(map[string]struct{}),
+		seenWildcard:    make(map[string]struct{}),
+		seenIgnoreWhen:  make(map[string]struct{}),
+		seenCommandOnly: make(map[string]struct{}),
+	}
+}
+
+func (b *candidateBuckets) add(kind bucketKind, mappingID string, cand *candidate) {
+	switch kind {
+	case bucketExactWhen:
+		if _, ok := b.seenExact[mappingID]; ok {
+			return
+		}
+		b.seenExact[mappingID] = struct{}{}
+		b.exactWhen = append(b.exactWhen, cand)
+	case bucketWildcard:
+		if _, ok := b.seenWildcard[mappingID]; ok {
+			return
+		}
+		b.seenWildcard[mappingID] = struct{}{}
+		b.wildcard = append(b.wildcard, cand)
+	case bucketIgnoreWhen:
+		if _, ok := b.seenIgnoreWhen[mappingID]; ok {
+			return
+		}
+		b.seenIgnoreWhen[mappingID] = struct{}{}
+		b.ignoreWhen = append(b.ignoreWhen, cand)
+	case bucketCommandOnly:
+		if _, ok := b.seenCommandOnly[mappingID]; ok {
+			return
+		}
+		b.seenCommandOnly[mappingID] = struct{}{}
+		b.commandOnly = append(b.commandOnly, cand)
+	}
+}
+
+func pickCandidate(cands []*candidate) *mappings.ActionMappingConfig {
+	if len(cands) == 0 {
+		return nil
+	}
+	var (
+		explicitForImport []*candidate
+		implicitForImport []*candidate
+		others            []*candidate
+	)
+	for _, c := range cands {
+		switch {
+		case c.forImport && c.explicit:
+			explicitForImport = append(explicitForImport, c)
+		case c.forImport:
+			implicitForImport = append(implicitForImport, c)
+		default:
+			others = append(others, c)
+		}
+	}
+	chooseFrom := cands
+	switch {
+	case len(explicitForImport) > 0:
+		chooseFrom = explicitForImport
+	case len(implicitForImport) > 0:
+		chooseFrom = implicitForImport
+	default:
+		chooseFrom = others
+	}
+	sort.Slice(chooseFrom, func(i, j int) bool {
+		return chooseFrom[i].mapping.ID < chooseFrom[j].mapping.ID
+	})
+	return chooseFrom[0].mapping
+}
+
+func (i *vscodeImporter) appendMappingCandidates(
+	buckets *candidateBuckets,
+	mapping mappings.ActionMappingConfig,
+	command, when string,
+	args map[string]interface{},
+) {
+	if len(mapping.VSCode) == 0 {
+		return
+	}
+
+	onlyConfig := len(mapping.VSCode) == 1
+	explicitOnly := mapping.VSCode.HasExplicitForImport()
+
+	for _, vc := range mapping.VSCode {
+		if vc.Command != command {
+			continue
+		}
+		if explicitOnly && !vc.ForImport {
+			continue
+		}
+
+		bucket := determineBucket(vc, when, args)
+		if bucket == bucketNone {
+			continue
+		}
+
+		effectiveForImport := vc.ForImport || onlyConfig
+		cand := newCandidate(mapping, effectiveForImport, vc.ForImport)
+		buckets.add(bucket, mapping.ID, cand)
+	}
+}
+
+func determineBucket(vc mappings.VscodeMappingConfig, when string, args map[string]interface{}) bucketKind {
+	if equalArgs(vc.Args, args) {
+		if vc.When == "" {
+			return bucketWildcard
+		}
+		if vc.When == when {
+			return bucketExactWhen
+		}
+		return bucketIgnoreWhen
+	}
+	if args == nil {
+		return bucketCommandOnly
+	}
+	return bucketNone
 }
 
 // equalArgs compares two args maps by canonical JSON encoding to avoid type

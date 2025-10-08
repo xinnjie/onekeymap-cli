@@ -104,36 +104,7 @@ func (m *ImportFormModel) build() error {
 	}
 
 	if m.needInput {
-		placeholderInput := ""
-		groups = append(groups,
-			huh.NewGroup(
-				huh.NewInput().
-					Key("input").
-					TitleFunc(func() string {
-						return "Input config path for " + *m.Editor
-					}, &m.Editor).
-					PlaceholderFunc(func() string {
-						if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-							if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
-								placeholderInput = v[0]
-							}
-						}
-						return placeholderInput
-					}, &m.Editor).
-					// Ensure the input file exists
-					Validate(func(s string) error {
-						filePath := s
-						if filePath == "" {
-							filePath = placeholderInput
-						}
-						if _, err := os.Stat(filePath); os.IsNotExist(err) {
-							return fmt.Errorf("file does not exist: %s", filePath)
-						}
-						return nil
-					}).
-					Value(m.EditorKeymapConfigInput),
-			),
-		)
+		groups = append(groups, m.createInputGroup())
 	}
 
 	if m.needOutput {
@@ -187,17 +158,7 @@ func (m *ImportFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 	if m.form.State == huh.StateCompleted {
-		// Fill placeholder if user input is empty
-		if m.needInput && *m.EditorKeymapConfigInput == "" {
-			if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-				if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
-					*m.EditorKeymapConfigInput = v[0]
-				}
-			}
-		}
-		if m.needOutput && *m.OnekeymapConfigOutput == "" {
-			*m.OnekeymapConfigOutput = m.OnekeymapConfigPlaceHolder
-		}
+		m.fillPlaceholders()
 		return m, tea.Quit
 	}
 
@@ -210,4 +171,49 @@ func (m *ImportFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *ImportFormModel) View() string {
 	return m.form.View()
+}
+
+func (m *ImportFormModel) fillPlaceholders() {
+	// Fill placeholder if user input is empty
+	if m.needInput && *m.EditorKeymapConfigInput == "" {
+		if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
+			if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
+				*m.EditorKeymapConfigInput = v[0]
+			}
+		}
+	}
+	if m.needOutput && *m.OnekeymapConfigOutput == "" {
+		*m.OnekeymapConfigOutput = m.OnekeymapConfigPlaceHolder
+	}
+}
+
+func (m *ImportFormModel) createInputGroup() *huh.Group {
+	placeholderInput := ""
+	return huh.NewGroup(
+		huh.NewInput().
+			Key("input").
+			TitleFunc(func() string {
+				return "Input config path for " + *m.Editor
+			}, &m.Editor).
+			PlaceholderFunc(func() string {
+				if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
+					if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
+						placeholderInput = v[0]
+					}
+				}
+				return placeholderInput
+			}, &m.Editor).
+			// Ensure the input file exists
+			Validate(func(s string) error {
+				filePath := s
+				if filePath == "" {
+					filePath = placeholderInput
+				}
+				if _, err := os.Stat(filePath); os.IsNotExist(err) {
+					return fmt.Errorf("file does not exist: %s", filePath)
+				}
+				return nil
+			}).
+			Value(m.EditorKeymapConfigInput),
+	)
 }

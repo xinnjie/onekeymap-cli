@@ -31,6 +31,29 @@ func NewKeyChord(protoKeyChord *keymapv1.KeyChord) *KeyChord {
 	return &KeyChord{KeyChord: protoKeyChord}
 }
 
+func handleSeparatorAsKey(chord *keymapv1.KeyChord, modifierSeparator string) error {
+	if kc, ok := keycode.FromString(modifierSeparator); ok {
+		chord.KeyCode = kc
+		return nil
+	}
+	return fmt.Errorf("invalid key code: '%s'", modifierSeparator)
+}
+
+func handleLastPart(chord *keymapv1.KeyChord, lastKey string) error {
+	// Check if the last part is a modifier.
+	if modifier, ok := modifierMap[lastKey]; ok {
+		// It's a modifier. The keycode will be empty.
+		chord.Modifiers = append(chord.Modifiers, modifier)
+		return nil
+	}
+	// It's a key code.
+	if kc, ok := keycode.FromString(lastKey); ok {
+		chord.KeyCode = kc
+		return nil
+	}
+	return fmt.Errorf("invalid key code: '%s'", lastKey)
+}
+
 // Parse takes a vscode-like keybind string like "ctrl+shift+f" or "ctrl-shift-f" and converts it
 // into a structured KeyChord proto message.
 func Parse(keybind string, modifierSeparator string) (*KeyChord, error) {
@@ -50,23 +73,12 @@ func Parse(keybind string, modifierSeparator string) (*KeyChord, error) {
 	// Handle cases like "ctrl+alt++" where the key is the separator.
 	// In this case, Split results in an empty string at the end.
 	if lastKey == "" && strings.HasSuffix(lowerKeybind, modifierSeparator) {
-		if kc, ok := keycode.FromString(modifierSeparator); ok {
-			chord.KeyCode = kc
-		} else {
-			return nil, fmt.Errorf("invalid key code: '%s'", modifierSeparator)
+		if err := handleSeparatorAsKey(chord, modifierSeparator); err != nil {
+			return nil, err
 		}
 	} else {
-		// Check if the last part is a modifier.
-		if modifier, ok := modifierMap[lastKey]; ok {
-			// It's a modifier. The keycode will be empty.
-			chord.Modifiers = append(chord.Modifiers, modifier)
-		} else {
-			// It's a key code.
-			if kc, ok := keycode.FromString(lastKey); ok {
-				chord.KeyCode = kc
-			} else {
-				return nil, fmt.Errorf("invalid key code: '%s'", lastKey)
-			}
+		if err := handleLastPart(chord, lastKey); err != nil {
+			return nil, err
 		}
 	}
 

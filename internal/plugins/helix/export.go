@@ -39,22 +39,7 @@ func (e *helixExporter) Export(
 	var existingKeys helixKeys
 	var existingFullConfig map[string]interface{}
 	if opts.ExistingConfig != nil {
-		// Parse as generic map to preserve all sections
-		if err := toml.NewDecoder(opts.ExistingConfig).Decode(&existingFullConfig); err != nil {
-			e.logger.WarnContext(
-				ctx,
-				"Failed to parse existing config, proceeding with destructive export",
-				"error",
-				err,
-			)
-		} else {
-			// Extract keys section if it exists
-			if keysSection, ok := existingFullConfig["keys"]; ok {
-				if keysMap, ok := keysSection.(map[string]interface{}); ok {
-					existingKeys = e.convertMapToHelixKeys(keysMap)
-				}
-			}
-		}
+		existingKeys, existingFullConfig = e.parseExistingConfig(ctx, opts.ExistingConfig)
 	}
 
 	// Identify unmanaged keybindings from existing config
@@ -91,6 +76,34 @@ func (e *helixExporter) Export(
 		BaseEditorConfig:   existingKeys,
 		ExportEditorConfig: finalKeys,
 	}, nil
+}
+
+func (e *helixExporter) parseExistingConfig(
+	ctx context.Context,
+	existingConfig io.Reader,
+) (helixKeys, map[string]interface{}) {
+	var existingKeys helixKeys
+	var existingFullConfig map[string]interface{}
+
+	// Parse as generic map to preserve all sections
+	if err := toml.NewDecoder(existingConfig).Decode(&existingFullConfig); err != nil {
+		e.logger.WarnContext(
+			ctx,
+			"Failed to parse existing config, proceeding with destructive export",
+			"error",
+			err,
+		)
+		return existingKeys, existingFullConfig
+	}
+
+	// Extract keys section if it exists
+	if keysSection, ok := existingFullConfig["keys"]; ok {
+		if keysMap, ok := keysSection.(map[string]interface{}); ok {
+			existingKeys = e.convertMapToHelixKeys(keysMap)
+		}
+	}
+
+	return existingKeys, existingFullConfig
 }
 
 // identifyUnmanagedKeybindings performs reverse lookup to identify keybindings
