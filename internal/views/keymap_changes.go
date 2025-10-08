@@ -15,6 +15,15 @@ import (
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
+const (
+	columnWidthType    = 8
+	columnWidthAction  = 50
+	tableDefaultHeight = 18
+	tableHeightMargin  = 4
+	minTableHeight     = 6
+	defaultColumnWidth = 20
+)
+
 var (
 	_ tea.Model = (*keymapChangesModel)(nil)
 )
@@ -33,8 +42,8 @@ func NewKeymapChangesModel(changes *importapi.KeymapChanges, confirm *bool) tea.
 	// Compute dynamic widths for Before/After based on actual content
 	beforeW, afterW := measureBeforeAfterWidths(changes)
 	cols := []table.Column{
-		{Title: "Type", Width: 8},
-		{Title: "Action", Width: 50},
+		{Title: "Type", Width: columnWidthType},
+		{Title: "Action", Width: columnWidthAction},
 		{Title: "Before", Width: beforeW},
 		{Title: "After", Width: afterW},
 	}
@@ -65,7 +74,12 @@ func NewKeymapChangesModel(changes *importapi.KeymapChanges, confirm *bool) tea.
 		}
 	}
 
-	t := table.New(table.WithColumns(cols), table.WithRows(rows), table.WithHeight(18), table.WithFocused(true))
+	t := table.New(
+		table.WithColumns(cols),
+		table.WithRows(rows),
+		table.WithHeight(tableDefaultHeight),
+		table.WithFocused(true),
+	)
 	return keymapChangesModel{table: t, changes: changes, confirm: confirm}
 }
 
@@ -112,9 +126,9 @@ func (m keymapChangesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.form.Init()
 		}
 	case tea.WindowSizeMsg:
-		h := msg.Height - 4
-		if h < 6 {
-			h = 6
+		h := msg.Height - tableHeightMargin
+		if h < minTableHeight {
+			h = minTableHeight
 		}
 		if h > len(m.table.Rows())+1 {
 			h = len(m.table.Rows()) + 1
@@ -175,7 +189,7 @@ func measureBeforeAfterWidths(changes *importapi.KeymapChanges) (before, after i
 		prefixLen = 2 // account for "+ " or "- " prefixes
 	)
 	if changes == nil {
-		return 20, 20
+		return defaultColumnWidth, defaultColumnWidth
 	}
 	maxBefore := 0
 	maxAfter := 0

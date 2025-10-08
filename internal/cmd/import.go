@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -31,8 +32,10 @@ func NewCmdImport() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "import",
 		Short: "Import an editor's keymap to the universal format",
-		RunE:  importRun(&f),
-		Args:  cobra.ExactArgs(0),
+		RunE: importRun(&f, func() (*slog.Logger, *plugins.Registry, importapi.Importer) {
+			return cmdLogger, cmdPluginRegistry, cmdImportService
+		}),
+		Args: cobra.ExactArgs(0),
 	}
 
 	cmd.Flags().StringVar(&f.from, "from", "", "Source editor to import from (e.g., vscode, zed)")
@@ -45,18 +48,22 @@ func NewCmdImport() *cobra.Command {
 	// Add completion for 'from' flag
 	_ = cmd.RegisterFlagCompletionFunc(
 		"from",
-		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return pluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
+		func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+			return cmdPluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
 		},
 	)
 
 	return cmd
 }
 
-func importRun(f *importFlags) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
+func importRun(
+	f *importFlags,
+	dependencies func() (*slog.Logger, *plugins.Registry, importapi.Importer),
+) func(cmd *cobra.Command, _ []string) error {
+	return func(cmd *cobra.Command, _ []string) error {
+		logger, pluginRegistry, importService := dependencies()
 		onekeymapConfig := viper.GetString("onekeymap")
-		err := prepareImportInputFlags(cmd, f, onekeymapConfig)
+		err := prepareImportInputFlags(cmd, f, onekeymapConfig, pluginRegistry, logger)
 		if err != nil {
 			return err
 		}
@@ -156,7 +163,13 @@ func importRun(f *importFlags) func(cmd *cobra.Command, args []string) error {
 	}
 }
 
-func prepareImportInputFlags(cmd *cobra.Command, f *importFlags, onekeymapConfig string) error {
+func prepareImportInputFlags(
+	cmd *cobra.Command,
+	f *importFlags,
+	onekeymapConfig string,
+	pluginRegistry *plugins.Registry,
+	logger *slog.Logger,
+) error {
 	if f.interactive {
 		needSelectEditor := !cmd.Flags().Changed("from") || f.from == ""
 		needInput := !cmd.Flags().Changed("input") || f.input == ""

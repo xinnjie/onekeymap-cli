@@ -30,7 +30,7 @@ func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *vs
 func (i *vscodeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	option pluginapi.PluginImportOption,
+	_ pluginapi.PluginImportOption,
 ) (*keymapv1.Keymap, error) {
 	// VSCode's keybindings.json can contain comments, so we need to strip them.
 	jsonData, err := io.ReadAll(source)

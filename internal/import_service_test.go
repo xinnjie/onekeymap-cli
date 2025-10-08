@@ -46,7 +46,7 @@ func (p *testPlugin) EditorType() pluginapi.EditorType {
 	return p.editorType
 }
 
-func (p *testPlugin) ConfigDetect(opts pluginapi.ConfigDetectOptions) ([]string, bool, error) {
+func (p *testPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) ([]string, bool, error) {
 	return []string{p.configPath}, true, nil
 }
 
@@ -68,9 +68,9 @@ type testPluginImporter struct {
 }
 
 func (i *testPluginImporter) Import(
-	ctx context.Context,
-	source io.Reader,
-	opts pluginapi.PluginImportOption,
+	_ context.Context,
+	_ io.Reader,
+	_ pluginapi.PluginImportOption,
 ) (*keymapv1.Keymap, error) {
 	return i.importData, i.importError
 }
@@ -79,10 +79,10 @@ func (i *testPluginImporter) Import(
 type testPluginExporter struct{}
 
 func (e *testPluginExporter) Export(
-	ctx context.Context,
-	destination io.Writer,
-	setting *keymapv1.Keymap,
-	opts pluginapi.PluginExportOption,
+	_ context.Context,
+	_ io.Writer,
+	_ *keymapv1.Keymap,
+	_ pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	return &pluginapi.PluginExportReport{}, nil
 }

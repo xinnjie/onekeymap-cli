@@ -21,8 +21,8 @@ func NewCmdDev() *cobra.Command {
 	return cmd
 }
 
-func devRun(_ *devFlags) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
+func devRun(_ *devFlags) func(_ *cobra.Command, _ []string) {
+	return func(_ *cobra.Command, _ []string) {
 		// Empty implementation - this is a parent command for dev subcommands
 	}
 }

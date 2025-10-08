@@ -81,7 +81,7 @@ var criticalKeybindingsByPlatform = map[platform.Platform]map[string]string{
 }
 
 // Validate checks for keybindings that might shadow critical system shortcuts.
-func (r *PotentialShadowingRule) Validate(ctx context.Context, validationContext *ValidationContext) error {
+func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *ValidationContext) error {
 	setting := validationContext.Setting
 	report := validationContext.Report
 

@@ -104,7 +104,7 @@ func toProtoKeymapDiff(diffs []importapi.KeymapDiff) []*keymapv1.ActionDiff {
 }
 
 func (s *Server) ConfigDetect(
-	ctx context.Context,
+	_ context.Context,
 	req *keymapv1.ConfigDetectRequest,
 ) (*keymapv1.ConfigDetectResponse, error) {
 	// For now, plugins resolve path by runtime.GOOS. We only support macOS requests on this server currently.
@@ -126,7 +126,7 @@ func (s *Server) ConfigDetect(
 }
 
 func (s *Server) GetKeymap(
-	ctx context.Context,
+	_ context.Context,
 	req *keymapv1.GetKeymapRequest,
 ) (*keymapv1.GetKeymapResponse, error) {
 	km, err := keymap.Load(strings.NewReader(req.GetConfig()))
@@ -161,7 +161,7 @@ func (s *Server) GetKeymap(
 }
 
 func (s *Server) SaveKeymap(
-	ctx context.Context,
+	_ context.Context,
 	req *keymapv1.SaveKeymapRequest,
 ) (*keymapv1.SaveKeymapResponse, error) {
 	var buf bytes.Buffer

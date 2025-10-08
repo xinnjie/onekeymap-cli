@@ -27,14 +27,14 @@ type helixConfig struct {
 	Extra map[string]interface{} `toml:",inline"`
 }
 
-// HelixMode enumerates known Helix modes. Underlying type is string to match TOML keys.
-// Unknown/custom modes are still representable as HelixMode values.
-type HelixMode string
+// Mode enumerates known Helix modes. Underlying type is string to match TOML keys.
+// Unknown/custom modes are still representable as Mode values.
+type Mode string
 
 const (
-	HelixModeNormal HelixMode = "normal"
-	HelixModeInsert HelixMode = "insert"
-	HelixModeSelect HelixMode = "select"
+	HelixModeNormal Mode = "normal"
+	HelixModeInsert Mode = "insert"
+	HelixModeSelect Mode = "select"
 )
 
 // helixKeys represents [keys.<mode>] => { "<key>": "<command>" }

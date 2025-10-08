@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,8 +35,10 @@ func NewCmdExport() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export a universal keymap to an editor's format",
-		RunE:  exportRun(&f),
-		Args:  cobra.ExactArgs(0),
+		RunE: exportRun(&f, func() (*slog.Logger, *plugins.Registry, exportapi.Exporter) {
+			return cmdLogger, cmdPluginRegistry, cmdExportService
+		}),
+		Args: cobra.ExactArgs(0),
 	}
 
 	cmd.Flags().StringVar(&f.to, "to", "", "Target editor to export to")
@@ -47,18 +50,22 @@ func NewCmdExport() *cobra.Command {
 	// Add completion for 'to' flag
 	_ = cmd.RegisterFlagCompletionFunc(
 		"to",
-		func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return pluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
+		func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+			return cmdPluginRegistry.GetNames(), cobra.ShellCompDirectiveNoFileComp
 		},
 	)
 
 	return cmd
 }
 
-func exportRun(f *exportFlags) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
+func exportRun(
+	f *exportFlags,
+	dependencies func() (*slog.Logger, *plugins.Registry, exportapi.Exporter),
+) func(cmd *cobra.Command, _ []string) error {
+	return func(cmd *cobra.Command, _ []string) error {
+		logger, pluginRegistry, exportService := dependencies()
 		onekeymapPlaceHolder := viper.GetString("onekeymap")
-		err := prepareExportInputFlags(cmd, f, onekeymapPlaceHolder)
+		err := prepareExportInputFlags(cmd, f, onekeymapPlaceHolder, pluginRegistry, logger)
 		if err != nil {
 			return err
 		}
@@ -163,6 +170,8 @@ func prepareExportInputFlags(
 	cmd *cobra.Command,
 	f *exportFlags,
 	onekeymapPlaceholder string,
+	pluginRegistry *plugins.Registry,
+	logger *slog.Logger,
 ) error {
 	if f.interactive {
 		needSelectEditor := !cmd.Flags().Changed("to") || f.to == ""

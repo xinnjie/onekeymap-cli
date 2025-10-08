@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	_ tea.Model = (*outputFormModel)(nil)
+	_ tea.Model = (*OutputFormModel)(nil)
 )
 
-// outputFormModel collects inputs for exporting onekeymap.json to a target editor.
-type outputFormModel struct {
+// OutputFormModel collects inputs for exporting onekeymap.json to a target editor.
+type OutputFormModel struct {
 	form *huh.Form
 
 	pluginRegistry *plugins.Registry
@@ -38,8 +38,8 @@ func NewOutputFormModel(
 	needSelectEditor, needInput, needOutput bool,
 	editor, onekeymapConfigInput, editorKeymapConfigOutput *string,
 	onekeymapConfigPlaceHolder string,
-) (*outputFormModel, error) {
-	m := &outputFormModel{
+) (*OutputFormModel, error) {
+	m := &OutputFormModel{
 		pluginRegistry:             registry,
 		needSelectEditor:           needSelectEditor,
 		needInput:                  needInput,
@@ -55,7 +55,7 @@ func NewOutputFormModel(
 	return m, nil
 }
 
-func (m *outputFormModel) build() error {
+func (m *OutputFormModel) build() error {
 	if !m.needSelectEditor && !m.needInput && !m.needOutput {
 		return errors.New("form not needed")
 	}
@@ -132,7 +132,7 @@ func (m *outputFormModel) build() error {
 	return nil
 }
 
-func (m *outputFormModel) GetExporterNames() []string {
+func (m *OutputFormModel) GetExporterNames() []string {
 	exporterNames := make([]string, 0)
 	for _, name := range m.pluginRegistry.GetNames() {
 		plugin, ok := m.pluginRegistry.Get(pluginapi.EditorType(name))
@@ -149,9 +149,9 @@ func (m *outputFormModel) GetExporterNames() []string {
 	return exporterNames
 }
 
-func (m *outputFormModel) Init() tea.Cmd { return m.form.Init() }
+func (m *OutputFormModel) Init() tea.Cmd { return m.form.Init() }
 
-func (m *outputFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *OutputFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if km, ok := msg.(tea.KeyMsg); ok {
 		switch km.String() {
 		case "ctrl+c", "esc", "q":
@@ -181,6 +181,6 @@ func (m *outputFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *outputFormModel) View() string {
+func (m *OutputFormModel) View() string {
 	return m.form.View()
 }

@@ -28,12 +28,12 @@ const (
 //nolint:gochecknoglobals // TODO(xinnjie): Stop using these global variables. But for now I can not think of a better way.
 var (
 	// Global shared state that needs to be accessed across commands
-	pluginRegistry *plugins.Registry
-	importService  importapi.Importer
-	exportService  exportapi.Exporter
-	logger         *slog.Logger
-	recorder       metrics.Recorder
-	mappingConfig  *mappings.MappingConfig
+	cmdPluginRegistry *plugins.Registry
+	cmdImportService  importapi.Importer
+	cmdExportService  exportapi.Exporter
+	cmdLogger         *slog.Logger
+	cmdRecorder       metrics.Recorder
+	cmdMappingConfig  *mappings.MappingConfig
 )
 
 type rootFlags struct {
@@ -54,9 +54,9 @@ func NewCmdRoot() *cobra.Command {
 		Short:            "A tool to import, export, and synchronize keyboard shortcuts between editors.",
 		Version:          version,
 		PersistentPreRun: rootPersistentPreRun(&f),
-		PersistentPostRun: func(cmd *cobra.Command, args []string) {
-			if err := recorder.Shutdown(cmd.Context()); err != nil {
-				logger.Error("failed to shutdown telemetry", "error", err)
+		PersistentPostRun: func(cmd *cobra.Command, _ []string) {
+			if err := cmdRecorder.Shutdown(cmd.Context()); err != nil {
+				cmdLogger.Error("failed to shutdown telemetry", "error", err)
 			}
 		},
 	}
@@ -91,8 +91,8 @@ func NewCmdRoot() *cobra.Command {
 	return cmd
 }
 
-func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
+func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
+	return func(cmd *cobra.Command, _ []string) {
 		_, err := cliconfig.NewConfig(cmd)
 		if err != nil {
 			cmd.PrintErrf("Error initializing configuration: %v\n", err)
@@ -103,13 +103,13 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 		quiet := viper.GetBool("quiet")
 		logJSON := viper.GetBool("log-json")
 
-		mappingConfig, err = mappings.NewMappingConfig()
+		cmdMappingConfig, err = mappings.NewMappingConfig()
 		if err != nil {
 			cmd.PrintErrf("failed to initialize mapping config: %v\n", err)
 			os.Exit(1)
 		}
 
-		recorder = metrics.NewNoop()
+		cmdRecorder = metrics.NewNoop()
 		if f.enableTelemetry {
 			if viper.GetString("otel.exporter.otlp.endpoint") == "" {
 				cmd.PrintErrln(
@@ -117,7 +117,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 				)
 			}
 
-			recorder, err = metrics.New(cmd.Context(), version, logger, mappingConfig)
+			cmdRecorder, err = metrics.New(cmd.Context(), version, cmdLogger, cmdMappingConfig)
 			if err != nil {
 				cmd.PrintErrf("failed to initialize telemetry: %v\n", err)
 				os.Exit(1)
@@ -141,7 +141,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 		var handler slog.Handler
 		handlerOpts := &slog.HandlerOptions{
 			Level: logLevel,
-			ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			ReplaceAttr: func(_ []string, a slog.Attr) slog.Attr {
 				if a.Key == slog.TimeKey {
 					return slog.Attr{}
 				}
@@ -155,16 +155,16 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, args []string) 
 			handler = slog.NewTextHandler(output, handlerOpts)
 		}
 
-		logger = slog.New(handler)
+		cmdLogger = slog.New(handler)
 
-		pluginRegistry = plugins.NewRegistry()
-		pluginRegistry.Register(vscode.New(mappingConfig, logger))
-		pluginRegistry.Register(zed.New(mappingConfig, logger))
-		pluginRegistry.Register(intellij.New(mappingConfig, logger))
-		pluginRegistry.Register(helix.New(mappingConfig, logger))
+		cmdPluginRegistry = plugins.NewRegistry()
+		cmdPluginRegistry.Register(vscode.New(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.New(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(helix.New(cmdMappingConfig, cmdLogger))
 
-		importService = internal.NewImportService(pluginRegistry, mappingConfig, logger, recorder)
-		exportService = internal.NewExportService(pluginRegistry, mappingConfig, logger)
+		cmdImportService = internal.NewImportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
+		cmdExportService = internal.NewExportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger)
 	}
 }
 

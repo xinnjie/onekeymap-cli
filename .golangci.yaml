@@ -129,16 +129,10 @@ linters:
     - funlen
     # TODO(xinnjie): Temporarily disable 'gocyclo' due to many violations; fix and re-enable
     - gocyclo
-    # TODO(xinnjie): Temporarily disable 'gomoddirectives' due to many violations; fix and re-enable
-    - gomoddirectives
-    # TODO(xinnjie): Temporarily disable 'mnd' due to many violations; fix and re-enable
-    - mnd
     # TODO(xinnjie): Temporarily disable 'nestif' due to many violations; fix and re-enable
     - nestif
     # TODO(xinnjie): Temporarily disable 'nonamedreturns' due to many violations; fix and re-enable
     - nonamedreturns
-    # TODO(xinnjie): Temporarily disable 'revive' due to many violations; fix and re-enable
-    - revive
     # TODO(xinnjie): Temporarily disable 'testpackage' due to many violations; fix and re-enable
     - testpackage
     # TODO(xinnjie): Temporarily disable 'gocognit' due to many violations; fix and re-enable

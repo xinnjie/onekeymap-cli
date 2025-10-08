@@ -24,7 +24,7 @@ type testExportPlugin struct {
 }
 
 func (p *testExportPlugin) EditorType() pluginapi.EditorType { return p.editorType }
-func (p *testExportPlugin) ConfigDetect(opts pluginapi.ConfigDetectOptions) ([]string, bool, error) {
+func (p *testExportPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) ([]string, bool, error) {
 	return nil, false, pluginapi.ErrNotSupported
 }
 func (p *testExportPlugin) Importer() (pluginapi.PluginImporter, error) {
@@ -41,9 +41,9 @@ type testExporter struct {
 }
 
 func (e *testExporter) Export(
-	ctx context.Context,
+	_ context.Context,
 	destination io.Writer,
-	setting *keymapv1.Keymap,
+	_ *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	if e.writeContent != "" {

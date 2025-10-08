@@ -21,6 +21,8 @@ const (
 	commandProcessedName = "onekeymap.import.commands.processed"
 )
 
+const metricExportIntervalSeconds = 15
+
 // Attribute keys.
 const (
 	attrKeyEditor  = "editor"
@@ -46,11 +48,11 @@ type recorder struct {
 type noopRecorder struct{}
 
 // RecordCommandProcessed is a no-op.
-func (r *noopRecorder) RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.Keymap) {
+func (r *noopRecorder) RecordCommandProcessed(_ context.Context, _ string, _ *keymapv1.Keymap) {
 }
 
 // Shutdown is a no-op.
-func (r *noopRecorder) Shutdown(ctx context.Context) error { return nil }
+func (r *noopRecorder) Shutdown(_ context.Context) error { return nil }
 
 // NewNoop returns a no-op Recorder.
 func NewNoop() Recorder {
@@ -81,7 +83,9 @@ func New(
 
 	provider := sdkmetric.NewMeterProvider(
 		sdkmetric.WithResource(res),
-		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(15*time.Second))),
+		sdkmetric.WithReader(
+			sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(metricExportIntervalSeconds*time.Second)),
+		),
 	)
 	otel.SetMeterProvider(provider)
 

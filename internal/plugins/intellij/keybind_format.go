@@ -11,6 +11,8 @@ import (
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
+const maxIntellijChords = 2
+
 func parseKeyBinding(ks KeyboardShortcutXML) (*keymap.KeyBinding, error) {
 	parts1, err := parseKeyStroke(ks.First)
 	if err != nil {
@@ -35,7 +37,7 @@ func parseKeyBinding(ks KeyboardShortcutXML) (*keymap.KeyBinding, error) {
 func formatKeybinding(keybind *keymap.KeyBinding) (*KeyboardShortcutXML, error) {
 	// Only support up to two chords for IntelliJ (first and optional second keystroke).
 	chords := keybind.GetKeyChords().GetChords()
-	if len(chords) > 2 {
+	if len(chords) > maxIntellijChords {
 		return nil, errors.New("too many chords for intellij, only first two are supported")
 	}
 
@@ -44,7 +46,7 @@ func formatKeybinding(keybind *keymap.KeyBinding) (*KeyboardShortcutXML, error) 
 		return nil, fmt.Errorf("failed to format first keystroke: %w", err)
 	}
 	var second string
-	if len(chords) == 2 {
+	if len(chords) == maxIntellijChords {
 		s, err := keyChordToIJKeyStroke(chords[1])
 		if err != nil {
 			return nil, fmt.Errorf("failed to format second keystroke: %w", err)

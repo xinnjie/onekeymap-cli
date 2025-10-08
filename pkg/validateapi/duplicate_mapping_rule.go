@@ -17,7 +17,7 @@ func NewDuplicateMappingRule() ValidationRule {
 }
 
 // Validate checks for duplicate mappings and adds warnings to the report.
-func (r *DuplicateMappingRule) Validate(ctx context.Context, validationContext *ValidationContext) error {
+func (r *DuplicateMappingRule) Validate(_ context.Context, validationContext *ValidationContext) error {
 	setting := validationContext.Setting
 	report := validationContext.Report
 

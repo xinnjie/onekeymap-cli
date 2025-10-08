@@ -14,6 +14,13 @@ import (
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
+const (
+	columnWidthActionName = 48
+	columnWidthKeybinding = 30
+	viewHeightMargin      = 7
+	minViewHeight         = 6
+)
+
 var _ tea.Model = (*KeymapViewModel)(nil)
 
 // KeymapViewModel is a read-only TUI model to present current OneKeymapSetting.
@@ -39,7 +46,12 @@ func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) te
 	m.initCategories()
 	m.rebuildRows()
 	m.table = table.New(
-		table.WithColumns([]table.Column{{Title: "Action", Width: 48}, {Title: "Keybinding", Width: 30}}),
+		table.WithColumns(
+			[]table.Column{
+				{Title: "Action", Width: columnWidthActionName},
+				{Title: "Keybinding", Width: columnWidthKeybinding},
+			},
+		),
 		table.WithRows(m.rows),
 		table.WithFocused(true),
 	)
@@ -87,9 +99,9 @@ func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 		// leave 5 lines for headers/help/detail; adjust table height
-		h := m.height - 7
-		if h < 6 {
-			h = 6
+		h := m.height - viewHeightMargin
+		if h < minViewHeight {
+			h = minViewHeight
 		}
 		m.table.SetHeight(h)
 	}

@@ -33,7 +33,7 @@ func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, dif
 // Export takes a universal KeymapSetting and writes it to an editor-specific
 // configuration destination.
 func (p *zedExporter) Export(
-	ctx context.Context,
+	_ context.Context,
 	destination io.Writer,
 	setting *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,

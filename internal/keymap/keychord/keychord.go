@@ -132,9 +132,8 @@ func (kc *KeyChord) Format(p platform.Platform) ([]string, error) {
 		if keyStr, ok := keycode.ToString(kc.KeyCode); ok {
 			parts = append(parts, keyStr)
 			return parts, nil
-		} else {
-			return nil, fmt.Errorf("invalid key code: %v", kc.KeyCode)
 		}
+		return nil, fmt.Errorf("invalid key code: %v", kc.KeyCode)
 	}
 
 	// Allow exactly one modifier without a key code (e.g., ["shift"]).

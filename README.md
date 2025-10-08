@@ -13,7 +13,7 @@
 ---
 **Sync your keyboard shortcuts across all your code editors.**
 
-OneKeymap is a powerful command-line tool that lets you import, export, and synchronize keyboard shortcuts between VSCode, IntelliJ IDEA, Zed, Helix, and more. Stop reconfiguring keybindings every time you switch editors—maintain one universal keymap and deploy it everywhere.
+OneKeymap CLI is a powerful command-line tool that lets you import, export, and synchronize keyboard shortcuts between VSCode, IntelliJ IDEA, Zed, Helix, and more. Stop reconfiguring keybindings every time you switch editors—maintain one universal keymap and deploy it everywhere.
 
 [![asciicast](https://asciinema.org/a/746874.svg)](https://asciinema.org/a/746874)
 

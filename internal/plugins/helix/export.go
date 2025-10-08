@@ -139,15 +139,15 @@ func (e *helixExporter) identifyUnmanagedKeybindings(existingKeys helixKeys) hel
 }
 
 // isManagedKeybinding checks if a keybinding is managed by onekeymap.
-func (e *helixExporter) isManagedKeybinding(command string, mode HelixMode) bool {
+func (e *helixExporter) isManagedKeybinding(command string, mode Mode) bool {
 	for _, mapping := range e.mappingConfig.Mappings {
 		for _, hconf := range mapping.Helix {
 			if hconf.Command == command {
-				var mappingMode HelixMode
+				var mappingMode Mode
 				if hconf.Mode == "" {
 					mappingMode = HelixModeNormal
 				} else {
-					mappingMode = HelixMode(hconf.Mode)
+					mappingMode = Mode(hconf.Mode)
 				}
 				if mappingMode == mode {
 					return true
@@ -193,11 +193,11 @@ func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting 
 				if hconf.Command == "" {
 					continue
 				}
-				var m HelixMode
+				var m Mode
 				if hconf.Mode == "" {
 					m = HelixModeNormal
 				} else {
-					m = HelixMode(hconf.Mode)
+					m = Mode(hconf.Mode)
 				}
 
 				var dest *map[string]string

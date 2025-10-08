@@ -12,7 +12,7 @@ import (
 
 // ConfigDetect returns the default path for Helix's config.toml file.
 // On macOS, this is typically ~/.config/helix/config.toml.
-func (p *helixPlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
+func (p *helixPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, false, err

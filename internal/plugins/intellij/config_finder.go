@@ -15,7 +15,7 @@ import (
 // ConfigDetect returns default keymap config path for IntelliJ.
 // NOTE: IntelliJ family has multiple editions/versions; precise discovery will
 // be implemented later. For now, we return a not-supported error placeholder.
-func (p *intellijPlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
+func (p *intellijPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	if runtime.GOOS != "darwin" {
 		return nil, false, fmt.Errorf(
 			"automatic path discovery is only supported on macOS for IntelliJ, %w",

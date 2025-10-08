@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"sort"
 	"strings"
@@ -22,15 +23,21 @@ func NewCmdDevDocSupportActions() *cobra.Command {
 		Short: "Generate markdown table showing action support across editors",
 		Long: `Reads all action mappings and generates a markdown table showing which editors
 support each action. The table includes columns for VSCode, Zed, IntelliJ, and Helix.`,
-		Run:  devDocSupportActionsRun(&f),
+		Run: devDocSupportActionsRun(&f, func() *slog.Logger {
+			return cmdLogger
+		}),
 		Args: cobra.ExactArgs(0),
 	}
 
 	return cmd
 }
 
-func devDocSupportActionsRun(f *devDocSupportActionsFlags) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
+func devDocSupportActionsRun(
+	_ *devDocSupportActionsFlags,
+	dependencies func() *slog.Logger,
+) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, _ []string) {
+		logger := dependencies()
 		ctx := cmd.Context()
 		// Load all mappings
 		mappingConfig, err := mappings.NewMappingConfig()

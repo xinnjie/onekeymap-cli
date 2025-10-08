@@ -36,8 +36,8 @@ This command is essential for maintaining the quality, consistency, and correctn
 	return cmd
 }
 
-func devDoctorRun(f *devDoctorFlags) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
+func devDoctorRun(_ *devDoctorFlags) func(cmd *cobra.Command, _ []string) {
+	return func(cmd *cobra.Command, _ []string) {
 		cmd.Println("Running mapping configuration diagnostics...")
 		var hasErrors bool
 
@@ -54,9 +54,8 @@ func devDoctorRun(f *devDoctorFlags) func(cmd *cobra.Command, args []string) {
 		if hasErrors {
 			cmd.PrintErrf("\nDoctor checks completed with errors.\n")
 			os.Exit(1)
-		} else {
-			cmd.Println("\n✅ All doctor checks passed successfully.")
 		}
+		cmd.Println("\n✅ All doctor checks passed successfully.")
 	}
 }
 

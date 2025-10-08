@@ -11,7 +11,7 @@ import (
 
 // ConfigDetect returns a reasonable default config path for the demo plugin.
 // It does not correspond to a real editor, but provides a stable location for testing.
-func (p *demoPlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
+func (p *demoPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, false, err

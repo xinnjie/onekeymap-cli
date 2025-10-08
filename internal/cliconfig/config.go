@@ -89,11 +89,10 @@ func NewConfig(cmd *cobra.Command) (*Config, error) {
 		// Read configuration file if it exists
 		if err := viper.ReadInConfig(); err != nil {
 			var configFileNotFoundError viper.ConfigFileNotFoundError
-			if errors.As(err, &configFileNotFoundError) {
-				// Config file not found is ignored
-			} else {
+			if !errors.As(err, &configFileNotFoundError) {
 				return nil, fmt.Errorf("failed to read config file: %w", err)
 			}
+			// Config file not found is ignored
 		}
 	}
 

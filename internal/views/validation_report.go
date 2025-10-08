@@ -18,6 +18,8 @@ const (
 	cyan   = lipgloss.Color("14")
 	green  = lipgloss.Color("10")
 	gray   = lipgloss.Color("8")
+
+	issuePaddingLeft = 2
 )
 
 var (
@@ -46,7 +48,7 @@ var (
 
 	//nolint:gochecknoglobals // style reused across TUI
 	issueStyle = lipgloss.NewStyle().
-			PaddingLeft(2)
+			PaddingLeft(issuePaddingLeft)
 
 	//nolint:gochecknoglobals // style reused across TUI
 	keyStyle = lipgloss.NewStyle().

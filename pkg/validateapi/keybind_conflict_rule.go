@@ -19,7 +19,7 @@ func NewKeybindConflictRule() ValidationRule {
 }
 
 // Validate checks for keybinding conflicts in the keymap setting.
-func (r *KeybindConflictRule) Validate(ctx context.Context, validationContext *ValidationContext) error {
+func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *ValidationContext) error {
 	if validationContext.Setting == nil || len(validationContext.Setting.GetKeybindings()) == 0 {
 		return nil
 	}

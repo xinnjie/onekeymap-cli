@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 )
 
@@ -20,8 +21,10 @@ func NewCmdView() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "view",
 		Short: "View current OneKeymapSetting in a read-only TUI",
-		RunE:  viewRun(&f),
-		Args:  cobra.ExactArgs(0),
+		RunE: viewRun(&f, func() *mappings.MappingConfig {
+			return cmdMappingConfig
+		}),
+		Args: cobra.ExactArgs(0),
 	}
 
 	cmd.Flags().StringVar(&f.file, "file", "", "Path to onekeymap.json (defaults to config value)")
@@ -29,8 +32,9 @@ func NewCmdView() *cobra.Command {
 	return cmd
 }
 
-func viewRun(f *viewFlags) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
+func viewRun(f *viewFlags, dependencies func() *mappings.MappingConfig) func(_ *cobra.Command, _ []string) error {
+	return func(_ *cobra.Command, _ []string) error {
+		mappingConfig := dependencies()
 		path := f.file
 		if path == "" {
 			path = viper.GetString("onekeymap")

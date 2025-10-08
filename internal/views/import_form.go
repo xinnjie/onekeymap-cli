@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	_ tea.Model = (*importFormModel)(nil)
+	_ tea.Model = (*ImportFormModel)(nil)
 )
 
 type editorOption struct {
@@ -21,7 +21,8 @@ type editorOption struct {
 	installed bool
 }
 
-type importFormModel struct {
+// ImportFormModel represents the import form UI model.
+type ImportFormModel struct {
 	form *huh.Form
 
 	pluginRegistry *plugins.Registry
@@ -40,8 +41,8 @@ func NewImportFormModel(
 	needSelectEditor, needInput, needOutput bool,
 	editor, editorKeymapConfigInput, onekeymapConfigOutput *string,
 	onekeymapConfigPlaceHolder string,
-) (*importFormModel, error) {
-	m := &importFormModel{
+) (*ImportFormModel, error) {
+	m := &ImportFormModel{
 		pluginRegistry:             registry,
 		needSelectEditor:           needSelectEditor,
 		needInput:                  needInput,
@@ -57,7 +58,7 @@ func NewImportFormModel(
 	return m, nil
 }
 
-func (m *importFormModel) build() error {
+func (m *ImportFormModel) build() error {
 	if !m.needSelectEditor && !m.needInput && !m.needOutput {
 		return errors.New("form not needed")
 	}
@@ -151,7 +152,7 @@ func (m *importFormModel) build() error {
 	return nil
 }
 
-func (m *importFormModel) getImporterOptions() []editorOption {
+func (m *ImportFormModel) getImporterOptions() []editorOption {
 	var options []editorOption
 	for _, name := range m.pluginRegistry.GetNames() {
 		plugin, ok := m.pluginRegistry.Get(pluginapi.EditorType(name))
@@ -175,10 +176,10 @@ func (m *importFormModel) getImporterOptions() []editorOption {
 	return options
 }
 
-// tea.Model minimal implementations (not used directly, kept for future extension).
-func (m *importFormModel) Init() tea.Cmd { return m.form.Init() }
+// Init initializes the import form model.
+func (m *ImportFormModel) Init() tea.Cmd { return m.form.Init() }
 
-func (m *importFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *ImportFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if km, ok := msg.(tea.KeyMsg); ok {
 		switch km.String() {
 		case "ctrl+c", "esc", "q":
@@ -207,6 +208,6 @@ func (m *importFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *importFormModel) View() string {
+func (m *ImportFormModel) View() string {
 	return m.form.View()
 }

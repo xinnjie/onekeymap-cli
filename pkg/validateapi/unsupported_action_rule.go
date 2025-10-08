@@ -25,7 +25,7 @@ func NewUnsupportedActionRule(mappingConfig *mappings.MappingConfig, targetEdito
 }
 
 // Validate checks for actions that cannot be exported to the target editor.
-func (r *UnsupportedActionRule) Validate(ctx context.Context, validationContext *ValidationContext) error {
+func (r *UnsupportedActionRule) Validate(_ context.Context, validationContext *ValidationContext) error {
 	setting := validationContext.Setting
 	report := validationContext.Report
 

@@ -76,7 +76,7 @@ func newExporter(
 }
 
 func (e *vscodeExporter) Export(
-	ctx context.Context,
+	_ context.Context,
 	destination io.Writer,
 	setting *keymapv1.Keymap,
 	opts pluginapi.PluginExportOption,

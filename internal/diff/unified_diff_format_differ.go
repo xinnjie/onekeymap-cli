@@ -8,6 +8,8 @@ import (
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
+const defaultContextLines = 3
+
 // UnifiedDiffFormatDiffer generates a diff in a format similar to `git diff`.
 type UnifiedDiffFormatDiffer struct{}
 
@@ -38,7 +40,7 @@ func (d *UnifiedDiffFormatDiffer) Diff(before, after io.Reader, filePath string)
 
 	// Convert to hunks and format as Unified Diff using go-diff-fmt
 	lineDiffs := difffmt.MakeLineDiffsFromDMP(diffs)
-	hunks := difffmt.MakeHunks(lineDiffs, 3)
+	hunks := difffmt.MakeHunks(lineDiffs, defaultContextLines)
 	unifiedFmt := difffmt.NewUnifiedFormat(difffmt.UnifiedFormatOption{
 		ColorMode: difffmt.ColorNone,
 	})

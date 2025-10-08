@@ -11,10 +11,16 @@ import (
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/service"
+	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/grpc"
 )
+
+const defaultGRPCPort = 50051
 
 type serveFlags struct {
 	port   int
@@ -26,11 +32,16 @@ func NewCmdServe() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Start the gRPC server",
-		Run:   serveRun(&f),
-		Args:  cobra.ExactArgs(0),
+		Run: serveRun(
+			&f,
+			func() (*slog.Logger, *plugins.Registry, importapi.Importer, exportapi.Exporter, *mappings.MappingConfig) {
+				return cmdLogger, cmdPluginRegistry, cmdImportService, cmdExportService, cmdMappingConfig
+			},
+		),
+		Args: cobra.ExactArgs(0),
 	}
 
-	cmd.Flags().IntVarP(&f.port, "port", "p", 50051, "Port to listen on")
+	cmd.Flags().IntVarP(&f.port, "port", "p", defaultGRPCPort, "Port to listen on")
 	cmd.Flags().
 		StringVar(&f.listen, "listen", "", "Listen address, e.g., tcp://127.0.0.1:50051 or unix:///tmp/onekeymap.sock")
 
@@ -40,8 +51,12 @@ func NewCmdServe() *cobra.Command {
 	return cmd
 }
 
-func serveRun(f *serveFlags) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
+func serveRun(
+	f *serveFlags,
+	dependencies func() (*slog.Logger, *plugins.Registry, importapi.Importer, exportapi.Exporter, *mappings.MappingConfig),
+) func(cmd *cobra.Command, _ []string) {
+	return func(cmd *cobra.Command, _ []string) {
+		logger, pluginRegistry, importService, exportService, mappingConfig := dependencies()
 		// Prefer explicit listen address from config/flag; fallback to --port
 		addr := viper.GetString("server.listen")
 		sandbox := viper.GetBool("sandbox")
@@ -156,7 +171,7 @@ func serveRun(f *serveFlags) func(cmd *cobra.Command, args []string) {
 
 // grpcLogger adapts slog to grpc_logging.Logger.
 func grpcLogger(l *slog.Logger) grpc_logging.Logger {
-	return grpc_logging.LoggerFunc(func(ctx context.Context, lvl grpc_logging.Level, msg string, fields ...any) {
+	return grpc_logging.LoggerFunc(func(_ context.Context, lvl grpc_logging.Level, msg string, fields ...any) {
 		switch lvl {
 		case grpc_logging.LevelDebug:
 			l.Debug(msg, fields...)

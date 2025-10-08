@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"log/slog"
 	"os"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
@@ -29,8 +31,10 @@ func NewCmdMigrate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "migrate",
 		Short: "Migrate keymaps from one editor to another",
-		RunE:  migrateRun(&f),
-		Args:  cobra.ExactArgs(0),
+		RunE: migrateRun(&f, func() (*slog.Logger, importapi.Importer, exportapi.Exporter, *plugins.Registry) {
+			return cmdLogger, cmdImportService, cmdExportService, cmdPluginRegistry
+		}),
+		Args: cobra.ExactArgs(0),
 	}
 
 	cmd.Flags().StringVar(&f.from, "from", "", "Source editor, valid values: vscode, zed")
@@ -43,9 +47,13 @@ func NewCmdMigrate() *cobra.Command {
 	return cmd
 }
 
-func migrateRun(f *migrateFlags) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
+func migrateRun(
+	f *migrateFlags,
+	dependencies func() (*slog.Logger, importapi.Importer, exportapi.Exporter, *plugins.Registry),
+) func(cmd *cobra.Command, _ []string) error {
+	return func(cmd *cobra.Command, _ []string) error {
 		ctx := cmd.Context()
+		logger, importService, exportService, pluginRegistry := dependencies()
 
 		if f.interactive {
 			// In interactive mode, we can use the form to get missing values.

@@ -31,7 +31,7 @@ func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *ze
 func (p *zedImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	opts pluginapi.PluginImportOption,
+	_ pluginapi.PluginImportOption,
 ) (*keymapv1.Keymap, error) {
 	jsonData, err := io.ReadAll(source)
 	if err != nil {

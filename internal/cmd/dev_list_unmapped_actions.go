@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log/slog"
 	"os"
 	"slices"
 	"sort"
@@ -20,8 +21,10 @@ func NewCmdDevListUnmappedActions() *cobra.Command {
 		Aliases: []string{"vscodeListUnmappedCommands"},
 		Short:   "List action IDs without mappings for a given editor.",
 		Long:    `Reads all action mappings and prints the list of action IDs that do not have a mapping for the specified editor (vscode|intellij|zed|vim|helix).`,
-		Run:     devListUnmappedActionsRun(&f),
-		Args:    cobra.ExactArgs(0),
+		Run: devListUnmappedActionsRun(&f, func() *slog.Logger {
+			return cmdLogger
+		}),
+		Args: cobra.ExactArgs(0),
 	}
 
 	cmd.Flags().StringVar(&f.editor, "editor", "vscode", "Editor to check: vscode|intellij|zed|vim|helix")
@@ -29,8 +32,12 @@ func NewCmdDevListUnmappedActions() *cobra.Command {
 	return cmd
 }
 
-func devListUnmappedActionsRun(f *devListUnmappedActionsFlags) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
+func devListUnmappedActionsRun(
+	f *devListUnmappedActionsFlags,
+	dependencies func() *slog.Logger,
+) func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, _ []string) {
+		logger := dependencies()
 		ctx := cmd.Context()
 		// Load all mappings
 		mappingConfig, err := mappings.NewMappingConfig()
