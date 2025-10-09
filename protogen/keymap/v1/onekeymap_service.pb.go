@@ -453,9 +453,7 @@ func (x *ExportKeymapResponse) GetDiff() string {
 type ConfigDetectRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The editor type.
-	EditorType EditorType `protobuf:"varint,1,opt,name=editor_type,json=editorType,proto3,enum=keymap.v1.EditorType" json:"editor_type,omitempty"`
-	// The platform.
-	Platform      Platform `protobuf:"varint,2,opt,name=platform,proto3,enum=keymap.v1.Platform" json:"platform,omitempty"`
+	EditorType    EditorType `protobuf:"varint,1,opt,name=editor_type,json=editorType,proto3,enum=keymap.v1.EditorType" json:"editor_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -495,13 +493,6 @@ func (x *ConfigDetectRequest) GetEditorType() EditorType {
 		return x.EditorType
 	}
 	return EditorType_EDITOR_TYPE_UNSPECIFIED
-}
-
-func (x *ConfigDetectRequest) GetPlatform() Platform {
-	if x != nil {
-		return x.Platform
-	}
-	return Platform_PLATFORM_UNSPECIFIED
 }
 
 // ConfigDetectResponse is the response message for ConfigDetect.
@@ -778,11 +769,10 @@ const file_keymap_v1_onekeymap_service_proto_rawDesc = "" +
 	"\fUNIFIED_DIFF\x10\x02\"B\n" +
 	"\x14ExportKeymapResponse\x12\x16\n" +
 	"\x06keymap\x18\x01 \x01(\tR\x06keymap\x12\x12\n" +
-	"\x04diff\x18\x02 \x01(\tR\x04diff\"~\n" +
+	"\x04diff\x18\x02 \x01(\tR\x04diff\"M\n" +
 	"\x13ConfigDetectRequest\x126\n" +
 	"\veditor_type\x18\x01 \x01(\x0e2\x15.keymap.v1.EditorTypeR\n" +
-	"editorType\x12/\n" +
-	"\bplatform\x18\x02 \x01(\x0e2\x13.keymap.v1.PlatformR\bplatform\",\n" +
+	"editorType\",\n" +
 	"\x14ConfigDetectResponse\x12\x14\n" +
 	"\x05paths\x18\x01 \x03(\tR\x05paths\"I\n" +
 	"\x10GetKeymapRequest\x12\x16\n" +
@@ -836,7 +826,6 @@ var file_keymap_v1_onekeymap_service_proto_goTypes = []any{
 	(EditorType)(0),                   // 13: keymap.v1.EditorType
 	(*Keymap)(nil),                    // 14: keymap.v1.Keymap
 	(*Action)(nil),                    // 15: keymap.v1.Action
-	(Platform)(0),                     // 16: keymap.v1.Platform
 }
 var file_keymap_v1_onekeymap_service_proto_depIdxs = []int32{
 	13, // 0: keymap.v1.ImportKeymapRequest.editor_type:type_name -> keymap.v1.EditorType
@@ -851,24 +840,23 @@ var file_keymap_v1_onekeymap_service_proto_depIdxs = []int32{
 	14, // 9: keymap.v1.ExportKeymapRequest.keymap:type_name -> keymap.v1.Keymap
 	0,  // 10: keymap.v1.ExportKeymapRequest.diff_type:type_name -> keymap.v1.ExportKeymapRequest.DiffType
 	13, // 11: keymap.v1.ConfigDetectRequest.editor_type:type_name -> keymap.v1.EditorType
-	16, // 12: keymap.v1.ConfigDetectRequest.platform:type_name -> keymap.v1.Platform
-	14, // 13: keymap.v1.GetKeymapResponse.keymap:type_name -> keymap.v1.Keymap
-	14, // 14: keymap.v1.SaveKeymapRequest.keymap:type_name -> keymap.v1.Keymap
-	1,  // 15: keymap.v1.OnekeymapService.ImportKeymap:input_type -> keymap.v1.ImportKeymapRequest
-	5,  // 16: keymap.v1.OnekeymapService.ExportKeymap:input_type -> keymap.v1.ExportKeymapRequest
-	7,  // 17: keymap.v1.OnekeymapService.ConfigDetect:input_type -> keymap.v1.ConfigDetectRequest
-	9,  // 18: keymap.v1.OnekeymapService.GetKeymap:input_type -> keymap.v1.GetKeymapRequest
-	11, // 19: keymap.v1.OnekeymapService.SaveKeymap:input_type -> keymap.v1.SaveKeymapRequest
-	2,  // 20: keymap.v1.OnekeymapService.ImportKeymap:output_type -> keymap.v1.ImportKeymapResponse
-	6,  // 21: keymap.v1.OnekeymapService.ExportKeymap:output_type -> keymap.v1.ExportKeymapResponse
-	8,  // 22: keymap.v1.OnekeymapService.ConfigDetect:output_type -> keymap.v1.ConfigDetectResponse
-	10, // 23: keymap.v1.OnekeymapService.GetKeymap:output_type -> keymap.v1.GetKeymapResponse
-	12, // 24: keymap.v1.OnekeymapService.SaveKeymap:output_type -> keymap.v1.SaveKeymapResponse
-	20, // [20:25] is the sub-list for method output_type
-	15, // [15:20] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	14, // 12: keymap.v1.GetKeymapResponse.keymap:type_name -> keymap.v1.Keymap
+	14, // 13: keymap.v1.SaveKeymapRequest.keymap:type_name -> keymap.v1.Keymap
+	1,  // 14: keymap.v1.OnekeymapService.ImportKeymap:input_type -> keymap.v1.ImportKeymapRequest
+	5,  // 15: keymap.v1.OnekeymapService.ExportKeymap:input_type -> keymap.v1.ExportKeymapRequest
+	7,  // 16: keymap.v1.OnekeymapService.ConfigDetect:input_type -> keymap.v1.ConfigDetectRequest
+	9,  // 17: keymap.v1.OnekeymapService.GetKeymap:input_type -> keymap.v1.GetKeymapRequest
+	11, // 18: keymap.v1.OnekeymapService.SaveKeymap:input_type -> keymap.v1.SaveKeymapRequest
+	2,  // 19: keymap.v1.OnekeymapService.ImportKeymap:output_type -> keymap.v1.ImportKeymapResponse
+	6,  // 20: keymap.v1.OnekeymapService.ExportKeymap:output_type -> keymap.v1.ExportKeymapResponse
+	8,  // 21: keymap.v1.OnekeymapService.ConfigDetect:output_type -> keymap.v1.ConfigDetectResponse
+	10, // 22: keymap.v1.OnekeymapService.GetKeymap:output_type -> keymap.v1.GetKeymapResponse
+	12, // 23: keymap.v1.OnekeymapService.SaveKeymap:output_type -> keymap.v1.SaveKeymapResponse
+	19, // [19:24] is the sub-list for method output_type
+	14, // [14:19] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_keymap_v1_onekeymap_service_proto_init() }

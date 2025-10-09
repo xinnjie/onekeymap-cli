@@ -22,20 +22,31 @@ func detectConfigForIDE(
 	appNamePrefix, dirPattern, commandName string,
 	opts pluginapi.ConfigDetectOptions,
 ) (paths []string, installed bool, err error) {
-	if runtime.GOOS != "darwin" {
-		return nil, false, fmt.Errorf(
-			"automatic path discovery is only supported on macOS for IntelliJ, %w",
-			pluginapi.ErrNotSupported,
-		)
-	}
-
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, false, err
 	}
 
-	candidates := []string{
-		filepath.Join(home, "Library", "Application Support", "JetBrains", dirPattern, "keymaps"),
+	var candidates []string
+	switch runtime.GOOS {
+	case "darwin":
+		candidates = append(
+			candidates,
+			filepath.Join(home, "Library", "Application Support", "JetBrains", dirPattern, "keymaps"),
+		)
+	case "linux":
+		candidates = append(candidates, filepath.Join(home, ".config", "JetBrains", dirPattern, "keymaps"))
+	case "windows":
+		appData := os.Getenv("APPDATA")
+		if appData == "" {
+			return nil, false, fmt.Errorf("APPDATA environment variable not set, %w", pluginapi.ErrNotSupported)
+		}
+		candidates = append(candidates, filepath.Join(appData, "JetBrains", dirPattern, "keymaps"))
+	default:
+		return nil, false, fmt.Errorf(
+			"automatic path discovery is only supported on macOS, Linux, and Windows for IntelliJ, %w",
+			pluginapi.ErrNotSupported,
+		)
 	}
 
 	var keymapDirs []string

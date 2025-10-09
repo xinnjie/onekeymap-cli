@@ -20,12 +20,17 @@ func (p *helixPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []str
 
 	var configPath string
 	switch runtime.GOOS {
-	case "darwin": // macOS
+	case "darwin", "linux":
 		configPath = filepath.Join(home, ".config", "helix", "config.toml")
+	case "windows":
+		appData := os.Getenv("APPDATA")
+		if appData == "" {
+			return nil, false, fmt.Errorf("APPDATA environment variable not set, %w", pluginapi.ErrNotSupported)
+		}
+		configPath = filepath.Join(appData, "helix", "config.toml")
 	default:
-		// For now, we only support macOS as requested.
 		return nil, false, fmt.Errorf(
-			"automatic path discovery is only supported on macOS, %w",
+			"automatic path discovery is only supported on macOS, Linux, and Windows, %w",
 			pluginapi.ErrNotSupported,
 		)
 	}

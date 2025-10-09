@@ -1,8 +1,51 @@
 package pluginapi
 
+import (
+	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+)
+
 type EditorType string
 
+func NewEditorTypeFromAPI(e keymapv1.EditorType) EditorType {
+	switch e {
+	case keymapv1.EditorType_VSCODE:
+		return EditorTypeVSCode
+	case keymapv1.EditorType_VSCODE_WINDSURF:
+		return EditorTypeWindsurf
+	case keymapv1.EditorType_VSCODE_WINDSURF_NEXT:
+		return EditorTypeWindsurfNext
+	case keymapv1.EditorType_VSCODE_CURSOR:
+		return EditorTypeCursor
+	case keymapv1.EditorType_INTELLIJ:
+		return EditorTypeIntelliJ
+	case keymapv1.EditorType_INTELLIJ_COMMUNITY:
+		return EditorTypeIntelliJCommunity
+	case keymapv1.EditorType_INTELLIJ_PYCHARM:
+		return EditorTypePyCharm
+	case keymapv1.EditorType_INTELLIJ_WEBSTORM:
+		return EditorTypeWebStorm
+	case keymapv1.EditorType_INTELLIJ_CLION:
+		return EditorTypeClion
+	case keymapv1.EditorType_INTELLIJ_PHPSTORM:
+		return EditorTypePhpStorm
+	case keymapv1.EditorType_INTELLIJ_RUBYMINE:
+		return EditorTypeRubyMine
+	case keymapv1.EditorType_INTELLIJ_GOLAND:
+		return EditorTypeGoLand
+	case keymapv1.EditorType_ZED:
+		return EditorTypeZed
+	case keymapv1.EditorType_VIM:
+		return EditorTypeVim
+	case keymapv1.EditorType_HELIX:
+		return EditorTypeHelix
+	default:
+		return EditorTypeUnknown
+	}
+}
+
 const (
+	EditorTypeUnknown EditorType = "unknown"
+
 	// VSCode series
 
 	// EditorTypeVSCode represents Visual Studio Code editor.

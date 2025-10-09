@@ -23,12 +23,13 @@ func (p *zedPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []strin
 
 	var configPath string
 	switch runtime.GOOS {
-	case "darwin": // macOS
+	case "darwin", "linux":
 		configPath = filepath.Join(home, ".config", "zed", "keymap.json")
+	case "windows":
+		configPath = filepath.Join(os.Getenv("APPDATA"), "Zed", "keymap.json")
 	default:
-		// For now, we only support macOS as requested.
 		return nil, false, fmt.Errorf(
-			"automatic path discovery is only supported on macOS, %w",
+			"automatic path discovery is only supported on macOS, Linux, and Windows, %w",
 			pluginapi.ErrNotSupported,
 		)
 	}
