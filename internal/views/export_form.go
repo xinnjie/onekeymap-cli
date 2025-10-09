@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	_ tea.Model = (*OutputFormModel)(nil)
+	_ tea.Model = (*ExportFormModel)(nil)
 )
 
-// OutputFormModel collects inputs for exporting onekeymap.json to a target editor.
-type OutputFormModel struct {
+// ExportFormModel collects inputs for exporting onekeymap.json to a target editor.
+type ExportFormModel struct {
 	form *huh.Form
 
 	pluginRegistry *plugins.Registry
@@ -38,8 +38,8 @@ func NewOutputFormModel(
 	needSelectEditor, needInput, needOutput bool,
 	editor, onekeymapConfigInput, editorKeymapConfigOutput *string,
 	onekeymapConfigPlaceHolder string,
-) (*OutputFormModel, error) {
-	m := &OutputFormModel{
+) (*ExportFormModel, error) {
+	m := &ExportFormModel{
 		pluginRegistry:             registry,
 		needSelectEditor:           needSelectEditor,
 		needInput:                  needInput,
@@ -55,7 +55,7 @@ func NewOutputFormModel(
 	return m, nil
 }
 
-func (m *OutputFormModel) build() error {
+func (m *ExportFormModel) build() error {
 	if !m.needSelectEditor && !m.needInput && !m.needOutput {
 		return errors.New("form not needed")
 	}
@@ -63,13 +63,10 @@ func (m *OutputFormModel) build() error {
 	var groups []*huh.Group
 
 	if m.needSelectEditor {
-		names := m.GetExporterNames()
-		sort.Strings(names)
-		opts := make([]huh.Option[string], 0, len(names))
-		for _, n := range names {
-			opts = append(opts, huh.NewOption(n, n))
-		}
-		if len(opts) == 0 {
+		editorOpts := m.getExporterOptions()
+		finalOpts := buildEditorSelectOptions(editorOpts)
+
+		if len(finalOpts) == 0 {
 			return errors.New("no editor plugins available")
 		}
 		groups = append(groups,
@@ -77,7 +74,7 @@ func (m *OutputFormModel) build() error {
 				huh.NewSelect[string]().
 					Key("editor").
 					Title("Select target editor").
-					Options(opts...).
+					Options(finalOpts...).
 					Value(m.Editor),
 			),
 		)
@@ -132,10 +129,11 @@ func (m *OutputFormModel) build() error {
 	return nil
 }
 
-func (m *OutputFormModel) GetExporterNames() []string {
-	exporterNames := make([]string, 0)
+func (m *ExportFormModel) getExporterOptions() []editorSelectorOption {
+	var options []editorSelectorOption
 	for _, name := range m.pluginRegistry.GetNames() {
-		plugin, ok := m.pluginRegistry.Get(pluginapi.EditorType(name))
+		editorType := pluginapi.EditorType(name)
+		plugin, ok := m.pluginRegistry.Get(editorType)
 		if !ok {
 			continue
 		}
@@ -144,17 +142,29 @@ func (m *OutputFormModel) GetExporterNames() []string {
 		if err != nil {
 			continue
 		}
-		exporterNames = append(exporterNames, name)
+
+		_, installed, _ := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
+		options = append(options, editorSelectorOption{
+			displayName: editorType.AppName(),
+			editorType:  name,
+			installed:   installed,
+		})
 	}
-	return exporterNames
+
+	// Sort by display name for consistent order
+	sort.Slice(options, func(i, j int) bool {
+		return options[i].displayName < options[j].displayName
+	})
+
+	return options
 }
 
-func (m *OutputFormModel) Init() tea.Cmd { return m.form.Init() }
+func (m *ExportFormModel) Init() tea.Cmd { return m.form.Init() }
 
-func (m *OutputFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *ExportFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if km, ok := msg.(tea.KeyMsg); ok {
 		switch km.String() {
-		case "ctrl+c", "esc", "q":
+		case keyCtrlC, keyEsc, keyQ:
 			return m, tea.Interrupt
 		}
 	}
@@ -171,11 +181,11 @@ func (m *OutputFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *OutputFormModel) View() string {
+func (m *ExportFormModel) View() string {
 	return m.form.View()
 }
 
-func (m *OutputFormModel) applyPlaceholders() {
+func (m *ExportFormModel) applyPlaceholders() {
 	// Apply placeholders if user left fields empty
 	if m.needInput && *m.OnekeymapConfigInput == "" {
 		*m.OnekeymapConfigInput = m.OnekeymapConfigPlaceHolder

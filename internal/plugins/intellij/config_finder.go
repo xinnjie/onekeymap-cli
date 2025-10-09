@@ -1,9 +1,9 @@
 package intellij
 
 import (
-	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -12,10 +12,16 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
-// ConfigDetect returns default keymap config path for IntelliJ.
-// NOTE: IntelliJ family has multiple editions/versions; precise discovery will
-// be implemented later. For now, we return a not-supported error placeholder.
-func (p *intellijPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
+// ConfigDetect returns default keymap config path for IntelliJ IDEA Ultimate.
+func (p *intellijPlugin) ConfigDetect(opts pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
+	return detectConfigForIDE("IntelliJ IDEA", "IntelliJIdea*", "idea", opts)
+}
+
+// detectConfigForIDE is a helper function to detect config paths for a specific JetBrains IDE.
+func detectConfigForIDE(
+	appNamePrefix, dirPattern, commandName string,
+	opts pluginapi.ConfigDetectOptions,
+) (paths []string, installed bool, err error) {
 	if runtime.GOOS != "darwin" {
 		return nil, false, fmt.Errorf(
 			"automatic path discovery is only supported on macOS for IntelliJ, %w",
@@ -29,7 +35,7 @@ func (p *intellijPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []
 	}
 
 	candidates := []string{
-		filepath.Join(home, "Library", "Application Support", "JetBrains", "*", "keymaps"),
+		filepath.Join(home, "Library", "Application Support", "JetBrains", dirPattern, "keymaps"),
 	}
 
 	var keymapDirs []string
@@ -42,7 +48,7 @@ func (p *intellijPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []
 		}
 	}
 	if len(keymapDirs) == 0 {
-		return nil, false, errors.New("could not locate JetBrains keymaps directory; please specify --output")
+		return nil, false, fmt.Errorf("could not locate %s keymaps directory", appNamePrefix)
 	}
 
 	sort.Slice(keymapDirs, func(i, j int) bool {
@@ -60,9 +66,12 @@ func (p *intellijPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []
 
 	configPath := filepath.Join(keymapDirs[0], "Onekeymap.xml")
 
-	installed, err = isIntelliJInstalled()
-	if err != nil {
-		return nil, false, err
+	if opts.Sandbox {
+		installed = false
+	} else {
+		// Outside of sandbox, `exec.LookPath` is the most reliable way to see if the command is in the user's PATH.
+		_, err := exec.LookPath(commandName)
+		installed = err == nil
 	}
 
 	return []string{configPath}, installed, nil

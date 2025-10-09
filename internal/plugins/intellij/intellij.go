@@ -17,6 +17,10 @@ type intellijPlugin struct {
 
 // New creates a new IntelliJ plugin instance.
 func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
+	return newIntellijPlugin(mappingConfig, logger)
+}
+
+func newIntellijPlugin(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *intellijPlugin {
 	return &intellijPlugin{
 		mappingConfig: mappingConfig,
 		importer:      newImporter(mappingConfig, logger),

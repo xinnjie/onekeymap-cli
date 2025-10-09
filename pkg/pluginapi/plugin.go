@@ -7,15 +7,24 @@ import (
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
-type EditorType string
+// Plugin is the core interface that all editor plugins must implement.
+// It defines the contract for importing and exporting keymaps.
+type Plugin interface {
+	// EditorType returns the unique identifier for the plugin (e.g., "vscode", "zed").
+	EditorType() EditorType
 
-const (
-	EditorTypeVSCode   EditorType = "vscode"
-	EditorTypeZed      EditorType = "zed"
-	EditorTypeIntelliJ EditorType = "intellij"
-	EditorTypeVim      EditorType = "vim"
-	EditorTypeHelix    EditorType = "helix"
-)
+	// ConfigDetect returns the default path to the editor's configuration file based on the platform.
+	// Return multiple paths if the editor has multiple configuration files.
+	ConfigDetect(opts ConfigDetectOptions) (paths []string, installed bool, err error)
+
+	// Importer returns an instance of PluginImporter for the plugin.
+	// Return ErrNotSupported if the plugin does not support importing.
+	Importer() (PluginImporter, error)
+
+	// Exporter returns an instance of PluginExporter for the plugin.
+	// Return ErrNotSupported if the plugin does not support exporting.
+	Exporter() (PluginExporter, error)
+}
 
 type PluginImportOption struct {
 }
@@ -66,23 +75,4 @@ type PluginExportReport struct {
 type ConfigDetectOptions struct {
 	// Whether to in sandbox mode, in sandbox mode, shell command lookup is not effective, like `code` command for vscode can not be found
 	Sandbox bool
-}
-
-// Plugin is the core interface that all editor plugins must implement.
-// It defines the contract for importing and exporting keymaps.
-type Plugin interface {
-	// EditorType returns the unique identifier for the plugin (e.g., "vscode", "zed").
-	EditorType() EditorType
-
-	// ConfigDetect returns the default path to the editor's configuration file based on the platform.
-	// Return multiple paths if the editor has multiple configuration files.
-	ConfigDetect(opts ConfigDetectOptions) (paths []string, installed bool, err error)
-
-	// Importer returns an instance of PluginImporter for the plugin.
-	// Return ErrNotSupported if the plugin does not support importing.
-	Importer() (PluginImporter, error)
-
-	// Exporter returns an instance of PluginExporter for the plugin.
-	// Return ErrNotSupported if the plugin does not support exporting.
-	Exporter() (PluginExporter, error)
 }

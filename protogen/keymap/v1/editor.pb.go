@@ -28,30 +28,64 @@ const (
 	// Unspecified
 	EditorType_EDITOR_TYPE_UNSPECIFIED EditorType = 0
 	// Visual Studio Code
-	EditorType_VSCODE EditorType = 1
+	EditorType_VSCODE               EditorType = 1
+	EditorType_VSCODE_WINDSURF      EditorType = 2
+	EditorType_VSCODE_WINDSURF_NEXT EditorType = 3
+	EditorType_VSCODE_CURSOR        EditorType = 4
 	// Zed
-	EditorType_ZED EditorType = 2
+	EditorType_ZED EditorType = 5
 	// IntelliJ
-	EditorType_INTELLIJ EditorType = 3
+	EditorType_INTELLIJ           EditorType = 6
+	EditorType_INTELLIJ_COMMUNITY EditorType = 7
+	EditorType_INTELLIJ_PYCHARM   EditorType = 8
+	EditorType_INTELLIJ_WEBSTORM  EditorType = 9
+	EditorType_INTELLIJ_CLION     EditorType = 10
+	EditorType_INTELLIJ_PHPSTORM  EditorType = 11
+	EditorType_INTELLIJ_RUBYMINE  EditorType = 12
+	EditorType_INTELLIJ_GOLAND    EditorType = 13
 	// Helix
-	EditorType_HELIX EditorType = 4
+	EditorType_HELIX EditorType = 14
+	// Vim
+	EditorType_VIM EditorType = 15
 )
 
 // Enum value maps for EditorType.
 var (
 	EditorType_name = map[int32]string{
-		0: "EDITOR_TYPE_UNSPECIFIED",
-		1: "VSCODE",
-		2: "ZED",
-		3: "INTELLIJ",
-		4: "HELIX",
+		0:  "EDITOR_TYPE_UNSPECIFIED",
+		1:  "VSCODE",
+		2:  "VSCODE_WINDSURF",
+		3:  "VSCODE_WINDSURF_NEXT",
+		4:  "VSCODE_CURSOR",
+		5:  "ZED",
+		6:  "INTELLIJ",
+		7:  "INTELLIJ_COMMUNITY",
+		8:  "INTELLIJ_PYCHARM",
+		9:  "INTELLIJ_WEBSTORM",
+		10: "INTELLIJ_CLION",
+		11: "INTELLIJ_PHPSTORM",
+		12: "INTELLIJ_RUBYMINE",
+		13: "INTELLIJ_GOLAND",
+		14: "HELIX",
+		15: "VIM",
 	}
 	EditorType_value = map[string]int32{
 		"EDITOR_TYPE_UNSPECIFIED": 0,
 		"VSCODE":                  1,
-		"ZED":                     2,
-		"INTELLIJ":                3,
-		"HELIX":                   4,
+		"VSCODE_WINDSURF":         2,
+		"VSCODE_WINDSURF_NEXT":    3,
+		"VSCODE_CURSOR":           4,
+		"ZED":                     5,
+		"INTELLIJ":                6,
+		"INTELLIJ_COMMUNITY":      7,
+		"INTELLIJ_PYCHARM":        8,
+		"INTELLIJ_WEBSTORM":       9,
+		"INTELLIJ_CLION":          10,
+		"INTELLIJ_PHPSTORM":       11,
+		"INTELLIJ_RUBYMINE":       12,
+		"INTELLIJ_GOLAND":         13,
+		"HELIX":                   14,
+		"VIM":                     15,
 	}
 )
 
@@ -86,15 +120,27 @@ var File_keymap_v1_editor_proto protoreflect.FileDescriptor
 
 const file_keymap_v1_editor_proto_rawDesc = "" +
 	"\n" +
-	"\x16keymap/v1/editor.proto\x12\tkeymap.v1*W\n" +
+	"\x16keymap/v1/editor.proto\x12\tkeymap.v1*\xbe\x02\n" +
 	"\n" +
 	"EditorType\x12\x1b\n" +
 	"\x17EDITOR_TYPE_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
-	"\x06VSCODE\x10\x01\x12\a\n" +
-	"\x03ZED\x10\x02\x12\f\n" +
-	"\bINTELLIJ\x10\x03\x12\t\n" +
-	"\x05HELIX\x10\x04B\x9c\x01\n" +
+	"\x06VSCODE\x10\x01\x12\x13\n" +
+	"\x0fVSCODE_WINDSURF\x10\x02\x12\x18\n" +
+	"\x14VSCODE_WINDSURF_NEXT\x10\x03\x12\x11\n" +
+	"\rVSCODE_CURSOR\x10\x04\x12\a\n" +
+	"\x03ZED\x10\x05\x12\f\n" +
+	"\bINTELLIJ\x10\x06\x12\x16\n" +
+	"\x12INTELLIJ_COMMUNITY\x10\a\x12\x14\n" +
+	"\x10INTELLIJ_PYCHARM\x10\b\x12\x15\n" +
+	"\x11INTELLIJ_WEBSTORM\x10\t\x12\x12\n" +
+	"\x0eINTELLIJ_CLION\x10\n" +
+	"\x12\x15\n" +
+	"\x11INTELLIJ_PHPSTORM\x10\v\x12\x15\n" +
+	"\x11INTELLIJ_RUBYMINE\x10\f\x12\x13\n" +
+	"\x0fINTELLIJ_GOLAND\x10\r\x12\t\n" +
+	"\x05HELIX\x10\x0e\x12\a\n" +
+	"\x03VIM\x10\x0fB\x9c\x01\n" +
 	"\rcom.keymap.v1B\vEditorProtoP\x01Z9github.com/xinnjie/watchbeats/protogen/keymap/v1;keymapv1\xa2\x02\x03KXX\xaa\x02\tKeymap.V1\xca\x02\tKeymap\\V1\xe2\x02\x15Keymap\\V1\\GPBMetadata\xea\x02\n" +
 	"Keymap::V1b\x06proto3"
 

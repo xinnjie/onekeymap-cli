@@ -30,7 +30,7 @@ func TestConfigDetect_Darwin(t *testing.T) {
 
 		_, _, err := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "could not locate JetBrains keymaps directory")
+		assert.Contains(t, err.Error(), "could not locate IntelliJ IDEA keymaps directory")
 	})
 
 	t.Run("choose most recently modified keymaps dir", func(t *testing.T) {

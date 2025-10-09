@@ -18,6 +18,10 @@ type vsCodePlugin struct {
 
 // New creates a new VSCodePlugin instance.
 func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
+	return newVSCodePlugin(mappingConfig, logger)
+}
+
+func newVSCodePlugin(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *vsCodePlugin {
 	return &vsCodePlugin{
 		mappingConfig: mappingConfig,
 		importer:      newImporter(mappingConfig, logger),

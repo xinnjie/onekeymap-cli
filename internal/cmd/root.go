@@ -158,10 +158,25 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		cmdLogger = slog.New(handler)
 
 		cmdPluginRegistry = plugins.NewRegistry()
+
+		// VSCode family
 		cmdPluginRegistry.Register(vscode.New(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(vscode.NewWindsurf(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(vscode.NewWindsurfNext(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(vscode.NewCursor(cmdMappingConfig, cmdLogger))
+
+		// IntelliJ family
 		cmdPluginRegistry.Register(intellij.New(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.NewPycharm(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.NewIntelliJCommunity(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.NewWebStorm(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.NewClion(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.NewPhpStorm(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.NewRubyMine(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.NewGoLand(cmdMappingConfig, cmdLogger))
+
 		cmdPluginRegistry.Register(helix.New(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger))
 
 		cmdImportService = internal.NewImportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
 		cmdExportService = internal.NewExportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger)

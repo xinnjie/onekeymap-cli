@@ -16,11 +16,6 @@ var (
 	_ tea.Model = (*ImportFormModel)(nil)
 )
 
-type editorOption struct {
-	name      string
-	installed bool
-}
-
 // ImportFormModel represents the import form UI model.
 type ImportFormModel struct {
 	form *huh.Form
@@ -67,26 +62,7 @@ func (m *ImportFormModel) build() error {
 
 	if m.needSelectEditor {
 		editorOpts := m.getImporterOptions()
-
-		installed := make([]huh.Option[string], 0)
-		uninstalled := make([]huh.Option[string], 0)
-
-		for _, opt := range editorOpts {
-			label := opt.name
-			if !opt.installed {
-				label = fmt.Sprintf("%s (uninstalled)", opt.name)
-			}
-			huhOpt := huh.NewOption(label, opt.name)
-			if opt.installed {
-				installed = append(installed, huhOpt)
-			} else {
-				uninstalled = append(uninstalled, huhOpt)
-			}
-		}
-
-		finalOpts := make([]huh.Option[string], 0, len(installed)+len(uninstalled))
-		finalOpts = append(finalOpts, installed...)
-		finalOpts = append(finalOpts, uninstalled...)
+		finalOpts := buildEditorSelectOptions(editorOpts)
 
 		if len(finalOpts) == 0 {
 			return errors.New("no editor plugins available")
@@ -118,15 +94,15 @@ func (m *ImportFormModel) build() error {
 			),
 		)
 	}
-
 	m.form = huh.NewForm(groups...)
 	return nil
 }
 
-func (m *ImportFormModel) getImporterOptions() []editorOption {
-	var options []editorOption
+func (m *ImportFormModel) getImporterOptions() []editorSelectorOption {
+	var options []editorSelectorOption
 	for _, name := range m.pluginRegistry.GetNames() {
-		plugin, ok := m.pluginRegistry.Get(pluginapi.EditorType(name))
+		editorType := pluginapi.EditorType(name)
+		plugin, ok := m.pluginRegistry.Get(editorType)
 		if !ok {
 			continue
 		}
@@ -136,12 +112,16 @@ func (m *ImportFormModel) getImporterOptions() []editorOption {
 		}
 
 		_, installed, _ := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
-		options = append(options, editorOption{name: name, installed: installed})
+		options = append(options, editorSelectorOption{
+			displayName: editorType.AppName(),
+			editorType:  name,
+			installed:   installed,
+		})
 	}
 
-	// Sort by name for consistent order
+	// Sort by display name for consistent order
 	sort.Slice(options, func(i, j int) bool {
-		return options[i].name < options[j].name
+		return options[i].displayName < options[j].displayName
 	})
 
 	return options
@@ -153,7 +133,7 @@ func (m *ImportFormModel) Init() tea.Cmd { return m.form.Init() }
 func (m *ImportFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if km, ok := msg.(tea.KeyMsg); ok {
 		switch km.String() {
-		case "ctrl+c", "esc", "q":
+		case keyCtrlC, keyEsc, keyQ:
 			return m, tea.Interrupt
 		}
 	}
