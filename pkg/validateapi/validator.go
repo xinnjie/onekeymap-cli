@@ -27,7 +27,7 @@ func (v *Validator) Validate(
 	setting *keymapv1.Keymap,
 	opts importapi.ImportOptions,
 ) (*keymapv1.ValidationReport, error) {
-	processed := len(setting.GetKeybindings())
+	processed := len(setting.GetActions())
 	if processed > math.MaxInt32 || processed < 0 {
 		return nil, errors.New("keybindings count out of range")
 	}

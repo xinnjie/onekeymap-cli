@@ -35,11 +35,11 @@ func compactKeybindingsList(list []*Action) []map[string]any {
 	return out
 }
 
-func keymapBindingCount(ks *Keymap) int {
+func actionCount(ks *Keymap) int {
 	if ks == nil {
 		return 0
 	}
-	return len(ks.GetKeybindings())
+	return len(ks.GetActions())
 }
 
 // LogValue implements slog.LogValuer for *ImportKeymapRequest.
@@ -83,7 +83,7 @@ func (resp *ImportKeymapResponse) LogValue() slog.Value {
 	}
 
 	return slog.GroupValue(
-		slog.Int("KeymapBindingCount", keymapBindingCount(resp.GetKeymap())),
+		slog.Int("ActionsCount", actionCount(resp.GetKeymap())),
 		slog.Group("Changes",
 			slog.Any("Add", addList),
 			slog.Any("Remove", removeList),
@@ -113,11 +113,11 @@ func (resp *GetKeymapResponse) LogValue() slog.Value {
 	ks := resp.GetKeymap()
 	var compact []map[string]any
 	if ks != nil {
-		compact = compactKeybindingsList(ks.GetKeybindings())
+		compact = compactKeybindingsList(ks.GetActions())
 	}
 	return slog.GroupValue(
-		slog.Int("KeymapBindingCount", keymapBindingCount(ks)),
-		slog.Any("Keybindings", compact),
+		slog.Int("ActionsCount", actionCount(ks)),
+		slog.Any("Actions", compact),
 	)
 }
 
@@ -130,11 +130,11 @@ func (req *SaveKeymapRequest) LogValue() slog.Value {
 	ks := req.GetKeymap()
 	var compact []map[string]any
 	if ks != nil {
-		compact = compactKeybindingsList(ks.GetKeybindings())
+		compact = compactKeybindingsList(ks.GetActions())
 	}
 	return slog.GroupValue(
-		slog.Int("KeymapBindingCount", keymapBindingCount(ks)),
-		slog.Any("Keybindings", compact),
+		slog.Int("ActionsCount", actionCount(ks)),
+		slog.Any("Actions", compact),
 	)
 }
 

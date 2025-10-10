@@ -22,67 +22,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// KeyModifier represents modifier keys like Shift, Ctrl, Alt, Meta.
-type KeyModifier int32
-
-const (
-	// Unspecified
-	KeyModifier_KEY_MODIFIER_UNSPECIFIED KeyModifier = 0
-	// Shift key
-	KeyModifier_KEY_MODIFIER_SHIFT KeyModifier = 1
-	// Ctrl key
-	KeyModifier_KEY_MODIFIER_CTRL KeyModifier = 2
-	// Alt key
-	KeyModifier_KEY_MODIFIER_ALT KeyModifier = 3
-	// Meta is Command(⌘) key on macOS, Windows(⊞) key on Windows, super key on Linux
-	KeyModifier_KEY_MODIFIER_META KeyModifier = 4
-)
-
-// Enum value maps for KeyModifier.
-var (
-	KeyModifier_name = map[int32]string{
-		0: "KEY_MODIFIER_UNSPECIFIED",
-		1: "KEY_MODIFIER_SHIFT",
-		2: "KEY_MODIFIER_CTRL",
-		3: "KEY_MODIFIER_ALT",
-		4: "KEY_MODIFIER_META",
-	}
-	KeyModifier_value = map[string]int32{
-		"KEY_MODIFIER_UNSPECIFIED": 0,
-		"KEY_MODIFIER_SHIFT":       1,
-		"KEY_MODIFIER_CTRL":        2,
-		"KEY_MODIFIER_ALT":         3,
-		"KEY_MODIFIER_META":        4,
-	}
-)
-
-func (x KeyModifier) Enum() *KeyModifier {
-	p := new(KeyModifier)
-	*p = x
-	return p
-}
-
-func (x KeyModifier) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (KeyModifier) Descriptor() protoreflect.EnumDescriptor {
-	return file_keymap_v1_keymap_proto_enumTypes[0].Descriptor()
-}
-
-func (KeyModifier) Type() protoreflect.EnumType {
-	return &file_keymap_v1_keymap_proto_enumTypes[0]
-}
-
-func (x KeyModifier) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use KeyModifier.Descriptor instead.
-func (KeyModifier) EnumDescriptor() ([]byte, []int) {
-	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{0}
-}
-
 // Keymap is the root message, representing a complete set of keybindings.
 type Keymap struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -92,11 +31,11 @@ type Keymap struct {
 	//
 	//	aip.dev/not-precedent: Action is a value object, not a separately managed resource --)
 	//
-	// The keybindings.
-	// One keybinding may correspond to multiple actions. Then there would be multiple Action
+	// The actions.
+	// One action may correspond to multiple keybindings. Then there would be multiple Action
 	// with the same keybinding but different id.
 	// Clients should merge Action that share the same `id` if necessary.
-	Keybindings   []*Action `protobuf:"bytes,2,rep,name=keybindings,proto3" json:"keybindings,omitempty"`
+	Actions       []*Action `protobuf:"bytes,2,rep,name=actions,proto3" json:"actions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -138,169 +77,11 @@ func (x *Keymap) GetName() string {
 	return ""
 }
 
-func (x *Keymap) GetKeybindings() []*Action {
+func (x *Keymap) GetActions() []*Action {
 	if x != nil {
-		return x.Keybindings
+		return x.Actions
 	}
 	return nil
-}
-
-// KeyChord represents a combination of a primary key and optional modifiers.
-type KeyChord struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The primary, non-modifier key being pressed.
-	KeyCode KeyCode `protobuf:"varint,1,opt,name=key_code,json=keyCode,proto3,enum=keymap.v1.KeyCode" json:"key_code,omitempty"`
-	// A list of modifier keys held down with the primary key.
-	Modifiers     []KeyModifier `protobuf:"varint,2,rep,packed,name=modifiers,proto3,enum=keymap.v1.KeyModifier" json:"modifiers,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *KeyChord) Reset() {
-	*x = KeyChord{}
-	mi := &file_keymap_v1_keymap_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *KeyChord) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*KeyChord) ProtoMessage() {}
-
-func (x *KeyChord) ProtoReflect() protoreflect.Message {
-	mi := &file_keymap_v1_keymap_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use KeyChord.ProtoReflect.Descriptor instead.
-func (*KeyChord) Descriptor() ([]byte, []int) {
-	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *KeyChord) GetKeyCode() KeyCode {
-	if x != nil {
-		return x.KeyCode
-	}
-	return KeyCode_KEY_CODE_UNSPECIFIED
-}
-
-func (x *KeyChord) GetModifiers() []KeyModifier {
-	if x != nil {
-		return x.Modifiers
-	}
-	return nil
-}
-
-// KeyChordSequence represents a sequence of one or more key chords that must be
-// pressed in order to trigger an action. This allows for multi-key sequences
-// like "shift shift" or "ctrl+k ctrl+s".
-type KeyChordSequence struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The sequence of key chords.
-	Chords        []*KeyChord `protobuf:"bytes,1,rep,name=chords,proto3" json:"chords,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *KeyChordSequence) Reset() {
-	*x = KeyChordSequence{}
-	mi := &file_keymap_v1_keymap_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *KeyChordSequence) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*KeyChordSequence) ProtoMessage() {}
-
-func (x *KeyChordSequence) ProtoReflect() protoreflect.Message {
-	mi := &file_keymap_v1_keymap_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use KeyChordSequence.ProtoReflect.Descriptor instead.
-func (*KeyChordSequence) Descriptor() ([]byte, []int) {
-	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *KeyChordSequence) GetChords() []*KeyChord {
-	if x != nil {
-		return x.Chords
-	}
-	return nil
-}
-
-// Binding represents a single keybinding with its readable string
-type Binding struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The key binding that triggers an action.
-	KeyChords *KeyChordSequence `protobuf:"bytes,1,opt,name=key_chords,json=keyChords,proto3" json:"key_chords,omitempty"`
-	// The readable key binding that triggers an action. e.g. "ctrl+s"
-	KeyChordsReadable string `protobuf:"bytes,2,opt,name=key_chords_readable,json=keyChordsReadable,proto3" json:"key_chords_readable,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
-}
-
-func (x *Binding) Reset() {
-	*x = Binding{}
-	mi := &file_keymap_v1_keymap_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Binding) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Binding) ProtoMessage() {}
-
-func (x *Binding) ProtoReflect() protoreflect.Message {
-	mi := &file_keymap_v1_keymap_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Binding.ProtoReflect.Descriptor instead.
-func (*Binding) Descriptor() ([]byte, []int) {
-	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *Binding) GetKeyChords() *KeyChordSequence {
-	if x != nil {
-		return x.KeyChords
-	}
-	return nil
-}
-
-func (x *Binding) GetKeyChordsReadable() string {
-	if x != nil {
-		return x.KeyChordsReadable
-	}
-	return ""
 }
 
 // Action represents a single mapping from multiple key bindings to a logical action.
@@ -310,7 +91,7 @@ type Action struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The key bindings that trigger the action.
 	// e.g. ctrl+s, ctrl+shift+s
-	Bindings []*Binding `protobuf:"bytes,2,rep,name=bindings,proto3" json:"bindings,omitempty"`
+	Bindings []*KeybindingReadable `protobuf:"bytes,2,rep,name=bindings,proto3" json:"bindings,omitempty"`
 	// The action config
 	ActionConfig *ActionConfig `protobuf:"bytes,3,opt,name=action_config,json=actionConfig,proto3" json:"action_config,omitempty"`
 	// Optional, user-provided comment for this keymap.
@@ -321,7 +102,7 @@ type Action struct {
 
 func (x *Action) Reset() {
 	*x = Action{}
-	mi := &file_keymap_v1_keymap_proto_msgTypes[4]
+	mi := &file_keymap_v1_keymap_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -333,7 +114,7 @@ func (x *Action) String() string {
 func (*Action) ProtoMessage() {}
 
 func (x *Action) ProtoReflect() protoreflect.Message {
-	mi := &file_keymap_v1_keymap_proto_msgTypes[4]
+	mi := &file_keymap_v1_keymap_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -346,7 +127,7 @@ func (x *Action) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Action.ProtoReflect.Descriptor instead.
 func (*Action) Descriptor() ([]byte, []int) {
-	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{4}
+	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Action) GetName() string {
@@ -356,7 +137,7 @@ func (x *Action) GetName() string {
 	return ""
 }
 
-func (x *Action) GetBindings() []*Binding {
+func (x *Action) GetBindings() []*KeybindingReadable {
 	if x != nil {
 		return x.Bindings
 	}
@@ -373,6 +154,164 @@ func (x *Action) GetActionConfig() *ActionConfig {
 func (x *Action) GetComment() string {
 	if x != nil {
 		return x.Comment
+	}
+	return ""
+}
+
+// KeyChord represents a combination of a primary key and optional modifiers. e.g. "ctrl+s"
+type KeyChord struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The primary, non-modifier key being pressed.
+	KeyCode KeyCode `protobuf:"varint,1,opt,name=key_code,json=keyCode,proto3,enum=keymap.v1.KeyCode" json:"key_code,omitempty"`
+	// A list of modifier keys held down with the primary key.
+	Modifiers     []KeyModifier `protobuf:"varint,2,rep,packed,name=modifiers,proto3,enum=keymap.v1.KeyModifier" json:"modifiers,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *KeyChord) Reset() {
+	*x = KeyChord{}
+	mi := &file_keymap_v1_keymap_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeyChord) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeyChord) ProtoMessage() {}
+
+func (x *KeyChord) ProtoReflect() protoreflect.Message {
+	mi := &file_keymap_v1_keymap_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeyChord.ProtoReflect.Descriptor instead.
+func (*KeyChord) Descriptor() ([]byte, []int) {
+	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *KeyChord) GetKeyCode() KeyCode {
+	if x != nil {
+		return x.KeyCode
+	}
+	return KeyCode_KEY_CODE_UNSPECIFIED
+}
+
+func (x *KeyChord) GetModifiers() []KeyModifier {
+	if x != nil {
+		return x.Modifiers
+	}
+	return nil
+}
+
+// Keybinding represents a sequence of one or more key chords that must be
+// pressed in order to trigger an action. This allows for multi-key sequences
+// like "shift shift" or "ctrl+k ctrl+s".
+type Keybinding struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The sequence of key chords.
+	Chords        []*KeyChord `protobuf:"bytes,1,rep,name=chords,proto3" json:"chords,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Keybinding) Reset() {
+	*x = Keybinding{}
+	mi := &file_keymap_v1_keymap_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Keybinding) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Keybinding) ProtoMessage() {}
+
+func (x *Keybinding) ProtoReflect() protoreflect.Message {
+	mi := &file_keymap_v1_keymap_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Keybinding.ProtoReflect.Descriptor instead.
+func (*Keybinding) Descriptor() ([]byte, []int) {
+	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Keybinding) GetChords() []*KeyChord {
+	if x != nil {
+		return x.Chords
+	}
+	return nil
+}
+
+// KeybindingReadable represents a single keybinding with its readable string
+type KeybindingReadable struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The key binding that triggers an action.
+	KeyChords *Keybinding `protobuf:"bytes,1,opt,name=key_chords,json=keyChords,proto3" json:"key_chords,omitempty"`
+	// The readable key binding that triggers an action. e.g. "ctrl+s"
+	KeyChordsReadable string `protobuf:"bytes,2,opt,name=key_chords_readable,json=keyChordsReadable,proto3" json:"key_chords_readable,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *KeybindingReadable) Reset() {
+	*x = KeybindingReadable{}
+	mi := &file_keymap_v1_keymap_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *KeybindingReadable) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KeybindingReadable) ProtoMessage() {}
+
+func (x *KeybindingReadable) ProtoReflect() protoreflect.Message {
+	mi := &file_keymap_v1_keymap_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KeybindingReadable.ProtoReflect.Descriptor instead.
+func (*KeybindingReadable) Descriptor() ([]byte, []int) {
+	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *KeybindingReadable) GetKeyChords() *Keybinding {
+	if x != nil {
+		return x.KeyChords
+	}
+	return nil
+}
+
+func (x *KeybindingReadable) GetKeyChordsReadable() string {
+	if x != nil {
+		return x.KeyChordsReadable
 	}
 	return ""
 }
@@ -447,36 +386,31 @@ var File_keymap_v1_keymap_proto protoreflect.FileDescriptor
 
 const file_keymap_v1_keymap_proto_rawDesc = "" +
 	"\n" +
-	"\x16keymap/v1/keymap.proto\x12\tkeymap.v1\x1a\x19google/api/resource.proto\x1a\x17keymap/v1/keycode.proto\x1a\x1fgoogle/api/field_behavior.proto\"\xa5\x01\n" +
+	"\x16keymap/v1/keymap.proto\x12\tkeymap.v1\x1a\x19google/api/resource.proto\x1a\x17keymap/v1/keycode.proto\x1a\x1fgoogle/api/field_behavior.proto\"\x9d\x01\n" +
 	"\x06Keymap\x12,\n" +
-	"\x04name\x18\x01 \x01(\tB\x18\xe0A\b\xfaA\x12\x12\x10keymap.v1.KeymapR\x04name\x123\n" +
-	"\vkeybindings\x18\x02 \x03(\v2\x11.keymap.v1.ActionR\vkeybindings:8\xeaA5\n" +
-	"\x14onekeymap.com/Keymap\x12\x1dusers/{user}/keymaps/{keymap}\"o\n" +
-	"\bKeyChord\x12-\n" +
-	"\bkey_code\x18\x01 \x01(\x0e2\x12.keymap.v1.KeyCodeR\akeyCode\x124\n" +
-	"\tmodifiers\x18\x02 \x03(\x0e2\x16.keymap.v1.KeyModifierR\tmodifiers\"?\n" +
-	"\x10KeyChordSequence\x12+\n" +
-	"\x06chords\x18\x01 \x03(\v2\x13.keymap.v1.KeyChordR\x06chords\"u\n" +
-	"\aBinding\x12:\n" +
-	"\n" +
-	"key_chords\x18\x01 \x01(\v2\x1b.keymap.v1.KeyChordSequenceR\tkeyChords\x12.\n" +
-	"\x13key_chords_readable\x18\x02 \x01(\tR\x11keyChordsReadable\"\xc3\x01\n" +
+	"\x04name\x18\x01 \x01(\tB\x18\xe0A\b\xfaA\x12\x12\x10keymap.v1.KeymapR\x04name\x12+\n" +
+	"\aactions\x18\x02 \x03(\v2\x11.keymap.v1.ActionR\aactions:8\xeaA5\n" +
+	"\x14onekeymap.com/Keymap\x12\x1dusers/{user}/keymaps/{keymap}\"\xce\x01\n" +
 	"\x06Action\x12\x17\n" +
-	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12.\n" +
-	"\bbindings\x18\x02 \x03(\v2\x12.keymap.v1.BindingR\bbindings\x12<\n" +
+	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x129\n" +
+	"\bbindings\x18\x02 \x03(\v2\x1d.keymap.v1.KeybindingReadableR\bbindings\x12<\n" +
 	"\raction_config\x18\x03 \x01(\v2\x17.keymap.v1.ActionConfigR\factionConfig\x12\x18\n" +
 	"\acomment\x18\x04 \x01(\tR\acomment:\x18\xeaA\x15\n" +
 	"\x10keymap.v1/Action\x12\x01*\"o\n" +
+	"\bKeyChord\x12-\n" +
+	"\bkey_code\x18\x01 \x01(\x0e2\x12.keymap.v1.KeyCodeR\akeyCode\x124\n" +
+	"\tmodifiers\x18\x02 \x03(\x0e2\x16.keymap.v1.KeyModifierR\tmodifiers\"9\n" +
+	"\n" +
+	"Keybinding\x12+\n" +
+	"\x06chords\x18\x01 \x03(\v2\x13.keymap.v1.KeyChordR\x06chords\"z\n" +
+	"\x12KeybindingReadable\x124\n" +
+	"\n" +
+	"key_chords\x18\x01 \x01(\v2\x15.keymap.v1.KeybindingR\tkeyChords\x12.\n" +
+	"\x13key_chords_readable\x18\x02 \x01(\tR\x11keyChordsReadable\"o\n" +
 	"\fActionConfig\x12!\n" +
 	"\fdisplay_name\x18\x01 \x01(\tR\vdisplayName\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
-	"\bcategory\x18\x03 \x01(\tR\bcategory*\x87\x01\n" +
-	"\vKeyModifier\x12\x1c\n" +
-	"\x18KEY_MODIFIER_UNSPECIFIED\x10\x00\x12\x16\n" +
-	"\x12KEY_MODIFIER_SHIFT\x10\x01\x12\x15\n" +
-	"\x11KEY_MODIFIER_CTRL\x10\x02\x12\x14\n" +
-	"\x10KEY_MODIFIER_ALT\x10\x03\x12\x15\n" +
-	"\x11KEY_MODIFIER_META\x10\x04B\x9c\x01\n" +
+	"\bcategory\x18\x03 \x01(\tR\bcategoryB\x9c\x01\n" +
 	"\rcom.keymap.v1B\vKeymapProtoP\x01Z9github.com/xinnjie/watchbeats/protogen/keymap/v1;keymapv1\xa2\x02\x03KXX\xaa\x02\tKeymap.V1\xca\x02\tKeymap\\V1\xe2\x02\x15Keymap\\V1\\GPBMetadata\xea\x02\n" +
 	"Keymap::V1b\x06proto3"
 
@@ -492,26 +426,25 @@ func file_keymap_v1_keymap_proto_rawDescGZIP() []byte {
 	return file_keymap_v1_keymap_proto_rawDescData
 }
 
-var file_keymap_v1_keymap_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_keymap_v1_keymap_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_keymap_v1_keymap_proto_goTypes = []any{
-	(KeyModifier)(0),         // 0: keymap.v1.KeyModifier
-	(*Keymap)(nil),           // 1: keymap.v1.Keymap
-	(*KeyChord)(nil),         // 2: keymap.v1.KeyChord
-	(*KeyChordSequence)(nil), // 3: keymap.v1.KeyChordSequence
-	(*Binding)(nil),          // 4: keymap.v1.Binding
-	(*Action)(nil),           // 5: keymap.v1.Action
-	(*ActionConfig)(nil),     // 6: keymap.v1.ActionConfig
-	(KeyCode)(0),             // 7: keymap.v1.KeyCode
+	(*Keymap)(nil),             // 0: keymap.v1.Keymap
+	(*Action)(nil),             // 1: keymap.v1.Action
+	(*KeyChord)(nil),           // 2: keymap.v1.KeyChord
+	(*Keybinding)(nil),         // 3: keymap.v1.Keybinding
+	(*KeybindingReadable)(nil), // 4: keymap.v1.KeybindingReadable
+	(*ActionConfig)(nil),       // 5: keymap.v1.ActionConfig
+	(KeyCode)(0),               // 6: keymap.v1.KeyCode
+	(KeyModifier)(0),           // 7: keymap.v1.KeyModifier
 }
 var file_keymap_v1_keymap_proto_depIdxs = []int32{
-	5, // 0: keymap.v1.Keymap.keybindings:type_name -> keymap.v1.Action
-	7, // 1: keymap.v1.KeyChord.key_code:type_name -> keymap.v1.KeyCode
-	0, // 2: keymap.v1.KeyChord.modifiers:type_name -> keymap.v1.KeyModifier
-	2, // 3: keymap.v1.KeyChordSequence.chords:type_name -> keymap.v1.KeyChord
-	3, // 4: keymap.v1.Binding.key_chords:type_name -> keymap.v1.KeyChordSequence
-	4, // 5: keymap.v1.Action.bindings:type_name -> keymap.v1.Binding
-	6, // 6: keymap.v1.Action.action_config:type_name -> keymap.v1.ActionConfig
+	1, // 0: keymap.v1.Keymap.actions:type_name -> keymap.v1.Action
+	4, // 1: keymap.v1.Action.bindings:type_name -> keymap.v1.KeybindingReadable
+	5, // 2: keymap.v1.Action.action_config:type_name -> keymap.v1.ActionConfig
+	6, // 3: keymap.v1.KeyChord.key_code:type_name -> keymap.v1.KeyCode
+	7, // 4: keymap.v1.KeyChord.modifiers:type_name -> keymap.v1.KeyModifier
+	2, // 5: keymap.v1.Keybinding.chords:type_name -> keymap.v1.KeyChord
+	3, // 6: keymap.v1.KeybindingReadable.key_chords:type_name -> keymap.v1.Keybinding
 	7, // [7:7] is the sub-list for method output_type
 	7, // [7:7] is the sub-list for method input_type
 	7, // [7:7] is the sub-list for extension type_name
@@ -530,14 +463,13 @@ func file_keymap_v1_keymap_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_keymap_v1_keymap_proto_rawDesc), len(file_keymap_v1_keymap_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_keymap_v1_keymap_proto_goTypes,
 		DependencyIndexes: file_keymap_v1_keymap_proto_depIdxs,
-		EnumInfos:         file_keymap_v1_keymap_proto_enumTypes,
 		MessageInfos:      file_keymap_v1_keymap_proto_msgTypes,
 	}.Build()
 	File_keymap_v1_keymap_proto = out.File

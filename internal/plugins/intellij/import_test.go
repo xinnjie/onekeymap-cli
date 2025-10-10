@@ -37,7 +37,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
   </action>
 </keymap>`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -58,7 +58,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
   </action>
 </keymap>`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+k ctrl+c"),
 					keymap.NewActioinBinding("actions.test.withArgs", "shift+home"),
@@ -75,7 +75,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
   </action>
 </keymap>`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 				},
@@ -100,7 +100,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
   </action>
 </keymap>`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+k"),
 				},
 			},
@@ -126,7 +126,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
   </action>
 </keymap>`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "f5"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+numpad3"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+shift+["),
@@ -142,7 +142,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
   </action>
 </keymap>`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
 				},
 			},

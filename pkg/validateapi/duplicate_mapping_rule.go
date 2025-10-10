@@ -24,7 +24,7 @@ func (r *DuplicateMappingRule) Validate(_ context.Context, validationContext *Va
 	// Track seen combinations of action + formatted keys
 	seen := make(map[string]struct{})
 
-	for _, ab := range setting.GetKeybindings() {
+	for _, ab := range setting.GetActions() {
 		if ab == nil {
 			continue
 		}

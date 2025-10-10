@@ -40,7 +40,7 @@ func TestImportZedKeymap(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -58,7 +58,7 @@ func TestImportZedKeymap(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 					keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 				},
@@ -88,7 +88,7 @@ func TestImportZedKeymap(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -111,7 +111,7 @@ func TestImportZedKeymap(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
@@ -135,7 +135,7 @@ func TestImportZedKeymap(t *testing.T) {
 			}
 	]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+1"),
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
@@ -158,7 +158,7 @@ func TestImportZedKeymap(t *testing.T) {
 				}
 			]`,
 			expected: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.withArgs", "meta+shift+t"),
 				},
 			},

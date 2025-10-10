@@ -92,7 +92,7 @@ func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *
 		return nil
 	}
 
-	for _, ab := range setting.GetKeybindings() {
+	for _, ab := range setting.GetActions() {
 		if ab == nil {
 			continue
 		}

@@ -163,7 +163,7 @@ func (e *vscodeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) *map
 func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []vscodeKeybinding {
 	var vscodeKeybindings []vscodeKeybinding
 
-	for _, km := range setting.GetKeybindings() {
+	for _, km := range setting.GetActions() {
 		mapping := e.mappingConfig.FindByUniversalAction(km.GetName())
 		if mapping == nil {
 			continue

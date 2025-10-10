@@ -37,7 +37,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "export copy keymap",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -50,7 +50,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "non-destructive export preserves user keybindings",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -73,7 +73,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -91,7 +91,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "multiple modes with mixed conflicts",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
 				},
 			},
@@ -123,7 +123,7 @@ func TestExportHelixKeymap(t *testing.T) {
 		{
 			name: "empty existing config behaves as destructive export",
 			setting: &keymapv1.Keymap{
-				Keybindings: []*keymapv1.Action{
+				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 				},
 			},
@@ -178,7 +178,7 @@ normal = "block"
 
 	// Managed keymap setting to apply
 	setting := &keymapv1.Keymap{
-		Keybindings: []*keymapv1.Action{
+		Actions: []*keymapv1.Action{
 			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
 		},
 	}

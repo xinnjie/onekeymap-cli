@@ -59,7 +59,7 @@ func TestFormatKeybinding_Table(t *testing.T) {
 		{name: "TooManyChords", in: "ctrl+a ctrl+b ctrl+c", wantErr: true, wantNil: true},
 		{name: "InvalidChordProto", build: func() *keymap.KeyBinding {
 			return keymap.NewKeyBinding(
-				&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{{}}}},
+				&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{Chords: []*keymapv1.KeyChord{{}}}},
 			)
 		}, wantErr: true, wantNil: true},
 	}

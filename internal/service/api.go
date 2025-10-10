@@ -134,13 +134,13 @@ func (s *Server) GetKeymap(
 	// If return_all is true, we will return all mappings in the config.
 	if req.GetReturnAll() {
 		existingBindings := make(map[string]*keymapv1.Action)
-		for _, binding := range km.GetKeybindings() {
+		for _, binding := range km.GetActions() {
 			existingBindings[binding.GetName()] = binding
 		}
 
 		for id, mapping := range s.mappingConfig.Mappings {
 			if _, exists := existingBindings[id]; !exists {
-				km.Keybindings = append(km.Keybindings, &keymapv1.Action{
+				km.Actions = append(km.Actions, &keymapv1.Action{
 					Name: id,
 					ActionConfig: &keymapv1.ActionConfig{
 						Description: mapping.Description,

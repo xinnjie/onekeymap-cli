@@ -21,11 +21,11 @@ func NewDanglingActionRule(mappingConfig *mappings.MappingConfig) ValidationRule
 
 // Validate checks for dangling actions in the keymap setting.
 func (r *DanglingActionRule) Validate(_ context.Context, validationContext *ValidationContext) error {
-	if validationContext.Setting == nil || len(validationContext.Setting.GetKeybindings()) == 0 {
+	if validationContext.Setting == nil || len(validationContext.Setting.GetActions()) == 0 {
 		return nil
 	}
 
-	for _, kb := range validationContext.Setting.GetKeybindings() {
+	for _, kb := range validationContext.Setting.GetActions() {
 		if kb == nil {
 			continue
 		}

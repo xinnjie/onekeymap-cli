@@ -175,7 +175,7 @@ func (e *helixExporter) isManagedKeybinding(command string, mode Mode) bool {
 func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting *keymapv1.Keymap) helixKeys {
 	keysByMode := helixKeys{}
 
-	for _, km := range setting.GetKeybindings() {
+	for _, km := range setting.GetActions() {
 		mapping := e.mappingConfig.FindByUniversalAction(km.GetName())
 		if mapping == nil || len(mapping.Helix) == 0 {
 			continue

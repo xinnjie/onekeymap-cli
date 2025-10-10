@@ -40,7 +40,7 @@ func DecorateSetting(
 		return setting
 	}
 
-	for _, ab := range setting.GetKeybindings() {
+	for _, ab := range setting.GetActions() {
 		if cfg := config.FindByUniversalAction(ab.GetName()); cfg != nil {
 			if ab.GetActionConfig() == nil {
 				ab.ActionConfig = &keymapv1.ActionConfig{}
@@ -177,13 +177,13 @@ func Load(reader io.Reader) (*keymapv1.Keymap, error) {
 			}
 			ab.Bindings = append(
 				ab.Bindings,
-				&keymapv1.Binding{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr},
+				&keymapv1.KeybindingReadable{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr},
 			)
 		}
 	}
 
 	for _, k := range order {
-		setting.Keybindings = append(setting.Keybindings, grouped[k])
+		setting.Actions = append(setting.Actions, grouped[k])
 	}
 
 	return setting, nil
@@ -202,7 +202,7 @@ func Save(writer io.Writer, setting *keymapv1.Keymap) error {
 	}
 	groupedKeybindings := make(map[groupKey]*OneKeymapConfig)
 
-	for _, k := range setting.GetKeybindings() {
+	for _, k := range setting.GetActions() {
 		var description, displayName string
 		if k.GetActionConfig() != nil {
 			description = k.GetActionConfig().GetDescription()

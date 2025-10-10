@@ -51,15 +51,15 @@ func TestServer_GetKeymap(t *testing.T) {
 			},
 			want: &keymapv1.GetKeymapResponse{
 				Keymap: &keymapv1.Keymap{
-					Keybindings: []*keymapv1.Action{
+					Actions: []*keymapv1.Action{
 						{
 							Name: "action1",
 							ActionConfig: &keymapv1.ActionConfig{
 								Description: "Description 1",
 							},
-							Bindings: []*keymapv1.Binding{
+							Bindings: []*keymapv1.KeybindingReadable{
 								{
-									KeyChords: &keymapv1.KeyChordSequence{
+									KeyChords: &keymapv1.Keybinding{
 										Chords: []*keymapv1.KeyChord{
 											{
 												KeyCode: keymapv1.KeyCode_A,
@@ -94,15 +94,15 @@ func TestServer_GetKeymap(t *testing.T) {
 			},
 			want: &keymapv1.GetKeymapResponse{
 				Keymap: &keymapv1.Keymap{
-					Keybindings: []*keymapv1.Action{
+					Actions: []*keymapv1.Action{
 						{
 							Name: "action1",
 							ActionConfig: &keymapv1.ActionConfig{
 								Description: "Description 1",
 							},
-							Bindings: []*keymapv1.Binding{
+							Bindings: []*keymapv1.KeybindingReadable{
 								{
-									KeyChords: &keymapv1.KeyChordSequence{
+									KeyChords: &keymapv1.Keybinding{
 										Chords: []*keymapv1.KeyChord{
 											{
 												KeyCode: keymapv1.KeyCode_A,
@@ -140,7 +140,7 @@ func TestServer_GetKeymap(t *testing.T) {
 			},
 			want: &keymapv1.GetKeymapResponse{
 				Keymap: &keymapv1.Keymap{
-					Keybindings: []*keymapv1.Action{
+					Actions: []*keymapv1.Action{
 						{Name: "action1", ActionConfig: &keymapv1.ActionConfig{Description: "Description 1"}},
 						{Name: "action2", ActionConfig: &keymapv1.ActionConfig{Description: "Description 2"}},
 						{Name: "action3", ActionConfig: &keymapv1.ActionConfig{Description: "Description 3"}},
@@ -180,7 +180,7 @@ func TestServer_GetKeymap(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				if tt.expectNoOrder {
-					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform(), protocmp.SortRepeatedFields(&keymapv1.Keymap{}, "keybindings")))
+					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform(), protocmp.SortRepeatedFields(&keymapv1.Keymap{}, "actions")))
 				} else {
 					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform()))
 				}

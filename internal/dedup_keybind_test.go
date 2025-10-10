@@ -21,8 +21,8 @@ func TestDedupKeyBindings_Table(t *testing.T) {
 			input: []*keymapv1.Action{
 				{
 					Name: "actions.copy",
-					Bindings: []*keymapv1.Binding{
-						{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{}}},
+					Bindings: []*keymapv1.KeybindingReadable{
+						{KeyChords: &keymapv1.Keybinding{Chords: []*keymapv1.KeyChord{}}},
 					},
 				},
 			},
@@ -66,7 +66,7 @@ func TestDedupKeyBindings_Table(t *testing.T) {
 			name: "NilVsEmptyChordsConsideredEqual",
 			input: []*keymapv1.Action{
 				{Name: "actions.nochord"},
-				{Name: "actions.nochord", Bindings: []*keymapv1.Binding{}},
+				{Name: "actions.nochord", Bindings: []*keymapv1.KeybindingReadable{}},
 			},
 			expected: []*keymapv1.Action{
 				{Name: "actions.nochord"},

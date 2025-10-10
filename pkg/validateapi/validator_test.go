@@ -16,7 +16,7 @@ func TestValidator_Validate_EmptyKeymaps(t *testing.T) {
 	validator := NewValidator()
 
 	setting := &keymapv1.Keymap{
-		Keybindings: []*keymapv1.Action{},
+		Actions: []*keymapv1.Action{},
 	}
 
 	opts := importapi.ImportOptions{
@@ -43,7 +43,7 @@ func TestValidator_Validate_ChainOfRules(t *testing.T) {
 
 	// Create keymaps with both conflicts and dangling actions
 	setting := &keymapv1.Keymap{
-		Keybindings: []*keymapv1.Action{
+		Actions: []*keymapv1.Action{
 			keymap.NewActioinBinding("valid.action", "ctrl+c"),
 			keymap.NewActioinBinding("invalid.action", "ctrl+c"), // This will cause dangling action
 		},

@@ -21,6 +21,67 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// KeyModifier represents modifier keys like Shift, Ctrl, Alt, Meta.
+type KeyModifier int32
+
+const (
+	// Unspecified
+	KeyModifier_KEY_MODIFIER_UNSPECIFIED KeyModifier = 0
+	// Shift key
+	KeyModifier_KEY_MODIFIER_SHIFT KeyModifier = 1
+	// Ctrl key
+	KeyModifier_KEY_MODIFIER_CTRL KeyModifier = 2
+	// Alt key
+	KeyModifier_KEY_MODIFIER_ALT KeyModifier = 3
+	// Meta is Command(⌘) key on macOS, Windows(⊞) key on Windows, super key on Linux
+	KeyModifier_KEY_MODIFIER_META KeyModifier = 4
+)
+
+// Enum value maps for KeyModifier.
+var (
+	KeyModifier_name = map[int32]string{
+		0: "KEY_MODIFIER_UNSPECIFIED",
+		1: "KEY_MODIFIER_SHIFT",
+		2: "KEY_MODIFIER_CTRL",
+		3: "KEY_MODIFIER_ALT",
+		4: "KEY_MODIFIER_META",
+	}
+	KeyModifier_value = map[string]int32{
+		"KEY_MODIFIER_UNSPECIFIED": 0,
+		"KEY_MODIFIER_SHIFT":       1,
+		"KEY_MODIFIER_CTRL":        2,
+		"KEY_MODIFIER_ALT":         3,
+		"KEY_MODIFIER_META":        4,
+	}
+)
+
+func (x KeyModifier) Enum() *KeyModifier {
+	p := new(KeyModifier)
+	*p = x
+	return p
+}
+
+func (x KeyModifier) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (KeyModifier) Descriptor() protoreflect.EnumDescriptor {
+	return file_keymap_v1_keycode_proto_enumTypes[0].Descriptor()
+}
+
+func (KeyModifier) Type() protoreflect.EnumType {
+	return &file_keymap_v1_keycode_proto_enumTypes[0]
+}
+
+func (x KeyModifier) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use KeyModifier.Descriptor instead.
+func (KeyModifier) EnumDescriptor() ([]byte, []int) {
+	return file_keymap_v1_keycode_proto_rawDescGZIP(), []int{0}
+}
+
 // KeyCode represents a standard key code.
 // https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf page 53 show keyboard
 type KeyCode int32
@@ -517,11 +578,11 @@ func (x KeyCode) String() string {
 }
 
 func (KeyCode) Descriptor() protoreflect.EnumDescriptor {
-	return file_keymap_v1_keycode_proto_enumTypes[0].Descriptor()
+	return file_keymap_v1_keycode_proto_enumTypes[1].Descriptor()
 }
 
 func (KeyCode) Type() protoreflect.EnumType {
-	return &file_keymap_v1_keycode_proto_enumTypes[0]
+	return &file_keymap_v1_keycode_proto_enumTypes[1]
 }
 
 func (x KeyCode) Number() protoreflect.EnumNumber {
@@ -530,14 +591,20 @@ func (x KeyCode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use KeyCode.Descriptor instead.
 func (KeyCode) EnumDescriptor() ([]byte, []int) {
-	return file_keymap_v1_keycode_proto_rawDescGZIP(), []int{0}
+	return file_keymap_v1_keycode_proto_rawDescGZIP(), []int{1}
 }
 
 var File_keymap_v1_keycode_proto protoreflect.FileDescriptor
 
 const file_keymap_v1_keycode_proto_rawDesc = "" +
 	"\n" +
-	"\x17keymap/v1/keycode.proto\x12\tkeymap.v1*\xf3\n" +
+	"\x17keymap/v1/keycode.proto\x12\tkeymap.v1*\x87\x01\n" +
+	"\vKeyModifier\x12\x1c\n" +
+	"\x18KEY_MODIFIER_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12KEY_MODIFIER_SHIFT\x10\x01\x12\x15\n" +
+	"\x11KEY_MODIFIER_CTRL\x10\x02\x12\x14\n" +
+	"\x10KEY_MODIFIER_ALT\x10\x03\x12\x15\n" +
+	"\x11KEY_MODIFIER_META\x10\x04*\xf3\n" +
 	"\n" +
 	"\aKeyCode\x12\x18\n" +
 	"\x14KEY_CODE_UNSPECIFIED\x10\x00\x12\x05\n" +
@@ -679,9 +746,10 @@ func file_keymap_v1_keycode_proto_rawDescGZIP() []byte {
 	return file_keymap_v1_keycode_proto_rawDescData
 }
 
-var file_keymap_v1_keycode_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_keymap_v1_keycode_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_keymap_v1_keycode_proto_goTypes = []any{
-	(KeyCode)(0), // 0: keymap.v1.KeyCode
+	(KeyModifier)(0), // 0: keymap.v1.KeyModifier
+	(KeyCode)(0),     // 1: keymap.v1.KeyCode
 }
 var file_keymap_v1_keycode_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -701,7 +769,7 @@ func file_keymap_v1_keycode_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_keymap_v1_keycode_proto_rawDesc), len(file_keymap_v1_keycode_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,

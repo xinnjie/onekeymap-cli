@@ -70,15 +70,15 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 	// Normalize: merge same-action entries and deduplicate identical bindings before downstream logic
-	if setting != nil && len(setting.GetKeybindings()) > 0 {
-		setting.Keybindings = dedupKeyBindings(setting.GetKeybindings())
+	if setting != nil && len(setting.GetActions()) > 0 {
+		setting.Actions = dedupKeyBindings(setting.GetActions())
 	}
 
 	s.recorder.RecordCommandProcessed(ctx, string(opts.EditorType), setting)
 
 	// Sort by action for determinism
-	sort.Slice(setting.GetKeybindings(), func(i, j int) bool {
-		return setting.GetKeybindings()[i].GetName() < setting.GetKeybindings()[j].GetName()
+	sort.Slice(setting.GetActions(), func(i, j int) bool {
+		return setting.GetActions()[i].GetName() < setting.GetActions()[j].GetName()
 	})
 
 	if setting == nil {
@@ -91,17 +91,17 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	}
 
 	// No baseline provided: all imported keymaps are additions.
-	if len(opts.Base.GetKeybindings()) == 0 {
+	if len(opts.Base.GetActions()) == 0 {
 		changes := &importapi.KeymapChanges{}
-		if len(setting.GetKeybindings()) > 0 {
-			changes.Add = append(changes.Add, setting.GetKeybindings()...)
+		if len(setting.GetActions()) > 0 {
+			changes.Add = append(changes.Add, setting.GetActions()...)
 		}
 		return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
 	}
 
 	// If baseline provided, first union baseline chords into current setting so unchanged chords are retained.
 	setting = unionWithBase(opts.Base, setting)
-	setting.Keybindings = dedupKeyBindings(setting.GetKeybindings())
+	setting.Actions = dedupKeyBindings(setting.GetActions())
 	// Re-decorate after union so metadata (Name/Description/Category) and readable chords are present
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 
@@ -109,7 +109,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	changes := s.calculateChanges(opts.Base, setting)
 
 	// Safety: ensure dedup on output as well
-	setting.Keybindings = dedupKeyBindings(setting.GetKeybindings())
+	setting.Actions = dedupKeyBindings(setting.GetActions())
 	return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
 }
 
@@ -140,7 +140,7 @@ func (s *importService) buildActionIndex(keymap *keymapv1.Keymap) *actionIndex {
 		byPair:   map[string]*keymapv1.Action{},
 	}
 
-	for _, kb := range keymap.GetKeybindings() {
+	for _, kb := range keymap.GetActions() {
 		if !hasValidChord(kb) {
 			continue
 		}
@@ -285,15 +285,15 @@ func unionWithBase(base *keymapv1.Keymap, imported *keymapv1.Keymap) *keymapv1.K
 	if imported == nil {
 		return base
 	}
-	if base == nil || len(base.GetKeybindings()) == 0 {
+	if base == nil || len(base.GetActions()) == 0 {
 		return imported
 	}
 	// index existing results by action id
-	out := &keymapv1.Keymap{Keybindings: []*keymapv1.Action{}}
+	out := &keymapv1.Keymap{Actions: []*keymapv1.Action{}}
 	byID := make(map[string]*keymapv1.Action)
 
 	// start with baseline (so Before reflects baseline order/first occurrence)
-	for _, kb := range base.GetKeybindings() {
+	for _, kb := range base.GetActions() {
 		if kb == nil {
 			continue
 		}
@@ -315,10 +315,10 @@ func unionWithBase(base *keymapv1.Keymap, imported *keymapv1.Keymap) *keymapv1.K
 			}
 		}
 		byID[ab.GetName()] = ab
-		out.Keybindings = append(out.Keybindings, ab)
+		out.Actions = append(out.Actions, ab)
 	}
 	// merge imported bindings into corresponding actions (or create new action entries)
-	for _, kb := range imported.GetKeybindings() {
+	for _, kb := range imported.GetActions() {
 		if kb == nil {
 			continue
 		}
@@ -341,7 +341,7 @@ func unionWithBase(base *keymapv1.Keymap, imported *keymapv1.Keymap) *keymapv1.K
 				}
 			}
 			byID[ab.GetName()] = ab
-			out.Keybindings = append(out.Keybindings, ab)
+			out.Actions = append(out.Actions, ab)
 			continue
 		}
 		// union bindings

@@ -73,9 +73,9 @@ func (i *vscodeImporter) Import(
 
 		newKeymap := &keymapv1.Action{
 			Name:     mapping.ID,
-			Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}},
+			Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
 		}
-		setting.Keybindings = append(setting.Keybindings, newKeymap)
+		setting.Actions = append(setting.Actions, newKeymap)
 	}
 
 	return setting, nil

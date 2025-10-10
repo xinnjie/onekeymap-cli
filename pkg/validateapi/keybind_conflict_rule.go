@@ -20,7 +20,7 @@ func NewKeybindConflictRule() ValidationRule {
 
 // Validate checks for keybinding conflicts in the keymap setting.
 func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *ValidationContext) error {
-	if validationContext.Setting == nil || len(validationContext.Setting.GetKeybindings()) == 0 {
+	if validationContext.Setting == nil || len(validationContext.Setting.GetActions()) == 0 {
 		return nil
 	}
 
@@ -36,7 +36,7 @@ func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *Val
 		map[string][]*keymapv1.Action,
 	) // key: formatted keybinding, value: list of action bindings having it
 
-	for _, ab := range validationContext.Setting.GetKeybindings() {
+	for _, ab := range validationContext.Setting.GetActions() {
 		if ab == nil {
 			continue
 		}

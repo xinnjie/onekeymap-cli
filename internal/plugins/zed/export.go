@@ -145,7 +145,7 @@ func orderByBaseContext(final zedKeymapConfig, base zedKeymapConfig) zedKeymapCo
 func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.Keymap) zedKeymapConfig {
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
-	for _, km := range setting.GetKeybindings() {
+	for _, km := range setting.GetActions() {
 		actionConfig, err := p.actionIDToZed(km.GetName())
 		if err != nil {
 			p.logger.Info("no mapping found for action", "action", km.GetName())

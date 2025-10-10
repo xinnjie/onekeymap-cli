@@ -35,7 +35,7 @@ func (e *demoExporter) Export(
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	var out []demoBinding
-	for _, km := range setting.GetKeybindings() {
+	for _, km := range setting.GetActions() {
 		for _, b := range km.GetBindings() {
 			if b == nil {
 				continue

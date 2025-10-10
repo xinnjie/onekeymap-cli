@@ -61,9 +61,9 @@ func (i *demoImporter) Import(
 			i.logger.WarnContext(ctx, "Skipping unparsable keybinding", "keys", b.Keys, "error", err)
 			continue
 		}
-		setting.Keybindings = append(
-			setting.Keybindings,
-			&keymapv1.Action{Name: b.Action, Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}}},
+		setting.Actions = append(
+			setting.Actions,
+			&keymapv1.Action{Name: b.Action, Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}}},
 		)
 	}
 	return setting, nil

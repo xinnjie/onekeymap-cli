@@ -29,7 +29,7 @@ func (r *UnsupportedActionRule) Validate(_ context.Context, validationContext *V
 	setting := validationContext.Setting
 	report := validationContext.Report
 
-	for _, ab := range setting.GetKeybindings() {
+	for _, ab := range setting.GetActions() {
 		if ab == nil {
 			continue
 		}

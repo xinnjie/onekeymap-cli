@@ -114,7 +114,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap) []Ac
 	actionsMap := make(map[string]*ActionXML)
 	var actionOrder []string
 
-	for _, km := range setting.GetKeybindings() {
+	for _, km := range setting.GetActions() {
 		if km == nil || len(km.GetBindings()) == 0 {
 			continue
 		}

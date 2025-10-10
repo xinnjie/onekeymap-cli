@@ -61,9 +61,9 @@ func (p *intellijImporter) Import(
 			}
 			newBinding := &keymapv1.Action{
 				Name:     actionID,
-				Bindings: []*keymapv1.Binding{{KeyChords: kb.KeyChords}},
+				Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
 			}
-			setting.Keybindings = append(setting.Keybindings, newBinding)
+			setting.Actions = append(setting.Actions, newBinding)
 		}
 	}
 	return setting, nil

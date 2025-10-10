@@ -15,18 +15,18 @@ const oneKeymapDefaultKeyChordSeparator = "+"
 // pressed in order to trigger an action. This allows for multi-key sequences
 // like "shift shift" or "ctrl+k ctrl+s".
 type KeyBinding struct {
-	*keymapv1.Binding
+	*keymapv1.KeybindingReadable
 }
 
-func NewKeyBinding(binding *keymapv1.Binding) *KeyBinding {
-	return &KeyBinding{Binding: binding}
+func NewKeyBinding(binding *keymapv1.KeybindingReadable) *KeyBinding {
+	return &KeyBinding{KeybindingReadable: binding}
 }
 
 // newBindingProto creates a Binding proto from a vscode-like key sequence string.
-func newBindingProto(keyChords ...string) []*keymapv1.Binding {
-	var bindings []*keymapv1.Binding
+func newBindingProto(keyChords ...string) []*keymapv1.KeybindingReadable {
+	var bindings []*keymapv1.KeybindingReadable
 	for _, keyChord := range keyChords {
-		bindings = append(bindings, &keymapv1.Binding{
+		bindings = append(bindings, &keymapv1.KeybindingReadable{
 			KeyChords: MustParseKeyBinding(keyChord).KeyChords,
 		})
 	}
@@ -70,7 +70,7 @@ func ParseKeyBinding(keybind string, modifierSeparator string) (*KeyBinding, err
 		}
 		chords = append(chords, kc.KeyChord)
 	}
-	return NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: chords}}), nil
+	return NewKeyBinding(&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{Chords: chords}}), nil
 }
 
 // MustParseKeyBinding parses a vscode-like keybind string (e.g., "ctrl+c") into a KeyBinding and panics on error.

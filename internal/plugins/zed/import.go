@@ -93,12 +93,12 @@ func (p *zedImporter) Import(
 			}
 			keymapEntry := &keymapv1.Action{
 				Name: actionID,
-				Bindings: []*keymapv1.Binding{
+				Bindings: []*keymapv1.KeybindingReadable{
 					{KeyChords: kb.KeyChords},
 				},
 			}
 
-			setting.Keybindings = append(setting.Keybindings, keymapEntry)
+			setting.Actions = append(setting.Actions, keymapEntry)
 		}
 	}
 	return setting, nil

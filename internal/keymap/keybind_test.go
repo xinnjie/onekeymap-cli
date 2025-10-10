@@ -15,13 +15,13 @@ func TestParseKeyBinding(t *testing.T) {
 	testCases := []struct {
 		name        string
 		input       string
-		expected    *keymapv1.KeyChordSequence
+		expected    *keymapv1.Keybinding
 		expectError bool
 	}{
 		{
 			name:  "Single chord(ctrl+s)",
 			input: "ctrl+s",
-			expected: &keymapv1.KeyChordSequence{
+			expected: &keymapv1.Keybinding{
 				Chords: []*keymapv1.KeyChord{
 					{
 						KeyCode:   keycode.MustKeyCode("s"),
@@ -33,7 +33,7 @@ func TestParseKeyBinding(t *testing.T) {
 		{
 			name:  "Multi-chord(ctrl+k ctrl+s)",
 			input: "ctrl+k ctrl+s",
-			expected: &keymapv1.KeyChordSequence{
+			expected: &keymapv1.Keybinding{
 				Chords: []*keymapv1.KeyChord{
 					{
 						KeyCode:   keycode.MustKeyCode("k"),
@@ -49,7 +49,7 @@ func TestParseKeyBinding(t *testing.T) {
 		{
 			name:  "Multi-chord(shift shift)",
 			input: "shift shift",
-			expected: &keymapv1.KeyChordSequence{
+			expected: &keymapv1.Keybinding{
 				Chords: []*keymapv1.KeyChord{
 					{
 						KeyCode:   keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
@@ -97,7 +97,7 @@ func TestKeyBinding_Format(t *testing.T) {
 	}{
 		{
 			name: "Single chord(cmd+s)",
-			input: NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{
+			input: NewKeyBinding(&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{
 				Chords: []*keymapv1.KeyChord{
 					{
 						KeyCode:   keycode.MustKeyCode("s"),
@@ -110,7 +110,7 @@ func TestKeyBinding_Format(t *testing.T) {
 		},
 		{
 			name: "Multi-chord(shift shift)",
-			input: NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{
+			input: NewKeyBinding(&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{
 				Chords: []*keymapv1.KeyChord{
 					{
 						KeyCode:   keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
@@ -127,7 +127,7 @@ func TestKeyBinding_Format(t *testing.T) {
 		},
 		{
 			name: "Multi-chord(ctrl+k ctrl+s)",
-			input: NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{
+			input: NewKeyBinding(&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{
 				Chords: []*keymapv1.KeyChord{
 					{
 						KeyCode:   keycode.MustKeyCode("k"),
@@ -151,7 +151,7 @@ func TestKeyBinding_Format(t *testing.T) {
 		{
 			name: "Empty Chords",
 			input: NewKeyBinding(
-				&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: []*keymapv1.KeyChord{}}},
+				&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{Chords: []*keymapv1.KeyChord{}}},
 			),
 			separator:   "+",
 			expectError: true,

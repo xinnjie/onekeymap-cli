@@ -181,7 +181,7 @@ func parseKeybinding(s string) (*keymap.KeyBinding, error) {
 		})
 	}
 
-	return keymap.NewKeyBinding(&keymapv1.Binding{KeyChords: &keymapv1.KeyChordSequence{Chords: chords}}), nil
+	return keymap.NewKeyBinding(&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{Chords: chords}}), nil
 }
 
 func fromHelixKey(s string) (keymapv1.KeyCode, error) {
