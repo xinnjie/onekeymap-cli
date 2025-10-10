@@ -7,7 +7,7 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/xinnjie/onekeymap-cli/internal/jsonutil"
+	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
@@ -39,7 +39,10 @@ func (i *demoImporter) Import(
 		return nil, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
-	clean := jsonutil.StripJSONComments(data)
+	clean, err := hujson.Standardize(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to standardize JSON: %w", err)
+	}
 	var bindings []struct {
 		Keys   string `json:"keys"`
 		Action string `json:"action"`

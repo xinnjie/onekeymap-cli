@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"sort"
 
+	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
@@ -84,7 +85,17 @@ func (e *vscodeExporter) Export(
 	// Decode existing config for non-destructive merge
 	var existingKeybindings []vscodeKeybinding
 	if opts.ExistingConfig != nil {
-		if err := json.NewDecoder(opts.ExistingConfig).Decode(&existingKeybindings); err != nil {
+		// Read all content first to apply hujson.Standardize
+		rawData, err := io.ReadAll(opts.ExistingConfig)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read existing config: %w", err)
+		}
+		// Strip comments and trailing commas using hujson
+		standardizedData, err := hujson.Standardize(rawData)
+		if err != nil {
+			return nil, fmt.Errorf("failed to standardize JSON: %w", err)
+		}
+		if err := json.Unmarshal(standardizedData, &existingKeybindings); err != nil {
 			return nil, fmt.Errorf("failed to decode existing config: %w", err)
 		}
 	}

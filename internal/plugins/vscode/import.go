@@ -7,7 +7,7 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/xinnjie/onekeymap-cli/internal/jsonutil"
+	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
@@ -38,7 +38,10 @@ func (i *vscodeImporter) Import(
 		return nil, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
-	cleanedJSON := jsonutil.StripJSONComments(jsonData)
+	cleanedJSON, err := hujson.Standardize(jsonData)
+	if err != nil {
+		return nil, fmt.Errorf("failed to standardize JSON: %w", err)
+	}
 
 	var vscodeKeybindings []vscodeKeybinding
 	if err := json.Unmarshal(cleanedJSON, &vscodeKeybindings); err != nil {

@@ -3,12 +3,12 @@ package zed
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"sort"
 
+	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
@@ -39,15 +39,9 @@ func (p *zedExporter) Export(
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	// Parse existing configuration if provided
-	var existingConfig zedKeymapConfig
-	if opts.ExistingConfig != nil {
-		if err := json.NewDecoder(opts.ExistingConfig).Decode(&existingConfig); err != nil {
-			if errors.Is(err, io.EOF) {
-				existingConfig = nil
-			} else {
-				return nil, fmt.Errorf("failed to decode existing config: %w", err)
-			}
-		}
+	existingConfig, err := p.parseExistingConfig(opts.ExistingConfig)
+	if err != nil {
+		return nil, err
 	}
 
 	// Generate managed keybindings from current setting
@@ -78,6 +72,34 @@ func (p *zedExporter) Export(
 		BaseEditorConfig:   existingConfig,
 		ExportEditorConfig: finalKeymaps,
 	}, nil
+}
+
+// parseExistingConfig reads and parses the existing configuration from the reader.
+func (p *zedExporter) parseExistingConfig(reader io.Reader) (zedKeymapConfig, error) {
+	var config zedKeymapConfig
+	if reader == nil {
+		return config, nil
+	}
+
+	rawData, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read existing config: %w", err)
+	}
+
+	if len(rawData) == 0 {
+		return config, nil
+	}
+
+	standardizedData, err := hujson.Standardize(rawData)
+	if err != nil {
+		return nil, fmt.Errorf("failed to standardize JSON: %w", err)
+	}
+
+	if err := json.Unmarshal(standardizedData, &config); err != nil {
+		return nil, fmt.Errorf("failed to decode existing config: %w", err)
+	}
+
+	return config, nil
 }
 
 // orderByBaseContext reorders exported contexts following the order present

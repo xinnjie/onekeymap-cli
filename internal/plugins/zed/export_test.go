@@ -270,6 +270,45 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
   }
 ]`,
 		},
+		{
+			name: "existing config with trailing commas and comments",
+			setting: &keymapv1.Keymap{
+				Keybindings: []*keymapv1.Action{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+				},
+			},
+			existingConfig: `[
+  // Editor context with user bindings
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-x": "custom::UserAction", // trailing comma here
+    },
+  }, // trailing comma after object
+  {
+    // Workspace context
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-p": "custom::WorkspaceAction",
+    },
+  }, // final trailing comma
+]`,
+			wantJSON: `[
+  {
+    "context": "Editor",
+    "bindings": {
+      "cmd-c": "editor::Copy",
+      "cmd-x": "custom::UserAction"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-p": "custom::WorkspaceAction"
+    }
+  }
+]`,
+		},
 	}
 
 	for _, tt := range tests {

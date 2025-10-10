@@ -178,6 +178,45 @@ func TestExporter_Export(t *testing.T) {
 				}
 			]`,
 		},
+		{
+			name: "existing config with trailing commas and comments",
+			keymapSetting: &keymapv1.Keymap{
+				Keybindings: []*keymapv1.Action{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+				},
+			},
+			existingConfig: `[
+				// User custom keybinding
+				{
+					"key": "cmd+x",
+					"command": "custom.user.command",
+					"when": "editorTextFocus", // trailing comma here
+				}, // trailing comma after object
+				{
+					// Another user keybinding
+					"key": "cmd+v",
+					"command": "custom.paste.command",
+					"when": "editorTextFocus",
+				}, // final trailing comma
+			]`,
+			expectedJSON: `[
+				{
+					"key": "cmd+c",
+					"command": "editor.action.clipboardCopyAction",
+					"when": "editorTextFocus && condition > 0"
+				},
+				{
+					"key": "cmd+x",
+					"command": "custom.user.command",
+					"when": "editorTextFocus"
+				},
+				{
+					"key": "cmd+v",
+					"command": "custom.paste.command",
+					"when": "editorTextFocus"
+				}
+			]`,
+		},
 		// Base order preservation tests
 		{
 			name: "preserves order by base config using command as key",
