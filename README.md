@@ -115,8 +115,8 @@ Contributions are welcome! Check out the [Contributing Guide](CONTRIBUTING.md) f
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/xinnjie/onekeymap-cli/issues)
-- **Discussions**: [Discord](https://discord.com/invite/fW3TWuXj9A)
+- **Issues**: [![GitHub Issues](https://img.shields.io/github/issues/xinnjie/onekeymap-cli?logo=github&label=Issues)](https://github.com/xinnjie/onekeymap-cli/issues)
+- **Discussions**: [![Discord](https://img.shields.io/badge/Discord-Join%20the%20chat-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/fW3TWuXj9A)
 
 ---
 
