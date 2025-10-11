@@ -56,6 +56,11 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
   ```powershell
   winget install xinnjie.onekeymap-cli
   ``` -->
+- **Scoop**
+  ```powershell
+  scoop bucket add xinnjie https://github.com/xinnjie/scoop-bucket
+  scoop install onekeymap-cli
+  ```
 - **Zip Archive**
   Download `onekeymap-cli_Windows_<arch>.zip` from [GitHub Releases](https://github.com/xinnjie/onekeymap-cli/releases), extract it, and add the directory to your PATH, or run:
   ```powershell
