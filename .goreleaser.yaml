@@ -34,7 +34,7 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/xinnjie/onekeymap-cli/internal/cmd/version={{.Version}}
+      - -X github.com/xinnjie/onekeymap-cli/internal/cmd.version={{.Version}}
 
 archives:
   - id: onekeymap-cli

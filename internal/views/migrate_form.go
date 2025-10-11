@@ -101,6 +101,7 @@ func (m *MigrateFormModel) Init() tea.Cmd {
 func (m *MigrateFormModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if km, ok := msg.(tea.KeyMsg); ok {
 		switch km.String() {
+		// nolint:goconst // key strings for TUI input are clearer inline here
 		case "ctrl+c", "esc", "q":
 			return m, tea.Interrupt
 		}

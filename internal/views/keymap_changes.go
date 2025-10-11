@@ -93,6 +93,7 @@ func (m keymapChangesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		// nolint:goconst // key strings for TUI input are clearer inline here
 		case "ctrl+c", "esc", "q":
 			return m, tea.Quit
 		case "enter":
@@ -127,6 +128,7 @@ func (m keymapChangesModel) handleConfirmingState(msg tea.Msg) (tea.Model, tea.C
 	// When confirming, delegate to the form
 	if km, ok := msg.(tea.KeyMsg); ok {
 		switch km.String() {
+		// nolint:goconst // key strings for TUI input are clearer inline here
 		case "ctrl+c", "esc", "q":
 			if m.confirm != nil {
 				*m.confirm = false

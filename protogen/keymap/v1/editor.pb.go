@@ -28,21 +28,31 @@ const (
 	// Unspecified
 	EditorType_EDITOR_TYPE_UNSPECIFIED EditorType = 0
 	// Visual Studio Code
-	EditorType_VSCODE               EditorType = 1
-	EditorType_VSCODE_WINDSURF      EditorType = 5
-	EditorType_VSCODE_WINDSURF_NEXT EditorType = 6
-	EditorType_VSCODE_CURSOR        EditorType = 7
+	EditorType_VSCODE EditorType = 1
+	// WindSurf
+	EditorType_WINDSURF EditorType = 5
+	// WindSurf preview
+	EditorType_WINDSURF_NEXT EditorType = 6
+	// Cursor
+	EditorType_CURSOR EditorType = 7
 	// Zed
 	EditorType_ZED EditorType = 2
-	// IntelliJ
-	EditorType_INTELLIJ           EditorType = 8
+	// IntelliJ IDEA Ultimate
+	EditorType_INTELLIJ EditorType = 8
+	// IntelliJ IDEA Community
 	EditorType_INTELLIJ_COMMUNITY EditorType = 9
-	EditorType_INTELLIJ_PYCHARM   EditorType = 10
-	EditorType_INTELLIJ_WEBSTORM  EditorType = 11
-	EditorType_INTELLIJ_CLION     EditorType = 12
-	EditorType_INTELLIJ_PHPSTORM  EditorType = 13
-	EditorType_INTELLIJ_RUBYMINE  EditorType = 14
-	EditorType_INTELLIJ_GOLAND    EditorType = 15
+	// PyCharm
+	EditorType_PYCHARM EditorType = 10
+	// WebStorm
+	EditorType_WEBSTORM EditorType = 11
+	// CLion
+	EditorType_CLION EditorType = 12
+	// PhpStorm
+	EditorType_PHPSTORM EditorType = 13
+	// RubyMine
+	EditorType_RUBYMINE EditorType = 14
+	// GoLand
+	EditorType_GOLAND EditorType = 15
 	// Helix
 	EditorType_HELIX EditorType = 3
 	// Vim
@@ -54,36 +64,36 @@ var (
 	EditorType_name = map[int32]string{
 		0:  "EDITOR_TYPE_UNSPECIFIED",
 		1:  "VSCODE",
-		5:  "VSCODE_WINDSURF",
-		6:  "VSCODE_WINDSURF_NEXT",
-		7:  "VSCODE_CURSOR",
+		5:  "WINDSURF",
+		6:  "WINDSURF_NEXT",
+		7:  "CURSOR",
 		2:  "ZED",
 		8:  "INTELLIJ",
 		9:  "INTELLIJ_COMMUNITY",
-		10: "INTELLIJ_PYCHARM",
-		11: "INTELLIJ_WEBSTORM",
-		12: "INTELLIJ_CLION",
-		13: "INTELLIJ_PHPSTORM",
-		14: "INTELLIJ_RUBYMINE",
-		15: "INTELLIJ_GOLAND",
+		10: "PYCHARM",
+		11: "WEBSTORM",
+		12: "CLION",
+		13: "PHPSTORM",
+		14: "RUBYMINE",
+		15: "GOLAND",
 		3:  "HELIX",
 		4:  "VIM",
 	}
 	EditorType_value = map[string]int32{
 		"EDITOR_TYPE_UNSPECIFIED": 0,
 		"VSCODE":                  1,
-		"VSCODE_WINDSURF":         5,
-		"VSCODE_WINDSURF_NEXT":    6,
-		"VSCODE_CURSOR":           7,
+		"WINDSURF":                5,
+		"WINDSURF_NEXT":           6,
+		"CURSOR":                  7,
 		"ZED":                     2,
 		"INTELLIJ":                8,
 		"INTELLIJ_COMMUNITY":      9,
-		"INTELLIJ_PYCHARM":        10,
-		"INTELLIJ_WEBSTORM":       11,
-		"INTELLIJ_CLION":          12,
-		"INTELLIJ_PHPSTORM":       13,
-		"INTELLIJ_RUBYMINE":       14,
-		"INTELLIJ_GOLAND":         15,
+		"PYCHARM":                 10,
+		"WEBSTORM":                11,
+		"CLION":                   12,
+		"PHPSTORM":                13,
+		"RUBYMINE":                14,
+		"GOLAND":                  15,
 		"HELIX":                   3,
 		"VIM":                     4,
 	}
@@ -120,25 +130,27 @@ var File_keymap_v1_editor_proto protoreflect.FileDescriptor
 
 const file_keymap_v1_editor_proto_rawDesc = "" +
 	"\n" +
-	"\x16keymap/v1/editor.proto\x12\tkeymap.v1*\xbe\x02\n" +
+	"\x16keymap/v1/editor.proto\x12\tkeymap.v1*\xf3\x01\n" +
 	"\n" +
 	"EditorType\x12\x1b\n" +
 	"\x17EDITOR_TYPE_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
-	"\x06VSCODE\x10\x01\x12\x13\n" +
-	"\x0fVSCODE_WINDSURF\x10\x05\x12\x18\n" +
-	"\x14VSCODE_WINDSURF_NEXT\x10\x06\x12\x11\n" +
-	"\rVSCODE_CURSOR\x10\a\x12\a\n" +
+	"\x06VSCODE\x10\x01\x12\f\n" +
+	"\bWINDSURF\x10\x05\x12\x11\n" +
+	"\rWINDSURF_NEXT\x10\x06\x12\n" +
+	"\n" +
+	"\x06CURSOR\x10\a\x12\a\n" +
 	"\x03ZED\x10\x02\x12\f\n" +
 	"\bINTELLIJ\x10\b\x12\x16\n" +
-	"\x12INTELLIJ_COMMUNITY\x10\t\x12\x14\n" +
-	"\x10INTELLIJ_PYCHARM\x10\n" +
-	"\x12\x15\n" +
-	"\x11INTELLIJ_WEBSTORM\x10\v\x12\x12\n" +
-	"\x0eINTELLIJ_CLION\x10\f\x12\x15\n" +
-	"\x11INTELLIJ_PHPSTORM\x10\r\x12\x15\n" +
-	"\x11INTELLIJ_RUBYMINE\x10\x0e\x12\x13\n" +
-	"\x0fINTELLIJ_GOLAND\x10\x0f\x12\t\n" +
+	"\x12INTELLIJ_COMMUNITY\x10\t\x12\v\n" +
+	"\aPYCHARM\x10\n" +
+	"\x12\f\n" +
+	"\bWEBSTORM\x10\v\x12\t\n" +
+	"\x05CLION\x10\f\x12\f\n" +
+	"\bPHPSTORM\x10\r\x12\f\n" +
+	"\bRUBYMINE\x10\x0e\x12\n" +
+	"\n" +
+	"\x06GOLAND\x10\x0f\x12\t\n" +
 	"\x05HELIX\x10\x03\x12\a\n" +
 	"\x03VIM\x10\x04B\x9c\x01\n" +
 	"\rcom.keymap.v1B\vEditorProtoP\x01Z9github.com/xinnjie/watchbeats/protogen/keymap/v1;keymapv1\xa2\x02\x03KXX\xaa\x02\tKeymap.V1\xca\x02\tKeymap\\V1\xe2\x02\x15Keymap\\V1\\GPBMetadata\xea\x02\n" +

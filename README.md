@@ -22,22 +22,51 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
 
 ## 🚀 Quick Start
 
-> ❗️Currently the OneKeymap CLI only supports macOS. Windows and Linux support is coming soon.
-
 ### Installation
 
-**macOS (Homebrew):**
-```bash
-brew install xinnjie/homebrew-onekeymap/onekeymap-cli
-```
+#### macOS
 
-**Go Install:**
-```bash
-go install github.com/xinnjie/onekeymap-cli/cmd/onekeymap-cli@latest
-```
+- **Homebrew**
+  ```bash
+  brew install xinnjie/homebrew-onekeymap/onekeymap-cli
+  ```
+
+#### Linux
+
+- **Debian/Ubuntu (.deb)**
+  ```bash
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v<version>/onekeymap-cli_<version>_x86_64.deb
+  sudo dpkg -i onekeymap-cli_<version>_x86_64.deb
+  ```
+- **Fedora/RHEL/CentOS (.rpm)**
+  ```bash
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v<version>/onekeymap-cli_<version>_x86_64.rpm
+  sudo rpm -i onekeymap-cli_<version>_x86_64.rpm
+  ```
+- **Alpine (.apk)**
+  ```bash
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v<version>/onekeymap-cli_<version>_x86_64.apk
+  sudo apk add --allow-untrusted onekeymap-cli_<version>_x86_64.apk
+  ```
+
+#### Windows
+
+- **Zip Archive**
+  Download `onekeymap-cli_Windows_<arch>.zip` from [GitHub Releases](https://github.com/xinnjie/onekeymap-cli/releases), extract it, and add the directory to your PATH, or run:
+  ```powershell
+  Expand-Archive -Path .\onekeymap-cli_*.zip -DestinationPath "$Env:USERPROFILE\onekeymap-cli"
+  setx PATH "$Env:USERPROFILE\onekeymap-cli;$Env:PATH"
+  ```
+
+#### Cross-platform
+
+- **Go Install**
+  ```bash
+  go install github.com/xinnjie/onekeymap-cli/cmd/onekeymap-cli@latest
+  ```
 
 **From Release:**
-Download the latest binary from [GitHub Releases](https://github.com/xinnjie/onekeymap-cli/releases).
+Download the latest binary from [GitHub Releases](https://github.com/xinnjie/onekeymap-cli/releases/latest).
 
 ### Basic Usage
 
@@ -70,7 +99,8 @@ You can append `-h` or `--help` to any subcommand for detailed flag descriptions
 
 ---
 
-## Configuration
+<details>
+<summary><strong>Configuration</strong></summary>
 
 OneKeymap can be configured via a config file at `~/.config/onekeymap/config.yaml`:
 
@@ -87,6 +117,8 @@ editors:
   intellij:
     keymap_path: ~/Library/Application Support/JetBrains/IntelliJIdea2024.1/keymaps/custom.xml
 ```
+
+</details>
 
 ---
 

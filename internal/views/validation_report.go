@@ -88,8 +88,8 @@ func (m ValidationReportModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		//nolint:goconst // key strings for TUI input are clearer inline here
 		switch msg.String() {
+		//nolint:goconst // key strings for TUI input are clearer inline here
 		case "q", "esc", "enter", "ctrl+c":
 			return m, tea.Quit
 		}

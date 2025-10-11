@@ -81,6 +81,7 @@ func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		// nolint:goconst // key strings for TUI input are clearer inline here
 		case "ctrl+c", "esc", "q":
 			return m, tea.Quit
 		case "left":

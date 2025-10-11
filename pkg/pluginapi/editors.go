@@ -10,27 +10,27 @@ func NewEditorTypeFromAPI(e keymapv1.EditorType) EditorType {
 	switch e {
 	case keymapv1.EditorType_VSCODE:
 		return EditorTypeVSCode
-	case keymapv1.EditorType_VSCODE_WINDSURF:
+	case keymapv1.EditorType_WINDSURF:
 		return EditorTypeWindsurf
-	case keymapv1.EditorType_VSCODE_WINDSURF_NEXT:
+	case keymapv1.EditorType_WINDSURF_NEXT:
 		return EditorTypeWindsurfNext
-	case keymapv1.EditorType_VSCODE_CURSOR:
+	case keymapv1.EditorType_CURSOR:
 		return EditorTypeCursor
 	case keymapv1.EditorType_INTELLIJ:
 		return EditorTypeIntelliJ
 	case keymapv1.EditorType_INTELLIJ_COMMUNITY:
 		return EditorTypeIntelliJCommunity
-	case keymapv1.EditorType_INTELLIJ_PYCHARM:
+	case keymapv1.EditorType_PYCHARM:
 		return EditorTypePyCharm
-	case keymapv1.EditorType_INTELLIJ_WEBSTORM:
+	case keymapv1.EditorType_WEBSTORM:
 		return EditorTypeWebStorm
-	case keymapv1.EditorType_INTELLIJ_CLION:
+	case keymapv1.EditorType_CLION:
 		return EditorTypeClion
-	case keymapv1.EditorType_INTELLIJ_PHPSTORM:
+	case keymapv1.EditorType_PHPSTORM:
 		return EditorTypePhpStorm
-	case keymapv1.EditorType_INTELLIJ_RUBYMINE:
+	case keymapv1.EditorType_RUBYMINE:
 		return EditorTypeRubyMine
-	case keymapv1.EditorType_INTELLIJ_GOLAND:
+	case keymapv1.EditorType_GOLAND:
 		return EditorTypeGoLand
 	case keymapv1.EditorType_ZED:
 		return EditorTypeZed

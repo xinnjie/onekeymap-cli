@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -14,15 +15,20 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
+	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
 
 	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 )
 
-const (
-	// NOTE: use go build -ldflags "-X github.com/xinnjie/onekeymap-cli/internal/cmd/version=$(git describe)"
+var (
+	// NOTE: use go build -ldflags "-X github.com/xinnjie/onekeymap-cli/internal/cmd.version=$(git describe)"
 	version = "dev"
+	//nolint:gochecknoglobals // use go build -ldflags "-X github.com/xinnjie/onekeymap-cli/internal/cmd.commit=$(git describe)"
+	commit = "unknown"
+	//nolint:gochecknoglobals // use go build -ldflags "-X github.com/xinnjie/onekeymap-cli/internal/cmd.dirty=$(git describe)"
+	dirty = "unknown"
 )
 
 //nolint:gochecknoglobals // TODO(xinnjie): Stop using these global variables. But for now I can not think of a better way.
@@ -44,6 +50,7 @@ type rootFlags struct {
 	interactive     bool
 	enableTelemetry bool
 	sandbox         bool
+	skipUpdateCheck bool
 }
 
 func NewCmdRoot() *cobra.Command {
@@ -52,7 +59,7 @@ func NewCmdRoot() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:              "onekeymap-cli",
 		Short:            "A tool to import, export, and synchronize keyboard shortcuts between editors.",
-		Version:          version,
+		Version:          buildVersionString(),
 		PersistentPreRun: rootPersistentPreRun(&f),
 		PersistentPostRun: func(cmd *cobra.Command, _ []string) {
 			if err := cmdRecorder.Shutdown(cmd.Context()); err != nil {
@@ -70,6 +77,8 @@ func NewCmdRoot() *cobra.Command {
 		BoolVar(&f.enableTelemetry, "telemetry", false, "Enable OpenTelemetry to help improve onekeymap")
 	cmd.PersistentFlags().
 		BoolVar(&f.sandbox, "sandbox", false, "Enable sandbox mode for macOS, restricting file access")
+	cmd.PersistentFlags().
+		BoolVar(&f.skipUpdateCheck, "skip-update-check", false, "Skip checking for updates")
 
 	if err := viper.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose")); err != nil {
 		cmd.PrintErrf("Error binding verbose flag: %v\n", err)
@@ -102,6 +111,8 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		verbose := viper.GetBool("verbose")
 		quiet := viper.GetBool("quiet")
 		logJSON := viper.GetBool("log-json")
+		sandbox := viper.GetBool("sandbox")
+		ctx := cmd.Context()
 
 		cmdMappingConfig, err = mappings.NewMappingConfig()
 		if err != nil {
@@ -180,6 +191,12 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 
 		cmdImportService = internal.NewImportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
 		cmdExportService = internal.NewExportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger)
+
+		// Check for updates asynchronously
+		if !sandbox && !f.skipUpdateCheck {
+			checker := updatecheck.New(version, cmdLogger)
+			checker.CheckForUpdate(ctx)
+		}
 	}
 }
 
@@ -199,4 +216,22 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func buildVersionString() string {
+	commitID := commit
+	if commitID == "" {
+		commitID = "unknown"
+	}
+
+	status := dirty
+	if status == "" {
+		status = "unknown"
+	}
+
+	if version == "dev" {
+		return fmt.Sprintf("%s (commit: %s, dirty: %s)", version, commitID, status)
+	}
+
+	return version
 }

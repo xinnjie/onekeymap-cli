@@ -6,12 +6,6 @@ import (
 	"github.com/charmbracelet/huh"
 )
 
-const (
-	keyCtrlC = "ctrl+c"
-	keyEsc   = "esc"
-	keyQ     = "q"
-)
-
 type editorSelectorOption struct {
 	displayName string
 	editorType  string
