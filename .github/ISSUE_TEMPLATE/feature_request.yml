@@ -24,7 +24,7 @@ body:
       description: Describe the solution you'd like to see
       placeholder: A clear and concise description of what you want to happen
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: example
