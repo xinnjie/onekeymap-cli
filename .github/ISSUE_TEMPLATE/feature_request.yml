@@ -1,0 +1,39 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for onekeymap-cli
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible to help us understand your request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem? Please describe the problem or limitation you're experiencing.
+      placeholder: "I'm always frustrated when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see
+      placeholder: A clear and concise description of what you want to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Usage Example
+      description: Show how you would use this feature with example commands
+      placeholder: |
+        $ onekeymap-cli [new-command] [flags]
+        # Expected output or behavior
+      render: shell
+    validations:
+      required: false
