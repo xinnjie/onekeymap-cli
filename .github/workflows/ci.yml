@@ -1,0 +1,46 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  golangci:
+    name: Lint
+    runs-on: ubuntu-latest
+    # Prevent duplicate builds on internal PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.4.0
+          args: --timeout 3m0s
+
+  build:
+    name: Test with Go
+    runs-on: ubuntu-latest
+    # Prevent duplicate builds on internal PRs.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v -race ./...
