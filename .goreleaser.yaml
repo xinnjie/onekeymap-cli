@@ -45,6 +45,9 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        formats: ['zip']
     files:
       - README.md
       - LICENSE.md
@@ -54,7 +57,7 @@ checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  version_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-devel"
 
 changelog:
   sort: asc
@@ -79,7 +82,8 @@ release:
 
     ### macOS
     ```bash
-    brew install xinnjie/homebrew-onekeymap/onekeymap-cli
+    brew tap xinnjie/onekeymap
+    brew install onekeymap-cli
     ```
 
     ### Linux
@@ -110,6 +114,29 @@ release:
 
     ### Windows
     Extract the zip file and add the directory to your PATH.
+
+winget:
+  - name: onekeymap-cli
+    publisher: xinnjie
+    license: MIT
+    license_url: "https://github.com/xinnjie/onekeymap-cli/blob/main/LICENSE.md"
+    homepage: https://github.com/xinnjie/onekeymap-cli
+    short_description: "Universal keymap configuration tool for VSCode, Zed, IntelliJ and more"
+    description: |
+      OneKeymap CLI is a powerful command-line tool that lets you import, export, and synchronize keyboard shortcuts between VSCode, IntelliJ IDEA, Zed, Helix, and more.
+      Stop reconfiguring keybindings every time you switch editors—maintain one universal keymap and deploy it everywhere.
+    repository:
+      owner: xinnjie
+      name: winget-pkgs
+      branch: "onekeymap-cli-{{.Version}}"
+      token: "{{ .Env.WINGET_GITHUB_TOKEN }}"
+      pull_request:
+        enabled: true
+        draft: true
+        base:
+          owner: microsoft
+          name: winget-pkgs
+          branch: master
 
 homebrew_casks:
   - name: onekeymap-cli

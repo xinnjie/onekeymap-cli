@@ -28,7 +28,8 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
 
 - **Homebrew**
   ```bash
-  brew install xinnjie/homebrew-onekeymap/onekeymap-cli
+  brew tap xinnjie/onekeymap
+  brew install onekeymap-cli
   ```
 
 #### Linux
@@ -50,7 +51,11 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
   ```
 
 #### Windows
-
+<!-- TODO(xinnjie): uncomment when winget is available -->
+<!-- - **Winget** (Recommended)
+  ```powershell
+  winget install xinnjie.onekeymap-cli
+  ``` -->
 - **Zip Archive**
   Download `onekeymap-cli_Windows_<arch>.zip` from [GitHub Releases](https://github.com/xinnjie/onekeymap-cli/releases), extract it, and add the directory to your PATH, or run:
   ```powershell
