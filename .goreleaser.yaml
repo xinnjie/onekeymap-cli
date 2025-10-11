@@ -82,10 +82,30 @@ release:
     brew install xinnjie/homebrew-onekeymap/onekeymap-cli
     ```
 
-    ### Linux/macOS (manual)
+    ### Linux
+
+    #### Debian/Ubuntu (deb)
+    ```bash
+    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Version}}/onekeymap-cli_{{.Version}}_x86_64.deb
+    sudo dpkg -i onekeymap-cli_{{.Version}}_x86_64.deb
+    ```
+
+    #### Fedora/RHEL/CentOS (rpm)
+    ```bash
+    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Version}}/onekeymap-cli_{{.Version}}_x86_64.rpm
+    sudo rpm -i onekeymap-cli_{{.Version}}_x86_64.rpm
+    ```
+
+    #### Alpine (apk)
+    ```bash
+    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Version}}/onekeymap-cli_{{.Version}}_x86_64.apk
+    sudo apk add --allow-untrusted onekeymap-cli_{{.Version}}_x86_64.apk
+    ```
+
+    #### Manual installation (Linux/macOS)
     ```bash
     tar -xzf onekeymap-cli_*.tar.gz
-    sudo mv onekeymap /usr/local/bin/
+    sudo mv onekeymap-cli /usr/local/bin/
     ```
 
     ### Windows
@@ -109,3 +129,44 @@ homebrew_casks:
 universal_binaries:
 - replace: true
   name_template: 'onekeymap-cli'
+
+nfpms:
+  - id: onekeymap-cli
+    package_name: onekeymap-cli
+    file_name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    vendor: xinnjie
+    homepage: https://github.com/xinnjie/onekeymap-cli
+    maintainer: xinnjie
+    description: Universal keymap configuration tool for VSCode, Zed, IntelliJ and more
+    license: MIT
+    formats:
+      - deb
+      - rpm
+      - apk
+    bindir: /usr/bin
+    contents:
+      - src: ./completions/onekeymap-cli.bash
+        dst: /usr/share/bash-completion/completions/onekeymap-cli
+        file_info:
+          mode: 0644
+      - src: ./completions/_onekeymap-cli
+        dst: /usr/share/zsh/site-functions/_onekeymap-cli
+        file_info:
+          mode: 0644
+      - src: ./completions/onekeymap-cli.fish
+        dst: /usr/share/fish/vendor_completions.d/onekeymap-cli.fish
+        file_info:
+          mode: 0644
+      - src: ./LICENSE.md
+        dst: /usr/share/doc/onekeymap-cli/LICENSE.md
+        file_info:
+          mode: 0644
+      - src: ./README.md
+        dst: /usr/share/doc/onekeymap-cli/README.md
+        file_info:
+          mode: 0644
