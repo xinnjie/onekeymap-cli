@@ -86,19 +86,19 @@ release:
 
     #### Debian/Ubuntu (deb)
     ```bash
-    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Version}}/onekeymap-cli_{{.Version}}_x86_64.deb
+    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Tag}}/onekeymap-cli_{{.Version}}_x86_64.deb
     sudo dpkg -i onekeymap-cli_{{.Version}}_x86_64.deb
     ```
 
     #### Fedora/RHEL/CentOS (rpm)
     ```bash
-    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Version}}/onekeymap-cli_{{.Version}}_x86_64.rpm
+    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Tag}}/onekeymap-cli_{{.Version}}_x86_64.rpm
     sudo rpm -i onekeymap-cli_{{.Version}}_x86_64.rpm
     ```
 
     #### Alpine (apk)
     ```bash
-    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Version}}/onekeymap-cli_{{.Version}}_x86_64.apk
+    wget https://github.com/xinnjie/onekeymap-cli/releases/download/{{.Tag}}/onekeymap-cli_{{.Version}}_x86_64.apk
     sudo apk add --allow-untrusted onekeymap-cli_{{.Version}}_x86_64.apk
     ```
 
