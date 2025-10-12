@@ -15,8 +15,10 @@
 
 OneKeymap CLI is a powerful command-line tool that lets you import, export, and synchronize keyboard shortcuts between VSCode, IntelliJ IDEA, Zed, Helix, and more. Stop reconfiguring keybindings every time you switch editors—maintain one universal keymap and deploy it everywhere.
 
-[![asciicast](https://asciinema.org/a/746874.svg)](https://asciinema.org/a/746874)
-
+| Import Keymap | View Keymap | Export Keymap |
+|---|---|---|
+| [<img src="assets/onekeymap-cli-import.gif" width="600" alt="Import Demo">](https://asciinema.org/a/748300) | [<img src="assets/onekeymap-cli-view.gif" width="600" alt="View Demo">](https://asciinema.org/a/ZNqGYNMKs0jVh5qH6Smv6ysni) | [<img src="assets/onekeymap-cli-export.gif" width="600" alt="Export Demo">](https://asciinema.org/a/748319) |
+| Auto-detects your editor's keymap file and lets you know keybindings to import. | View keybindings by category and navigate with arrow keys. | Shows a diff of your target keymap file before exporting. |
 
 ---
 
@@ -36,23 +38,24 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
 
 - **Debian/Ubuntu (.deb)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v<version>/onekeymap-cli_<version>_x86_64.deb
-  sudo dpkg -i onekeymap-cli_<version>_x86_64.deb
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.2.3/onekeymap-cli_0.2.3_x86_64.deb
+  sudo dpkg -i onekeymap-cli_0.2.3_x86_64.deb
   ```
 - **Fedora/RHEL/CentOS (.rpm)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v<version>/onekeymap-cli_<version>_x86_64.rpm
-  sudo rpm -i onekeymap-cli_<version>_x86_64.rpm
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.2.3/onekeymap-cli_0.2.3_x86_64.rpm
+  sudo rpm -i onekeymap-cli_0.2.3_x86_64.rpm
   ```
 - **Alpine (.apk)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v<version>/onekeymap-cli_<version>_x86_64.apk
-  sudo apk add --allow-untrusted onekeymap-cli_<version>_x86_64.apk
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.2.3/onekeymap-cli_0.2.3_x86_64.apk
+  sudo apk add --allow-untrusted onekeymap-cli_0.2.3_x86_64.apk
   ```
 
 #### Windows
 <!-- TODO(xinnjie): uncomment when winget is available -->
 <!-- - **Winget** (Recommended)
+
   ```powershell
   winget install xinnjie.onekeymap-cli
   ``` -->
@@ -162,7 +165,8 @@ Contributions are welcome! Check out the [Contributing Guide](CONTRIBUTING.md) f
 
 ---
 
-## How It Works
+<details>
+<summary><strong>How It Works</strong></summary>
 
 OneKeymap uses a **universal keymap format** that represents keyboard shortcuts in an editor-agnostic way. Here's the workflow:
 
@@ -219,6 +223,7 @@ OneKeymap maintains a comprehensive mapping that translates between editor-speci
   - Zed: `editor::Copy`
 
 This mapping layer handles context-specific behaviors, stateful toggles, and editor quirks automatically.
+</details>
 
 ---
 
