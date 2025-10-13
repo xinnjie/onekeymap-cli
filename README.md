@@ -229,6 +229,6 @@ This mapping layer handles context-specific behaviors, stateful toggles, and edi
 
 ## ✨ Companion App: OneKeymap GUI
 
-Prefer a polished interface? Take a look at [OneKeymap.app](https://onekeymap-landing-page.vercel.app/)—a paid GUI companion built on top of the CLI. `onekeymap-cli` will always remain free and open; the app is simply an optional bonus for those who enjoy visual workflows.
+Prefer a polished interface? Take a look at [OneKeymap.app](https://www.onekeymap.com/)—a paid GUI companion built on top of the CLI. `onekeymap-cli` will always remain free and open; the app is simply an optional bonus for those who enjoy visual workflows.
 
 ---
