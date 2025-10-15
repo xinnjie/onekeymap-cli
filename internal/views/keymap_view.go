@@ -1,12 +1,13 @@
 package views
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
@@ -17,30 +18,136 @@ import (
 const (
 	columnWidthActionName = 48
 	columnWidthKeybinding = 30
-	viewHeightMargin      = 7
 	minViewHeight         = 6
+	categoryPanelWidth    = 25
+	viewHeightMargin      = 7
 )
 
 var _ tea.Model = (*KeymapViewModel)(nil)
 
-type CategoryViewModel struct {
-	categories []string
-	selected   int
-	mc         *mappings.MappingConfig
+// KeymapViewModel is a read-only TUI model to present current OneKeymapSetting.
+type KeymapViewModel struct {
+	setting *keymapv1.Keymap
+	mc      *mappings.MappingConfig
+
+	// category selection
+	categories       []string
+	selectedCategory string
+	categorySelect   *huh.Select[string]
+	actionTable      table.Model
+
+	width, height int
 }
 
-func newCategoryViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) CategoryViewModel {
-	cv := CategoryViewModel{
-		mc: mc,
+func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) tea.Model {
+	m := &KeymapViewModel{
+		setting: setting,
+		mc:      mc,
 	}
-	cv.initCategories(setting)
-	return cv
+	m.initCategories()
+	m.selectedCategory = "All"
+
+	// Create huh.Select for categories
+	options := make([]huh.Option[string], len(m.categories))
+	for i, cat := range m.categories {
+		options[i] = huh.NewOption(cat, cat)
+	}
+	m.categorySelect = huh.NewSelect[string]().
+		Title("Categories").
+		Options(options...).
+		Value(&m.selectedCategory)
+
+	m.actionTable = table.New(
+		table.WithColumns(
+			[]table.Column{
+				{Title: "Action", Width: columnWidthActionName},
+				{Title: "Keybinding", Width: columnWidthKeybinding},
+			},
+		),
+		table.WithRows(m.keybindingRows()),
+		table.WithFocused(true),
+	)
+	return m
 }
 
-func (cv *CategoryViewModel) initCategories(setting *keymapv1.Keymap) {
+func (m *KeymapViewModel) Init() tea.Cmd {
+	return m.categorySelect.Init()
+}
+
+func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		// nolint:goconst // key strings for TUI input are clearer inline here
+		case "ctrl+c", "esc", "q":
+			return m, tea.Quit
+		case "tab":
+			// Move to next category
+			m.moveToNextCategory(1)
+			m.actionTable.SetRows(m.keybindingRows())
+		case "shift+tab":
+			// Move to previous category
+			m.moveToNextCategory(-1)
+			m.actionTable.SetRows(m.keybindingRows())
+		}
+	case tea.WindowSizeMsg:
+		h := msg.Height - viewHeightMargin
+		if h < minViewHeight {
+			h = minViewHeight
+		}
+		m.width, m.height = msg.Width, h
+		m.actionTable.SetHeight(h)
+	}
+
+	var tableCmd tea.Cmd
+	m.actionTable, tableCmd = m.actionTable.Update(msg)
+	cmds = append(cmds, tableCmd)
+
+	return m, tea.Batch(cmds...)
+}
+
+func (m *KeymapViewModel) View() string {
+	help := "OneKeymap Viewer (read-only)  —  Use ↑/↓ navigate, Tab/Shift+Tab to switch category, q to quit\n\n"
+
+	// Left panel: category select
+	categoryPanel := lipgloss.NewStyle().
+		Width(categoryPanelWidth).
+		Border(lipgloss.RoundedBorder()).
+		Padding(1).
+		Render(m.categorySelect.View())
+
+	// Right panel: table and details
+	rightPanelContent := m.actionTable.View() + "\n"
+	selectedID := m.selectedActionID()
+	if selectedID != "" {
+		details := newActionDetailsViewModel(selectedID, m.mc)
+		rightPanelContent += details.View()
+	}
+
+	rightPanel := lipgloss.NewStyle().
+		Width(m.width - categoryPanelWidth).
+		Render(rightPanelContent)
+
+	body := lipgloss.JoinHorizontal(lipgloss.Top, categoryPanel, rightPanel)
+	body = lipgloss.JoinVertical(lipgloss.Top, body, help)
+
+	return body
+}
+
+func (m *KeymapViewModel) selectedActionID() string {
+	row := m.actionTable.SelectedRow()
+	if len(row) == 0 {
+		return ""
+	}
+	return row[0]
+}
+
+func (m *KeymapViewModel) initCategories() {
 	catSet := map[string]struct{}{}
-	for _, kb := range setting.GetActions() {
-		if mapping := cv.mc.FindByUniversalAction(kb.GetName()); mapping != nil {
+	for _, kb := range m.setting.GetActions() {
+		if mapping := m.mc.FindByUniversalAction(kb.GetName()); mapping != nil {
 			if mapping.Category != "" {
 				catSet[mapping.Category] = struct{}{}
 			}
@@ -51,151 +158,48 @@ func (cv *CategoryViewModel) initCategories(setting *keymapv1.Keymap) {
 		cats = append(cats, c)
 	}
 	sort.Strings(cats)
-	cv.categories = append([]string{"All"}, cats...)
+	m.categories = append([]string{"All"}, cats...)
 }
 
-func (cv *CategoryViewModel) SelectPrev() bool {
-	if cv.selected > 0 {
-		cv.selected--
+func (m *KeymapViewModel) moveToNextCategory(delta int) {
+	if len(m.categories) == 0 {
+		return
+	}
+
+	// Find current index
+	currentIdx := 0
+	for i, cat := range m.categories {
+		if cat == m.selectedCategory {
+			currentIdx = i
+			break
+		}
+	}
+
+	// Calculate next index with wrapping
+	nextIdx := (currentIdx + delta) % len(m.categories)
+	if nextIdx < 0 {
+		nextIdx += len(m.categories)
+	}
+
+	m.selectedCategory = m.categories[nextIdx]
+	m.categorySelect.Value(&m.selectedCategory)
+}
+
+func (m *KeymapViewModel) includeAction(actionID string) bool {
+	if m.selectedCategory == "All" {
 		return true
+	}
+	if mapping := m.mc.FindByUniversalAction(actionID); mapping != nil {
+		return mapping.Category == m.selectedCategory
 	}
 	return false
 }
 
-func (cv *CategoryViewModel) SelectNext() bool {
-	if cv.selected < len(cv.categories)-1 {
-		cv.selected++
-		return true
-	}
-	return false
-}
-
-func (cv *CategoryViewModel) Include(actionID string) bool {
-	if cv.selected == 0 {
-		return true
-	}
-	cat := cv.categories[cv.selected]
-	if mapping := cv.mc.FindByUniversalAction(actionID); mapping != nil {
-		return mapping.Category == cat
-	}
-	return false
-}
-
-func (cv *CategoryViewModel) View() string {
-	var b strings.Builder
-	for i, c := range cv.categories {
-		if i == cv.selected {
-			b.WriteString(fmt.Sprintf("[ %s ] ", c))
-			continue
-		}
-		b.WriteString(fmt.Sprintf("  %s   ", c))
-	}
-	return b.String()
-}
-
-// KeymapViewModel is a read-only TUI model to present current OneKeymapSetting.
-type KeymapViewModel struct {
-	setting *keymapv1.Keymap
-	mc      *mappings.MappingConfig
-
-	// derived state
-	category CategoryViewModel
-
-	rows  []table.Row
-	table table.Model
-
-	width, height int
-}
-
-func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) tea.Model {
-	m := &KeymapViewModel{
-		setting: setting,
-		mc:      mc,
-	}
-	m.category = newCategoryViewModel(setting, mc)
-	m.rebuildRows()
-	m.table = table.New(
-		table.WithColumns(
-			[]table.Column{
-				{Title: "Action", Width: columnWidthActionName},
-				{Title: "Keybinding", Width: columnWidthKeybinding},
-			},
-		),
-		table.WithRows(m.rows),
-		table.WithFocused(true),
-	)
-	return m
-}
-
-func (m *KeymapViewModel) Init() tea.Cmd { return nil }
-
-func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		// nolint:goconst // key strings for TUI input are clearer inline here
-		case "ctrl+c", "esc", "q":
-			return m, tea.Quit
-		case "left":
-			if m.category.SelectPrev() {
-				m.rebuildRows()
-				m.table.SetRows(m.rows)
-			}
-		case "right":
-			if m.category.SelectNext() {
-				m.rebuildRows()
-				m.table.SetRows(m.rows)
-			}
-		}
-	case tea.WindowSizeMsg:
-		m.width, m.height = msg.Width, msg.Height
-		// leave 5 lines for headers/help/detail; adjust table height
-		h := m.height - viewHeightMargin
-		if h < minViewHeight {
-			h = minViewHeight
-		}
-		m.table.SetHeight(h)
-	}
-	var cmd tea.Cmd
-	m.table, cmd = m.table.Update(msg)
-	return m, cmd
-}
-
-func (m *KeymapViewModel) View() string {
-	var b strings.Builder
-	// Header title
-	b.WriteString("OneKeymap Viewer (read-only)  —  Use ←/→ switch category, ↑/↓ navigate, q to quit\n")
-	// Categories
-	b.WriteString("Categories: ")
-	b.WriteString(m.category.View())
-	b.WriteString("\n\n")
-
-	// Table
-	b.WriteString(m.table.View())
-	b.WriteString("\n")
-
-	// Detail of selected row
-	selectedID := m.selectedActionID()
-	if selectedID != "" {
-		details := newActionDetailsViewModel(selectedID, m.mc)
-		b.WriteString(details.View())
-	}
-	return b.String()
-}
-
-func (m *KeymapViewModel) selectedActionID() string {
-	row := m.table.SelectedRow()
-	if len(row) == 0 {
-		return ""
-	}
-	return row[0]
-}
-
-func (m *KeymapViewModel) rebuildRows() {
+func (m *KeymapViewModel) keybindingRows() []table.Row {
 	// Aggregate keybindings by action id
 	agg := map[string][]string{}
 	for _, ab := range m.setting.GetActions() {
-		if !m.category.Include(ab.GetName()) {
+		if !m.includeAction(ab.GetName()) {
 			continue
 		}
 		for _, b := range ab.GetBindings() {
@@ -225,7 +229,7 @@ func (m *KeymapViewModel) rebuildRows() {
 		}()
 		rows = append(rows, table.Row{d, strings.Join(keys, " or ")})
 	}
-	m.rows = rows
+	return rows
 }
 
 func dedup(in []string) []string {
