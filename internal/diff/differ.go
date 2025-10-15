@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 	"regexp"
 
 	"github.com/yudai/gojsondiff"
@@ -104,16 +105,37 @@ func normalizeToJSONValue(v any) (any, error) {
 	switch x := v.(type) {
 	case map[string]any, []any:
 		return x, nil
-	default:
-		// JSON round trip to convert strong types into generic maps/slices
-		raw, err := json.Marshal(v)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal value to JSON: %w", err)
-		}
-		var out any
-		if err := json.Unmarshal(raw, &out); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal value from JSON: %w", err)
-		}
-		return out, nil
 	}
+
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.Map:
+		if rv.IsNil() {
+			return map[string]any{}, nil
+		}
+	case reflect.Slice:
+		if rv.IsNil() {
+			return []any{}, nil
+		}
+	}
+
+	// JSON round trip to convert strong types into generic maps/slices
+	raw, err := json.Marshal(v)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal value to JSON: %w", err)
+	}
+	var out any
+	if err := json.Unmarshal(raw, &out); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal value from JSON: %w", err)
+	}
+	if out == nil {
+		switch rv.Kind() {
+		case reflect.Map:
+			return map[string]any{}, nil
+		case reflect.Slice:
+			return []any{}, nil
+		}
+		return []any{}, nil
+	}
+	return out, nil
 }
