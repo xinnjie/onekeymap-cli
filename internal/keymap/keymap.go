@@ -17,8 +17,114 @@ const (
 )
 
 var (
-	errInvalidConfig = errors.New("invalid config format: 'keymaps' field is missing or null")
+	errInvalidConfig = errors.New("invalid config format: 'keymaps' field is missing")
 )
+
+// Load reads from the given reader, parses the user config file format,
+// and converts it into the internal KeymapSetting proto message.
+func Load(reader io.Reader) (*keymapv1.Keymap, error) {
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(bytes.TrimSpace(data)) == 0 {
+		return &keymapv1.Keymap{}, nil
+	}
+
+	friendlyData, err := parseOneKeymapSetting(data)
+	if err != nil {
+		return nil, err
+	}
+
+	setting := &keymapv1.Keymap{}
+	// Group keybindings by Id ONLY. Preserve insertion order of first appearance.
+	grouped := make(map[string]*keymapv1.Action)
+	order := make([]string, 0)
+
+	for _, fk := range friendlyData.Keymaps {
+		key := fk.ID
+		ab, ok := grouped[key]
+		if !ok {
+			ab = newAction(fk)
+			grouped[key] = ab
+			order = append(order, key)
+		} else {
+			mergeActionMetadata(ab, fk)
+		}
+
+		for _, keybindingStr := range fk.Keybinding {
+			kb, err := ParseKeyBinding(keybindingStr, "+")
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.ID, err)
+			}
+			ab.Bindings = append(
+				ab.Bindings,
+				&keymapv1.KeybindingReadable{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr},
+			)
+		}
+	}
+
+	for _, k := range order {
+		setting.Actions = append(setting.Actions, grouped[k])
+	}
+
+	return setting, nil
+}
+
+// Save takes a KeymapSetting proto message and writes it to the given writer
+// in the user config file format.
+func Save(writer io.Writer, setting *keymapv1.Keymap) error {
+	friendlyData := OneKeymapSetting{}
+	friendlyData.Keymaps = make([]OneKeymapConfig, 0)
+	friendlyData.Version = configVersion
+	// Group keybindings by a composite key of Id and Comment.
+	type groupKey struct {
+		ID          string
+		Comment     string
+		Description string
+	}
+	groupedKeybindings := make(map[groupKey]*OneKeymapConfig)
+
+	for _, k := range setting.GetActions() {
+		var description, displayName string
+		if k.GetActionConfig() != nil {
+			description = k.GetActionConfig().GetDescription()
+			displayName = k.GetActionConfig().GetDisplayName()
+		}
+		key := groupKey{ID: k.GetName(), Comment: k.GetComment(), Description: description}
+		config, ok := groupedKeybindings[key]
+		if !ok {
+			config = &OneKeymapConfig{
+				ID:          k.GetName(),
+				Comment:     k.GetComment(),
+				Description: description,
+				Name:        displayName,
+			}
+			groupedKeybindings[key] = config
+		}
+
+		for _, b := range k.GetBindings() {
+			if b == nil || len(b.GetKeyChords().GetChords()) == 0 {
+				continue
+			}
+			binding := NewKeyBinding(b)
+			keys, err := binding.Format(platform.PlatformMacOS, "+")
+			if err != nil {
+				return err
+			}
+			config.Keybinding = append(config.Keybinding, keys)
+		}
+	}
+
+	for _, config := range groupedKeybindings {
+		friendlyData.Keymaps = append(friendlyData.Keymaps, *config)
+	}
+
+	encoder := json.NewEncoder(writer)
+	encoder.SetIndent("", "  ") // Use 2 spaces for indentation
+	return encoder.Encode(friendlyData)
+}
 
 // OneKeymapConfig is a struct that matches the user config file format.
 type OneKeymapConfig struct {
@@ -133,111 +239,36 @@ func mergeActionMetadata(ab *keymapv1.Action, fk OneKeymapConfig) {
 	}
 }
 
-// Load reads from the given reader, parses the user config file format,
-// and converts it into the internal KeymapSetting proto message.
-func Load(reader io.Reader) (*keymapv1.Keymap, error) {
-	data, err := io.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(bytes.TrimSpace(data)) == 0 {
-		return &keymapv1.Keymap{}, nil
+// parseOneKeymapSetting parses the raw JSON into `OneKeymapSetting` and returns
+// `errInvalidConfig` when `keymaps` is explicitly null or absent while other
+// unsupported top-level fields exist.
+func parseOneKeymapSetting(data []byte) (OneKeymapSetting, error) {
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return OneKeymapSetting{}, err
 	}
 
 	var friendlyData OneKeymapSetting
 	if err := json.Unmarshal(data, &friendlyData); err != nil {
-		return nil, err
+		return OneKeymapSetting{}, err
 	}
 
-	if friendlyData.Keymaps == nil {
-		return nil, errInvalidConfig
-	}
-
-	setting := &keymapv1.Keymap{}
-	// Group keybindings by Id ONLY. Preserve insertion order of first appearance.
-	grouped := make(map[string]*keymapv1.Action)
-	order := make([]string, 0)
-
-	for _, fk := range friendlyData.Keymaps {
-		key := fk.ID
-		ab, ok := grouped[key]
-		if !ok {
-			ab = newAction(fk)
-			grouped[key] = ab
-			order = append(order, key)
-		} else {
-			mergeActionMetadata(ab, fk)
-		}
-
-		for _, keybindingStr := range fk.Keybinding {
-			kb, err := ParseKeyBinding(keybindingStr, "+")
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.ID, err)
-			}
-			ab.Bindings = append(
-				ab.Bindings,
-				&keymapv1.KeybindingReadable{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr},
-			)
+	var (
+		unknownFieldsPresent bool
+	)
+	for field := range raw {
+		switch field {
+		case "keymaps":
+		case "version":
+			// allowed field
+		default:
+			unknownFieldsPresent = true
 		}
 	}
 
-	for _, k := range order {
-		setting.Actions = append(setting.Actions, grouped[k])
+	if len(friendlyData.Keymaps) == 0 && unknownFieldsPresent {
+		return OneKeymapSetting{}, errInvalidConfig
 	}
 
-	return setting, nil
-}
-
-// Save takes a KeymapSetting proto message and writes it to the given writer
-// in the user config file format.
-func Save(writer io.Writer, setting *keymapv1.Keymap) error {
-	friendlyData := OneKeymapSetting{}
-	friendlyData.Version = configVersion
-	// Group keybindings by a composite key of Id and Comment.
-	type groupKey struct {
-		ID          string
-		Comment     string
-		Description string
-	}
-	groupedKeybindings := make(map[groupKey]*OneKeymapConfig)
-
-	for _, k := range setting.GetActions() {
-		var description, displayName string
-		if k.GetActionConfig() != nil {
-			description = k.GetActionConfig().GetDescription()
-			displayName = k.GetActionConfig().GetDisplayName()
-		}
-		key := groupKey{ID: k.GetName(), Comment: k.GetComment(), Description: description}
-		config, ok := groupedKeybindings[key]
-		if !ok {
-			config = &OneKeymapConfig{
-				ID:          k.GetName(),
-				Comment:     k.GetComment(),
-				Description: description,
-				Name:        displayName,
-			}
-			groupedKeybindings[key] = config
-		}
-
-		for _, b := range k.GetBindings() {
-			if b == nil || len(b.GetKeyChords().GetChords()) == 0 {
-				continue
-			}
-			binding := NewKeyBinding(b)
-			keys, err := binding.Format(platform.PlatformMacOS, "+")
-			if err != nil {
-				return err
-			}
-			config.Keybinding = append(config.Keybinding, keys)
-		}
-	}
-
-	for _, config := range groupedKeybindings {
-		friendlyData.Keymaps = append(friendlyData.Keymaps, *config)
-	}
-
-	encoder := json.NewEncoder(writer)
-	encoder.SetIndent("", "  ") // Use 2 spaces for indentation
-	return encoder.Encode(friendlyData)
+	return friendlyData, nil
 }

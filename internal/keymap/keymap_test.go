@@ -239,7 +239,8 @@ func TestLoad(t *testing.T) {
 		{
 			name:      "Empty keymaps array",
 			jsonInput: `{"keymaps": null }`,
-			expectErr: true,
+			expected:  &keymapv1.Keymap{},
+			expectErr: false,
 		},
 		{
 			name:      "Unknown field",
