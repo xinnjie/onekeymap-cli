@@ -83,7 +83,7 @@ func (e EditorType) AppName() string {
 	case EditorTypeCursor:
 		return "Cursor"
 	case EditorTypeIntelliJ:
-		return "IntelliJ IDEA Ultimate"
+		return "IntelliJ IDEA"
 	case EditorTypeIntelliJCommunity:
 		return "IntelliJ IDEA Community"
 	case EditorTypePyCharm:
