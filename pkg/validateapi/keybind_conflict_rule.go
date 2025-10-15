@@ -66,7 +66,7 @@ func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *Val
 
 				// Try to get editor command from mapping config
 				if mappingConfig != nil {
-					if mapping := mappingConfig.FindByUniversalAction(kb.GetName()); mapping != nil {
+					if mapping := mappingConfig.Get(kb.GetName()); mapping != nil {
 						// Get editor command based on source editor from report
 						editorCommand := getEditorCommand(mapping, validationContext.Report.GetSourceEditor())
 						action.EditorCommand = editorCommand

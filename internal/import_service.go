@@ -249,7 +249,7 @@ func (s *importService) decorateAction(kb *keymapv1.Action) {
 		return
 	}
 
-	if cfg := s.mappingConfig.FindByUniversalAction(kb.GetName()); cfg != nil {
+	if cfg := s.mappingConfig.Get(kb.GetName()); cfg != nil {
 		if kb.GetActionConfig() == nil {
 			kb.ActionConfig = &keymapv1.ActionConfig{}
 		}

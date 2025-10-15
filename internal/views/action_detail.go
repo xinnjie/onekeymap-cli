@@ -18,7 +18,7 @@ func newActionDetailsViewModel(actionID string, mc *mappings.MappingConfig) Acti
 	if mc == nil {
 		return d
 	}
-	if mapping := mc.FindByUniversalAction(actionID); mapping != nil {
+	if mapping := mc.Get(actionID); mapping != nil {
 		if mapping.Name != "" {
 			d.description = mapping.Name
 		} else if mapping.Description != "" {

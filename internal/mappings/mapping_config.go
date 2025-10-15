@@ -146,9 +146,9 @@ func load(reader io.Reader) (*MappingConfig, error) {
 	return &MappingConfig{Mappings: mergedMappings}, nil
 }
 
-// FindByUniversalAction searches for a mapping by universal action ID.
-func (mc *MappingConfig) FindByUniversalAction(action string) *ActionMappingConfig {
-	if mapping, exists := mc.Mappings[action]; exists {
+// Get searches for a mapping by universal action ID.
+func (mc *MappingConfig) Get(actionID string) *ActionMappingConfig {
+	if mapping, exists := mc.Mappings[actionID]; exists {
 		return &mapping
 	}
 	return nil

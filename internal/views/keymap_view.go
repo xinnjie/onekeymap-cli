@@ -9,18 +9,21 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 const (
 	columnWidthActionName = 48
 	columnWidthKeybinding = 30
-	minViewHeight         = 6
+	minViewHeight         = 10 // Need space for header + rows
 	categoryPanelWidth    = 25
-	viewHeightMargin      = 7
+	viewHeightMargin      = 10 // Space for help text + details
+	detailsHeight         = 8  // Estimated height for action details
+	defaultInitialWidth   = 120
+	defaultInitialHeight  = 30
+	tablePaddingWidth     = 6 // Padding for borders and spacing
+	panelBorderWidth      = 4 // Width adjustment for panel borders
 )
 
 var _ tea.Model = (*KeymapViewModel)(nil)
@@ -43,6 +46,8 @@ func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) te
 	m := &KeymapViewModel{
 		setting: setting,
 		mc:      mc,
+		width:   defaultInitialWidth,
+		height:  defaultInitialHeight,
 	}
 	m.initCategories()
 	m.selectedCategory = "All"
@@ -57,6 +62,13 @@ func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) te
 		Options(options...).
 		Value(&m.selectedCategory)
 
+	// Calculate initial table dimensions
+	initialTableWidth := m.width - categoryPanelWidth - tablePaddingWidth
+	initialTableHeight := m.height - viewHeightMargin - detailsHeight
+	if initialTableHeight < minViewHeight {
+		initialTableHeight = minViewHeight
+	}
+
 	m.actionTable = table.New(
 		table.WithColumns(
 			[]table.Column{
@@ -66,6 +78,8 @@ func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) te
 		),
 		table.WithRows(m.keybindingRows()),
 		table.WithFocused(true),
+		table.WithHeight(initialTableHeight),
+		table.WithWidth(initialTableWidth),
 	)
 	return m
 }
@@ -93,12 +107,20 @@ func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.actionTable.SetRows(m.keybindingRows())
 		}
 	case tea.WindowSizeMsg:
-		h := msg.Height - viewHeightMargin
-		if h < minViewHeight {
-			h = minViewHeight
+		m.width, m.height = msg.Width, msg.Height
+
+		// Calculate available width for table (total - category panel)
+		tableWidth := m.width - categoryPanelWidth - tablePaddingWidth
+
+		// Calculate available height for table (total - help - details - margins)
+		tableHeight := m.height - viewHeightMargin - detailsHeight
+		if tableHeight < minViewHeight {
+			tableHeight = minViewHeight
 		}
-		m.width, m.height = msg.Width, h
-		m.actionTable.SetHeight(h)
+
+		// Update table dimensions
+		m.actionTable.SetHeight(tableHeight)
+		m.actionTable.SetWidth(tableWidth)
 	}
 
 	var tableCmd tea.Cmd
@@ -109,7 +131,10 @@ func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *KeymapViewModel) View() string {
-	help := "OneKeymap Viewer (read-only)  —  Use ↑/↓ navigate, Tab/Shift+Tab to switch category, q to quit\n\n"
+	// Help text at the top
+	help := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("241")).
+		Render("OneKeymap Viewer (read-only)  —  Use ↑/↓ navigate, Tab/Shift+Tab to switch category, q to quit")
 
 	// Left panel: category select
 	categoryPanel := lipgloss.NewStyle().
@@ -119,21 +144,25 @@ func (m *KeymapViewModel) View() string {
 		Render(m.categorySelect.View())
 
 	// Right panel: table and details
-	rightPanelContent := m.actionTable.View() + "\n"
-	selectedID := m.selectedActionID()
-	if selectedID != "" {
-		details := newActionDetailsViewModel(selectedID, m.mc)
-		rightPanelContent += details.View()
+	var rightPanelContent string
+	if m.width > 0 && m.height > 0 {
+		rightPanelContent = m.actionTable.View()
+		selectedID := m.selectedActionID()
+		if selectedID != "" {
+			details := newActionDetailsViewModel(selectedID, m.mc)
+			rightPanelContent += "\n" + details.View()
+		}
 	}
 
 	rightPanel := lipgloss.NewStyle().
-		Width(m.width - categoryPanelWidth).
+		Width(m.width - categoryPanelWidth - panelBorderWidth).
 		Render(rightPanelContent)
 
-	body := lipgloss.JoinHorizontal(lipgloss.Top, categoryPanel, rightPanel)
-	body = lipgloss.JoinVertical(lipgloss.Top, body, help)
+	// Combine panels horizontally
+	mainContent := lipgloss.JoinHorizontal(lipgloss.Top, categoryPanel, rightPanel)
 
-	return body
+	// Combine help and main content vertically
+	return lipgloss.JoinVertical(lipgloss.Left, help, "", mainContent)
 }
 
 func (m *KeymapViewModel) selectedActionID() string {
@@ -141,13 +170,18 @@ func (m *KeymapViewModel) selectedActionID() string {
 	if len(row) == 0 {
 		return ""
 	}
-	return row[0]
+	for _, actionName := range m.mc.Mappings {
+		if actionName.Name == row[0] {
+			return actionName.ID
+		}
+	}
+	return ""
 }
 
 func (m *KeymapViewModel) initCategories() {
 	catSet := map[string]struct{}{}
 	for _, kb := range m.setting.GetActions() {
-		if mapping := m.mc.FindByUniversalAction(kb.GetName()); mapping != nil {
+		if mapping := m.mc.Get(kb.GetName()); mapping != nil {
 			if mapping.Category != "" {
 				catSet[mapping.Category] = struct{}{}
 			}
@@ -189,7 +223,7 @@ func (m *KeymapViewModel) includeAction(actionID string) bool {
 	if m.selectedCategory == "All" {
 		return true
 	}
-	if mapping := m.mc.FindByUniversalAction(actionID); mapping != nil {
+	if mapping := m.mc.Get(actionID); mapping != nil {
 		return mapping.Category == m.selectedCategory
 	}
 	return false
@@ -203,24 +237,29 @@ func (m *KeymapViewModel) keybindingRows() []table.Row {
 			continue
 		}
 		for _, b := range ab.GetBindings() {
-			k := keybindingToString(b)
+			k := b.GetKeyChordsReadable()
 			if k == "" {
 				continue
 			}
 			agg[ab.GetName()] = append(agg[ab.GetName()], k)
 		}
 	}
-	ids := make([]string, 0, len(agg))
-	for id := range agg {
+
+	return m.sortDeterministic(agg)
+}
+
+func (m *KeymapViewModel) sortDeterministic(action2keybindings map[string][]string) []table.Row {
+	ids := make([]string, 0, len(action2keybindings))
+	for id := range action2keybindings {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)
 
 	rows := make([]table.Row, 0, len(ids))
 	for _, id := range ids {
-		keys := dedup(agg[id])
+		keys := dedup(action2keybindings[id])
 
-		mapping := m.mc.FindByUniversalAction(id)
+		mapping := m.mc.Get(id)
 		d := func() string {
 			if mapping == nil {
 				return id
@@ -243,15 +282,4 @@ func dedup(in []string) []string {
 		out = append(out, s)
 	}
 	return out
-}
-
-func keybindingToString(kb *keymapv1.KeybindingReadable) string {
-	if kb == nil {
-		return ""
-	}
-	f, err := keymap.NewKeyBinding(kb).Format(platform.PlatformMacOS, "+")
-	if err != nil {
-		return ""
-	}
-	return f
 }

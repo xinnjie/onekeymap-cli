@@ -164,7 +164,7 @@ func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []
 	var vscodeKeybindings []vscodeKeybinding
 
 	for _, km := range setting.GetActions() {
-		mapping := e.mappingConfig.FindByUniversalAction(km.GetName())
+		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil {
 			continue
 		}

@@ -118,7 +118,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap) []Ac
 		if km == nil || len(km.GetBindings()) == 0 {
 			continue
 		}
-		mapping := e.mappingConfig.FindByUniversalAction(km.GetName())
+		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil || mapping.IntelliJ.Action == "" {
 			e.logger.Info("no mapping found for action", "action", km.GetName())
 			continue

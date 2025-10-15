@@ -147,7 +147,7 @@ func DecorateSetting(
 	}
 
 	for _, ab := range setting.GetActions() {
-		if cfg := config.FindByUniversalAction(ab.GetName()); cfg != nil {
+		if cfg := config.Get(ab.GetName()); cfg != nil {
 			if ab.GetActionConfig() == nil {
 				ab.ActionConfig = &keymapv1.ActionConfig{}
 			}
