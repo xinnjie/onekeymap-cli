@@ -23,14 +23,83 @@ const (
 
 var _ tea.Model = (*KeymapViewModel)(nil)
 
+type CategoryViewModel struct {
+	categories []string
+	selected   int
+	mc         *mappings.MappingConfig
+}
+
+func newCategoryViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) CategoryViewModel {
+	cv := CategoryViewModel{
+		mc: mc,
+	}
+	cv.initCategories(setting)
+	return cv
+}
+
+func (cv *CategoryViewModel) initCategories(setting *keymapv1.Keymap) {
+	catSet := map[string]struct{}{}
+	for _, kb := range setting.GetActions() {
+		if mapping := cv.mc.FindByUniversalAction(kb.GetName()); mapping != nil {
+			if mapping.Category != "" {
+				catSet[mapping.Category] = struct{}{}
+			}
+		}
+	}
+	cats := make([]string, 0, len(catSet))
+	for c := range catSet {
+		cats = append(cats, c)
+	}
+	sort.Strings(cats)
+	cv.categories = append([]string{"All"}, cats...)
+}
+
+func (cv *CategoryViewModel) SelectPrev() bool {
+	if cv.selected > 0 {
+		cv.selected--
+		return true
+	}
+	return false
+}
+
+func (cv *CategoryViewModel) SelectNext() bool {
+	if cv.selected < len(cv.categories)-1 {
+		cv.selected++
+		return true
+	}
+	return false
+}
+
+func (cv *CategoryViewModel) Include(actionID string) bool {
+	if cv.selected == 0 {
+		return true
+	}
+	cat := cv.categories[cv.selected]
+	if mapping := cv.mc.FindByUniversalAction(actionID); mapping != nil {
+		return mapping.Category == cat
+	}
+	return false
+}
+
+func (cv *CategoryViewModel) View() string {
+	var b strings.Builder
+	for i, c := range cv.categories {
+		if i == cv.selected {
+			b.WriteString(fmt.Sprintf("[ %s ] ", c))
+			continue
+		}
+		b.WriteString(fmt.Sprintf("  %s   ", c))
+	}
+	return b.String()
+}
+
 // KeymapViewModel is a read-only TUI model to present current OneKeymapSetting.
 type KeymapViewModel struct {
 	setting *keymapv1.Keymap
 	mc      *mappings.MappingConfig
 
 	// derived state
-	categories       []string
-	selectedCategory int
+	category CategoryViewModel
 
 	rows  []table.Row
 	table table.Model
@@ -43,7 +112,7 @@ func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) te
 		setting: setting,
 		mc:      mc,
 	}
-	m.initCategories()
+	m.category = newCategoryViewModel(setting, mc)
 	m.rebuildRows()
 	m.table = table.New(
 		table.WithColumns(
@@ -58,23 +127,6 @@ func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) te
 	return m
 }
 
-func (m *KeymapViewModel) initCategories() {
-	catSet := map[string]struct{}{}
-	for _, kb := range m.setting.GetActions() {
-		if mapping := m.mc.FindByUniversalAction(kb.GetName()); mapping != nil {
-			if mapping.Category != "" {
-				catSet[mapping.Category] = struct{}{}
-			}
-		}
-	}
-	cats := make([]string, 0, len(catSet))
-	for c := range catSet {
-		cats = append(cats, c)
-	}
-	sort.Strings(cats)
-	m.categories = append([]string{"All"}, cats...)
-}
-
 func (m *KeymapViewModel) Init() tea.Cmd { return nil }
 
 func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -85,14 +137,12 @@ func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "esc", "q":
 			return m, tea.Quit
 		case "left":
-			if m.selectedCategory > 0 {
-				m.selectedCategory--
+			if m.category.SelectPrev() {
 				m.rebuildRows()
 				m.table.SetRows(m.rows)
 			}
 		case "right":
-			if m.selectedCategory < len(m.categories)-1 {
-				m.selectedCategory++
+			if m.category.SelectNext() {
 				m.rebuildRows()
 				m.table.SetRows(m.rows)
 			}
@@ -117,13 +167,7 @@ func (m *KeymapViewModel) View() string {
 	b.WriteString("OneKeymap Viewer (read-only)  —  Use ←/→ switch category, ↑/↓ navigate, q to quit\n")
 	// Categories
 	b.WriteString("Categories: ")
-	for i, c := range m.categories {
-		if i == m.selectedCategory {
-			b.WriteString(fmt.Sprintf("[ %s ] ", c))
-		} else {
-			b.WriteString(fmt.Sprintf("  %s   ", c))
-		}
-	}
+	b.WriteString(m.category.View())
 	b.WriteString("\n\n")
 
 	// Table
@@ -133,24 +177,10 @@ func (m *KeymapViewModel) View() string {
 	// Detail of selected row
 	selectedID := m.selectedActionID()
 	if selectedID != "" {
-		m.appendSelectedActionDetails(&b, selectedID)
+		details := newActionDetailsViewModel(selectedID, m.mc)
+		b.WriteString(details.View())
 	}
 	return b.String()
-}
-
-func (m *KeymapViewModel) appendSelectedActionDetails(b *strings.Builder, selectedID string) {
-	b.WriteString("\n")
-	fmt.Fprintf(b, "Action: %s\n", selectedID)
-	if mapping := m.mc.FindByUniversalAction(selectedID); mapping != nil {
-		if mapping.Name != "" {
-			fmt.Fprintf(b, "Description: %s\n", mapping.Name)
-		} else if mapping.Description != "" {
-			fmt.Fprintf(b, "Description: %s\n", mapping.Description)
-		}
-		if mapping.Category != "" {
-			fmt.Fprintf(b, "Category: %s\n", mapping.Category)
-		}
-	}
 }
 
 func (m *KeymapViewModel) selectedActionID() string {
@@ -165,7 +195,7 @@ func (m *KeymapViewModel) rebuildRows() {
 	// Aggregate keybindings by action id
 	agg := map[string][]string{}
 	for _, ab := range m.setting.GetActions() {
-		if !m.includeByCategory(ab.GetName()) {
+		if !m.category.Include(ab.GetName()) {
 			continue
 		}
 		for _, b := range ab.GetBindings() {
@@ -196,17 +226,6 @@ func (m *KeymapViewModel) rebuildRows() {
 		rows = append(rows, table.Row{d, strings.Join(keys, " or ")})
 	}
 	m.rows = rows
-}
-
-func (m *KeymapViewModel) includeByCategory(actionID string) bool {
-	if m.selectedCategory == 0 { // All
-		return true
-	}
-	cat := m.categories[m.selectedCategory]
-	if mapping := m.mc.FindByUniversalAction(actionID); mapping != nil {
-		return mapping.Category == cat
-	}
-	return false
 }
 
 func dedup(in []string) []string {

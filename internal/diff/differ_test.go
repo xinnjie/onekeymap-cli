@@ -52,3 +52,23 @@ func TestJsonDiffer_TypeMismatch_ReturnsError(t *testing.T) {
 	_, err := d.Diff(before, after)
 	require.Error(t, err)
 }
+
+func TestJsonDiffer_TypedNilSliceHandled(t *testing.T) {
+	d := NewJSONDiffer()
+	var before []string
+	after := []string{"x"}
+
+	ds, err := d.Diff(before, after)
+	require.NoError(t, err)
+	assert.Contains(t, ds, "\n+  0: \"x\"")
+}
+
+func TestJsonDiffer_TypedNilMapHandled(t *testing.T) {
+	d := NewJSONDiffer()
+	var before map[string]string
+	after := map[string]string{"a": "1"}
+
+	ds, err := d.Diff(before, after)
+	require.NoError(t, err)
+	assert.Contains(t, ds, "\n+  \"a\": \"1\"")
+}
