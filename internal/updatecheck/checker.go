@@ -9,9 +9,11 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/hashicorp/go-version"
 )
 
@@ -21,6 +23,15 @@ const (
 	cacheFileName      = "last_update_check"
 	requestTimeout     = 5 * time.Second
 	updateCheckTimeout = 3 * time.Second
+
+	// UI formatting constants
+	notificationBoxWidth   = 80
+	notificationBoxPadding = 2
+
+	cyan  = lipgloss.Color("#00D7FF")
+	green = lipgloss.Color("#00FF87")
+	gold  = lipgloss.Color("#FFD700")
+	blue  = lipgloss.Color("#87CEEB")
 )
 
 type GitHubRelease struct {
@@ -54,28 +65,44 @@ func New(currentVersion string, logger *slog.Logger) *Checker {
 	}
 }
 
-// CheckForUpdate checks if a new version is available and prints a message if so.
-// This runs asynchronously and will not block the main command execution.
-func (c *Checker) CheckForUpdate(ctx context.Context) {
+// CheckForUpdateMessage checks if a new version is available and returns a formatted message.
+// Returns empty string if no update is available or if check should be skipped.
+func (c *Checker) CheckForUpdateMessage(ctx context.Context) string {
 	if c.currentVersion == "dev" {
 		c.logger.DebugContext(ctx, "skipping update check for dev version")
-		return
+		return ""
 	}
 
 	if !c.shouldCheck() {
 		c.logger.DebugContext(ctx, "skipping update check, checked recently")
-		return
+		return ""
 	}
 
-	// Run the check in a goroutine with timeout to avoid blocking
-	go func() {
-		checkCtx, cancel := context.WithTimeout(ctx, updateCheckTimeout)
-		defer cancel()
+	checkCtx, cancel := context.WithTimeout(ctx, updateCheckTimeout)
+	defer cancel()
 
-		if err := c.checkAndNotify(checkCtx); err != nil {
-			c.logger.DebugContext(checkCtx, "update check failed", "error", err)
-		}
+	msg, err := c.checkAndGetMessage(checkCtx)
+	if err != nil {
+		c.logger.DebugContext(checkCtx, "update check failed", "error", err)
+		return ""
+	}
+
+	return msg
+}
+
+// CheckForUpdateAsync starts an asynchronous update check and returns a channel
+// that will receive the update message. The channel is buffered and will be closed
+// after writing the result (or empty string if no update).
+func (c *Checker) CheckForUpdateAsync(ctx context.Context) <-chan string {
+	resultChan := make(chan string, 1)
+
+	go func() {
+		defer close(resultChan)
+		msg := c.CheckForUpdateMessage(ctx)
+		resultChan <- msg
 	}()
+
+	return resultChan
 }
 
 func (c *Checker) shouldCheck() bool {
@@ -103,10 +130,10 @@ func (c *Checker) updateCheckTime() error {
 	return nil
 }
 
-func (c *Checker) checkAndNotify(ctx context.Context) error {
+func (c *Checker) checkAndGetMessage(ctx context.Context) (string, error) {
 	release, err := c.fetchLatestVersion(ctx)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Update the check time regardless of whether there's a new version
@@ -116,19 +143,19 @@ func (c *Checker) checkAndNotify(ctx context.Context) error {
 
 	current, err := version.NewVersion(c.currentVersion)
 	if err != nil {
-		return fmt.Errorf("failed to parse current version: %w", err)
+		return "", fmt.Errorf("failed to parse current version: %w", err)
 	}
 
 	latest, err := version.NewVersion(release.Version)
 	if err != nil {
-		return fmt.Errorf("failed to parse latest version: %w", err)
+		return "", fmt.Errorf("failed to parse latest version: %w", err)
 	}
 
 	if latest.GreaterThan(current) {
-		c.printUpdateNotification(release.Version, release.HTMLURL)
+		return c.formatUpdateNotification(c.currentVersion, release.Version, release.HTMLURL), nil
 	}
 
-	return nil
+	return "", nil
 }
 
 func (c *Checker) fetchLatestVersion(ctx context.Context) (GitHubRelease, error) {
@@ -164,19 +191,79 @@ func (c *Checker) fetchLatestVersion(ctx context.Context) (GitHubRelease, error)
 	return release, nil
 }
 
-func (c *Checker) printUpdateNotification(newVersion, releaseURL string) {
-	fmt.Fprintf(os.Stderr, "\n")
-	fmt.Fprintf(os.Stderr, "╭─────────────────────────────────────────────────────────────╮\n")
-	fmt.Fprintf(os.Stderr, "│  A new version of onekeymap-cli is available!              │\n")
-	fmt.Fprintf(os.Stderr, "│                                                             │\n")
-	fmt.Fprintf(os.Stderr, "│  Current version: %-10s                                │\n", c.currentVersion)
-	fmt.Fprintf(os.Stderr, "│  Latest version:  %-10s                                │\n", newVersion)
-	fmt.Fprintf(os.Stderr, "│                                                             │\n")
-	fmt.Fprintf(os.Stderr, "│  Release notes: %-43s │\n", releaseURL)
-	fmt.Fprintf(os.Stderr, "│                                                             │\n")
-	fmt.Fprintf(os.Stderr, "│  Update instructions:                                       │\n")
-	fmt.Fprintf(os.Stderr, "│    macOS:  brew upgrade onekeymap-cli                       │\n")
-	fmt.Fprintf(os.Stderr, "│    Linux:  Download from GitHub releases                    │\n")
-	fmt.Fprintf(os.Stderr, "╰─────────────────────────────────────────────────────────────╯\n")
-	fmt.Fprintf(os.Stderr, "\n")
+func (c *Checker) formatUpdateNotification(currentVersion, newVersion, releaseURL string) string {
+	// Define styles
+	boxStyle := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(cyan).
+		Padding(0, notificationBoxPadding).
+		Width(notificationBoxWidth)
+
+	titleStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(green)
+
+	versionStyle := lipgloss.NewStyle().
+		Foreground(gold)
+
+	linkStyle := lipgloss.NewStyle().
+		Foreground(blue).
+		Underline(true).
+		Inline(true) // Prevent wrapping for link
+
+	// Build content
+	var content strings.Builder
+
+	// Title with emoji
+	content.WriteString(titleStyle.Render("🎉 A new version of onekeymap-cli is available!"))
+	content.WriteString("\n\n")
+
+	// Version info
+	content.WriteString(fmt.Sprintf("📦 Current version: %s\n", versionStyle.Render(currentVersion)))
+	content.WriteString(fmt.Sprintf("✨ Latest version:  %s\n", versionStyle.Render(newVersion)))
+	content.WriteString("\n")
+
+	// Release notes link (ensure it stays on one line)
+	content.WriteString("📝 Release notes:\n")
+	content.WriteString("   " + linkStyle.Render(releaseURL) + "\n")
+	content.WriteString("\n")
+
+	// Update instructions based on OS
+	content.WriteString(lipgloss.NewStyle().Bold(true).Render("🚀 Update instructions:"))
+	content.WriteString("\n")
+	content.WriteString(getUpdateInstructions(runtime.GOOS, newVersion))
+
+	return boxStyle.Render(content.String())
+}
+
+// getUpdateInstructions returns OS-specific update instructions
+func getUpdateInstructions(goos, newVersion string) string {
+	switch goos {
+	case "darwin":
+		return "  🍎 macOS:\n" +
+			"     brew update && brew upgrade onekeymap-cli"
+	case "windows":
+		return "  ❏ Windows:\n" +
+			"     winget upgrade xinnjie.onekeymap-cli\n" +
+			"     # or: scoop update onekeymap-cli"
+	case "linux":
+		return fmt.Sprintf(`  🐧 Linux:
+     # Debian/Ubuntu:
+     wget https://github.com/xinnjie/onekeymap-cli/releases/download/v%s/onekeymap-cli_%s_x86_64.deb
+     sudo dpkg -i onekeymap-cli_%s_x86_64.deb
+
+     # Fedora/RHEL/CentOS:
+     wget https://github.com/xinnjie/onekeymap-cli/releases/download/v%s/onekeymap-cli_%s_x86_64.rpm
+     sudo rpm -i onekeymap-cli_%s_x86_64.rpm
+
+     # Alpine:
+     wget https://github.com/xinnjie/onekeymap-cli/releases/download/v%s/onekeymap-cli_%s_x86_64.apk
+     sudo apk add --allow-untrusted onekeymap-cli_%s_x86_64.apk`,
+			newVersion, newVersion, newVersion,
+			newVersion, newVersion, newVersion,
+			newVersion, newVersion, newVersion)
+	default:
+		return "  📦 Download from:\n" +
+			"     https://github.com/xinnjie/onekeymap-cli/releases/latest"
+	}
 }

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -54,12 +55,34 @@ func TestChecker_DevVersionSkipsCheck(t *testing.T) {
 		t.Fatalf("expected current version to be dev, got %s", checker.currentVersion)
 	}
 
-	// This should not panic or block
+	// This should return empty string for dev version
 	ctx := context.Background()
-	checker.CheckForUpdate(ctx)
+	msg := checker.CheckForUpdateMessage(ctx)
 
-	// Give goroutine a moment to potentially start
-	time.Sleep(10 * time.Millisecond)
+	if msg != "" {
+		t.Errorf("expected empty message for dev version, got %s", msg)
+	}
+}
+
+func TestChecker_CheckForUpdateAsync(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
+	checker := New("dev", logger)
+
+	ctx := context.Background()
+	msgChan := checker.CheckForUpdateAsync(ctx)
+
+	// Should receive empty string for dev version
+	msg := <-msgChan
+
+	if msg != "" {
+		t.Errorf("expected empty message for dev version, got %s", msg)
+	}
+
+	// Channel should be closed
+	_, ok := <-msgChan
+	if ok {
+		t.Error("expected channel to be closed")
+	}
 }
 
 func TestChecker_FetchLatestVersion(t *testing.T) {
@@ -88,4 +111,35 @@ func TestChecker_FetchLatestVersion(t *testing.T) {
 	}
 
 	t.Logf("Latest version: %s, URL: %s", release.Version, release.HTMLURL)
+}
+
+func TestFormatUpdateNotification_Darwin(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
+	checker := New("0.2.0", logger)
+
+	output := checker.formatUpdateNotification(
+		"0.2.0",
+		"0.3.0",
+		"https://github.com/xinnjie/onekeymap-cli/releases/tag/v0.3.0",
+	)
+
+	if output == "" {
+		t.Error("expected non-empty output")
+	}
+
+	// Verify content
+	if !strings.Contains(output, "🎉 A new version of onekeymap-cli is available!") {
+		t.Error("missing title")
+	}
+	if !strings.Contains(output, "0.2.0") {
+		t.Error("missing current version")
+	}
+	if !strings.Contains(output, "0.3.0") {
+		t.Error("missing new version")
+	}
+	if !strings.Contains(output, "https://github.com/xinnjie/onekeymap-cli/releases/tag/v0.3.0") {
+		t.Error("missing release URL")
+	}
+
+	t.Logf("\n%s", output)
 }

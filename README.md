@@ -38,32 +38,32 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
 
 - **Debian/Ubuntu (.deb)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.2.3/onekeymap-cli_0.2.3_x86_64.deb
-  sudo dpkg -i onekeymap-cli_0.2.3_x86_64.deb
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.3.0/onekeymap-cli_0.3.0_x86_64.deb
+  sudo dpkg -i onekeymap-cli_0.3.0_x86_64.deb
   ```
 - **Fedora/RHEL/CentOS (.rpm)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.2.3/onekeymap-cli_0.2.3_x86_64.rpm
-  sudo rpm -i onekeymap-cli_0.2.3_x86_64.rpm
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.3.0/onekeymap-cli_0.3.0_x86_64.rpm
+  sudo rpm -i onekeymap-cli_0.3.0_x86_64.rpm
   ```
 - **Alpine (.apk)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.2.3/onekeymap-cli_0.2.3_x86_64.apk
-  sudo apk add --allow-untrusted onekeymap-cli_0.2.3_x86_64.apk
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.3.0/onekeymap-cli_0.3.0_x86_64.apk
+  sudo apk add --allow-untrusted onekeymap-cli_0.3.0_x86_64.apk
   ```
 
 #### Windows
-<!-- TODO(xinnjie): uncomment when winget is available -->
-<!-- - **Winget** (Recommended)
-
-  ```powershell
-  winget install xinnjie.onekeymap-cli
-  ``` -->
 - **Scoop**
   ```powershell
   scoop bucket add xinnjie https://github.com/xinnjie/scoop-bucket
   scoop install onekeymap-cli
   ```
+
+- **Winget**
+  ```powershell
+  winget install xinnjie.onekeymap-cli
+  ```
+
 - **Zip Archive**
   Download `onekeymap-cli_Windows_<arch>.zip` from [GitHub Releases](https://github.com/xinnjie/onekeymap-cli/releases), extract it, and add the directory to your PATH, or run:
   ```powershell
@@ -71,14 +71,14 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
   setx PATH "$Env:USERPROFILE\onekeymap-cli;$Env:PATH"
   ```
 
-#### Cross-platform
+#### Cross-platform (Linux/MacOS/Windows)
 
 - **Go Install**
   ```bash
   go install github.com/xinnjie/onekeymap-cli/cmd/onekeymap-cli@latest
   ```
 
-**From Release:**
+- **From Release:**
 Download the latest binary from [GitHub Releases](https://github.com/xinnjie/onekeymap-cli/releases/latest).
 
 ### Basic Usage

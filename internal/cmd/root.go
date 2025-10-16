@@ -40,6 +40,7 @@ var (
 	cmdLogger         *slog.Logger
 	cmdRecorder       metrics.Recorder
 	cmdMappingConfig  *mappings.MappingConfig
+	cmdUpdateMsgChan  <-chan string // Channel for async update check result
 )
 
 type rootFlags struct {
@@ -57,15 +58,11 @@ func NewCmdRoot() *cobra.Command {
 	f := rootFlags{}
 
 	cmd := &cobra.Command{
-		Use:              "onekeymap-cli",
-		Short:            "A tool to import, export, and synchronize keyboard shortcuts between editors.",
-		Version:          buildVersionString(),
-		PersistentPreRun: rootPersistentPreRun(&f),
-		PersistentPostRun: func(cmd *cobra.Command, _ []string) {
-			if err := cmdRecorder.Shutdown(cmd.Context()); err != nil {
-				cmdLogger.Error("failed to shutdown telemetry", "error", err)
-			}
-		},
+		Use:               "onekeymap-cli",
+		Short:             "A tool to import, export, and synchronize keyboard shortcuts between editors.",
+		Version:           buildVersionString(),
+		PersistentPreRun:  rootPersistentPreRun(&f),
+		PersistentPostRun: rootPersistentPostRun(&f),
 	}
 
 	cmd.PersistentFlags().BoolVarP(&f.verbose, "verbose", "v", false, "Enable verbose output")
@@ -111,8 +108,6 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		verbose := viper.GetBool("verbose")
 		quiet := viper.GetBool("quiet")
 		logJSON := viper.GetBool("log-json")
-		sandbox := viper.GetBool("sandbox")
-		ctx := cmd.Context()
 
 		cmdMappingConfig, err = mappings.NewMappingConfig()
 		if err != nil {
@@ -192,10 +187,10 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		cmdImportService = internal.NewImportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
 		cmdExportService = internal.NewExportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger)
 
-		// Check for updates asynchronously
-		if !sandbox && !f.skipUpdateCheck {
+		// Start async update check only in interactive mode and when not in sandbox
+		if f.interactive && !f.sandbox && !f.skipUpdateCheck {
 			checker := updatecheck.New(version, cmdLogger)
-			checker.CheckForUpdate(ctx)
+			cmdUpdateMsgChan = checker.CheckForUpdateAsync(cmd.Context())
 		}
 	}
 }
@@ -215,6 +210,27 @@ func Execute() {
 	rootCmd.AddCommand(NewCmdExport())
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
+	}
+}
+
+func rootPersistentPostRun(_ *rootFlags) func(cmd *cobra.Command, _ []string) {
+	return func(cmd *cobra.Command, _ []string) {
+		if err := cmdRecorder.Shutdown(cmd.Context()); err != nil {
+			cmdLogger.Error("failed to shutdown telemetry", "error", err)
+		}
+
+		// Try to get update message from async check (non-blocking)
+		if cmdUpdateMsgChan != nil {
+			select {
+			case msg := <-cmdUpdateMsgChan:
+				if msg != "" {
+					cmd.Print(msg)
+				}
+			default:
+				// Update check not completed yet, skip printing
+				cmdLogger.Debug("update check not completed, skipping notification")
+			}
+		}
 	}
 }
 
