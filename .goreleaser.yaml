@@ -74,7 +74,7 @@ release:
   github:
     owner: xinnjie
     name: onekeymap-cli
-  draft: false
+  draft: true
   prerelease: auto
   name_template: "onekeymap-cli {{.Version}}"
   footer: |
