@@ -18,10 +18,10 @@ By improving these mappings, you help OneKeymap CLI support more commands across
 
 ### File Structure
 
-All action mappings are defined in YAML files located in the `internal/mappings/action_mappings/` directory. The mappings are split into logical groups to keep them organized and maintainable.
+All action mappings are defined in YAML files located in the `config/action_mappings/` directory. The mappings are split into logical groups to keep them organized and maintainable.
 
 ```
-internal/mappings/action_mappings/
+config/action_mappings/
 ├── editor.yaml
 ├── navigation.yaml
 ├── view-management.yaml
@@ -41,7 +41,7 @@ A simple mapping connects one universal action to one specific command in each e
 **Example:** Mapping the universal "copy" action.
 
 ```yaml
-# internal/mappings/action_mappings/editor.yaml
+# config/action_mappings/editor.yaml
 mappings:
   - id: "actions.editor.copy"
     description: "Copies the current selection to the clipboard."
@@ -71,7 +71,7 @@ To handle this, you can define the editor-specific mapping as a **list of comman
 **Example:** Mapping a universal "toggle search" action.
 
 ```yaml
-# internal/mappings/action_mappings/view-management.yaml
+# config/action_mappings/view-management.yaml
 mappings:
   - id: "actions.view.toggleSearch"
     description: "Toggles the visibility of the Search view."
@@ -95,7 +95,7 @@ During import, the plugin will recognize either of the VSCode commands as matchi
 
 1.  **Find an Unmapped Command**: Identify a command in an editor that you'd like to use in OneKeymap CLI.
 2.  **Define a Universal ID**: Create a new, descriptive, and unique `id` for this action.
-3.  **Locate or Create a YAML File**: Find the appropriate `*.yaml` file in `internal/mappings/action_mappings/` (e.g., `editor.yaml` for text editing commands) or create a new one if a suitable category doesn't exist.
+3.  **Locate or Create a YAML File**: Find the appropriate `*.yaml` file in `config/action_mappings/` (e.g., `editor.yaml` for text editing commands) or create a new one if a suitable category doesn't exist.
 4.  **Add the Mapping**: Add your new mapping to the file, providing the editor-specific command and context.
 5.  **Add Mappings for Other Editors (Optional but Recommended)**: To make the action truly universal, add the corresponding commands for other supported editors.
 6.  **Submit a Pull Request**: Open a PR with your changes. We'll review it and merge it in.

@@ -6,7 +6,7 @@ import (
 	"io"
 	"slices"
 
-	actionmappings "github.com/xinnjie/onekeymap-cli/internal/mappings/action_mappings"
+	actionmappings "github.com/xinnjie/onekeymap-cli/config/action_mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	"gopkg.in/yaml.v3"
 )

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	actionmappings "github.com/xinnjie/onekeymap-cli/internal/mappings/action_mappings"
+	actionmappings "github.com/xinnjie/onekeymap-cli/config/action_mappings"
 	"gopkg.in/yaml.v3"
 )
 

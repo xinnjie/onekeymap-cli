@@ -268,16 +268,16 @@
 | Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------------|-----------|
 | Edit cell | ✅ | ❌ (zed do not support jupyter notebook yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Edit Cell | actions.notebook.cell.edit |
-| Execute cell | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Execute Cell | actions.notebook.cell.execute |
-| Execute and insert | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Execute Cell and Insert Below | actions.notebook.cell.executeAndInsertBelow |
-| Execute and select | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Execute Cell and Select Below | actions.notebook.cell.executeAndSelectBelow |
-| Insert above | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Insert Code Cell Above | actions.notebook.cell.insertCodeCellAbove |
-| Insert below | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Insert Code Cell Below | actions.notebook.cell.insertCodeCellBelow |
-| Move down | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Move Cell Down | actions.notebook.cell.moveDown |
-| Move up | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Move Cell Up | actions.notebook.cell.moveUp |
-| Quit edit | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Stop Editing Cell | actions.notebook.cell.quitEdit |
-| Focus bottom | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Focus Bottom | actions.notebook.focusBottom |
-| Focus top | ✅ | ❌ (jupyter notebook yet) | ✅ | N/A | Focus Top | actions.notebook.focusTop |
+| Execute cell | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Execute Cell | actions.notebook.cell.execute |
+| Execute and insert | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Execute Cell and Insert Below | actions.notebook.cell.executeAndInsertBelow |
+| Execute and select | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Execute Cell and Select Below | actions.notebook.cell.executeAndSelectBelow |
+| Insert above | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Insert Code Cell Above | actions.notebook.cell.insertCodeCellAbove |
+| Insert below | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Insert Code Cell Below | actions.notebook.cell.insertCodeCellBelow |
+| Move down | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Move Cell Down | actions.notebook.cell.moveDown |
+| Move up | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Move Cell Up | actions.notebook.cell.moveUp |
+| Quit edit | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Stop Editing Cell | actions.notebook.cell.quitEdit |
+| Focus bottom | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Focus Bottom | actions.notebook.focusBottom |
+| Focus top | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Focus Top | actions.notebook.focusTop |
 
 ## Version Control
 
