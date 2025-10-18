@@ -4619,6 +4619,11 @@
     "category": "Chat"
   },
   {
+    "id": "workbench.action.chat.copyKatexMathSource",
+    "title": "Copy Math Source",
+    "category": "Chat"
+  },
+  {
     "id": "workbench.action.chat.copyCodeBlock",
     "title": "Copy",
     "category": "Chat"
@@ -4993,19 +4998,19 @@
   },
   {
     "id": "workbench.action.chat.openInEditor",
-    "title": "Open Chat in Editor",
+    "title": "Move Chat into Editor Area",
     "precondition": "chatIsEnabled",
     "category": "Chat"
   },
   {
     "id": "workbench.action.chat.openInNewWindow",
-    "title": "Open Chat in New Window",
+    "title": "Move Chat into New Window",
     "precondition": "chatIsEnabled",
     "category": "Chat"
   },
   {
     "id": "workbench.action.chat.openInSidebar",
-    "title": "Open Chat in Side Bar",
+    "title": "Move Chat into Side Bar",
     "precondition": "chatIsEnabled",
     "category": "Chat"
   },
@@ -5426,17 +5431,17 @@
   },
   {
     "id": "workbench.action.chat.openSessionInNewWindow",
-    "title": "Open Chat in New Window",
+    "title": "Move Chat into New Window",
     "category": "Chat"
   },
   {
     "id": "workbench.action.chat.openSessionInNewEditorGroup",
-    "title": "Open Chat to the Side",
+    "title": "Move Chat to the Side",
     "category": "Chat"
   },
   {
     "id": "workbench.action.chat.openSessionInSidebar",
-    "title": "Open Chat in Sidebar",
+    "title": "Move Chat into Side Bar",
     "category": "Chat"
   },
   {
@@ -9246,6 +9251,11 @@
     "category": "Inline Chat"
   },
   {
+    "id": "workbench.action.terminal.chat.viewChatTerminals",
+    "title": "View Chat Terminals",
+    "category": "Terminal"
+  },
+  {
     "id": "workbench.action.terminal.clearPreviousSessionHistory",
     "title": "Clear Previous Session History",
     "precondition": "terminalHasBeenCreated || terminalProcessSupported",
@@ -12692,6 +12702,18 @@
     "title": "Terminal"
   },
   {
+    "id": "workbench.action.output.show.shared",
+    "title": "Shared"
+  },
+  {
+    "id": "workbench.action.output.show.remoteTunnelService",
+    "title": "Remote Tunnel Service"
+  },
+  {
+    "id": "workbench.action.output.show.userDataSync",
+    "title": "Settings Sync"
+  },
+  {
     "id": "workbench.action.output.addCompoundLog",
     "title": "Add Compound Log...",
     "category": "Output"
@@ -12809,10 +12831,6 @@
     "category": "Developer"
   },
   {
-    "id": "workbench.action.output.show.shared",
-    "title": "Shared"
-  },
-  {
     "id": "~remote.forwardedPortsContainer.resetViewContainerLocation",
     "title": "Reset Location"
   },
@@ -12821,42 +12839,6 @@
     "title": "Toggle Ports",
     "precondition": "viewContainer.~remote.forwardedPortsContainer.enabled",
     "category": "View"
-  },
-  {
-    "id": "~remote.forwardedPorts.open",
-    "title": "Toggle Ports",
-    "precondition": "~remote.forwardedPorts.active",
-    "category": "View"
-  },
-  {
-    "id": "~remote.forwardedPorts.focus",
-    "title": "Focus on Ports View",
-    "category": "Ports",
-    "keybinding": {
-      "when": "~remote.forwardedPorts.active"
-    }
-  },
-  {
-    "id": "~remote.forwardedPorts.resetViewLocation",
-    "title": "Reset Location"
-  },
-  {
-    "id": "~remote.forwardedPorts.toggleVisibility",
-    "title": "Ports",
-    "precondition": "false"
-  },
-  {
-    "id": "~remote.forwardedPorts.removeView",
-    "title": "Hide 'Ports'",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.action.output.show.remoteTunnelService",
-    "title": "Remote Tunnel Service"
-  },
-  {
-    "id": "workbench.action.output.show.userDataSync",
-    "title": "Settings Sync"
   },
   {
     "id": "_signOutOfAccount",
@@ -12888,6 +12870,40 @@
     "category": "Authentication"
   },
   {
+    "id": "~remote.forwardedPorts.open",
+    "title": "Toggle Ports",
+    "precondition": "~remote.forwardedPorts.active",
+    "category": "View"
+  },
+  {
+    "id": "~remote.forwardedPorts.focus",
+    "title": "Focus on Ports View",
+    "category": "Ports",
+    "keybinding": {
+      "when": "~remote.forwardedPorts.active"
+    }
+  },
+  {
+    "id": "~remote.forwardedPorts.resetViewLocation",
+    "title": "Reset Location"
+  },
+  {
+    "id": "~remote.forwardedPorts.toggleVisibility",
+    "title": "Ports",
+    "precondition": "false"
+  },
+  {
+    "id": "~remote.forwardedPorts.removeView",
+    "title": "Hide 'Ports'",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.editSessions.actions.resetAuth",
+    "title": "Turn off Cloud Changes...",
+    "precondition": "editSessionsSignedIn",
+    "category": "Cloud Changes"
+  },
+  {
     "id": "workbench.extensions.action.openExtensionsFolder",
     "title": "Open Extensions Folder",
     "category": "Extensions"
@@ -12896,12 +12912,6 @@
     "id": "_workbench.extensions.action.cleanUpExtensionsFolder",
     "title": "Cleanup Extensions Folder",
     "category": "Developer"
-  },
-  {
-    "id": "workbench.editSessions.actions.resetAuth",
-    "title": "Turn off Cloud Changes...",
-    "precondition": "editSessionsSignedIn",
-    "category": "Cloud Changes"
   },
   {
     "id": "workbench.action.reportPerformanceIssueUsingReporter",
