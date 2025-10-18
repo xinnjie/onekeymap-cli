@@ -4993,19 +4993,19 @@
   },
   {
     "id": "workbench.action.chat.openInEditor",
-    "title": "Open Chat in Editor",
+    "title": "Move Chat into Editor Area",
     "precondition": "chatIsEnabled",
     "category": "Chat"
   },
   {
     "id": "workbench.action.chat.openInNewWindow",
-    "title": "Open Chat in New Window",
+    "title": "Move Chat into New Window",
     "precondition": "chatIsEnabled",
     "category": "Chat"
   },
   {
     "id": "workbench.action.chat.openInSidebar",
-    "title": "Open Chat in Side Bar",
+    "title": "Move Chat into Side Bar",
     "precondition": "chatIsEnabled",
     "category": "Chat"
   },
@@ -5426,17 +5426,17 @@
   },
   {
     "id": "workbench.action.chat.openSessionInNewWindow",
-    "title": "Open Chat in New Window",
+    "title": "Move Chat into New Window",
     "category": "Chat"
   },
   {
     "id": "workbench.action.chat.openSessionInNewEditorGroup",
-    "title": "Open Chat to the Side",
+    "title": "Move Chat to the Side",
     "category": "Chat"
   },
   {
     "id": "workbench.action.chat.openSessionInSidebar",
-    "title": "Open Chat in Sidebar",
+    "title": "Move Chat into Side Bar",
     "category": "Chat"
   },
   {
@@ -11473,216 +11473,6 @@
     "title": "Reset Location"
   },
   {
-    "id": "workbench.view.extension.references-view.resetViewContainerLocation",
-    "title": "Reset Location"
-  },
-  {
-    "id": "workbench.view.extension.references-view",
-    "title": "Show References",
-    "precondition": "viewContainer.workbench.view.extension.references-view.enabled",
-    "category": "View"
-  },
-  {
-    "id": "jsBrowserBreakpoints.open",
-    "title": "Show Event Listener Breakpoints",
-    "precondition": "jsBrowserBreakpoints.active",
-    "category": "View"
-  },
-  {
-    "id": "jsBrowserBreakpoints.focus",
-    "title": "Focus on Event Listener Breakpoints View",
-    "category": "Run and Debug",
-    "keybinding": {
-      "when": "jsBrowserBreakpoints.active"
-    }
-  },
-  {
-    "id": "jsBrowserBreakpoints.resetViewLocation",
-    "title": "Reset Location"
-  },
-  {
-    "id": "jsExcludedCallers.open",
-    "title": "Show Excluded Callers",
-    "precondition": "jsExcludedCallers.active",
-    "category": "View"
-  },
-  {
-    "id": "jsExcludedCallers.focus",
-    "title": "Focus on Excluded Callers View",
-    "category": "Run and Debug",
-    "keybinding": {
-      "when": "jsExcludedCallers.active"
-    }
-  },
-  {
-    "id": "jsExcludedCallers.resetViewLocation",
-    "title": "Reset Location"
-  },
-  {
-    "id": "jsDebugNetworkTree.open",
-    "title": "Show Network",
-    "precondition": "jsDebugNetworkTree.active",
-    "category": "View"
-  },
-  {
-    "id": "jsDebugNetworkTree.focus",
-    "title": "Focus on Network View",
-    "category": "Run and Debug",
-    "keybinding": {
-      "when": "jsDebugNetworkTree.active"
-    }
-  },
-  {
-    "id": "jsDebugNetworkTree.resetViewLocation",
-    "title": "Reset Location"
-  },
-  {
-    "id": "npm.open",
-    "title": "Show NPM Scripts",
-    "precondition": "npm.active",
-    "category": "View"
-  },
-  {
-    "id": "npm.focus",
-    "title": "Focus on NPM Scripts View",
-    "category": "Explorer",
-    "keybinding": {
-      "when": "npm.active"
-    }
-  },
-  {
-    "id": "npm.resetViewLocation",
-    "title": "Reset Location"
-  },
-  {
-    "id": "references-view.tree.open",
-    "title": "Show Reference Search Results",
-    "precondition": "references-view.tree.active",
-    "category": "View"
-  },
-  {
-    "id": "references-view.tree.focus",
-    "title": "Focus on Reference Search Results View",
-    "category": "References",
-    "keybinding": {
-      "when": "references-view.tree.active"
-    }
-  },
-  {
-    "id": "references-view.tree.resetViewLocation",
-    "title": "Reset Location"
-  },
-  {
-    "id": "workbench.panel.chat.view.copilot.toggleVisibility",
-    "title": "Chat",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.panel.chat.view.copilot.removeView",
-    "title": "Hide 'Chat'",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.explorer.openEditorsView.toggleVisibility",
-    "title": "Open Editors",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.explorer.openEditorsView.removeView",
-    "title": "Hide 'Open Editors'",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.explorer.emptyView.toggleVisibility",
-    "title": "No Folder Opened",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.explorer.emptyView.removeView",
-    "title": "Hide 'No Folder Opened'",
-    "precondition": "true"
-  },
-  {
-    "id": "outline.toggleVisibility",
-    "title": "Outline",
-    "precondition": "true"
-  },
-  {
-    "id": "outline.removeView",
-    "title": "Hide 'Outline'",
-    "precondition": "true"
-  },
-  {
-    "id": "timeline.toggleVisibility",
-    "title": "Timeline",
-    "precondition": "true"
-  },
-  {
-    "id": "timeline.removeView",
-    "title": "Hide 'Timeline'",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.view.search.toggleVisibility",
-    "title": "Search",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.view.search.removeView",
-    "title": "Hide 'Search'",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.scm.toggleVisibility",
-    "title": "Changes",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.scm.removeView",
-    "title": "Hide 'Changes'",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.panel.markers.view.toggleVisibility",
-    "title": "Problems",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.panel.markers.view.removeView",
-    "title": "Hide 'Problems'",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.panel.output.toggleVisibility",
-    "title": "Output",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.panel.output.removeView",
-    "title": "Hide 'Output'",
-    "precondition": "false"
-  },
-  {
-    "id": "terminal.toggleVisibility",
-    "title": "Terminal",
-    "precondition": "false"
-  },
-  {
-    "id": "terminal.removeView",
-    "title": "Hide 'Terminal'",
-    "precondition": "false"
-  },
-  {
-    "id": "workbench.action.openRemoteSettings",
-    "title": "Open Remote Settings (vscode-remote)",
-    "category": "Preferences"
-  },
-  {
-    "id": "workbench.action.openRemoteSettingsFile",
-    "title": "Open Remote Settings (JSON) (vscode-remote)",
-    "category": "Preferences"
-  },
-  {
     "id": "workbench.action.showTelemetry",
     "title": "Show Telemetry",
     "category": "Developer"
@@ -11694,46 +11484,6 @@
   {
     "id": "settings.switchToJSON",
     "title": "Open Settings (JSON)"
-  },
-  {
-    "id": "workbench.debug.variablesView.toggleVisibility",
-    "title": "Variables",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.debug.variablesView.removeView",
-    "title": "Hide 'Variables'",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.debug.watchExpressionsView.toggleVisibility",
-    "title": "Watch",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.debug.watchExpressionsView.removeView",
-    "title": "Hide 'Watch'",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.debug.callStackView.toggleVisibility",
-    "title": "Call Stack",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.debug.callStackView.removeView",
-    "title": "Hide 'Call Stack'",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.debug.breakPointsView.toggleVisibility",
-    "title": "Breakpoints",
-    "precondition": "true"
-  },
-  {
-    "id": "workbench.debug.breakPointsView.removeView",
-    "title": "Hide 'Breakpoints'",
-    "precondition": "true"
   },
   {
     "id": "workbench.extensions.action.focusExtensionsView",
@@ -12143,6 +11893,256 @@
     "id": "workbench.extensions.action.manageTrustedPublishers",
     "title": "Manage Trusted Extension Publishers",
     "category": "Extensions"
+  },
+  {
+    "id": "workbench.view.extension.references-view.resetViewContainerLocation",
+    "title": "Reset Location"
+  },
+  {
+    "id": "workbench.view.extension.references-view",
+    "title": "Show References",
+    "precondition": "viewContainer.workbench.view.extension.references-view.enabled",
+    "category": "View"
+  },
+  {
+    "id": "jsBrowserBreakpoints.open",
+    "title": "Show Event Listener Breakpoints",
+    "precondition": "jsBrowserBreakpoints.active",
+    "category": "View"
+  },
+  {
+    "id": "jsBrowserBreakpoints.focus",
+    "title": "Focus on Event Listener Breakpoints View",
+    "category": "Run and Debug",
+    "keybinding": {
+      "when": "jsBrowserBreakpoints.active"
+    }
+  },
+  {
+    "id": "jsBrowserBreakpoints.resetViewLocation",
+    "title": "Reset Location"
+  },
+  {
+    "id": "jsExcludedCallers.open",
+    "title": "Show Excluded Callers",
+    "precondition": "jsExcludedCallers.active",
+    "category": "View"
+  },
+  {
+    "id": "jsExcludedCallers.focus",
+    "title": "Focus on Excluded Callers View",
+    "category": "Run and Debug",
+    "keybinding": {
+      "when": "jsExcludedCallers.active"
+    }
+  },
+  {
+    "id": "jsExcludedCallers.resetViewLocation",
+    "title": "Reset Location"
+  },
+  {
+    "id": "jsDebugNetworkTree.open",
+    "title": "Show Network",
+    "precondition": "jsDebugNetworkTree.active",
+    "category": "View"
+  },
+  {
+    "id": "jsDebugNetworkTree.focus",
+    "title": "Focus on Network View",
+    "category": "Run and Debug",
+    "keybinding": {
+      "when": "jsDebugNetworkTree.active"
+    }
+  },
+  {
+    "id": "jsDebugNetworkTree.resetViewLocation",
+    "title": "Reset Location"
+  },
+  {
+    "id": "npm.open",
+    "title": "Show NPM Scripts",
+    "precondition": "npm.active",
+    "category": "View"
+  },
+  {
+    "id": "npm.focus",
+    "title": "Focus on NPM Scripts View",
+    "category": "Explorer",
+    "keybinding": {
+      "when": "npm.active"
+    }
+  },
+  {
+    "id": "npm.resetViewLocation",
+    "title": "Reset Location"
+  },
+  {
+    "id": "references-view.tree.open",
+    "title": "Show Reference Search Results",
+    "precondition": "references-view.tree.active",
+    "category": "View"
+  },
+  {
+    "id": "references-view.tree.focus",
+    "title": "Focus on Reference Search Results View",
+    "category": "References",
+    "keybinding": {
+      "when": "references-view.tree.active"
+    }
+  },
+  {
+    "id": "references-view.tree.resetViewLocation",
+    "title": "Reset Location"
+  },
+  {
+    "id": "workbench.panel.chat.view.copilot.toggleVisibility",
+    "title": "Chat",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.panel.chat.view.copilot.removeView",
+    "title": "Hide 'Chat'",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.explorer.openEditorsView.toggleVisibility",
+    "title": "Open Editors",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.explorer.openEditorsView.removeView",
+    "title": "Hide 'Open Editors'",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.explorer.emptyView.toggleVisibility",
+    "title": "No Folder Opened",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.explorer.emptyView.removeView",
+    "title": "Hide 'No Folder Opened'",
+    "precondition": "true"
+  },
+  {
+    "id": "outline.toggleVisibility",
+    "title": "Outline",
+    "precondition": "true"
+  },
+  {
+    "id": "outline.removeView",
+    "title": "Hide 'Outline'",
+    "precondition": "true"
+  },
+  {
+    "id": "timeline.toggleVisibility",
+    "title": "Timeline",
+    "precondition": "true"
+  },
+  {
+    "id": "timeline.removeView",
+    "title": "Hide 'Timeline'",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.view.search.toggleVisibility",
+    "title": "Search",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.view.search.removeView",
+    "title": "Hide 'Search'",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.scm.toggleVisibility",
+    "title": "Changes",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.scm.removeView",
+    "title": "Hide 'Changes'",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.debug.variablesView.toggleVisibility",
+    "title": "Variables",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.debug.variablesView.removeView",
+    "title": "Hide 'Variables'",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.debug.watchExpressionsView.toggleVisibility",
+    "title": "Watch",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.debug.watchExpressionsView.removeView",
+    "title": "Hide 'Watch'",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.debug.callStackView.toggleVisibility",
+    "title": "Call Stack",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.debug.callStackView.removeView",
+    "title": "Hide 'Call Stack'",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.debug.breakPointsView.toggleVisibility",
+    "title": "Breakpoints",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.debug.breakPointsView.removeView",
+    "title": "Hide 'Breakpoints'",
+    "precondition": "true"
+  },
+  {
+    "id": "workbench.panel.markers.view.toggleVisibility",
+    "title": "Problems",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.panel.markers.view.removeView",
+    "title": "Hide 'Problems'",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.panel.output.toggleVisibility",
+    "title": "Output",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.panel.output.removeView",
+    "title": "Hide 'Output'",
+    "precondition": "false"
+  },
+  {
+    "id": "terminal.toggleVisibility",
+    "title": "Terminal",
+    "precondition": "false"
+  },
+  {
+    "id": "terminal.removeView",
+    "title": "Hide 'Terminal'",
+    "precondition": "false"
+  },
+  {
+    "id": "workbench.action.openRemoteSettings",
+    "title": "Open Remote Settings (vscode-remote)",
+    "category": "Preferences"
+  },
+  {
+    "id": "workbench.action.openRemoteSettingsFile",
+    "title": "Open Remote Settings (JSON) (vscode-remote)",
+    "category": "Preferences"
   },
   {
     "id": "workbench.views.extensions.installed.open",
@@ -12888,6 +12888,12 @@
     "category": "Authentication"
   },
   {
+    "id": "workbench.editSessions.actions.resetAuth",
+    "title": "Turn off Cloud Changes...",
+    "precondition": "editSessionsSignedIn",
+    "category": "Cloud Changes"
+  },
+  {
     "id": "workbench.extensions.action.openExtensionsFolder",
     "title": "Open Extensions Folder",
     "category": "Extensions"
@@ -12896,12 +12902,6 @@
     "id": "_workbench.extensions.action.cleanUpExtensionsFolder",
     "title": "Cleanup Extensions Folder",
     "category": "Developer"
-  },
-  {
-    "id": "workbench.editSessions.actions.resetAuth",
-    "title": "Turn off Cloud Changes...",
-    "precondition": "editSessionsSignedIn",
-    "category": "Cloud Changes"
   },
   {
     "id": "workbench.action.reportPerformanceIssueUsingReporter",
