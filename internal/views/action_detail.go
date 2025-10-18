@@ -63,41 +63,10 @@ func (d *ActionDetailsViewModel) collectEditorSupport(mapping *mappings.ActionMa
 	}
 
 	for _, editorType := range editorTypes {
+		supported, notSupportedReason := mapping.IsSupported(editorType)
 		info := editorSupportInfo{
-			supported: mapping.IsSupported(editorType),
-		}
-
-		// Get not supported reason if applicable
-		switch editorType {
-		case pluginapi.EditorTypeVSCode:
-			for _, vc := range mapping.VSCode {
-				if vc.NotSupported && vc.NotSupportedReason != "" {
-					info.notSupportedReason = vc.NotSupportedReason
-					break
-				}
-			}
-		case pluginapi.EditorTypeIntelliJ:
-			if mapping.IntelliJ.NotSupported {
-				info.notSupportedReason = mapping.IntelliJ.NotSupportedReason
-			}
-		case pluginapi.EditorTypeZed:
-			for _, zc := range mapping.Zed {
-				if zc.NotSupported && zc.NotSupportedReason != "" {
-					info.notSupportedReason = zc.NotSupportedReason
-					break
-				}
-			}
-		case pluginapi.EditorTypeVim:
-			if mapping.Vim.NotSupported {
-				info.notSupportedReason = mapping.Vim.NotSupportedReason
-			}
-		case pluginapi.EditorTypeHelix:
-			for _, hc := range mapping.Helix {
-				if hc.NotSupported && hc.NotSupportedReason != "" {
-					info.notSupportedReason = hc.NotSupportedReason
-					break
-				}
-			}
+			supported:          supported,
+			notSupportedReason: notSupportedReason,
 		}
 
 		d.editorSupport[editorType] = info

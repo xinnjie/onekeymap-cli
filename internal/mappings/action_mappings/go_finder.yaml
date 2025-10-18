@@ -1,7 +1,7 @@
 mappings:
   - id: "actions.go.fileFinder"
     name: "Find file"
-    description: "Go to File"
+    description: "Go to file"
     category: "Navigation"
     vscode:
       command: "workbench.action.quickOpen"
@@ -13,7 +13,7 @@ mappings:
       action: "GotoFile"
   - id: "actions.go.symbolFinder"
     name: "Find symbol"
-    description: "Go to Symbol in Workspace"
+    description: "Go to symbol in workspace, across files in the workspace"
     category: "Navigation"
     vscode:
       command: "workbench.action.showAllSymbols"
@@ -25,7 +25,7 @@ mappings:
       action: "GotoClass"
   - id: "actions.go.symbolFinderInEditor"
     name: "Find symbol in editor"
-    description: "Go to Symbol in Editor"
+    description: "Go to symbol in current open editor"
     category: "Navigation"
     vscode:
       # breadcrumbsFocusAndSelect is very like workbench.action.gotoSymbol

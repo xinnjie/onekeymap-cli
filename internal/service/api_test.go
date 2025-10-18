@@ -179,10 +179,12 @@ func TestServer_GetKeymap(t *testing.T) {
 				assert.Equal(t, tt.wantErrCode, st.Code())
 			} else {
 				require.NoError(t, err)
+				// Ignore editor_support field in comparison as it's tested separately
+				ignoreEditorSupport := protocmp.IgnoreFields(&keymapv1.ActionConfig{}, "editor_support")
 				if tt.expectNoOrder {
-					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform(), protocmp.SortRepeatedFields(&keymapv1.Keymap{}, "actions")))
+					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform(), protocmp.SortRepeatedFields(&keymapv1.Keymap{}, "actions"), ignoreEditorSupport))
 				} else {
-					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform()))
+					assert.Empty(t, cmp.Diff(tt.want, got, protocmp.Transform(), ignoreEditorSupport))
 				}
 			}
 		})

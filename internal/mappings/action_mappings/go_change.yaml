@@ -1,7 +1,7 @@
 mappings:
   - id: "actions.go.nextChange"
     name: "Next change"
-    description: "Go to Next Change"
+    description: "Go to next change"
     category: "Navigation.DirtyDiff"
     vscode:
       command: "editor.action.dirtydiff.next"
@@ -13,7 +13,7 @@ mappings:
       action: "VcsShowNextChangeMarker"
   - id: "actions.go.previousChange"
     name: "Previous change"
-    description: "Go to Previous Change"
+    description: "Go to previous change"
     category: "Navigation.DirtyDiff"
     vscode:
       command: "editor.action.dirtydiff.previous"

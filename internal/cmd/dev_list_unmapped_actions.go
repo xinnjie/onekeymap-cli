@@ -48,7 +48,8 @@ func devListUnmappedActionsRun(
 		editorType := pluginapi.EditorType(f.editor)
 		unmapped := make([]string, 0)
 		for id, m := range mappingConfig.Mappings {
-			if !m.IsSupported(editorType) {
+			supported, _ := m.IsSupported(editorType)
+			if !supported {
 				unmapped = append(unmapped, id)
 			}
 		}

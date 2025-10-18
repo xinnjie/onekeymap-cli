@@ -43,6 +43,44 @@ func NewEditorTypeFromAPI(e keymapv1.EditorType) EditorType {
 	}
 }
 
+// ToAPI converts EditorType to proto EditorType.
+func (e EditorType) ToAPI() keymapv1.EditorType {
+	switch e {
+	case EditorTypeVSCode:
+		return keymapv1.EditorType_VSCODE
+	case EditorTypeWindsurf:
+		return keymapv1.EditorType_WINDSURF
+	case EditorTypeWindsurfNext:
+		return keymapv1.EditorType_WINDSURF_NEXT
+	case EditorTypeCursor:
+		return keymapv1.EditorType_CURSOR
+	case EditorTypeIntelliJ:
+		return keymapv1.EditorType_INTELLIJ
+	case EditorTypeIntelliJCommunity:
+		return keymapv1.EditorType_INTELLIJ_COMMUNITY
+	case EditorTypePyCharm:
+		return keymapv1.EditorType_PYCHARM
+	case EditorTypeWebStorm:
+		return keymapv1.EditorType_WEBSTORM
+	case EditorTypeClion:
+		return keymapv1.EditorType_CLION
+	case EditorTypePhpStorm:
+		return keymapv1.EditorType_PHPSTORM
+	case EditorTypeRubyMine:
+		return keymapv1.EditorType_RUBYMINE
+	case EditorTypeGoLand:
+		return keymapv1.EditorType_GOLAND
+	case EditorTypeZed:
+		return keymapv1.EditorType_ZED
+	case EditorTypeVim:
+		return keymapv1.EditorType_VIM
+	case EditorTypeHelix:
+		return keymapv1.EditorType_HELIX
+	default:
+		return keymapv1.EditorType_EDITOR_TYPE_UNSPECIFIED
+	}
+}
+
 const (
 	EditorTypeUnknown EditorType = "unknown"
 

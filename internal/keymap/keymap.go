@@ -9,6 +9,7 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -23,6 +24,12 @@ var (
 // Load reads from the given reader, parses the user config file format,
 // and converts it into the internal KeymapSetting proto message.
 func Load(reader io.Reader) (*keymapv1.Keymap, error) {
+	return LoadWithMappingConfig(reader, nil)
+}
+
+// LoadWithMappingConfig reads from the given reader and enriches actions with
+// editor support information from the mapping config.
+func LoadWithMappingConfig(reader io.Reader, mc *mappings.MappingConfig) (*keymapv1.Keymap, error) {
 	data, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
@@ -46,11 +53,11 @@ func Load(reader io.Reader) (*keymapv1.Keymap, error) {
 		key := fk.ID
 		ab, ok := grouped[key]
 		if !ok {
-			ab = newAction(fk)
+			ab = newAction(fk, mc)
 			grouped[key] = ab
 			order = append(order, key)
 		} else {
-			mergeActionMetadata(ab, fk)
+			mergeActionMetadata(ab, fk, mc)
 		}
 
 		for _, keybindingStr := range fk.Keybinding {
@@ -206,22 +213,58 @@ func (ks KeybindingStrings) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]string(ks))
 }
 
-func newAction(fk OneKeymapConfig) *keymapv1.Action {
+func newAction(fk OneKeymapConfig, mc *mappings.MappingConfig) *keymapv1.Action {
 	ab := &keymapv1.Action{
 		Name:    fk.ID,
 		Comment: fk.Comment,
 	}
-	// Only create ActionConfig if there's actual data
-	if fk.Description != "" || fk.Name != "" {
+	// Only create ActionConfig if there's actual data or editor support
+	needsConfig := fk.Description != "" || fk.Name != "" || mc != nil
+	if needsConfig {
 		ab.ActionConfig = &keymapv1.ActionConfig{
 			Description: fk.Description,
 			DisplayName: fk.Name,
+		}
+		// Populate editor support from mapping config
+		if mc != nil {
+			if mapping := mc.Get(fk.ID); mapping != nil {
+				ab.ActionConfig.EditorSupport = BuildEditorSupportFromMapping(mapping)
+			}
 		}
 	}
 	return ab
 }
 
-func mergeActionMetadata(ab *keymapv1.Action, fk OneKeymapConfig) {
+// BuildEditorSupportFromMapping constructs EditorSupport slice from an ActionMappingConfig.
+func BuildEditorSupportFromMapping(mapping *mappings.ActionMappingConfig) []*keymapv1.EditorSupport {
+	if mapping == nil {
+		return nil
+	}
+
+	// Define all main editor types to check
+	editorTypes := []pluginapi.EditorType{
+		pluginapi.EditorTypeVSCode,
+		pluginapi.EditorTypeIntelliJ,
+		pluginapi.EditorTypeZed,
+		pluginapi.EditorTypeVim,
+		pluginapi.EditorTypeHelix,
+	}
+
+	var result []*keymapv1.EditorSupport
+	for _, editorType := range editorTypes {
+		supported, notSupportedReason := mapping.IsSupported(editorType)
+
+		result = append(result, &keymapv1.EditorSupport{
+			EditorType:         editorType.ToAPI(),
+			Supported:          supported,
+			NotSupportedReason: notSupportedReason,
+		})
+	}
+
+	return result
+}
+
+func mergeActionMetadata(ab *keymapv1.Action, fk OneKeymapConfig, mc *mappings.MappingConfig) {
 	// Preserve first non-empty metadata.
 	if ab.GetComment() == "" && fk.Comment != "" {
 		ab.Comment = fk.Comment
@@ -235,6 +278,12 @@ func mergeActionMetadata(ab *keymapv1.Action, fk OneKeymapConfig) {
 		}
 		if ab.GetActionConfig().GetDisplayName() == "" && fk.Name != "" {
 			ab.ActionConfig.DisplayName = fk.Name
+		}
+	}
+	// Populate editor support if not already set and mapping config is available
+	if mc != nil && ab.GetActionConfig() != nil && len(ab.GetActionConfig().GetEditorSupport()) == 0 {
+		if mapping := mc.Get(fk.ID); mapping != nil {
+			ab.ActionConfig.EditorSupport = BuildEditorSupportFromMapping(mapping)
 		}
 	}
 }

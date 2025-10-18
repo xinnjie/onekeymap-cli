@@ -44,47 +44,52 @@ type ActionMappingConfig struct {
 	Helix       HelixConfig           `yaml:"helix"`
 }
 
-func (am *ActionMappingConfig) IsSupported(editorType pluginapi.EditorType) bool {
+// IsSupported checks if the action is supported by the given editor type.
+// Returns (supported, notSupportedReason).
+func (am *ActionMappingConfig) IsSupported(editorType pluginapi.EditorType) (bool, string) {
 	switch editorType {
 	case pluginapi.EditorTypeVSCode:
-		if slices.ContainsFunc(am.VSCode, func(vc VscodeMappingConfig) bool {
-			return vc.NotSupported
-		}) {
-			return false
+		for _, vc := range am.VSCode {
+			if vc.NotSupported {
+				return false, vc.NotSupportedReason
+			}
 		}
-		return slices.ContainsFunc(am.VSCode, func(vc VscodeMappingConfig) bool {
+		hasMapping := slices.ContainsFunc(am.VSCode, func(vc VscodeMappingConfig) bool {
 			return vc.Command != ""
 		})
+		return hasMapping, ""
 	case pluginapi.EditorTypeIntelliJ:
 		if am.IntelliJ.NotSupported {
-			return false
+			return false, am.IntelliJ.NotSupportedReason
 		}
-		return am.IntelliJ.Action != ""
+		return am.IntelliJ.Action != "", ""
 	case pluginapi.EditorTypeZed:
-		if slices.ContainsFunc(am.Zed, func(zc ZedMappingConfig) bool {
-			return zc.NotSupported
-		}) {
-			return false
+		for _, zc := range am.Zed {
+			if zc.NotSupported {
+				return false, zc.NotSupportedReason
+			}
 		}
-		return slices.ContainsFunc(am.Zed, func(zc ZedMappingConfig) bool {
+		hasMapping := slices.ContainsFunc(am.Zed, func(zc ZedMappingConfig) bool {
 			return zc.Action != ""
 		})
+		return hasMapping, ""
 	case pluginapi.EditorTypeVim:
 		if am.Vim.NotSupported {
-			return false
+			return false, am.Vim.NotSupportedReason
 		}
-		return am.Vim.Command != ""
+		return am.Vim.Command != "", ""
 	case pluginapi.EditorTypeHelix:
-		if slices.ContainsFunc(am.Helix, func(hc HelixMappingConfig) bool {
-			return hc.NotSupported
-		}) {
-			return false
+		for _, hc := range am.Helix {
+			if hc.NotSupported {
+				return false, hc.NotSupportedReason
+			}
 		}
-		return slices.ContainsFunc(am.Helix, func(hc HelixMappingConfig) bool {
+		hasMapping := slices.ContainsFunc(am.Helix, func(hc HelixMappingConfig) bool {
 			return hc.Command != ""
 		})
+		return hasMapping, ""
 	default:
-		return false
+		return false, ""
 	}
 }
 

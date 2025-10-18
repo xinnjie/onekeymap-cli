@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
 type devDocSupportActionsFlags struct {
@@ -46,14 +47,7 @@ func devDocSupportActionsRun(
 			os.Exit(1)
 		}
 
-		// Collect all action IDs and sort them
-		actionIDs := make([]string, 0, len(mappingConfig.Mappings))
-		for id := range mappingConfig.Mappings {
-			actionIDs = append(actionIDs, id)
-		}
-		sort.Strings(actionIDs)
-
-		// Prepare data rows for template rendering
+		// Prepare data structures for template rendering
 		type supportRow struct {
 			Action      string
 			VSCode      string
@@ -64,15 +58,24 @@ func devDocSupportActionsRun(
 			ActionID    string
 		}
 
-		rows := make([]supportRow, 0, len(actionIDs))
-		for _, id := range actionIDs {
-			mapping := mappingConfig.Mappings[id]
+		type categorySection struct {
+			Category string
+			Rows     []supportRow
+		}
+
+		// Group actions by category
+		categoryMap := make(map[string][]supportRow)
+		for id, mapping := range mappingConfig.Mappings {
+			category := mapping.Category
+			if category == "" {
+				category = "Uncategorized"
+			}
 
 			// Check support for each editor
-			vscodeSupport, vscodeReason := checkVSCodeSupport(mapping)
-			zedSupport, zedReason := checkZedSupport(mapping)
-			intellijSupport, intellijReason := checkIntelliJSupport(mapping)
-			helixSupport, helixReason := checkHelixSupport(mapping)
+			vscodeSupport, vscodeReason := mapping.IsSupported(pluginapi.EditorTypeVSCode)
+			zedSupport, zedReason := mapping.IsSupported(pluginapi.EditorTypeZed)
+			intellijSupport, intellijReason := mapping.IsSupported(pluginapi.EditorTypeIntelliJ)
+			helixSupport, helixReason := mapping.IsSupported(pluginapi.EditorTypeHelix)
 
 			// Format description for markdown (escape pipes and newlines)
 			description := strings.ReplaceAll(mapping.Description, "|", "\\|")
@@ -81,7 +84,7 @@ func devDocSupportActionsRun(
 				description = "-"
 			}
 
-			rows = append(rows, supportRow{
+			row := supportRow{
 				Action:      mapping.Name,
 				VSCode:      formatSupport(vscodeSupport, vscodeReason),
 				Zed:         formatSupport(zedSupport, zedReason),
@@ -89,70 +92,51 @@ func devDocSupportActionsRun(
 				Helix:       formatSupport(helixSupport, helixReason),
 				Description: description,
 				ActionID:    id,
+			}
+
+			categoryMap[category] = append(categoryMap[category], row)
+		}
+
+		// Sort categories and rows within each category
+		categories := make([]string, 0, len(categoryMap))
+		for category := range categoryMap {
+			categories = append(categories, category)
+		}
+		sort.Strings(categories)
+
+		// Build category sections
+		sections := make([]categorySection, 0, len(categories))
+		for _, category := range categories {
+			rows := categoryMap[category]
+			// Sort rows by ActionID within each category
+			sort.Slice(rows, func(i, j int) bool {
+				return rows[i].ActionID < rows[j].ActionID
+			})
+			sections = append(sections, categorySection{
+				Category: category,
+				Rows:     rows,
 			})
 		}
 
 		const supportMatrixTmpl = `# Action Support Matrix
+{{- range . }}
+
+## {{ .Category }}
 
 | Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------------|-----------|
-{{- range . }}
+{{- range .Rows }}
 | {{ .Action }} | {{ .VSCode }} | {{ .Zed }} | {{ .IntelliJ }} | {{ .Helix }} | {{ .Description }} | {{ .ActionID }} |
+{{- end }}
 {{- end }}
 `
 
 		t := template.Must(template.New("support-matrix").Parse(supportMatrixTmpl))
-		if err := t.Execute(cmd.OutOrStdout(), rows); err != nil {
+		if err := t.Execute(cmd.OutOrStdout(), sections); err != nil {
 			logger.ErrorContext(ctx, "Error executing template", "error", err)
 			os.Exit(1)
 		}
 	}
-}
-
-func checkVSCodeSupport(mapping mappings.ActionMappingConfig) (bool, string) {
-	// Check if explicitly marked as not supported
-	for _, vc := range mapping.VSCode {
-		if vc.NotSupported {
-			return false, vc.NotSupportedReason
-		}
-		if vc.Command != "" {
-			return true, ""
-		}
-	}
-	return false, ""
-}
-
-func checkZedSupport(mapping mappings.ActionMappingConfig) (bool, string) {
-	// Check if explicitly marked as not supported
-	for _, zc := range mapping.Zed {
-		if zc.NotSupported {
-			return false, zc.NotSupportedReason
-		}
-		if zc.Action != "" {
-			return true, ""
-		}
-	}
-	return false, ""
-}
-
-func checkIntelliJSupport(mapping mappings.ActionMappingConfig) (bool, string) {
-	if mapping.IntelliJ.NotSupported {
-		return false, mapping.IntelliJ.NotSupportedReason
-	}
-	return mapping.IntelliJ.Action != "", ""
-}
-
-func checkHelixSupport(mapping mappings.ActionMappingConfig) (bool, string) {
-	// Check if explicitly marked as not supported
-	for _, hc := range mapping.Helix {
-		if hc.NotSupported {
-			return false, hc.NotSupportedReason
-		}
-		if hc.Command != "" {
-			return true, ""
-		}
-	}
-	return false, ""
 }
 
 func formatSupport(supported bool, reason string) string {

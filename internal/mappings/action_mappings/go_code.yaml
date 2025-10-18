@@ -1,7 +1,7 @@
 mappings:
   - id: "actions.go.goToDeclaration"
     name: "Go to declaration"
-    description: "Go to Declaration or Usages"
+    description: "Go to declaration or usages"
     category: "Code.Go"
     vscode:
       command: "editor.action.goToDeclaration"
@@ -13,7 +13,7 @@ mappings:
       context: "Editor"
   - id: "actions.go.peekDeclaration"
     name: "Peek declaration"
-    description: "Peek Declaration"
+    description: "Peek declaration"
     category: "Code.Go"
     vscode:
       command: "editor.action.previewDeclaration"
@@ -25,7 +25,7 @@ mappings:
       context: "Editor"
   - id: "actions.go.implementations"
     name: "Go to implementations"
-    description: "Go to Implementations"
+    description: "Go to implementations"
     category: "Code.Go"
     vscode:
       command: "editor.action.goToImplementation"
@@ -37,7 +37,7 @@ mappings:
       action: "GotoImplementation"
   - id: "actions.go.goToTest"
     name: "Go to test"
-    description: "Go to Test"
+    description: "Go to test"
     category: "Code.Go"
     vscode:
       command: "java.test.goToTest"
@@ -48,7 +48,7 @@ mappings:
       notSupported: true
   - id: "actions.go.goToSuper"
     name: "Go to super"
-    description: "Go to Super Class/Super Method"
+    description: "Go to super class/super method"
     category: "Code.Go"
     vscode:
       command: "dart.goToSuper"
@@ -57,9 +57,19 @@ mappings:
       notSupported: true
     intellij:
       action: "GotoSuperMethod"
+  - id: "actions.go.definition"
+    name: "Go to definition"
+    description: "Go to definition"
+    category: "Code.Go"
+    vscode:
+      command: "editor.action.revealDefinition"
+      when: "editorHasDefinitionProvider && editorTextFocus"
+    zed:
+      action: "editor::GoToDefinition"
+      context: "Editor"
   - id: "actions.go.typeDefinition"
     name: "Go to type definition"
-    description: "Go to Type Definition"
+    description: "Go to type definition"
     category: "Code.Go"
     vscode:
       command: "editor.action.goToTypeDefinition"
@@ -71,7 +81,7 @@ mappings:
       action: "GotoTypeDeclaration"
   - id: "actions.go.references"
     name: "Go to references"
-    description: "Go to References"
+    description: "Go to references"
     category: "Code.Go"
     vscode:
       command: "references-view.findReferences"
@@ -83,7 +93,7 @@ mappings:
       action: "FindUsages"
   - id: "actions.go.referencePeek"
     name: "Reference peek"
-    description: "Show Usages / Reference Search"
+    description: "Show usages / reference search"
     category: "Code.Go"
     vscode:
       command: "editor.action.referenceSearch.trigger"
@@ -95,7 +105,7 @@ mappings:
       notSupported: true
   - id: "actions.go.callHierarchy"
     name: "Call hierarchy"
-    description: "Show Call Hierarchy"
+    description: "Show call hierarchy"
     category: "Code.Go"
     vscode:
       command: "references-view.showCallHierarchy"
@@ -107,7 +117,7 @@ mappings:
       notSupported: true
   - id: "actions.go.typeHierarchy"
     name: "Type hierarchy"
-    description: "Show Type Hierarchy"
+    description: "Show type hierarchy"
     category: "Code.Go"
     vscode:
       command: "java.action.showTypeHierarchy"
@@ -118,7 +128,7 @@ mappings:
       notSupported: true
   - id: "actions.go.bracket"
     name: "Go to bracket"
-    description: "Go to Bracket"
+    description: "Go to bracket"
     category: "Code.Go"
     vscode:
       command: "editor.action.jumpToBracket"

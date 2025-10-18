@@ -65,7 +65,7 @@ func (s *Server) ImportKeymap(
 
 	var baseSetting *keymapv1.Keymap
 	if req.GetBase() != "" {
-		km, err := keymap.Load(strings.NewReader(req.GetBase()))
+		km, err := keymap.LoadWithMappingConfig(strings.NewReader(req.GetBase()), s.mappingConfig)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to parse base keymap: %v", err)
 		}
@@ -126,7 +126,7 @@ func (s *Server) GetKeymap(
 	_ context.Context,
 	req *keymapv1.GetKeymapRequest,
 ) (*keymapv1.GetKeymapResponse, error) {
-	km, err := keymap.Load(strings.NewReader(req.GetConfig()))
+	km, err := keymap.LoadWithMappingConfig(strings.NewReader(req.GetConfig()), s.mappingConfig)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to parse keymap config: %v", err)
 	}
@@ -140,12 +140,15 @@ func (s *Server) GetKeymap(
 
 		for id, mapping := range s.mappingConfig.Mappings {
 			if _, exists := existingBindings[id]; !exists {
+				// Build editor support for unmapped actions
+				editorSupport := keymap.BuildEditorSupportFromMapping(&mapping)
 				km.Actions = append(km.Actions, &keymapv1.Action{
 					Name: id,
 					ActionConfig: &keymapv1.ActionConfig{
-						Description: mapping.Description,
-						DisplayName: mapping.Name,
-						Category:    mapping.Category,
+						Description:   mapping.Description,
+						DisplayName:   mapping.Name,
+						Category:      mapping.Category,
+						EditorSupport: editorSupport,
 					},
 				})
 			}

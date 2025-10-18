@@ -326,7 +326,9 @@ type ActionConfig struct {
 	// category of the action
 	// e.g. "Editor", "Terminal"
 	// Has subcategories if category has ".", e.g. "Editor.Clipboard"
-	Category      string `protobuf:"bytes,3,opt,name=category,proto3" json:"category,omitempty"`
+	Category string `protobuf:"bytes,3,opt,name=category,proto3" json:"category,omitempty"`
+	// editor support information for this action
+	EditorSupport []*EditorSupport `protobuf:"bytes,4,rep,name=editor_support,json=editorSupport,proto3" json:"editor_support,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -382,11 +384,82 @@ func (x *ActionConfig) GetCategory() string {
 	return ""
 }
 
+func (x *ActionConfig) GetEditorSupport() []*EditorSupport {
+	if x != nil {
+		return x.EditorSupport
+	}
+	return nil
+}
+
+// EditorSupport represents whether an action is supported by a specific editor.
+type EditorSupport struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The editor type
+	EditorType EditorType `protobuf:"varint,1,opt,name=editor_type,json=editorType,proto3,enum=keymap.v1.EditorType" json:"editor_type,omitempty"`
+	// Whether this action is supported by the editor
+	Supported bool `protobuf:"varint,2,opt,name=supported,proto3" json:"supported,omitempty"`
+	// Reason why this action is not supported (only set when supported = false)
+	NotSupportedReason string `protobuf:"bytes,3,opt,name=not_supported_reason,json=notSupportedReason,proto3" json:"not_supported_reason,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *EditorSupport) Reset() {
+	*x = EditorSupport{}
+	mi := &file_keymap_v1_keymap_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EditorSupport) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EditorSupport) ProtoMessage() {}
+
+func (x *EditorSupport) ProtoReflect() protoreflect.Message {
+	mi := &file_keymap_v1_keymap_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EditorSupport.ProtoReflect.Descriptor instead.
+func (*EditorSupport) Descriptor() ([]byte, []int) {
+	return file_keymap_v1_keymap_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *EditorSupport) GetEditorType() EditorType {
+	if x != nil {
+		return x.EditorType
+	}
+	return EditorType_EDITOR_TYPE_UNSPECIFIED
+}
+
+func (x *EditorSupport) GetSupported() bool {
+	if x != nil {
+		return x.Supported
+	}
+	return false
+}
+
+func (x *EditorSupport) GetNotSupportedReason() string {
+	if x != nil {
+		return x.NotSupportedReason
+	}
+	return ""
+}
+
 var File_keymap_v1_keymap_proto protoreflect.FileDescriptor
 
 const file_keymap_v1_keymap_proto_rawDesc = "" +
 	"\n" +
-	"\x16keymap/v1/keymap.proto\x12\tkeymap.v1\x1a\x19google/api/resource.proto\x1a\x17keymap/v1/keycode.proto\x1a\x1fgoogle/api/field_behavior.proto\"\x9d\x01\n" +
+	"\x16keymap/v1/keymap.proto\x12\tkeymap.v1\x1a\x19google/api/resource.proto\x1a\x17keymap/v1/keycode.proto\x1a\x16keymap/v1/editor.proto\x1a\x1fgoogle/api/field_behavior.proto\"\x9d\x01\n" +
 	"\x06Keymap\x12,\n" +
 	"\x04name\x18\x01 \x01(\tB\x18\xe0A\b\xfaA\x12\x12\x10keymap.v1.KeymapR\x04name\x12+\n" +
 	"\aactions\x18\x02 \x03(\v2\x11.keymap.v1.ActionR\aactions:8\xeaA5\n" +
@@ -406,11 +479,17 @@ const file_keymap_v1_keymap_proto_rawDesc = "" +
 	"\x12KeybindingReadable\x124\n" +
 	"\n" +
 	"key_chords\x18\x01 \x01(\v2\x15.keymap.v1.KeybindingR\tkeyChords\x12.\n" +
-	"\x13key_chords_readable\x18\x02 \x01(\tR\x11keyChordsReadable\"o\n" +
+	"\x13key_chords_readable\x18\x02 \x01(\tR\x11keyChordsReadable\"\xb0\x01\n" +
 	"\fActionConfig\x12!\n" +
 	"\fdisplay_name\x18\x01 \x01(\tR\vdisplayName\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
-	"\bcategory\x18\x03 \x01(\tR\bcategoryB\x9c\x01\n" +
+	"\bcategory\x18\x03 \x01(\tR\bcategory\x12?\n" +
+	"\x0eeditor_support\x18\x04 \x03(\v2\x18.keymap.v1.EditorSupportR\reditorSupport\"\x97\x01\n" +
+	"\rEditorSupport\x126\n" +
+	"\veditor_type\x18\x01 \x01(\x0e2\x15.keymap.v1.EditorTypeR\n" +
+	"editorType\x12\x1c\n" +
+	"\tsupported\x18\x02 \x01(\bR\tsupported\x120\n" +
+	"\x14not_supported_reason\x18\x03 \x01(\tR\x12notSupportedReasonB\x9c\x01\n" +
 	"\rcom.keymap.v1B\vKeymapProtoP\x01Z9github.com/xinnjie/watchbeats/protogen/keymap/v1;keymapv1\xa2\x02\x03KXX\xaa\x02\tKeymap.V1\xca\x02\tKeymap\\V1\xe2\x02\x15Keymap\\V1\\GPBMetadata\xea\x02\n" +
 	"Keymap::V1b\x06proto3"
 
@@ -426,7 +505,7 @@ func file_keymap_v1_keymap_proto_rawDescGZIP() []byte {
 	return file_keymap_v1_keymap_proto_rawDescData
 }
 
-var file_keymap_v1_keymap_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_keymap_v1_keymap_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_keymap_v1_keymap_proto_goTypes = []any{
 	(*Keymap)(nil),             // 0: keymap.v1.Keymap
 	(*Action)(nil),             // 1: keymap.v1.Action
@@ -434,22 +513,26 @@ var file_keymap_v1_keymap_proto_goTypes = []any{
 	(*Keybinding)(nil),         // 3: keymap.v1.Keybinding
 	(*KeybindingReadable)(nil), // 4: keymap.v1.KeybindingReadable
 	(*ActionConfig)(nil),       // 5: keymap.v1.ActionConfig
-	(KeyCode)(0),               // 6: keymap.v1.KeyCode
-	(KeyModifier)(0),           // 7: keymap.v1.KeyModifier
+	(*EditorSupport)(nil),      // 6: keymap.v1.EditorSupport
+	(KeyCode)(0),               // 7: keymap.v1.KeyCode
+	(KeyModifier)(0),           // 8: keymap.v1.KeyModifier
+	(EditorType)(0),            // 9: keymap.v1.EditorType
 }
 var file_keymap_v1_keymap_proto_depIdxs = []int32{
 	1, // 0: keymap.v1.Keymap.actions:type_name -> keymap.v1.Action
 	4, // 1: keymap.v1.Action.bindings:type_name -> keymap.v1.KeybindingReadable
 	5, // 2: keymap.v1.Action.action_config:type_name -> keymap.v1.ActionConfig
-	6, // 3: keymap.v1.KeyChord.key_code:type_name -> keymap.v1.KeyCode
-	7, // 4: keymap.v1.KeyChord.modifiers:type_name -> keymap.v1.KeyModifier
+	7, // 3: keymap.v1.KeyChord.key_code:type_name -> keymap.v1.KeyCode
+	8, // 4: keymap.v1.KeyChord.modifiers:type_name -> keymap.v1.KeyModifier
 	2, // 5: keymap.v1.Keybinding.chords:type_name -> keymap.v1.KeyChord
 	3, // 6: keymap.v1.KeybindingReadable.key_chords:type_name -> keymap.v1.Keybinding
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	6, // 7: keymap.v1.ActionConfig.editor_support:type_name -> keymap.v1.EditorSupport
+	9, // 8: keymap.v1.EditorSupport.editor_type:type_name -> keymap.v1.EditorType
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_keymap_v1_keymap_proto_init() }
@@ -458,13 +541,14 @@ func file_keymap_v1_keymap_proto_init() {
 		return
 	}
 	file_keymap_v1_keycode_proto_init()
+	file_keymap_v1_editor_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_keymap_v1_keymap_proto_rawDesc), len(file_keymap_v1_keymap_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
