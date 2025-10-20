@@ -180,6 +180,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		cmdPluginRegistry.Register(intellij.NewPhpStorm(cmdMappingConfig, cmdLogger))
 		cmdPluginRegistry.Register(intellij.NewRubyMine(cmdMappingConfig, cmdLogger))
 		cmdPluginRegistry.Register(intellij.NewGoLand(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.NewRustRover(cmdMappingConfig, cmdLogger))
 
 		cmdPluginRegistry.Register(helix.New(cmdMappingConfig, cmdLogger))
 		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger))

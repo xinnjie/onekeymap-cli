@@ -32,6 +32,8 @@ func NewEditorTypeFromAPI(e keymapv1.EditorType) EditorType {
 		return EditorTypeRubyMine
 	case keymapv1.EditorType_GOLAND:
 		return EditorTypeGoLand
+	case keymapv1.EditorType_RUSTROVER:
+		return EditorTypeRustRover
 	case keymapv1.EditorType_ZED:
 		return EditorTypeZed
 	case keymapv1.EditorType_VIM:
@@ -70,6 +72,8 @@ func (e EditorType) ToAPI() keymapv1.EditorType {
 		return keymapv1.EditorType_RUBYMINE
 	case EditorTypeGoLand:
 		return keymapv1.EditorType_GOLAND
+	case EditorTypeRustRover:
+		return keymapv1.EditorType_RUSTROVER
 	case EditorTypeZed:
 		return keymapv1.EditorType_ZED
 	case EditorTypeVim:
@@ -103,6 +107,7 @@ const (
 	EditorTypePhpStorm          EditorType = "intellij.phpstorm"
 	EditorTypeRubyMine          EditorType = "intellij.rubymine"
 	EditorTypeGoLand            EditorType = "intellij.goland"
+	EditorTypeRustRover         EditorType = "intellij.rustrover"
 
 	EditorTypeZed   EditorType = "zed"
 	EditorTypeVim   EditorType = "vim"
@@ -136,6 +141,8 @@ func (e EditorType) AppName() string {
 		return "RubyMine"
 	case EditorTypeGoLand:
 		return "GoLand"
+	case EditorTypeRustRover:
+		return "RustRover"
 	case EditorTypeZed:
 		return "Zed"
 	case EditorTypeVim:

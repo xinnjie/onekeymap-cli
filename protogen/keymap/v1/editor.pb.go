@@ -53,6 +53,8 @@ const (
 	EditorType_RUBYMINE EditorType = 14
 	// GoLand
 	EditorType_GOLAND EditorType = 15
+	// RustRover
+	EditorType_RUSTROVER EditorType = 16
 	// Helix
 	EditorType_HELIX EditorType = 3
 	// Vim
@@ -76,6 +78,7 @@ var (
 		13: "PHPSTORM",
 		14: "RUBYMINE",
 		15: "GOLAND",
+		16: "RUSTROVER",
 		3:  "HELIX",
 		4:  "VIM",
 	}
@@ -94,6 +97,7 @@ var (
 		"PHPSTORM":                13,
 		"RUBYMINE":                14,
 		"GOLAND":                  15,
+		"RUSTROVER":               16,
 		"HELIX":                   3,
 		"VIM":                     4,
 	}
@@ -130,7 +134,7 @@ var File_keymap_v1_editor_proto protoreflect.FileDescriptor
 
 const file_keymap_v1_editor_proto_rawDesc = "" +
 	"\n" +
-	"\x16keymap/v1/editor.proto\x12\tkeymap.v1*\xf3\x01\n" +
+	"\x16keymap/v1/editor.proto\x12\tkeymap.v1*\x82\x02\n" +
 	"\n" +
 	"EditorType\x12\x1b\n" +
 	"\x17EDITOR_TYPE_UNSPECIFIED\x10\x00\x12\n" +
@@ -150,7 +154,8 @@ const file_keymap_v1_editor_proto_rawDesc = "" +
 	"\bPHPSTORM\x10\r\x12\f\n" +
 	"\bRUBYMINE\x10\x0e\x12\n" +
 	"\n" +
-	"\x06GOLAND\x10\x0f\x12\t\n" +
+	"\x06GOLAND\x10\x0f\x12\r\n" +
+	"\tRUSTROVER\x10\x10\x12\t\n" +
 	"\x05HELIX\x10\x03\x12\a\n" +
 	"\x03VIM\x10\x04B\x9c\x01\n" +
 	"\rcom.keymap.v1B\vEditorProtoP\x01Z9github.com/xinnjie/watchbeats/protogen/keymap/v1;keymapv1\xa2\x02\x03KXX\xaa\x02\tKeymap.V1\xca\x02\tKeymap\\V1\xe2\x02\x15Keymap\\V1\\GPBMetadata\xea\x02\n" +

@@ -59,6 +59,8 @@ func (p *intellijVariantPlugin) ConfigDetect(
 		return detectConfigForIDE("RubyMine", "RubyMine*", "rubymine", opts)
 	case pluginapi.EditorTypeGoLand:
 		return detectConfigForIDE("GoLand", "GoLand*", "goland", opts)
+	case pluginapi.EditorTypeRustRover:
+		return detectConfigForIDE("RustRover", "RustRover*", "rustrover", opts)
 	case pluginapi.EditorTypeIntelliJ:
 		return detectConfigForIDE("IntelliJ IDEA", "IntelliJIdea*", "idea", opts)
 	default:
@@ -99,4 +101,9 @@ func NewRubyMine(mappingConfig *mappings.MappingConfig, logger *slog.Logger) plu
 // NewGoLand creates a GoLand plugin instance.
 func NewGoLand(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
 	return newIntellijVariantPlugin(pluginapi.EditorTypeGoLand, mappingConfig, logger)
+}
+
+// NewRustRover creates a RustRover plugin instance.
+func NewRustRover(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
+	return newIntellijVariantPlugin(pluginapi.EditorTypeRustRover, mappingConfig, logger)
 }
