@@ -12,17 +12,17 @@
 | Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------------|-----------|
 | Go to bracket | ✅ | ✅ | ✅ | N/A | Go to bracket | actions.go.bracket |
-| Call hierarchy | ✅ | N/A | ✅ | N/A | Show call hierarchy | actions.go.callHierarchy |
+| Call hierarchy | ✅ | ❌ (not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)) | ✅ | N/A | Show call hierarchy | actions.go.callHierarchy |
 | Go to definition | ✅ | ✅ | N/A | N/A | Go to definition | actions.go.definition |
 | Go to declaration | ✅ | ✅ | ✅ | N/A | Go to declaration or usages | actions.go.goToDeclaration |
-| Go to super | ✅ | N/A | ✅ | N/A | Go to super class/super method | actions.go.goToSuper |
-| Go to test | ✅ | N/A | ✅ | N/A | Go to test | actions.go.goToTest |
+| Go to super | ✅ | ❌ (not supported yet, no issue tracked) | ✅ | N/A | Go to super class/super method | actions.go.goToSuper |
+| Go to test | ✅ | ❌ (not supported yet, see [`Go to test` discussion](https://github.com/zed-industries/zed/discussions/40859)) | ✅ | N/A | Go to test | actions.go.goToTest |
 | Go to implementations | ✅ | ✅ | ✅ | N/A | Go to implementations | actions.go.implementations |
 | Peek declaration | ✅ | ✅ | ✅ | N/A | Peek declaration | actions.go.peekDeclaration |
-| Reference peek | ✅ | N/A | ✅ | N/A | Show usages / reference search | actions.go.referencePeek |
+| Reference peek | ✅ | ❌ (Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)) | ✅ | N/A | Show usages / reference search | actions.go.referencePeek |
 | Go to references | ✅ | ✅ | ✅ | N/A | Go to references | actions.go.references |
 | Go to type definition | ✅ | ✅ | ✅ | N/A | Go to type definition | actions.go.typeDefinition |
-| Type hierarchy | ✅ | N/A | ✅ | N/A | Show type hierarchy | actions.go.typeHierarchy |
+| Type hierarchy | ✅ | ❌ (Not supported yet, see [`Type hierarchy (class inheritance tree) support` discussion](https://github.com/zed-industries/zed/discussions/16348)) | ✅ | N/A | Show type hierarchy | actions.go.typeHierarchy |
 
 ## Code.Refactor
 
@@ -30,8 +30,8 @@
 |--------|--------|-----|----------|-------|-------------|-----------|
 | Code action | ✅ | ✅ | ✅ | ✅ | Code Action... | actions.refactor.codeAction |
 | Organize imports | ✅ | ✅ | ✅ | N/A | Organize Imports | actions.refactor.organizeImports |
-| Quick fix | ✅ | N/A | N/A | N/A | Quick Fix... | actions.refactor.quickFix |
-| Refactor code | ✅ | N/A | ✅ | ✅ | Refactor This... | actions.refactor.refactor |
+| Quick fix | ✅ | ❌ (not supported yet, no issue tracked) | N/A | N/A | Quick Fix... | actions.refactor.quickFix |
+| Refactor code | ✅ | ❌ (not supported yet, see [Code refactoring in Zed ](https://github.com/zed-industries/zed/discussions/8623)) | ✅ | ✅ | Refactor This... | actions.refactor.refactor |
 | Rename symbol | ✅ | ✅ | ✅ | ✅ | Rename | actions.refactor.rename |
 
 ## Code.Suggestion
@@ -267,29 +267,32 @@
 
 | Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------------|-----------|
-| Edit cell | ✅ | ❌ (zed do not support jupyter notebook yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Edit Cell | actions.notebook.cell.edit |
-| Execute cell | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Execute Cell | actions.notebook.cell.execute |
-| Execute and insert | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Execute Cell and Insert Below | actions.notebook.cell.executeAndInsertBelow |
-| Execute and select | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Execute Cell and Select Below | actions.notebook.cell.executeAndSelectBelow |
-| Insert above | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Insert Code Cell Above | actions.notebook.cell.insertCodeCellAbove |
-| Insert below | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Insert Code Cell Below | actions.notebook.cell.insertCodeCellBelow |
-| Move down | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Move Cell Down | actions.notebook.cell.moveDown |
-| Move up | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Move Cell Up | actions.notebook.cell.moveUp |
-| Quit edit | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Stop Editing Cell | actions.notebook.cell.quitEdit |
-| Focus bottom | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Focus Bottom | actions.notebook.focusBottom |
-| Focus top | ✅ | ❌ (jupyter notebook not supported yet) | ✅ | N/A | Focus Top | actions.notebook.focusTop |
+| Edit cell | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Edit Cell | actions.notebook.cell.edit |
+| Execute cell | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Execute Cell | actions.notebook.cell.execute |
+| Execute and insert | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Execute Cell and Insert Below | actions.notebook.cell.executeAndInsertBelow |
+| Execute and select | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Execute Cell and Select Below | actions.notebook.cell.executeAndSelectBelow |
+| Insert above | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Insert Code Cell Above | actions.notebook.cell.insertCodeCellAbove |
+| Insert below | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Insert Code Cell Below | actions.notebook.cell.insertCodeCellBelow |
+| Move down | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Move Cell Down | actions.notebook.cell.moveDown |
+| Move up | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Move Cell Up | actions.notebook.cell.moveUp |
+| Quit edit | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Stop Editing Cell | actions.notebook.cell.quitEdit |
+| Focus bottom | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Focus Bottom | actions.notebook.focusBottom |
+| Focus top | ✅ | ❌ (Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)) | ✅ | N/A | Focus Top | actions.notebook.focusTop |
 
 ## Version Control
 
 | Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------------|-----------|
+| Blame hover | ❌ (vscode support blame inline, see `Toggle blame inline`) | ✅ | N/A | N/A | Show blame information on hover | actions.git.blameHover |
 | Commit all | ✅ | ✅ | ✅ | N/A | Commit All | actions.git.commitAll |
 | Open changes | ✅ | ✅ | ✅ | N/A | Open all git changed files | actions.git.openChanges |
 | Push changes | ✅ | ✅ | ✅ | N/A | Push Changes | actions.git.push |
 | Revert changes | ✅ | ✅ | ✅ | N/A | Revert Changes | actions.git.revert |
 | Stage changes | ✅ | ✅ | ✅ | N/A | Stage Changes | actions.git.stage |
 | Sync changes | ✅ | ✅ | ✅ | N/A | Sync (Pull, Push) | actions.git.sync |
-| Toggle blame | N/A | ✅ | N/A | N/A | Toggle Blame | actions.git.toggleBlame |
+| Toggle blame | ❌ (vscode support toggle blame inline, see `Toggle blame inline`) | ✅ | ❌ (intellij can only toggle blame in actions) | N/A | Toggle Blame in left of editor | actions.git.toggleBlame |
+| Toggle blame inline | ✅ | ✅ | N/A | N/A | Toggle blame inline, next to editor content | actions.git.toggleBlameInline |
+| Toggle blame status bar | ✅ | ❌ (not supported yet, see [`Optional Git Blame in status bar instead of inline` discussion](https://github.com/zed-industries/zed/discussions/26127)) | N/A | N/A | Toggle blame in status bar | actions.git.toggleBlameStatusBar |
 | Unstage changes | ✅ | ✅ | ✅ | N/A | Unstage Changes | actions.git.unstage |
 | Accept current | ✅ | N/A | ✅ | N/A | Accept current change (keep left side) | actions.merge.acceptCurrent |
 | Accept incoming | ✅ | N/A | ✅ | N/A | Accept incoming change (take right side) | actions.merge.acceptIncoming |

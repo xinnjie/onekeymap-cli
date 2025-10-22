@@ -85,13 +85,41 @@ mappings:
       context: "Editor"
   - id: "actions.git.toggleBlame"
     name: "Toggle blame"
-    description: "Toggle Blame"
+    description: "Toggle Blame in left of editor"
     category: "Version Control"
     vscode:
       notSupported: true
-    # intellij can only toggle blame in actions
+      notSupportedReason: "vscode support toggle blame inline, see `Toggle blame inline`"
     intellij:
       notSupported: true
+      notSupportedReason: "intellij can only toggle blame in actions"
     zed:
       action: "git::blame"
+      context: "Editor"
+  - id: "actions.git.toggleBlameInline"
+    name: "Toggle blame inline"
+    description: "Toggle blame inline, next to editor content"
+    category: "Version Control"
+    vscode:
+      command: "git.blame.toggleEditorDecoration"
+    zed:
+      action: "editor::ToggleGitBlameInline"
+  - id: "actions.git.toggleBlameStatusBar"
+    name: "Toggle blame status bar"
+    description: "Toggle blame in status bar"
+    category: "Version Control"
+    vscode:
+      command: "git.blame.toggleStatusBarItem"
+    zed:
+      notSupported: true
+      notSupportedReason: "not supported yet, see [`Optional Git Blame in status bar instead of inline` discussion](https://github.com/zed-industries/zed/discussions/26127)"
+  - id: "actions.git.blameHover"
+    name: "Blame hover"
+    description: "Show blame information on hover"
+    category: "Version Control"
+    vscode:
+      notSupported: true
+      notSupportedReason: "vscode support blame inline, see `Toggle blame inline`"
+    zed:
+      action: "editor::BlameHover"
       context: "Editor"

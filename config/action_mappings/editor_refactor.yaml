@@ -30,6 +30,7 @@ mappings:
       action: "Refactorings.QuickListPopupAction"
     zed:
       notSupported: true
+      notSupportedReason: "not supported yet, see [Code refactoring in Zed ](https://github.com/zed-industries/zed/discussions/8623)"
     helix:
       command: "code_action"
       mode: "insert"
@@ -56,9 +57,9 @@ mappings:
       when: "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
     intellij:
       notSupported: true
-    # zed do not support yet
     zed:
       notSupported: true
+      notSupportedReason: "not supported yet, no issue tracked"
     helix:
       notSupported: true
   - id: "actions.refactor.codeAction"

@@ -46,6 +46,7 @@ mappings:
       action: "GotoTest"
     zed:
       notSupported: true
+      notSupportedReason: "not supported yet, see [`Go to test` discussion](https://github.com/zed-industries/zed/discussions/40859)"
   - id: "actions.go.goToSuper"
     name: "Go to super"
     description: "Go to super class/super method"
@@ -55,6 +56,7 @@ mappings:
       when: "editorTextFocus && dart.isTestFile != true && dart.isTestFile != true"
     zed:
       notSupported: true
+      notSupportedReason: "not supported yet, no issue tracked"
     intellij:
       action: "GotoSuperMethod"
   - id: "actions.go.definition"
@@ -100,9 +102,9 @@ mappings:
       when: "editorHasReferenceProvider && editorTextFocus && !inReferenceSearchEditor"
     intellij:
       action: "ShowUsages"
-    # zed do not have reference peek
     zed:
       notSupported: true
+      notSupportedReason: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
   - id: "actions.go.callHierarchy"
     name: "Call hierarchy"
     description: "Show call hierarchy"
@@ -112,9 +114,9 @@ mappings:
       when: "editorHasCallHierarchyProvider && editorTextFocus"
     intellij:
       action: "CallHierarchy"
-    # Zed do not support yet
     zed:
       notSupported: true
+      notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
   - id: "actions.go.typeHierarchy"
     name: "Type hierarchy"
     description: "Show type hierarchy"
@@ -126,6 +128,7 @@ mappings:
       action: "TypeHierarchy"
     zed:
       notSupported: true
+      notSupportedReason: "Not supported yet, see [`Type hierarchy (class inheritance tree) support` discussion](https://github.com/zed-industries/zed/discussions/16348)"
   - id: "actions.go.bracket"
     name: "Go to bracket"
     description: "Go to bracket"
