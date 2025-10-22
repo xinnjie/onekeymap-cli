@@ -10,4 +10,4 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupportedReason: "intellij need configure in settings"
+      notSupportedReason: "intellij has a `Soft-Wrap` configuration in settings"

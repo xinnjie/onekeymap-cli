@@ -5,7 +5,6 @@ mappings:
     category: "View Management"
     vscode:
       command: "workbench.action.openGlobalSettings"
-      when: ""
     intellij:
       action: "ShowSettingsAndFindPlugin"
     zed:
@@ -19,7 +18,6 @@ mappings:
     category: "View Management"
     vscode:
       command: "workbench.action.selectTheme"
-      when: ""
     intellij:
       action: "QuickChangeScheme"
     zed:
@@ -28,3 +26,15 @@ mappings:
     helix:
       command: ":theme"
       mode: "insert"
+  - id: "actions.view.openKeyboardShortcuts"
+    name: "Open keyboard shortcuts"
+    description: "Open Keyboard Shortcuts Settings"
+    category: "View Management"
+    vscode:
+      command: "workbench.action.openGlobalKeybindings"
+    intellij:
+      notSupported: true
+      notSupportedReason: "intellij do not have open keyboard shortcuts, you can open `Keymap` in command palette searching for `Keymap` and then open it."
+    zed:
+      action: "zed::OpenKeymap"
+      context: "Workspace"

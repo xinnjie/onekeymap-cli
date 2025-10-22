@@ -28,7 +28,6 @@ mappings:
     description: "Go to symbol in current open editor"
     category: "Navigation"
     vscode:
-      # breadcrumbsFocusAndSelect is very like workbench.action.gotoSymbol
       command: "workbench.action.gotoSymbol"
       when: "!accessibilityHelpIsShown && !accessibleViewIsShown"
     zed:

@@ -64,7 +64,7 @@ mappings:
       action: "zed::Extensions"
       context: "Workspace"
     intellij:
-      notSupported: true
+      action: "WelcomeScreen.Plugins"
     helix:
       notSupported: true
   - id: "actions.view.showTesting"
@@ -76,6 +76,7 @@ mappings:
       when: ""
     zed:
       notSupported: true
+      notSupportedReason: "zed do not have testing view"
     intellij:
       action: "ActivateUnitTestsToolWindow"
     helix:
@@ -103,9 +104,9 @@ mappings:
     vscode:
       command: "workbench.action.output.toggleOutput"
       when: "workbench.panel.output.active"
-    # zed do not have output view
     zed:
       notSupported: true
+      notSupportedReason: "zed do not have output view"
     intellij:
       action: "ActivateRunToolWindow"
     helix:
@@ -145,12 +146,14 @@ mappings:
     name: "Show debug console"
     description: "Show Debug Output Console view"
     category: "View Management.Pannels"
+    priority: "low"
+    priorityReason: "Not all editors have debug console"
     vscode:
       command: "workbench.debug.action.toggleRepl"
       when: "workbench.panel.repl.view.active"
-    # zed do not have debug console
     zed:
       notSupported: true
+      notSupportedReason: "zed do not have debug console"
     intellij:
       notSupported: true
       notSupportedReason: "intellij have debug output with DebugPanel"

@@ -36,9 +36,9 @@ mappings:
     vscode:
       command: "editor.action.insertCursorAtEndOfEachLineSelected"
       when: "editorTextFocus"
-    # zed do not support yet
     zed:
-      notSupported: true
+      action: "editor::SplitSelectionIntoLines"
+      context: "Editor"
     intellij:
       action: "EditorAddCaretPerSelectedLine"
     helix:

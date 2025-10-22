@@ -9,9 +9,9 @@ mappings:
     zed:
       action: "editor::DuplicateLineUp"
       context: "Editor"
-    # intellij only support duplicate line down
     intellij:
       notSupported: true
+      notSupportedReason: "not supported, no ticket tracked"
     helix:
       command: "copy_selection_on_prev_line"
       mode: "insert"

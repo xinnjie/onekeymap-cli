@@ -26,7 +26,7 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupppotedReason: "intellij need to turn on `CamelHumps` setting"
+      notSupportedReason: "intellij need to turn on `CamelHumps` setting"
     helix:
       command: "move_next_sub_word_start"
       mode: "insert"
@@ -88,6 +88,7 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
+      notSupportedReason: "intellij need to turn on `CamelHumps` setting"
     helix:
       notSupported: true
   - id: "actions.cursor.wordLeftSelect"

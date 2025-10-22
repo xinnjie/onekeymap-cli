@@ -8,6 +8,6 @@ mappings:
       when: "breadcrumbsPossible && breadcrumbsVisible"
     intellij:
       action: "ShowNavBar"
-    # zed only support search symbol
     zed:
       notSupported: true
+      notSupportedReason: "Not support, no issue tracked"

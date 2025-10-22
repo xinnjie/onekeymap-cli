@@ -5,7 +5,6 @@ mappings:
     category: "File"
     vscode:
       command: "workbench.action.files.save"
-      when: ""
     zed:
       action: "workspace::Save"
       context: "Workspace"
@@ -18,14 +17,16 @@ mappings:
     name: "Save as"
     description: "Save current file with a new name"
     category: "File"
+    priority: "low"
+    priorityReason: "Use `Save file` instead. Not all editors support `Save as`."
     vscode:
       command: "workbench.action.files.saveAs"
-      when: ""
     zed:
       action: "workspace::SaveAs"
       context: "Workspace"
     intellij:
       notSupported: true
+      notSupportedReason: "intellij do not have save as, you can use `Save file`."
     helix:
       notSupported: true
   - id: "actions.file.saveAll"
@@ -34,7 +35,6 @@ mappings:
     category: "File"
     vscode:
       command: "workbench.action.files.saveAll"
-      when: ""
     zed:
       action: "workspace::SaveAll"
       context: "Workspace"

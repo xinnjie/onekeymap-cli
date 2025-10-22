@@ -6,9 +6,9 @@ mappings:
     vscode:
       command: "workbench.action.toggleStatusbarVisibility"
       when: ""
-    # zed can not hide status bar
     zed:
       notSupported: true
+      notSupportedReason: "Not support, see [Add options to hide title and status bar issue](https://github.com/zed-industries/zed/issues/5120)"
     # intellij need configure in settings
     intellij:
       notSupported: true

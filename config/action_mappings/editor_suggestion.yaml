@@ -63,8 +63,8 @@ mappings:
       command: "signature_help"
       mode: "insert"
   - id: "actions.hover.showHover"
-    name: "Show hover"
-    description: "Show Hover"
+    name: "Show documentation hover"
+    description: "Show documentation hover"
     category: "Code"
     vscode:
       command: "editor.action.showHover"

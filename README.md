@@ -135,15 +135,17 @@ editors:
 
 ---
 
-## 🧩 Supported Editors
+## 🧩 Supported Editors & Actions
 
 | Editor | Import | Export | Notes |
 |--------|--------|--------|-------|
-| **VSCode** | ✅ | ✅ | Full support including `when` clauses |
-| **Zed** | ✅ | ✅ | Full support including contexts |
-| **IntelliJ IDEA** | ✅ | ✅ | Supports XML keymap format; shortcut coverage is still limited (see [Action Support Matrix](action-support-matrix.md)) |
+| **VSCode** | ✅ | ✅ |  |
+| **Zed** | ✅ | ✅ |  |
+| **IntelliJ IDEA** | ✅ | ✅ |  |
 | **Helix** | ❌ | ✅ | TOML configuration support; shortcut coverage is still limited (see [Action Support Matrix](action-support-matrix.md)) |
 | **Vim/Neovim** | 🚧 | 🚧 | Planned |
+
+> See all supported actions: [action-support-matrix.md](action-support-matrix.md)
 
 ---
 

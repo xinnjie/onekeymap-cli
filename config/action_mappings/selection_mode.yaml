@@ -1,15 +1,15 @@
 mappings:
   - id: "actions.selection.toggleColumnSelectionMode"
-    name: "Toggle column mode"
-    description: "Toggle column selection mode"
+    name: "Toggle column selection"
+    description: "Toggle column selection."
     category: "Editor.Selection"
     # vscode could also presee `option` to cloumn select
     vscode:
       command: "editor.action.toggleColumnSelection"
       when: "editorTextFocus"
-    # presee shift-option to column select, but zed do not support toggle with keybind
     zed:
       notSupported: true
+      notSupportedReason: "holding shift-option and perform a cursor drag to column select, see detail in [Add support for column selection mode issue](https://github.com/zed-industries/zed/issues/7215)"
     intellij:
       action: "EditorToggleColumnMode"
     helix:

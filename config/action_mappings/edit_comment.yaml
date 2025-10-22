@@ -21,10 +21,9 @@ mappings:
     vscode:
       command: "editor.action.blockComment"
       when: "editorTextFocus && !editorReadonly"
-    # zed do not support block comment yet
-    # https://github.com/zed-industries/zed/issues/4751
     zed:
       notSupported: true
+      notSupportedReason: "not supported yet, see [`Toggle block comment` discussion](https://github.com/zed-industries/zed/discussions/4751)"
     intellij:
       action: "CommentByBlockComment"
     helix:

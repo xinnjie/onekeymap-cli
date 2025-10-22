@@ -46,11 +46,13 @@ mappings:
      - action: "pane::SplitRight"
        context: "Terminal"
     intellij:
-      action: "OpenInRightSplit"
+      action: "SplitVertically"
   - id: "actions.view.splitLeft"
     name: "Split left"
     description: "Split editor to left"
     category: "View Management.Split"
+    priority: "low"
+    priorityReason: "Not all editors support split left, use `Split right` instead."
     vscode:
       command: "workbench.action.splitEditorLeft"
       when: "editorFocus"
@@ -59,10 +61,15 @@ mappings:
         context: "Editor"
       - action: "pane::SplitLeft"
         context: "Terminal"
+    intellij:
+      notSupported: true
+      notSupportedReason: "intellij do not have split left, use `Split right` instead."
   - id: "actions.view.splitUp"
     name: "Split up"
     description: "Split editor to up"
     category: "View Management.Split"
+    priority: "low"
+    priorityReason: "Not all editors support split up, use `Split down` instead."
     vscode:
       command: "workbench.action.splitEditorUp"
       when: "editorFocus"
@@ -71,6 +78,9 @@ mappings:
         context: "Editor"
       - action: "pane::SplitUp"
         context: "Terminal"
+    intellij:
+     notSupported: true
+     notSupportedReason: "intellij do not have split up, use `Split down` instead."
   - id: "actions.view.splitDown"
     name: "Split down"
     description: "Split editor to down"
@@ -83,3 +93,5 @@ mappings:
         context: "Editor"
       - action: "pane::SplitDown"
         context: "Terminal"
+    intellij:
+     action: "SplitHorizontally"

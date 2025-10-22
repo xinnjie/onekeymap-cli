@@ -20,6 +20,7 @@ mappings:
       when: "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !peekViewVisible"
     intellij:
       action: "QuickImplementations"
+      disableImport: true
     zed:
       action: "editor::GoToDefinitionSplit"
       context: "Editor"
@@ -72,6 +73,18 @@ mappings:
     intellij:
       notSupported: true
       notSupportedReason: "There is not `Go to definition` in intellij, use `Go to declaration` instead"
+  - id: "actions.go.definitionPeek"
+    name: "Peek definition"
+    description: "Peek definition"
+    category: "Code.Go"
+    vscode:
+      command: "editor.action.peekDefinition"
+      when: "ditorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor"
+    zed:
+      notSupported: true
+      notSupportedReason: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
+    intellij:
+      action: "QuickImplementations"
   - id: "actions.go.typeDefinition"
     name: "Go to type definition"
     description: "Go to type definition"
@@ -84,6 +97,18 @@ mappings:
       context: "Editor"
     intellij:
       action: "GotoTypeDeclaration"
+  - id: "actions.go.typeDefinitionPeek"
+    name: "Peek type definition"
+    description: "Peek type definition"
+    category: "Code.Go"
+    vscode:
+      command: "editor.action.peekTypeDefinition"
+      when: "editorTextFocus"
+    zed:
+      notSupported: true
+      notSupportedReason: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
+    intellij:
+      action: "QuickTypeDefinition"
   - id: "actions.go.references"
     name: "Go to references"
     description: "Go to references"
@@ -118,6 +143,19 @@ mappings:
     intellij:
       action: "CallHierarchy"
     zed:
+      notSupported: true
+      notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
+  - id: "actions.go.callHierarchyPeek"
+    name: "Peek call hierarchy"
+    description: "Peek call hierarchy"
+    category: "Code.Go"
+    vscode:
+      command: "editor.showCallHierarchy"
+      when: "editorHasCallHierarchyProvider && editorTextFocus && !inReferenceSearchEditor"
+    zed:
+      notSupported: true
+      notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
+    intellij:
       notSupported: true
       notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
   - id: "actions.go.typeHierarchy"

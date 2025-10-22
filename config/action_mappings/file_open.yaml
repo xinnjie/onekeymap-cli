@@ -22,9 +22,9 @@ mappings:
       when: "emptyWorkspaceSupport"
     intellij:
       action: "EditSourceInNewWindow"
-    # zed do not support
     zed:
       notSupported: true
+      notSupportedReason: "Not support, no issue tracked"
     helix:
       notSupported: true
   - id: "actions.file.openRecent"
