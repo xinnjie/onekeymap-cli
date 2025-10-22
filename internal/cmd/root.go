@@ -52,6 +52,7 @@ type rootFlags struct {
 	enableTelemetry bool
 	sandbox         bool
 	skipUpdateCheck bool
+	onekeymap       string
 }
 
 func NewCmdRoot() *cobra.Command {
@@ -71,11 +72,13 @@ func NewCmdRoot() *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&f.backup, "backup", "b", true, "Create a backup of the target editor's keymap")
 	cmd.PersistentFlags().BoolVarP(&f.interactive, "interactive", "i", true, "Run in interactive mode")
 	cmd.PersistentFlags().
-		BoolVar(&f.enableTelemetry, "telemetry", false, "Enable OpenTelemetry to help improve onekeymap")
+		BoolVar(&f.enableTelemetry, "telemetry", false, "Enable telemetry to help improve onekeymap-cli")
 	cmd.PersistentFlags().
 		BoolVar(&f.sandbox, "sandbox", false, "Enable sandbox mode for macOS, restricting file access")
 	cmd.PersistentFlags().
 		BoolVar(&f.skipUpdateCheck, "skip-update-check", false, "Skip checking for updates")
+	cmd.PersistentFlags().
+		StringVar(&f.onekeymap, "onekeymap", "", "Path to onekeymap.json file (overrides config file setting)")
 
 	if err := viper.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose")); err != nil {
 		cmd.PrintErrf("Error binding verbose flag: %v\n", err)
@@ -91,6 +94,10 @@ func NewCmdRoot() *cobra.Command {
 	}
 	if err := viper.BindPFlag("sandbox", cmd.PersistentFlags().Lookup("sandbox")); err != nil {
 		cmd.PrintErrf("Error binding sandbox flag: %v\n", err)
+		os.Exit(1)
+	}
+	if err := viper.BindPFlag("onekeymap", cmd.PersistentFlags().Lookup("onekeymap")); err != nil {
+		cmd.PrintErrf("Error binding onekeymap flag: %v\n", err)
 		os.Exit(1)
 	}
 

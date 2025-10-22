@@ -1,0 +1,105 @@
+# OneKeyMap CLI Configuration Example
+# This file should be placed in one of the following locations:
+# - ./config.yaml (current directory)
+# - ~/.config/onekeymap/config.yaml (user config directory)
+# - /etc/onekeymap/config.yaml (system-wide config)
+
+# Enable verbose output for debugging
+# Can be overridden with --verbose or -v flag
+# Default: false
+verbose: false
+
+# Suppress all output except errors
+# Can be overridden with --quiet or -q flag
+# Default: false
+quiet: false
+
+# Enable macOS sandbox mode (restricts file access)
+# Can be overridden with --sandbox flag
+# Default: false
+sandbox: false
+
+# Path to the main onekeymap.json configuration file
+# This is where your unified keymap settings are stored
+# Can be overridden with --onekeymap flag or ONEKEYMAP_ONEKEYMAP environment variable
+# Default: ~/.config/onekeymap/onekeymap.json
+onekeymap: ~/.config/onekeymap/onekeymap.json
+
+# OpenTelemetry OTLP exporter endpoint for telemetry
+# Only used when --telemetry flag is enabled
+# Can be overridden with ONEKEYMAP_OTEL_EXPORTER_OTLP_ENDPOINT environment variable
+# Example: http://localhost:4318
+otel:
+  exporter:
+    otlp:
+      endpoint: ""
+
+# Per-editor configuration settings
+editors:
+  # VSCode configuration
+  vscode:
+    # Path to VSCode's keybindings.json file
+    # If not specified, the CLI will auto-detect the default location
+    keymap_path: ""
+    # Enable automatic syncing for this editor (not implemented yet)
+    sync_enabled: false
+
+  # Windsurf configuration
+  windsurf:
+    keymap_path: ""
+    sync_enabled: false
+
+  # Cursor configuration
+  cursor:
+    keymap_path: ""
+    sync_enabled: false
+
+  # IntelliJ IDEA configuration
+  intellij:
+    keymap_path: ""
+    sync_enabled: false
+
+  # PyCharm configuration
+  pycharm:
+    keymap_path: ""
+    sync_enabled: false
+
+  # WebStorm configuration
+  webstorm:
+    keymap_path: ""
+    sync_enabled: false
+
+  # GoLand configuration
+  goland:
+    keymap_path: ""
+    sync_enabled: false
+
+  # CLion configuration
+  clion:
+    keymap_path: ""
+    sync_enabled: false
+
+  # Helix configuration
+  helix:
+    keymap_path: ""
+    sync_enabled: false
+
+  # Zed configuration
+  zed:
+    keymap_path: ""
+    sync_enabled: false
+# Configuration Priority (from highest to lowest):
+# 1. Command-line flags (e.g., --onekeymap, --verbose)
+# 2. Environment variables (e.g., ONEKEYMAP_ONEKEYMAP, ONEKEYMAP_VERBOSE)
+# 3. Configuration file settings (this file)
+# 4. Default values
+
+# Environment Variables:
+# All config keys can be set via environment variables with the ONEKEYMAP_ prefix
+# and dots replaced with underscores:
+# - ONEKEYMAP_VERBOSE -> verbose
+# - ONEKEYMAP_QUIET -> quiet
+# - ONEKEYMAP_ONEKEYMAP -> onekeymap
+# - ONEKEYMAP_OTEL_EXPORTER_OTLP_ENDPOINT -> otel.exporter.otlp.endpoint
+# - ONEKEYMAP_SERVER_LISTEN -> server.listen
+# - ONEKEYMAP_EDITORS_VSCODE_KEYMAP_PATH -> editors.vscode.keymap_path
