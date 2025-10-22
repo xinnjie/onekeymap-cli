@@ -1,6 +1,8 @@
 package views
 
 import (
+	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -28,10 +31,21 @@ const (
 
 var _ tea.Model = (*KeymapViewModel)(nil)
 
+// FileChangedMsg is sent when the watched file changes
+type FileChangedMsg struct {
+	Path string
+}
+
+// FileErrorMsg is sent when there's an error watching the file
+type FileErrorMsg struct {
+	Err error
+}
+
 // KeymapViewModel is a read-only TUI model to present current OneKeymapSetting.
 type KeymapViewModel struct {
-	setting *keymapv1.Keymap
-	mc      *mappings.MappingConfig
+	setting  *keymapv1.Keymap
+	mc       *mappings.MappingConfig
+	filePath string // Path to the onekeymap.json file being watched
 
 	// category selection
 	categories       []string
@@ -40,14 +54,16 @@ type KeymapViewModel struct {
 	actionTable      table.Model
 
 	width, height int
+	errorMsg      string // Error message to display
 }
 
-func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig) tea.Model {
+func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig, filePath string) tea.Model {
 	m := &KeymapViewModel{
-		setting: setting,
-		mc:      mc,
-		width:   defaultInitialWidth,
-		height:  defaultInitialHeight,
+		setting:  setting,
+		mc:       mc,
+		filePath: filePath,
+		width:    defaultInitialWidth,
+		height:   defaultInitialHeight,
 	}
 	m.initCategories()
 	m.selectedCategory = "All"
@@ -92,6 +108,23 @@ func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
+	case FileChangedMsg:
+		// File changed, reload the keymap
+		m.errorMsg = "" // Clear any previous error
+		if err := m.reloadKeymap(); err != nil {
+			m.errorMsg = fmt.Sprintf("Failed to reload keymap: %v", err)
+		} else {
+			// Reinitialize categories and update table
+			m.initCategories()
+			m.actionTable.SetRows(m.keybindingRows())
+		}
+		return m, nil
+
+	case FileErrorMsg:
+		// Error watching file
+		m.errorMsg = fmt.Sprintf("File watch error: %v", msg.Err)
+		return m, nil
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		// nolint:goconst // key strings for TUI input are clearer inline here
@@ -132,9 +165,13 @@ func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *KeymapViewModel) View() string {
 	// Help text at the top
+	helpText := "OneKeymap Viewer (read-only)  —  Use ↑/↓ navigate, Tab/Shift+Tab to switch category, q to quit"
+	if m.errorMsg != "" {
+		helpText = fmt.Sprintf("⚠ %s", m.errorMsg)
+	}
 	help := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("241")).
-		Render("OneKeymap Viewer (read-only)  —  Use ↑/↓ navigate, Tab/Shift+Tab to switch category, q to quit")
+		Render(helpText)
 
 	// Left panel: category select
 	categoryPanel := lipgloss.NewStyle().
@@ -282,4 +319,21 @@ func dedup(in []string) []string {
 		out = append(out, s)
 	}
 	return out
+}
+
+// reloadKeymap reloads the keymap from the file
+func (m *KeymapViewModel) reloadKeymap() error {
+	file, err := os.Open(m.filePath)
+	if err != nil {
+		return fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	setting, err := keymap.Load(file)
+	if err != nil {
+		return fmt.Errorf("failed to parse keymap: %w", err)
+	}
+
+	m.setting = setting
+	return nil
 }
