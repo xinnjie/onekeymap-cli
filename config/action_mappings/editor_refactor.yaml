@@ -6,10 +6,11 @@ mappings:
     vscode:
       - command: "editor.action.rename"
         when: "editorHasRenameProvider && editorTextFocus && !editorReadonly"
-        forImport: true
       - command: "editor.action.changeAll"
         when: "!editorHasRenameProvider &&editorTextFocus && !editorReadonly"
+        disableImport: true
       - command: "renameFile"
+        disableImport: true
         when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
     intellij:
       action: "RenameElement"
@@ -56,7 +57,8 @@ mappings:
       command: "editor.action.quickFix"
       when: "editorHasCodeActionsProvider && textInputFocus && !editorReadonly"
     intellij:
-      notSupported: true
+      action: "ShowIntentionActions"
+      disableImport: true
     zed:
       notSupported: true
       notSupportedReason: "not supported yet, no issue tracked"
@@ -71,6 +73,7 @@ mappings:
       when: "editorHasCodeActionsProvider && editorTextFocus && !editorReadonly"
     intellij:
       action: "ShowIntentionActions"
+      disableImport: true
     zed:
       action: "editor::ToggleCodeActions"
       context: "Editor"

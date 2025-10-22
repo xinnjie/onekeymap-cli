@@ -6,10 +6,9 @@ mappings:
     vscode:
       - command: "workbench.view.explorer"
         when: "viewContainer.workbench.view.explorer.enabled"
-        forImport: true
       - command: "workbench.action.toggleSidebarVisibility"
         when: "explorerViewletFocus"
-        forImport: false
+        disableImport: true
     zed:
       action: "project_panel::ToggleFocus"
       context: "Workspace"
@@ -25,10 +24,9 @@ mappings:
     vscode:
       - command: "workbench.view.search"
         when: "workbench.view.search.active && neverMatch =~ /doesNotMatch/"
-        forImport: true
       - command: "workbench.action.toggleSidebarVisibility"
         when: "searchViewletVisible"
-        forImport: false
+        disableImport: true
     zed:
       action: "project_search::ToggleFocus"
       context: "Workspace"
@@ -44,10 +42,9 @@ mappings:
     vscode:
       - command: "workbench.view.scm"
         when: "workbench.scm.active"
-        forImport: true
       - command: "workbench.action.toggleSidebarVisibility"
         when: "activeViewlet == 'workbench.view.scm'"
-        forImport: false
+        disableImport: true
     zed:
       action: "git_panel::ToggleFocus"
       context: "Workspace"
@@ -134,10 +131,9 @@ mappings:
     vscode:
       - command: "workbench.view.debug"
         when: "viewContainer.workbench.view.debug.enabled"
-        forImport: true
       - command: "workbench.action.toggleSidebarVisibility"
         when: "activeViewlet == 'workbench.view.debug'"
-        forImport: false
+        disableImport: true
     zed:
       action: "debug_panel::ToggleFocus"
       context: "Workspace"

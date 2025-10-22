@@ -45,14 +45,13 @@ func (i *vscodeImporter) FindByVSCodeActionWithArgs(
 }
 
 type candidate struct {
-	mapping   *mappings.ActionMappingConfig
-	forImport bool
-	explicit  bool
+	mapping          *mappings.ActionMappingConfig
+	enabledForImport bool
 }
 
-func newCandidate(mapping mappings.ActionMappingConfig, effective bool, explicit bool) *candidate {
+func newCandidate(mapping mappings.ActionMappingConfig, enabled bool) *candidate {
 	mCopy := mapping
-	return &candidate{mapping: &mCopy, forImport: effective, explicit: explicit}
+	return &candidate{mapping: &mCopy, enabledForImport: enabled}
 }
 
 type bucketKind int
@@ -120,28 +119,20 @@ func pickCandidate(cands []*candidate) *mappings.ActionMappingConfig {
 		return nil
 	}
 	var (
-		explicitForImport []*candidate
-		implicitForImport []*candidate
-		others            []*candidate
+		enabled  []*candidate
+		disabled []*candidate
 	)
 	for _, c := range cands {
-		switch {
-		case c.forImport && c.explicit:
-			explicitForImport = append(explicitForImport, c)
-		case c.forImport:
-			implicitForImport = append(implicitForImport, c)
-		default:
-			others = append(others, c)
+		if c.enabledForImport {
+			enabled = append(enabled, c)
+		} else {
+			disabled = append(disabled, c)
 		}
 	}
-	chooseFrom := cands
-	switch {
-	case len(explicitForImport) > 0:
-		chooseFrom = explicitForImport
-	case len(implicitForImport) > 0:
-		chooseFrom = implicitForImport
-	default:
-		chooseFrom = others
+	// Prefer enabled configs, fall back to disabled if no enabled ones
+	chooseFrom := enabled
+	if len(chooseFrom) == 0 {
+		chooseFrom = disabled
 	}
 	sort.Slice(chooseFrom, func(i, j int) bool {
 		return chooseFrom[i].mapping.ID < chooseFrom[j].mapping.ID
@@ -159,14 +150,12 @@ func (i *vscodeImporter) appendMappingCandidates(
 		return
 	}
 
-	onlyConfig := len(mapping.VSCode) == 1
-	explicitOnly := mapping.VSCode.HasExplicitForImport()
-
 	for _, vc := range mapping.VSCode {
 		if vc.Command != command {
 			continue
 		}
-		if explicitOnly && !vc.ForImport {
+		// Skip configs that are explicitly disabled for import
+		if vc.DisableImport {
 			continue
 		}
 
@@ -175,8 +164,8 @@ func (i *vscodeImporter) appendMappingCandidates(
 			continue
 		}
 
-		effectiveForImport := vc.ForImport || onlyConfig
-		cand := newCandidate(mapping, effectiveForImport, vc.ForImport)
+		// All remaining configs are enabled for import
+		cand := newCandidate(mapping, true)
 		buckets.add(bucket, mapping.ID, cand)
 	}
 }

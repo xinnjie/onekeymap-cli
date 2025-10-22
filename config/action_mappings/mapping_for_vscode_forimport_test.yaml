@@ -1,40 +1,40 @@
-# Additional mappings for ForImport importer tests
+# Additional mappings for DisableImport importer tests
 mappings:
-  # ForImport preference among command+args ignoring when
+  # DisableImport preference among command+args ignoring when
   - id: "actions.test.forimport.withArgs.A"
-    description: "ForImport args candidate A"
+    description: "DisableImport args candidate A (disabled)"
     category: "Testing"
     vscode:
       - command: "cmd.forimp.args"
         when: "W_A"
         args:
           x: 1
+        disableImport: true
   - id: "actions.test.forimport.withArgs.B"
-    description: "ForImport args candidate B (preferred)"
+    description: "DisableImport args candidate B (enabled, preferred)"
     category: "Testing"
     vscode:
       - command: "cmd.forimp.args"
         when: "W_B"
         args:
           x: 1
-        forImport: true
-  # ForImport preference in command-only fallback (no args)
+  # DisableImport preference in command-only fallback (no args)
   - id: "actions.test.forimport.cmdOnly.A"
-    description: "ForImport cmd-only candidate A"
+    description: "DisableImport cmd-only candidate A (disabled)"
     category: "Testing"
     vscode:
       - command: "cmd.forimp.noargs"
         when: "Y_A"
+        disableImport: true
   - id: "actions.test.forimport.cmdOnly.B"
-    description: "ForImport cmd-only candidate B (preferred)"
+    description: "DisableImport cmd-only candidate B (enabled, preferred)"
     category: "Testing"
     vscode:
       - command: "cmd.forimp.noargs"
         when: "Y_B"
-        forImport: true
-  # Single-entry implicit ForImport vs multi-entry
+  # Single-entry implicit enabled vs multi-entry
   - id: "actions.test.forimport.singleImplicit"
-    description: "Single-entry mapping implicitly preferred"
+    description: "Single-entry mapping implicitly enabled"
     category: "Testing"
     vscode:
       command: "cmd.forimp.single"
@@ -45,6 +45,6 @@ mappings:
     vscode:
       - command: "could.be.imported"
         when: "SomeCondition"
-        forImport: true
       - command: "should.not.import.command"
         when: "OtherCondition"
+        disableImport: true

@@ -95,8 +95,8 @@ func (am *ActionMappingConfig) IsSupported(editorType pluginapi.EditorType) (boo
 
 // EditorActionMapping provides extra flags for editor-specific configurations.
 type EditorActionMapping struct {
-	// when true, this config is used for import, otherwise it is only used for export
-	ForImport bool `yaml:"forImport,omitempty"`
+	// when true, this config is only used for export, otherwise it is used for both import and export
+	DisableImport bool `yaml:"disableImport,omitempty"`
 
 	// explicitly set to true if this config is not supported by the editor
 	NotSupported bool `yaml:"notSupported,omitempty"`

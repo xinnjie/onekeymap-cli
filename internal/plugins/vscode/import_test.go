@@ -193,9 +193,9 @@ func TestImporter_Import(t *testing.T) {
 				},
 			},
 		},
-		// ForImport behavior tests using importer.Import
+		// DisableImport behavior tests using importer.Import
 		{
-			name: "ForImport preference with args (ignoring when)",
+			name: "DisableImport: prefer enabled config with args (ignoring when)",
 			jsonContent: `[
 				{
 					"key": "alt+4",
@@ -211,7 +211,7 @@ func TestImporter_Import(t *testing.T) {
 			},
 		},
 		{
-			name: "ForImport preference with no args (ignoring when)",
+			name: "DisableImport: prefer enabled config with no args (ignoring when)",
 			jsonContent: `[
 				{
 					"key": "alt+5",
@@ -226,7 +226,7 @@ func TestImporter_Import(t *testing.T) {
 			},
 		},
 		{
-			name: "Single-entry mapping implicitly forImport=true",
+			name: "Single-entry mapping implicitly enabled for import",
 			jsonContent: `[
 				{
 					"key": "alt+6",
@@ -241,7 +241,7 @@ func TestImporter_Import(t *testing.T) {
 			},
 		},
 		{
-			name: "Non-forImport entry should not import even when when matches",
+			name: "DisableImport entry should not import even when when matches",
 			jsonContent: `[
 				{
 					"key": "alt+7",

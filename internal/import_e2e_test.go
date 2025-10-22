@@ -33,13 +33,13 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 				Category:    "Editor",
 				VSCode: mappings.VscodeConfigs{
 					{
-						EditorActionMapping: mappings.EditorActionMapping{ForImport: true},
-						Command:             "editor.action.formatSelection",
-						When:                "editorHasDocumentSelectionFormattingProvider && editorTextFocus && !editorReadonly",
+						Command: "editor.action.formatSelection",
+						When:    "editorHasDocumentSelectionFormattingProvider && editorTextFocus && !editorReadonly",
 					},
 					{
-						Command: "notebook.formatCell",
-						When:    "editorHasDocumentFormattingProvider && editorTextFocus && inCompositeEditor && notebookEditable && !editorReadonly && activeEditor == 'workbench.editor.notebook'",
+						EditorActionMapping: mappings.EditorActionMapping{DisableImport: true},
+						Command:             "notebook.formatCell",
+						When:                "editorHasDocumentFormattingProvider && editorTextFocus && inCompositeEditor && notebookEditable && !editorReadonly && activeEditor == 'workbench.editor.notebook'",
 					},
 				},
 			},

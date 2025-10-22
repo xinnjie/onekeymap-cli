@@ -25,7 +25,7 @@ mappings:
       context: "Editor"
   - id: "actions.go.implementations"
     name: "Go to implementations"
-    description: "Go to implementations"
+    description: "Go to implementations, For an interface, this shows all the implementors of that interface and for abstract methods, this shows all concrete implementations of that method."
     category: "Code.Go"
     vscode:
       command: "editor.action.goToImplementation"
@@ -69,6 +69,9 @@ mappings:
     zed:
       action: "editor::GoToDefinition"
       context: "Editor"
+    intellij:
+      notSupported: true
+      notSupportedReason: "There is not `Go to definition` in intellij, use `Go to declaration` instead"
   - id: "actions.go.typeDefinition"
     name: "Go to type definition"
     description: "Go to type definition"

@@ -6,12 +6,13 @@ mappings:
     vscode:
       - command: "editor.action.clipboardCutAction"
         when: "editorTextFocus"
-        forImport: true
       # cut in file explorer
       - command: "filesExplorer.cut"
         when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+        disableImport: true
       # underlying cut
       - command: "execCut"
+        disableImport: true
     zed:
       - action: "editor::Cut"
         context: "Editor"
@@ -29,15 +30,17 @@ mappings:
     vscode:
       - command: "editor.action.clipboardCopyAction"
         when: "editorTextFocus"
-        forImport: true
       # copy in file explorer
       - command: "filesExplorer.copy"
+        disableImport: true
         when: "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !inputFocus"
       # copy in problem view
       - command: "problems.action.copy"
         when: "problemsVisibility && !relatedInformationFocus && focusedView == 'workbench.panel.markers.view'"
+        disableImport: true
       # underlying copy
       - command: "execCopy"
+        disableImport: true
     zed:
       - action: "editor::Copy"
         context: "Editor"
@@ -61,12 +64,13 @@ mappings:
     vscode:
       - command: "editor.action.clipboardPasteAction"
         when: "editorTextFocus && !editorReadonly"
-        forImport: true
       # paste in file explorer
       - command: "filesExplorer.paste"
         when: "filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+        disableImport: true
       # underlying paste
       - command: "execPaste"
+        disableImport: true
     zed:
       - action: "editor::Paste"
         context: "Editor"

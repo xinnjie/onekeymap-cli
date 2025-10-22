@@ -14,6 +14,10 @@ func checkIntellijDuplicateConfig(mappings map[string]ActionMappingConfig) error
 		if action == "" {
 			continue
 		}
+		// Skip configs that are disabled for import (export-only)
+		if m.IntelliJ.DisableImport {
+			continue
+		}
 		if prev, ok := seen[action]; ok {
 			if _, exists := dups[action]; !exists {
 				dups[action] = []string{prev}

@@ -32,6 +32,7 @@ mappings:
       when: "textCompareEditorVisible"
     intellij:
       action: "PreviousDiff"
+    # TODO(xinnjie): compare editor not available in zed?
     zed:
       action: "editor::GoToPreviousChange"
       context: "Editor && mode == full"

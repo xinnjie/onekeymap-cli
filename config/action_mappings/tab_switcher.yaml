@@ -6,10 +6,11 @@ mappings:
     vscode:
       - command: "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup"
         when: "editorFocus"
-        forImport: true
       - command: "workbench.action.quickOpenNavigateNextInEditorPicker"
         when: "inEditorsPicker && inQuickOpen"
+        disableImport: true
       - command: "workbench.action.quickOpenNavigateNext"
+        disableImport: true
         when: "inQuickOpen"
       - command: "workbench.action.terminal.focusNext"
         when: "terminalFocus"
@@ -25,10 +26,11 @@ mappings:
     vscode:
       - command: "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup"
         when: "editorFocus"
-        forImport: true
       - command: "workbench.action.quickOpenNavigatePreviousInEditorPicker"
         when: "inEditorsPicker && inQuickOpen"
+        disableImport: true
       - command: "workbench.action.terminal.focusPrevious"
+        disableImport: true
         when: "terminalFocus"
     zed:
       action: "tab_switcher::Toggle"

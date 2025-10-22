@@ -13,11 +13,11 @@
 |--------|--------|-----|----------|-------|-------------|-----------|
 | Go to bracket | ✅ | ✅ | ✅ | N/A | Go to bracket | actions.go.bracket |
 | Call hierarchy | ✅ | ❌ (not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)) | ✅ | N/A | Show call hierarchy | actions.go.callHierarchy |
-| Go to definition | ✅ | ✅ | N/A | N/A | Go to definition | actions.go.definition |
+| Go to definition | ✅ | ✅ | ❌ (There is not `Go to definition` in intellij, use `Go to declaration` instead) | N/A | Go to definition | actions.go.definition |
 | Go to declaration | ✅ | ✅ | ✅ | N/A | Go to declaration or usages | actions.go.goToDeclaration |
 | Go to super | ✅ | ❌ (not supported yet, no issue tracked) | ✅ | N/A | Go to super class/super method | actions.go.goToSuper |
 | Go to test | ✅ | ❌ (not supported yet, see [`Go to test` discussion](https://github.com/zed-industries/zed/discussions/40859)) | ✅ | N/A | Go to test | actions.go.goToTest |
-| Go to implementations | ✅ | ✅ | ✅ | N/A | Go to implementations | actions.go.implementations |
+| Go to implementations | ✅ | ✅ | ✅ | N/A | Go to implementations, For an interface, this shows all the implementors of that interface and for abstract methods, this shows all concrete implementations of that method. | actions.go.implementations |
 | Peek declaration | ✅ | ✅ | ✅ | N/A | Peek declaration | actions.go.peekDeclaration |
 | Reference peek | ✅ | ❌ (Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)) | ✅ | N/A | Show usages / reference search | actions.go.referencePeek |
 | Go to references | ✅ | ✅ | ✅ | N/A | Go to references | actions.go.references |
@@ -30,7 +30,7 @@
 |--------|--------|-----|----------|-------|-------------|-----------|
 | Code action | ✅ | ✅ | ✅ | ✅ | Code Action... | actions.refactor.codeAction |
 | Organize imports | ✅ | ✅ | ✅ | N/A | Organize Imports | actions.refactor.organizeImports |
-| Quick fix | ✅ | ❌ (not supported yet, no issue tracked) | N/A | N/A | Quick Fix... | actions.refactor.quickFix |
+| Quick fix | ✅ | ❌ (not supported yet, no issue tracked) | ✅ | N/A | Quick Fix... | actions.refactor.quickFix |
 | Refactor code | ✅ | ❌ (not supported yet, see [Code refactoring in Zed ](https://github.com/zed-industries/zed/discussions/8623)) | ✅ | ✅ | Refactor This... | actions.refactor.refactor |
 | Rename symbol | ✅ | ✅ | ✅ | ✅ | Rename | actions.refactor.rename |
 
@@ -183,8 +183,8 @@
 | Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------------|-----------|
 | Delete previous word | ✅ | ✅ | ✅ | N/A | Delete to the start of the previous word | actions.edit.deleteWordLeft |
-| Delete previous subword | ✅ | ✅ | N/A | N/A | Delete to the start of the previous subword (hump) | actions.edit.deleteWordPartLeft |
-| Delete next subword | ✅ | ✅ | N/A | N/A | Delete to the end of the next subword (hump) | actions.edit.deleteWordPartRight |
+| Delete previous subword | ✅ | ✅ | ❌ (behaviour is controlled by `CamelHumps` setting) | N/A | Delete to the start of the previous subword (hump) | actions.edit.deleteWordPartLeft |
+| Delete next subword | ✅ | ✅ | ❌ (behaviour is controlled by `CamelHumps` setting) | N/A | Delete to the end of the next subword (hump) | actions.edit.deleteWordPartRight |
 
 ## File
 
@@ -224,7 +224,7 @@
 |--------|--------|-----|----------|-------|-------------|-----------|
 | Go back | ✅ | ✅ | ✅ | N/A | Go to previous cursor location | actions.go.back |
 | Go forward | ✅ | ✅ | ✅ | N/A | Go to next cursor location | actions.go.forward |
-| Go to last edit location | ✅ | N/A | ✅ | N/A | Go to last edit location | actions.go.lastEditLocation |
+| Go to last edit location | ✅ | ❌ (not supported yet, see [Implement "Go To Last Edit Location" issue](https://github.com/zed-industries/zed/issues/19731)) | ✅ | N/A | Go to last edit location | actions.go.lastEditLocation |
 
 ## Navigation.Problems
 
