@@ -9,6 +9,14 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
+// nolint:gochecknoglobals // editorTypesDisplayOrder defines the order in which editor types are displayed
+var editorTypesDisplayOrder = [...]pluginapi.EditorType{
+	pluginapi.EditorTypeVSCode,
+	pluginapi.EditorTypeIntelliJ,
+	pluginapi.EditorTypeZed,
+	pluginapi.EditorTypeHelix,
+}
+
 type ActionDetailsViewModel struct {
 	actionID      string
 	description   string
@@ -53,16 +61,7 @@ func newActionDetailsViewModel(actionID string, mc *mappings.MappingConfig) *Act
 }
 
 func (d *ActionDetailsViewModel) collectEditorSupport(mapping *mappings.ActionMappingConfig) {
-	// Define all main editor types to check
-	editorTypes := []pluginapi.EditorType{
-		pluginapi.EditorTypeVSCode,
-		pluginapi.EditorTypeIntelliJ,
-		pluginapi.EditorTypeZed,
-		pluginapi.EditorTypeVim,
-		pluginapi.EditorTypeHelix,
-	}
-
-	for _, editorType := range editorTypes {
+	for _, editorType := range editorTypesDisplayOrder {
 		supported, notSupportedReason := mapping.IsSupported(editorType)
 		info := editorSupportInfo{
 			supported:          supported,
@@ -104,16 +103,7 @@ func (d *ActionDetailsViewModel) renderEditorSupport(labelStyle lipgloss.Style) 
 
 	b.WriteString(labelStyle.Render("Editor Support:") + "\n")
 
-	// Define display order
-	editorOrder := []pluginapi.EditorType{
-		pluginapi.EditorTypeVSCode,
-		pluginapi.EditorTypeIntelliJ,
-		pluginapi.EditorTypeZed,
-		pluginapi.EditorTypeVim,
-		pluginapi.EditorTypeHelix,
-	}
-
-	for _, editorType := range editorOrder {
+	for _, editorType := range editorTypesDisplayOrder {
 		info, exists := d.editorSupport[editorType]
 		if !exists {
 			continue
