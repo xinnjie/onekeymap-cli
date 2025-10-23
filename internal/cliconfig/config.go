@@ -80,7 +80,7 @@ func NewConfig(cmd *cobra.Command) (*Config, error) {
 
 	if !sandbox {
 		// Set configuration file name and paths
-		viper.SetConfigName("onekeymap")
+		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("${HOME}/.config/onekeymap")
