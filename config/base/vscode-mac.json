@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "keymaps": [
+    {
+      "id": "actions.file.saveAll",
+      "keybinding": "cmd+alt+s",
+      "description": "Save all files",
+      "name": "Save All"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
@@ -63,104 +64,197 @@ func importRun(
 	return func(cmd *cobra.Command, _ []string) error {
 		logger, pluginRegistry, importService := dependencies()
 		onekeymapConfig := viper.GetString("onekeymap")
-		err := prepareImportInputFlags(cmd, f, onekeymapConfig, pluginRegistry, logger)
-		if err != nil {
-			return err
-		}
 
-		var file *os.File
-		if f.input != "" {
-			file, err = os.Open(f.input)
-			if err != nil {
-				logger.Error("Failed to open input file", "path", f.input, "error", err)
-				return err
-			}
-			defer func() { _ = file.Close() }()
-		}
-
-		baseConfig := func() *keymapv1.Keymap {
-			if f.output != "" {
-				baseConfigFile, err := os.Open(f.output)
-				if err != nil {
-					logger.Debug("Base config file not found, skip loading base config", "path", f.output)
-					return nil
-				}
-				defer func() { _ = baseConfigFile.Close() }()
-				baseConfig, err := keymap.Load(baseConfigFile)
-				if err != nil {
-					logger.Warn("Failed to load base keymap, treat as no base config", "error", err)
-					return nil
-				}
-				return baseConfig
-			}
-			return nil
-		}()
-
-		opts := importapi.ImportOptions{
-			EditorType:  pluginapi.EditorType(f.from),
-			InputStream: file,
-			Base:        baseConfig,
-		}
-
-		result, err := importService.Import(cmd.Context(), opts)
-		if err != nil {
-			logger.Error("import failed", "error", err)
-			return err
-		}
 		if f.interactive {
-			// Validation Report Display
-			if result != nil && result.Report != nil &&
-				(len(result.Report.GetIssues()) > 0 || len(result.Report.GetWarnings()) > 0) {
-				logger.Info("Validation found issues. Displaying report...")
-				if err := runValidationReportPreview(result.Report); err != nil {
-					// Log the error but don't block the import process
-					logger.Warn("Failed to display validation report", "error", err)
-				}
-			}
+			return importRunInteractive(cmd, f, logger, pluginRegistry, importService, onekeymapConfig)
 		}
 
-		// If interactive, preview the calculated changes in three tables (Add/Remove/Update).
-		if f.interactive && result != nil && result.Changes != nil {
-			confirmed, err := runImportChangesPreview(result.Changes)
-			if err != nil {
-				logger.Warn("failed to render changes preview", "error", err)
-			}
-			if !confirmed {
-				logger.Info("User cancelled applying changes; no file will be written")
-				return nil
-			}
-		}
+		return importRunNonInteractive(cmd, f, logger, pluginRegistry, importService, onekeymapConfig)
+	}
+}
 
-		// Ensure parent directory exists, then create/truncate output file
-		if err := os.MkdirAll(filepath.Dir(f.output), 0o750); err != nil {
-			logger.Error("Failed to create output directory", "dir", filepath.Dir(f.output), "error", err)
-			return err
-		}
-		outputFile, err := os.OpenFile(f.output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+func importRunInteractive(
+	cmd *cobra.Command,
+	f *importFlags,
+	logger *slog.Logger,
+	pluginRegistry *plugins.Registry,
+	importService importapi.Importer,
+	onekeymapConfig string,
+) error {
+	if err := prepareInteractiveImportFlags(cmd, f, onekeymapConfig, pluginRegistry, logger); err != nil {
+		return err
+	}
+
+	return executeImportInteractive(cmd, f, logger, importService, onekeymapConfig)
+}
+
+func importRunNonInteractive(
+	cmd *cobra.Command,
+	f *importFlags,
+	logger *slog.Logger,
+	pluginRegistry *plugins.Registry,
+	importService importapi.Importer,
+	onekeymapConfig string,
+) error {
+	if err := prepareNonInteractiveImportFlags(f, onekeymapConfig, pluginRegistry, logger); err != nil {
+		return err
+	}
+
+	return executeImportNonInteractive(cmd, f, logger, importService, onekeymapConfig)
+}
+
+func executeImportInteractive(
+	cmd *cobra.Command,
+	f *importFlags,
+	logger *slog.Logger,
+	importService importapi.Importer,
+	onekeymapConfig string,
+) error {
+	var (
+		file *os.File
+		err  error
+	)
+
+	if f.input != "" {
+		file, err = os.Open(f.input)
 		if err != nil {
-			logger.Error("Failed to create output file", "error", err)
+			logger.Error("Failed to open input file", "path", f.input, "error", err)
 			return err
 		}
-		defer func() {
-			_ = outputFile.Close()
-		}()
+		defer func() { _ = file.Close() }()
+	}
 
-		if result == nil || result.Setting == nil {
-			logger.Warn("No keymaps imported; nothing to save")
+	baseConfig := loadBaseConfig(f.output, onekeymapConfig, logger)
+
+	opts := importapi.ImportOptions{
+		EditorType:  pluginapi.EditorType(f.from),
+		InputStream: file,
+		Base:        baseConfig,
+	}
+
+	result, err := importService.Import(cmd.Context(), opts)
+	if err != nil {
+		logger.Error("import failed", "error", err)
+		return err
+	}
+
+	// Show validation report if there are issues
+	if result != nil && result.Report != nil &&
+		(len(result.Report.GetIssues()) > 0 || len(result.Report.GetWarnings()) > 0) {
+		logger.Info("Validation found issues. Displaying report...")
+		if err := runValidationReportPreview(result.Report); err != nil {
+			logger.Warn("Failed to display validation report", "error", err)
+		}
+	}
+
+	// Show changes preview and get user confirmation
+	if result != nil && result.Changes != nil {
+		confirmed, err := runImportChangesPreview(result.Changes)
+		if err != nil {
+			logger.Warn("failed to render changes preview", "error", err)
+		}
+		if !confirmed {
+			logger.Info("User cancelled applying changes; no file will be written")
 			return nil
 		}
+	}
 
-		if err := keymap.Save(outputFile, result.Setting); err != nil {
-			logger.Error("Failed to save config file", "error", err)
+	return saveImportResult(f.output, result, logger)
+}
+
+func executeImportNonInteractive(
+	cmd *cobra.Command,
+	f *importFlags,
+	logger *slog.Logger,
+	importService importapi.Importer,
+	onekeymapConfig string,
+) error {
+	var (
+		file *os.File
+		err  error
+	)
+
+	if f.input != "" {
+		file, err = os.Open(f.input)
+		if err != nil {
+			logger.Error("Failed to open input file", "path", f.input, "error", err)
 			return err
 		}
+		defer func() { _ = file.Close() }()
+	}
 
-		logger.Info("Successfully imported keymap", "output", f.output)
-		if result.Report != nil {
-			logger.Debug("Import report", "report", result.Report)
-		}
+	baseConfig := loadBaseConfig(f.output, onekeymapConfig, logger)
+
+	opts := importapi.ImportOptions{
+		EditorType:  pluginapi.EditorType(f.from),
+		InputStream: file,
+		Base:        baseConfig,
+	}
+
+	result, err := importService.Import(cmd.Context(), opts)
+	if err != nil {
+		logger.Error("import failed", "error", err)
+		return err
+	}
+
+	return saveImportResult(f.output, result, logger)
+}
+
+func loadBaseConfig(outputPath, onekeymapConfig string, logger *slog.Logger) *keymapv1.Keymap {
+	basePath := outputPath
+	if basePath == "" {
+		basePath = onekeymapConfig
+	}
+	if basePath == "" {
 		return nil
 	}
+
+	baseConfigFile, err := os.Open(basePath)
+	if err != nil {
+		logger.Debug("Base config file not found, skip loading base config", "path", basePath)
+		return nil
+	}
+	defer func() { _ = baseConfigFile.Close() }()
+
+	cfg, lerr := keymap.Load(baseConfigFile, keymap.LoadOptions{})
+	if lerr != nil {
+		logger.Warn("Failed to load base keymap, treat as no base config", "error", lerr)
+		return nil
+	}
+
+	return cfg
+}
+
+func saveImportResult(outputPath string, result *importapi.ImportResult, logger *slog.Logger) error {
+	if err := os.MkdirAll(filepath.Dir(outputPath), 0o750); err != nil {
+		logger.Error("Failed to create output directory", "dir", filepath.Dir(outputPath), "error", err)
+		return err
+	}
+	outputFile, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+	if err != nil {
+		logger.Error("Failed to create output file", "error", err)
+		return err
+	}
+	defer func() {
+		_ = outputFile.Close()
+	}()
+
+	if result == nil || result.Setting == nil {
+		logger.Warn("No keymaps imported; nothing to save")
+		return nil
+	}
+
+	saveOpt := keymap.SaveOptions{Platform: platform.PlatformMacOS}
+	if err := keymap.Save(outputFile, result.Setting, saveOpt); err != nil {
+		logger.Error("Failed to save config file", "error", err)
+		return err
+	}
+
+	logger.Info("Successfully imported keymap", "output", outputPath)
+	if result.Report != nil {
+		logger.Debug("Import report", "report", result.Report)
+	}
+	return nil
 }
 
 func handleInteractiveImportFlags(
@@ -168,47 +262,74 @@ func handleInteractiveImportFlags(
 	f *importFlags,
 	onekeymapConfig string,
 	pluginRegistry *plugins.Registry,
+	_ *slog.Logger,
 ) error {
 	needSelectEditor := !cmd.Flags().Changed("from") || f.from == ""
 	needInput := !cmd.Flags().Changed("input") || f.input == ""
 	needOutput := !cmd.Flags().Changed("output") || f.output == ""
 
 	if needSelectEditor || needInput || needOutput {
-		if err := runImportForm(pluginRegistry, &f.from, &f.input, &f.output, onekeymapConfig, needSelectEditor, needInput, needOutput); err != nil {
+		if err := runImportForm(
+			pluginRegistry,
+			&f.from,
+			&f.input,
+			&f.output,
+			onekeymapConfig,
+			needSelectEditor,
+			needInput,
+			needOutput,
+		); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func handleNonInteractiveImportFlags(
-	f *importFlags,
-	onekeymapConfig string,
-) error {
-	if f.from == "" {
-		return errors.New("flag --from is required")
-	}
-	if onekeymapConfig != "" {
-		f.output = onekeymapConfig
-	}
-	return nil
-}
-
-func prepareImportInputFlags(
+func prepareInteractiveImportFlags(
 	cmd *cobra.Command,
 	f *importFlags,
 	onekeymapConfig string,
 	pluginRegistry *plugins.Registry,
 	logger *slog.Logger,
 ) error {
-	if f.interactive {
-		if err := handleInteractiveImportFlags(cmd, f, onekeymapConfig, pluginRegistry); err != nil {
-			return err
+	if err := handleInteractiveImportFlags(cmd, f, onekeymapConfig, pluginRegistry, logger); err != nil {
+		return err
+	}
+
+	p, ok := pluginRegistry.Get(pluginapi.EditorType(f.from))
+	if !ok {
+		logger.Error("Editor not found", "editor", f.from)
+		return fmt.Errorf("editor %s not found", f.from)
+	}
+
+	if f.input == "" {
+		configPath := viper.GetString(fmt.Sprintf("editors.%s.keymap_path", f.from))
+		if configPath != "" {
+			f.input = configPath
+			logger.Info("Using keymap path from config", "editor", f.from, "path", configPath)
+		} else {
+			v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{})
+			if err != nil {
+				logger.Error("Failed to get default config path", "error", err)
+				return err
+			}
+			f.input = v[0]
 		}
-	} else {
-		if err := handleNonInteractiveImportFlags(f, onekeymapConfig); err != nil {
-			return err
-		}
+	}
+	return nil
+}
+
+func prepareNonInteractiveImportFlags(
+	f *importFlags,
+	onekeymapConfig string,
+	pluginRegistry *plugins.Registry,
+	logger *slog.Logger,
+) error {
+	if f.from == "" {
+		return errors.New("flag --from is required")
+	}
+	if onekeymapConfig != "" {
+		f.output = onekeymapConfig
 	}
 
 	p, ok := pluginRegistry.Get(pluginapi.EditorType(f.from))
@@ -243,8 +364,12 @@ func runImportChangesPreview(changes *importapi.KeymapChanges) (bool, error) {
 
 // runImportForm runs the interactive import form and returns the selected values.
 // All TUI logic is encapsulated here to keep cmd/import.go simple.
-func runImportForm(pluginRegistry *plugins.Registry, from, input, output *string, onekeymapConfigPlaceHolder string,
-	needSelectEditor, needInput, needOutput bool) error {
+func runImportForm(
+	pluginRegistry *plugins.Registry,
+	from, input, output *string,
+	onekeymapConfigPlaceHolder string,
+	needSelectEditor, needInput, needOutput bool,
+) error {
 	m, err := views.NewImportFormModel(
 		pluginRegistry,
 		needSelectEditor,

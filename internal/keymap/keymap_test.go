@@ -1,4 +1,4 @@
-package keymap
+package keymap_test
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/protobuf/testing/protocmp"
 )
@@ -17,18 +18,18 @@ func TestSave(t *testing.T) {
 	testCases := []struct {
 		name               string
 		input              *keymapv1.Keymap
-		expectedKeymaps    []OneKeymapConfig
+		expectedKeymaps    []keymap.OneKeymapConfig
 		expectedNumKeymaps int
 	}{
 		{
 			name: "Single keybinding",
 			input: &keymapv1.Keymap{
 				Actions: []*keymapv1.Action{
-					NewActionBindingWithDescription("actions.copy", "ctrl+c", "copy"),
+					keymap.NewActionBindingWithDescription("actions.copy", "ctrl+c", "copy"),
 				},
 			},
-			expectedKeymaps: []OneKeymapConfig{
-				{ID: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}, Description: "copy"},
+			expectedKeymaps: []keymap.OneKeymapConfig{
+				{ID: "actions.copy", Keybinding: keymap.KeybindingStrings{"ctrl+c"}, Description: "copy"},
 			},
 			expectedNumKeymaps: 1,
 		},
@@ -36,11 +37,11 @@ func TestSave(t *testing.T) {
 			name: "Single keybinding with comment",
 			input: &keymapv1.Keymap{
 				Actions: []*keymapv1.Action{
-					NewActionBindingWithComment("actions.find", "shift+f", "with comment"),
+					keymap.NewActionBindingWithComment("actions.find", "shift+f", "with comment"),
 				},
 			},
-			expectedKeymaps: []OneKeymapConfig{
-				{ID: "actions.find", Keybinding: KeybindingStrings{"shift+f"}, Comment: "with comment"},
+			expectedKeymaps: []keymap.OneKeymapConfig{
+				{ID: "actions.find", Keybinding: keymap.KeybindingStrings{"shift+f"}, Comment: "with comment"},
 			},
 			expectedNumKeymaps: 1,
 		},
@@ -48,12 +49,12 @@ func TestSave(t *testing.T) {
 			name: "Multiple keybindings for the same action",
 			input: &keymapv1.Keymap{
 				Actions: []*keymapv1.Action{
-					NewActioinBinding("actions.find", "ctrl+f"),
-					NewActioinBinding("actions.find", "cmd+f"),
+					keymap.NewActioinBinding("actions.find", "ctrl+f"),
+					keymap.NewActioinBinding("actions.find", "cmd+f"),
 				},
 			},
-			expectedKeymaps: []OneKeymapConfig{
-				{ID: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
+			expectedKeymaps: []keymap.OneKeymapConfig{
+				{ID: "actions.find", Keybinding: keymap.KeybindingStrings{"ctrl+f", "cmd+f"}},
 			},
 			expectedNumKeymaps: 1,
 		},
@@ -61,14 +62,12 @@ func TestSave(t *testing.T) {
 			name: "Multiple keybindings for the same action",
 			input: &keymapv1.Keymap{
 				Actions: []*keymapv1.Action{
-					{
-						Name:     "actions.find",
-						Bindings: newBindingProto("ctrl+f", "cmd+f"),
-					},
+					keymap.NewActioinBinding("actions.find", "ctrl+f"),
+					keymap.NewActioinBinding("actions.find", "cmd+f"),
 				},
 			},
-			expectedKeymaps: []OneKeymapConfig{
-				{ID: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
+			expectedKeymaps: []keymap.OneKeymapConfig{
+				{ID: "actions.find", Keybinding: keymap.KeybindingStrings{"ctrl+f", "cmd+f"}},
 			},
 			expectedNumKeymaps: 1,
 		},
@@ -76,16 +75,16 @@ func TestSave(t *testing.T) {
 			name: "Multiple keybindings for different actions",
 			input: &keymapv1.Keymap{
 				Actions: []*keymapv1.Action{
-					NewActioinBinding("actions.copy", "ctrl+c"),
-					NewActioinBinding("actions.find", "ctrl+f"),
-					NewActioinBinding("actions.find", "cmd+f"),
-					NewActionBindingWithComment("actions.find", "shift+f", "with comment"),
+					keymap.NewActioinBinding("actions.copy", "ctrl+c"),
+					keymap.NewActioinBinding("actions.find", "ctrl+f"),
+					keymap.NewActioinBinding("actions.find", "cmd+f"),
+					keymap.NewActionBindingWithComment("actions.find", "shift+f", "with comment"),
 				},
 			},
-			expectedKeymaps: []OneKeymapConfig{
-				{ID: "actions.copy", Keybinding: KeybindingStrings{"ctrl+c"}},
-				{ID: "actions.find", Keybinding: KeybindingStrings{"ctrl+f", "cmd+f"}},
-				{ID: "actions.find", Keybinding: KeybindingStrings{"shift+f"}, Comment: "with comment"},
+			expectedKeymaps: []keymap.OneKeymapConfig{
+				{ID: "actions.copy", Keybinding: keymap.KeybindingStrings{"ctrl+c"}},
+				{ID: "actions.find", Keybinding: keymap.KeybindingStrings{"ctrl+f", "cmd+f"}},
+				{ID: "actions.find", Keybinding: keymap.KeybindingStrings{"shift+f"}, Comment: "with comment"},
 			},
 			expectedNumKeymaps: 3,
 		},
@@ -94,10 +93,10 @@ func TestSave(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var buf bytes.Buffer
-			err := Save(&buf, tc.input)
+			err := keymap.Save(&buf, tc.input, keymap.SaveOptions{})
 			require.NoError(t, err)
 
-			var result OneKeymapSetting
+			var result keymap.OneKeymapSetting
 			err = json.Unmarshal(buf.Bytes(), &result)
 			require.NoError(t, err)
 
@@ -149,14 +148,14 @@ func TestLoad(t *testing.T) {
 						Name:    "actions.copy",
 						Comment: "Standard copy command",
 						Bindings: []*keymapv1.KeybindingReadable{
-							{KeyChords: MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
+							{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
 						},
 					},
 					{
 						Name: "actions.find",
 						Bindings: []*keymapv1.KeybindingReadable{
 							{
-								KeyChords:         MustParseKeyBinding("ctrl+shift+f").KeyChords,
+								KeyChords:         keymap.MustParseKeyBinding("ctrl+shift+f").KeyChords,
 								KeyChordsReadable: "Ctrl+Shift+F",
 							},
 						},
@@ -184,8 +183,8 @@ func TestLoad(t *testing.T) {
 						Name:    "actions.copy",
 						Comment: "Standard copy command",
 						Bindings: []*keymapv1.KeybindingReadable{
-							{KeyChords: MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
-							{KeyChords: MustParseKeyBinding("cmd+c").KeyChords, KeyChordsReadable: "Cmd+C"},
+							{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
+							{KeyChords: keymap.MustParseKeyBinding("cmd+c").KeyChords, KeyChordsReadable: "Cmd+C"},
 						},
 					},
 				},
@@ -216,8 +215,8 @@ func TestLoad(t *testing.T) {
 						Name:    "actions.copy",
 						Comment: "Standard copy command",
 						Bindings: []*keymapv1.KeybindingReadable{
-							{KeyChords: MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
-							{KeyChords: MustParseKeyBinding("cmd+c").KeyChords, KeyChordsReadable: "Cmd+C"},
+							{KeyChords: keymap.MustParseKeyBinding("ctrl+c").KeyChords, KeyChordsReadable: "Ctrl+C"},
+							{KeyChords: keymap.MustParseKeyBinding("cmd+c").KeyChords, KeyChordsReadable: "Cmd+C"},
 						},
 					},
 				},
@@ -272,7 +271,7 @@ func TestLoad(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			reader := strings.NewReader(tc.jsonInput)
-			loadedSetting, err := Load(reader)
+			loadedSetting, err := keymap.Load(reader, keymap.LoadOptions{})
 
 			if tc.expectErr {
 				require.Error(t, err)

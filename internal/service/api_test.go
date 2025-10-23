@@ -1,4 +1,4 @@
-package service
+package service_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/service"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,7 +27,7 @@ func TestServer_GetKeymap(t *testing.T) {
 		},
 	}
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	server := NewServer(nil, nil, nil, mockMappingConfig, logger, ServerOption{Sandbox: false})
+	server := service.NewServer(nil, nil, nil, mockMappingConfig, logger, service.ServerOption{Sandbox: false})
 
 	tests := []struct {
 		name          string

@@ -211,6 +211,7 @@ func Execute() {
 	devCmd.AddCommand(NewCmdDevDocSupportActions())
 	devCmd.AddCommand(NewCmdDevDoctor())
 	devCmd.AddCommand(NewCmdDevListUnmappedActions())
+	devCmd.AddCommand(NewCmdDevGenerateBase())
 	rootCmd.AddCommand(NewCmdView())
 	rootCmd.AddCommand(NewCmdServe())
 	rootCmd.AddCommand(NewCmdMigrate())

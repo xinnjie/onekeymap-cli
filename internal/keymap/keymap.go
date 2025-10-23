@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
@@ -21,15 +22,13 @@ var (
 	errInvalidConfig = errors.New("invalid config format: 'keymaps' field is missing")
 )
 
-// Load reads from the given reader, parses the user config file format,
-// and converts it into the internal KeymapSetting proto message.
-func Load(reader io.Reader) (*keymapv1.Keymap, error) {
-	return LoadWithMappingConfig(reader, nil)
+// LoadOptions provides advanced options for loading a OneKeymap config.
+type LoadOptions struct {
+	MappingConfig *mappings.MappingConfig
 }
 
-// LoadWithMappingConfig reads from the given reader and enriches actions with
-// editor support information from the mapping config.
-func LoadWithMappingConfig(reader io.Reader, mc *mappings.MappingConfig) (*keymapv1.Keymap, error) {
+// Load reads from reader and builds a keymap.
+func Load(reader io.Reader, opt LoadOptions) (*keymapv1.Keymap, error) {
 	data, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
@@ -44,44 +43,14 @@ func LoadWithMappingConfig(reader io.Reader, mc *mappings.MappingConfig) (*keyma
 		return nil, err
 	}
 
-	setting := &keymapv1.Keymap{}
-	// Group keybindings by Id ONLY. Preserve insertion order of first appearance.
-	grouped := make(map[string]*keymapv1.Action)
-	order := make([]string, 0)
-
-	for _, fk := range friendlyData.Keymaps {
-		key := fk.ID
-		ab, ok := grouped[key]
-		if !ok {
-			ab = newAction(fk, mc)
-			grouped[key] = ab
-			order = append(order, key)
-		} else {
-			mergeActionMetadata(ab, fk, mc)
-		}
-
-		for _, keybindingStr := range fk.Keybinding {
-			kb, err := ParseKeyBinding(keybindingStr, "+")
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.ID, err)
-			}
-			ab.Bindings = append(
-				ab.Bindings,
-				&keymapv1.KeybindingReadable{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr},
-			)
-		}
-	}
-
-	for _, k := range order {
-		setting.Actions = append(setting.Actions, grouped[k])
-	}
-
-	return setting, nil
+	return buildKeymapFromFriendly(friendlyData, opt.MappingConfig)
 }
 
-// Save takes a KeymapSetting proto message and writes it to the given writer
-// in the user config file format.
-func Save(writer io.Writer, setting *keymapv1.Keymap) error {
+type SaveOptions struct {
+	Platform platform.Platform
+}
+
+func Save(writer io.Writer, setting *keymapv1.Keymap, opt SaveOptions) error {
 	friendlyData := OneKeymapSetting{}
 	friendlyData.Keymaps = make([]OneKeymapConfig, 0)
 	friendlyData.Version = configVersion
@@ -116,7 +85,11 @@ func Save(writer io.Writer, setting *keymapv1.Keymap) error {
 				continue
 			}
 			binding := NewKeyBinding(b)
-			keys, err := binding.Format(platform.PlatformMacOS, "+")
+			p := opt.Platform
+			if p == "" {
+				p = platform.PlatformMacOS
+			}
+			keys, err := binding.Format(p, "+")
 			if err != nil {
 				return err
 			}
@@ -128,18 +101,16 @@ func Save(writer io.Writer, setting *keymapv1.Keymap) error {
 		friendlyData.Keymaps = append(friendlyData.Keymaps, *config)
 	}
 
+	sort.Slice(friendlyData.Keymaps, func(i, j int) bool {
+		if friendlyData.Keymaps[i].ID != friendlyData.Keymaps[j].ID {
+			return friendlyData.Keymaps[i].ID < friendlyData.Keymaps[j].ID
+		}
+		return false
+	})
+
 	encoder := json.NewEncoder(writer)
 	encoder.SetIndent("", "  ") // Use 2 spaces for indentation
 	return encoder.Encode(friendlyData)
-}
-
-// OneKeymapConfig is a struct that matches the user config file format.
-type OneKeymapConfig struct {
-	ID          string            `json:"id,omitempty"`
-	Keybinding  KeybindingStrings `json:"keybinding,omitempty"`
-	Comment     string            `json:"comment,omitempty"`
-	Description string            `json:"description,omitempty"`
-	Name        string            `json:"name,omitempty"`
 }
 
 // DecorateSetting applies metadata (Description, Name, Category) to each
@@ -174,43 +145,6 @@ func DecorateSetting(
 	}
 
 	return setting
-}
-
-// OneKeymapSetting is the root struct for the user config file.
-type OneKeymapSetting struct {
-	// Version default to 1.0. When having breaking changes, increment the version.
-	Version string            `json:"version"`
-	Keymaps []OneKeymapConfig `json:"keymaps"`
-}
-
-// KeybindingStrings is a custom type to handle single or multiple keybindings.
-type KeybindingStrings []string
-
-// UnmarshalJSON allows KeybindingStrings to be unmarshalled from either a single string or an array of strings.
-func (ks *KeybindingStrings) UnmarshalJSON(data []byte) error {
-	// Try to unmarshal as a single string
-	var s string
-	if err := json.Unmarshal(data, &s); err == nil {
-		*ks = []string{s}
-		return nil
-	}
-
-	// Try to unmarshal as an array of strings
-	var ss []string
-	if err := json.Unmarshal(data, &ss); err == nil {
-		*ks = ss
-		return nil
-	}
-
-	return errors.New("keybinding must be a string or an array of strings")
-}
-
-// MarshalJSON allows KeybindingStrings to be marshalled to a single string if it contains only one element.
-func (ks KeybindingStrings) MarshalJSON() ([]byte, error) {
-	if len(ks) == 1 {
-		return json.Marshal(ks[0])
-	}
-	return json.Marshal([]string(ks))
 }
 
 func newAction(fk OneKeymapConfig, mc *mappings.MappingConfig) *keymapv1.Action {
@@ -320,4 +254,38 @@ func parseOneKeymapSetting(data []byte) (OneKeymapSetting, error) {
 	}
 
 	return friendlyData, nil
+}
+
+func buildKeymapFromFriendly(friendlyData OneKeymapSetting, mc *mappings.MappingConfig) (*keymapv1.Keymap, error) {
+	setting := &keymapv1.Keymap{}
+	grouped := make(map[string]*keymapv1.Action)
+	order := make([]string, 0)
+
+	for _, fk := range friendlyData.Keymaps {
+		key := fk.ID
+		ab, ok := grouped[key]
+		if !ok {
+			ab = newAction(fk, mc)
+			grouped[key] = ab
+			order = append(order, key)
+		} else {
+			mergeActionMetadata(ab, fk, mc)
+		}
+
+		for _, keybindingStr := range fk.Keybinding {
+			kb, err := ParseKeyBinding(keybindingStr, "+")
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.ID, err)
+			}
+			ab.Bindings = append(
+				ab.Bindings,
+				&keymapv1.KeybindingReadable{KeyChords: kb.KeyChords, KeyChordsReadable: keybindingStr},
+			)
+		}
+	}
+
+	for _, k := range order {
+		setting.Actions = append(setting.Actions, grouped[k])
+	}
+	return setting, nil
 }

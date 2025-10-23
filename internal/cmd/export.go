@@ -82,7 +82,7 @@ func exportRun(
 			}
 		}()
 
-		setting, err := keymap.Load(inputFile)
+		setting, err := keymap.Load(inputFile, keymap.LoadOptions{})
 		if err != nil {
 			logger.Error("Failed to load config file", "error", err)
 			return err

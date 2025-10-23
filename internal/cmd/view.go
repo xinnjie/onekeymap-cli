@@ -70,7 +70,7 @@ func viewRun(
 		}
 		defer func() { _ = file.Close() }()
 
-		setting, err := keymap.Load(file)
+		setting, err := keymap.Load(file, keymap.LoadOptions{MappingConfig: mappingConfig})
 		if err != nil {
 			return fmt.Errorf("failed to parse onekeymap config: %w", err)
 		}
@@ -151,7 +151,7 @@ func ensureConfigFile(path string) error {
 		return fmt.Errorf("failed to initialize onekeymap config: %w", err)
 	}
 
-	if err := keymap.Save(file, &keymapv1.Keymap{}); err != nil {
+	if err := keymap.Save(file, &keymapv1.Keymap{}, keymap.SaveOptions{}); err != nil {
 		_ = file.Close()
 		return fmt.Errorf("failed to initialize onekeymap config: %w", err)
 	}

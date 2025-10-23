@@ -94,6 +94,7 @@ func (m *ImportFormModel) build() error {
 			),
 		)
 	}
+
 	m.form = huh.NewForm(groups...)
 	return nil
 }

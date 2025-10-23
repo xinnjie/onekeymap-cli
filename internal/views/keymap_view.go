@@ -329,7 +329,7 @@ func (m *KeymapViewModel) reloadKeymap() error {
 	}
 	defer file.Close()
 
-	setting, err := keymap.Load(file)
+	setting, err := keymap.Load(file, keymap.LoadOptions{MappingConfig: m.mc})
 	if err != nil {
 		return fmt.Errorf("failed to parse keymap: %w", err)
 	}

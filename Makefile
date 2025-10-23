@@ -1,4 +1,8 @@
-.PHONY: build lint format test
+.PHONY: all build lint format test completion docs generate-base
+
+.DEFAULT_GOAL := all
+
+all: build format lint test completion docs generate-base
 
 GO_LINT_CONFIG := $(CURDIR)/.golangci.yaml
 GO_ENV := GO111MODULE=on GOFLAGS=-mod=mod
@@ -8,15 +12,7 @@ GO_LDFLAGS := -X github.com/xinnjie/onekeymap-cli/internal/cmd.commit=$(GIT_COMM
 
 build:
 	@mkdir -p .bin
-	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags "$(GO_LDFLAGS)" -o .bin/onekeymap-cli-arm64 ./cmd/onekeymap-cli
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags "$(GO_LDFLAGS)" -o .bin/onekeymap-cli-amd64 ./cmd/onekeymap-cli
-	lipo -create -output .bin/onekeymap-cli .bin/onekeymap-cli-arm64 .bin/onekeymap-cli-amd64
-	rm .bin/onekeymap-cli-arm64 .bin/onekeymap-cli-amd64
-	./.bin/onekeymap-cli dev docSupportActions &> ./action-support-matrix.md
-	mkdir -p completions
-	./.bin/onekeymap-cli completion bash > completions/onekeymap-cli.bash
-	./.bin/onekeymap-cli completion zsh > completions/_onekeymap-cli
-	./.bin/onekeymap-cli completion fish > completions/onekeymap-cli.fish
+	CGO_ENABLED=0 go build -ldflags "$(GO_LDFLAGS)" -o .bin/onekeymap-cli ./cmd/onekeymap-cli
 
 format:
 	@$(GO_ENV) go fmt ./...
@@ -26,3 +22,15 @@ lint:
 
 test:
 	@$(GO_ENV) go test ./...
+
+completion:
+	mkdir -p completions
+	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli completion bash > completions/onekeymap-cli.bash
+	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli completion zsh > completions/_onekeymap-cli
+	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli completion fish > completions/onekeymap-cli.fish
+
+docs:
+	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli dev docSupportActions &> ./action-support-matrix.md
+
+generate-base:
+	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli dev generateBase

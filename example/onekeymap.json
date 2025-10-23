@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "keymaps": [
+    {
+      "id": "actions.file.saveAll",
+      "keybinding": "ctrl+s",
+      "description": "Save all open files",
+      "name": "Save all"
+    }
+  ]
+}

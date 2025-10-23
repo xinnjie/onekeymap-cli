@@ -65,7 +65,7 @@ func (s *Server) ImportKeymap(
 
 	var baseSetting *keymapv1.Keymap
 	if req.GetBase() != "" {
-		km, err := keymap.LoadWithMappingConfig(strings.NewReader(req.GetBase()), s.mappingConfig)
+		km, err := keymap.Load(strings.NewReader(req.GetBase()), keymap.LoadOptions{MappingConfig: s.mappingConfig})
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "failed to parse base keymap: %v", err)
 		}
@@ -126,7 +126,7 @@ func (s *Server) GetKeymap(
 	_ context.Context,
 	req *keymapv1.GetKeymapRequest,
 ) (*keymapv1.GetKeymapResponse, error) {
-	km, err := keymap.LoadWithMappingConfig(strings.NewReader(req.GetConfig()), s.mappingConfig)
+	km, err := keymap.Load(strings.NewReader(req.GetConfig()), keymap.LoadOptions{MappingConfig: s.mappingConfig})
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "failed to parse keymap config: %v", err)
 	}
@@ -165,7 +165,7 @@ func (s *Server) SaveKeymap(
 	req *keymapv1.SaveKeymapRequest,
 ) (*keymapv1.SaveKeymapResponse, error) {
 	var buf bytes.Buffer
-	err := keymap.Save(&buf, req.GetKeymap())
+	err := keymap.Save(&buf, req.GetKeymap(), keymap.SaveOptions{})
 	if err != nil {
 		return nil, err
 	}
