@@ -112,6 +112,9 @@ const (
 	EditorTypeZed   EditorType = "zed"
 	EditorTypeVim   EditorType = "vim"
 	EditorTypeHelix EditorType = "helix"
+
+	// EditorTypeBasekeymap is used to import base intellij/vscode/zed keymap
+	EditorTypeBasekeymap EditorType = "basekeymap"
 )
 
 // AppName returns the human-readable display name for the editor type.
@@ -149,6 +152,8 @@ func (e EditorType) AppName() string {
 		return "Vim"
 	case EditorTypeHelix:
 		return "Helix"
+	case EditorTypeBasekeymap:
+		return "Base Keymap - Import default keymap from intellij/vscode/zed..."
 	default:
 		return "Unknown"
 	}

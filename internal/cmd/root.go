@@ -11,6 +11,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/cliconfig"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/basekeymap"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/helix"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
@@ -191,6 +192,8 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 
 		cmdPluginRegistry.Register(helix.New(cmdMappingConfig, cmdLogger))
 		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger))
+
+		cmdPluginRegistry.Register(basekeymap.New())
 
 		cmdImportService = internal.NewImportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
 		cmdExportService = internal.NewExportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger)

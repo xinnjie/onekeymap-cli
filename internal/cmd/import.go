@@ -3,9 +3,11 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
@@ -111,17 +113,22 @@ func executeImportInteractive(
 	onekeymapConfig string,
 ) error {
 	var (
-		file *os.File
+		file io.ReadCloser
 		err  error
 	)
 
 	if f.input != "" {
-		file, err = os.Open(f.input)
-		if err != nil {
-			logger.Error("Failed to open input file", "path", f.input, "error", err)
-			return err
+		if f.from == "basekeymap" {
+			// For basekeymap, f.input is the base keymap name, not a file path
+			file = io.NopCloser(strings.NewReader(f.input))
+		} else {
+			file, err = os.Open(f.input)
+			if err != nil {
+				logger.Error("Failed to open input file", "path", f.input, "error", err)
+				return err
+			}
+			defer func() { _ = file.Close() }()
 		}
-		defer func() { _ = file.Close() }()
 	}
 
 	baseConfig := loadBaseConfig(f.output, onekeymapConfig, logger)
@@ -170,17 +177,22 @@ func executeImportNonInteractive(
 	onekeymapConfig string,
 ) error {
 	var (
-		file *os.File
+		file io.ReadCloser
 		err  error
 	)
 
 	if f.input != "" {
-		file, err = os.Open(f.input)
-		if err != nil {
-			logger.Error("Failed to open input file", "path", f.input, "error", err)
-			return err
+		if f.from == "basekeymap" {
+			// For basekeymap, f.input is the base keymap name, not a file path
+			file = io.NopCloser(strings.NewReader(f.input))
+		} else {
+			file, err = os.Open(f.input)
+			if err != nil {
+				logger.Error("Failed to open input file", "path", f.input, "error", err)
+				return err
+			}
+			defer func() { _ = file.Close() }()
 		}
-		defer func() { _ = file.Close() }()
 	}
 
 	baseConfig := loadBaseConfig(f.output, onekeymapConfig, logger)

@@ -29,6 +29,8 @@ type ImportFormModel struct {
 	EditorKeymapConfigInput    *string
 	OnekeymapConfigOutput      *string
 	OnekeymapConfigPlaceHolder string
+
+	configPathSelection string
 }
 
 func NewImportFormModel(
@@ -80,7 +82,7 @@ func (m *ImportFormModel) build() error {
 	}
 
 	if m.needInput {
-		groups = append(groups, m.createInputGroup())
+		groups = append(groups, m.createInputGroup()...)
 	}
 
 	if m.needOutput {
@@ -158,10 +160,9 @@ func (m *ImportFormModel) View() string {
 func (m *ImportFormModel) fillPlaceholders() {
 	// Fill placeholder if user input is empty
 	if m.needInput && *m.EditorKeymapConfigInput == "" {
-		if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-			if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
-				*m.EditorKeymapConfigInput = v[0]
-			}
+		configs := m.configPaths()
+		if len(configs) > 0 {
+			*m.EditorKeymapConfigInput = configs[0]
 		}
 	}
 	if m.needOutput && *m.OnekeymapConfigOutput == "" {
@@ -169,33 +170,87 @@ func (m *ImportFormModel) fillPlaceholders() {
 	}
 }
 
-func (m *ImportFormModel) createInputGroup() *huh.Group {
-	placeholderInput := ""
-	return huh.NewGroup(
+func (m *ImportFormModel) createInputGroup() []*huh.Group {
+	const otherOption = "Other (manual input)"
+
+	multipleConfigAvailableSelect := huh.NewGroup(
+		huh.NewSelect[string]().
+			TitleFunc(func() string {
+				return "Select config path for " + *m.Editor
+			}, &m.Editor).
+			OptionsFunc(func() []huh.Option[string] {
+				configs := m.configPaths()
+				var opts []huh.Option[string]
+				for _, path := range configs {
+					opts = append(opts, huh.NewOption(path, path))
+				}
+				opts = append(opts, huh.NewOption(otherOption, otherOption))
+				return opts
+			}, &m.Editor).
+			Value(&m.configPathSelection),
+	).WithHideFunc(func() bool {
+		configs := m.configPaths()
+		return len(configs) <= 1
+	})
+
+	multipleConfigAvailableInput := huh.NewGroup(
 		huh.NewInput().
-			Key("input").
+			TitleFunc(func() string {
+				return "Input config path for " + *m.Editor
+			}, &m.Editor).
+			Validate(func(s string) error {
+				if s == "" {
+					return errors.New("config path is required")
+				}
+				if _, err := os.Stat(s); os.IsNotExist(err) {
+					return fmt.Errorf("file does not exist: %s", s)
+				}
+				return nil
+			}).
+			Value(m.EditorKeymapConfigInput),
+	).WithHideFunc(func() bool {
+		configs := m.configPaths()
+		return len(configs) <= 1 || m.configPathSelection != otherOption
+	})
+
+	lessConfigAvailableInput := huh.NewGroup(
+		huh.NewInput().
 			TitleFunc(func() string {
 				return "Input config path for " + *m.Editor
 			}, &m.Editor).
 			PlaceholderFunc(func() string {
-				if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-					if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
-						placeholderInput = v[0]
-					}
+				configs := m.configPaths()
+				if len(configs) > 0 {
+					return configs[0]
 				}
-				return placeholderInput
+				return ""
 			}, &m.Editor).
 			// Ensure the input file exists
 			Validate(func(s string) error {
 				filePath := s
-				if filePath == "" {
-					filePath = placeholderInput
-				}
 				if _, err := os.Stat(filePath); os.IsNotExist(err) {
 					return fmt.Errorf("file does not exist: %s", filePath)
 				}
 				return nil
 			}).
 			Value(m.EditorKeymapConfigInput),
-	)
+	).WithHideFunc(func() bool {
+		configs := m.configPaths()
+		return len(configs) > 1
+	})
+
+	return []*huh.Group{
+		multipleConfigAvailableSelect,
+		multipleConfigAvailableInput,
+		lessConfigAvailableInput,
+	}
+}
+
+func (m *ImportFormModel) configPaths() []string {
+	if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
+		if paths, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
+			return paths
+		}
+	}
+	return []string{}
 }

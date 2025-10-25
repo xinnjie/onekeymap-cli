@@ -133,7 +133,6 @@ func (m ValidationReportModel) footerView() string {
 func (m ValidationReportModel) renderReport() string {
 	var b strings.Builder
 
-	// Summary
 	s := m.report.GetSummary()
 	b.WriteString(summaryStyle.Render(
 		fmt.Sprintf("Source: %s | Mappings Processed: %d | Succeeded: %d",
@@ -141,15 +140,13 @@ func (m ValidationReportModel) renderReport() string {
 	))
 	b.WriteString("\n")
 
-	// Errors
 	if len(m.report.GetIssues()) > 0 {
-		b.WriteString(errorHeader.Render(fmt.Sprintf("Errors (%d)", len(m.report.GetIssues()))))
+		b.WriteString(errorHeader.Render(fmt.Sprintf("Issues (%d)", len(m.report.GetIssues()))))
 		for _, issue := range m.report.GetIssues() {
 			b.WriteString(renderIssue(issue))
 		}
 	}
 
-	// Warnings
 	if len(m.report.GetWarnings()) > 0 {
 		b.WriteString(warningHeader.Render(fmt.Sprintf("Warnings (%d)", len(m.report.GetWarnings()))))
 		for _, warning := range m.report.GetWarnings() {
