@@ -86,10 +86,18 @@ func devGenerateBaseRun(
 
 		for _, t := range tasks {
 			logger.Info("generating base", "platform", t.name, "src", t.source)
-			xmlDoc, err := loadAndFlattenIJXML(ctx, f.SourceDir, t.source)
+			xmlDoc, meta, err := loadAndFlattenIJXML(ctx, f.SourceDir, t.source)
 			if err != nil {
 				logger.ErrorContext(ctx, "flatten xml", "src", t.source, "error", err)
 				os.Exit(1)
+			}
+
+			// For macOS: convert 'control' to 'meta' for inherited actions only
+			// This matches IntelliJ's runtime behavior: actions inherited from $default.xml
+			// have control->command mapping, while actions explicitly defined in Mac OS X.xml
+			// keep their control keys as-is (e.g., control SPACE for code completion)
+			if t.platform == platform.PlatformMacOS && meta != nil {
+				convertControlToMetaForMac(xmlDoc, meta)
 			}
 
 			buf := &bytes.Buffer{}
@@ -123,23 +131,23 @@ func devGenerateBaseRun(
 	}
 }
 
-func loadAndFlattenIJXML(_ context.Context, dir, file string) (*ij.KeymapXML, error) {
+func loadAndFlattenIJXML(_ context.Context, dir, file string) (*ij.KeymapXML, *keymapMetadata, error) {
 	visited := map[string]bool{}
 	var chain []*ij.KeymapXML
 	n := file
 	for {
 		if visited[n] {
-			return nil, fmt.Errorf("cyclic parent reference: %s", n)
+			return nil, nil, fmt.Errorf("cyclic parent reference: %s", n)
 		}
 		visited[n] = true
 		p := filepath.Join(dir, n)
 		data, err := os.ReadFile(p)
 		if err != nil {
-			return nil, fmt.Errorf("read %s: %w", p, err)
+			return nil, nil, fmt.Errorf("read %s: %w", p, err)
 		}
 		var doc ij.KeymapXML
 		if err := xml.Unmarshal(data, &doc); err != nil {
-			return nil, fmt.Errorf("parse %s: %w", p, err)
+			return nil, nil, fmt.Errorf("parse %s: %w", p, err)
 		}
 		chain = append(chain, &doc)
 		par := strings.TrimSpace(doc.Parent)
@@ -152,6 +160,15 @@ func loadAndFlattenIJXML(_ context.Context, dir, file string) (*ij.KeymapXML, er
 	acc := &ij.KeymapXML{}
 	order := []string{}
 	actions := map[string]*ij.ActionXML{}
+	// Track which actions come from the top-level file (not inherited)
+	topLevelActions := make(map[string]bool)
+
+	// Mark actions from the top-level file (first in chain, before we reverse)
+	if len(chain) > 0 {
+		for _, a := range chain[0].Actions {
+			topLevelActions[a.ID] = true
+		}
+	}
 
 	for i := len(chain) - 1; i >= 0; i-- {
 		for _, a := range chain[i].Actions {
@@ -183,5 +200,64 @@ func loadAndFlattenIJXML(_ context.Context, dir, file string) (*ij.KeymapXML, er
 			acc.Actions = append(acc.Actions, *ax)
 		}
 	}
-	return acc, nil
+
+	meta := &keymapMetadata{
+		topLevelActions: topLevelActions,
+	}
+	return acc, meta, nil
+}
+
+// keymapMetadata contains metadata about the flattened keymap
+type keymapMetadata struct {
+	topLevelActions map[string]bool // actions defined in top-level file (not inherited)
+}
+
+// convertControlToMetaForMac transforms 'control' modifier to 'meta' for inherited actions only.
+// This matches IntelliJ's runtime behavior on macOS:
+// - Actions inherited from $default.xml have 'control' auto-mapped to Command (meta)
+// - Actions explicitly defined in Mac OS X.xml keep their 'control' keys as-is
+// For example: inherited "$Copy" with "control C" becomes "meta C",
+// but explicit "CodeCompletion" with "control SPACE" stays "control SPACE"
+func convertControlToMetaForMac(doc *ij.KeymapXML, meta *keymapMetadata) {
+	if doc == nil || meta == nil {
+		return
+	}
+
+	for i := range doc.Actions {
+		actionID := doc.Actions[i].ID
+		// Only convert actions that are NOT explicitly defined in the top-level file
+		// (i.e., they are inherited from parent keymaps like $default.xml)
+		if meta.topLevelActions[actionID] {
+			continue // Skip actions explicitly defined in Mac OS X.xml
+		}
+
+		for j := range doc.Actions[i].KeyboardShortcuts {
+			ks := &doc.Actions[i].KeyboardShortcuts[j]
+			ks.First = replaceControlWithMeta(ks.First)
+			ks.Second = replaceControlWithMeta(ks.Second)
+		}
+	}
+}
+
+// replaceControlWithMeta replaces "control" modifier with "meta" in a keystroke string.
+// Handles both lowercase "control" and uppercase "CONTROL" to be safe.
+func replaceControlWithMeta(keystroke string) string {
+	if keystroke == "" {
+		return keystroke
+	}
+
+	// Replace word boundaries to avoid replacing "control" in the middle of other words
+	// IntelliJ uses space-separated tokens like "control C", "control alt S", etc.
+	result := strings.ReplaceAll(keystroke, "control ", "meta ")
+	result = strings.ReplaceAll(result, "CONTROL ", "meta ")
+
+	// Handle case where "control" is the last token (no trailing space)
+	if strings.HasSuffix(result, "control") {
+		result = strings.TrimSuffix(result, "control") + "meta"
+	}
+	if strings.HasSuffix(result, "CONTROL") {
+		result = strings.TrimSuffix(result, "CONTROL") + "meta"
+	}
+
+	return result
 }

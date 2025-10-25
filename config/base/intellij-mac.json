@@ -4,25 +4,25 @@
     {
       "id": "actions.clipboard.copy",
       "keybinding": [
-        "ctrl+c",
-        "ctrl+insert"
+        "cmd+c",
+        "cmd+insert"
       ]
     },
     {
       "id": "actions.clipboard.copyFilePath",
-      "keybinding": "ctrl+shift+c"
+      "keybinding": "cmd+shift+c"
     },
     {
       "id": "actions.clipboard.cut",
       "keybinding": [
-        "ctrl+x",
+        "cmd+x",
         "shift+delete"
       ]
     },
     {
       "id": "actions.clipboard.paste",
       "keybinding": [
-        "ctrl+v",
+        "cmd+v",
         "shift+insert"
       ]
     },
@@ -56,19 +56,19 @@
     },
     {
       "id": "actions.cursor.moveToBottom",
-      "keybinding": "ctrl+end"
+      "keybinding": "cmd+end"
     },
     {
       "id": "actions.cursor.moveToBottomSelect",
-      "keybinding": "ctrl+shift+pagedown"
+      "keybinding": "cmd+shift+pagedown"
     },
     {
       "id": "actions.cursor.moveToTop",
-      "keybinding": "ctrl+home"
+      "keybinding": "cmd+home"
     },
     {
       "id": "actions.cursor.moveToTopSelect",
-      "keybinding": "ctrl+shift+pageup"
+      "keybinding": "cmd+shift+pageup"
     },
     {
       "id": "actions.cursor.pageDown",
@@ -116,7 +116,7 @@
     },
     {
       "id": "actions.diff.compareTwoFiles",
-      "keybinding": "ctrl+d"
+      "keybinding": "cmd+d"
     },
     {
       "id": "actions.diff.nextChange",
@@ -135,7 +135,7 @@
     },
     {
       "id": "actions.edit.deleteLines",
-      "keybinding": "ctrl+y"
+      "keybinding": "cmd+y"
     },
     {
       "id": "actions.edit.deleteWordLeft",
@@ -147,7 +147,7 @@
     {
       "id": "actions.edit.find",
       "keybinding": [
-        "ctrl+f",
+        "cmd+f",
         "alt+f3"
       ]
     },
@@ -157,11 +157,11 @@
     },
     {
       "id": "actions.edit.formatDocument",
-      "keybinding": "ctrl+shift+alt+l"
+      "keybinding": "cmd+shift+alt+l"
     },
     {
       "id": "actions.edit.formatSelection",
-      "keybinding": "ctrl+alt+l"
+      "keybinding": "cmd+alt+l"
     },
     {
       "id": "actions.edit.insertLineAfter",
@@ -169,7 +169,7 @@
     },
     {
       "id": "actions.edit.insertLineBefore",
-      "keybinding": "ctrl+alt+enter"
+      "keybinding": "cmd+alt+enter"
     },
     {
       "id": "actions.edit.joinLines",
@@ -177,7 +177,7 @@
     },
     {
       "id": "actions.edit.lineBreakInsert",
-      "keybinding": "ctrl+enter"
+      "keybinding": "cmd+enter"
     },
     {
       "id": "actions.edit.nextMatchFindAction",
@@ -196,13 +196,13 @@
     {
       "id": "actions.edit.redo",
       "keybinding": [
-        "ctrl+shift+z",
+        "cmd+shift+z",
         "shift+alt+backspace"
       ]
     },
     {
       "id": "actions.edit.replace",
-      "keybinding": "ctrl+r"
+      "keybinding": "cmd+r"
     },
     {
       "id": "actions.edit.replaceInFiles",
@@ -224,8 +224,8 @@
     {
       "id": "actions.edit.toggleLineComment",
       "keybinding": [
-        "ctrl+/",
-        "ctrl+numpad_divide"
+        "cmd+/",
+        "cmd+numpad_divide"
       ]
     },
     {
@@ -238,7 +238,7 @@
     },
     {
       "id": "actions.file.closeEditor",
-      "keybinding": "ctrl+f4"
+      "keybinding": "cmd+f4"
     },
     {
       "id": "actions.file.closeWindow",
@@ -253,11 +253,11 @@
     },
     {
       "id": "actions.file.openRecent",
-      "keybinding": "ctrl+e"
+      "keybinding": "cmd+e"
     },
     {
       "id": "actions.file.saveAll",
-      "keybinding": "ctrl+s"
+      "keybinding": "cmd+s"
     },
     {
       "id": "actions.file.showOpenedFileInNewWindow",
@@ -266,64 +266,64 @@
     {
       "id": "actions.fold.fold",
       "keybinding": [
-        "ctrl+numpad_subtract",
-        "ctrl+-"
+        "cmd+numpad_subtract",
+        "cmd+-"
       ]
     },
     {
       "id": "actions.fold.foldAll",
       "keybinding": [
-        "ctrl+shift+numpad_subtract",
-        "ctrl+shift+-"
+        "cmd+shift+numpad_subtract",
+        "cmd+shift+-"
       ]
     },
     {
       "id": "actions.fold.foldRecursively",
       "keybinding": [
-        "ctrl+alt+numpad_subtract",
-        "ctrl+alt+-"
+        "cmd+alt+numpad_subtract",
+        "cmd+alt+-"
       ]
     },
     {
       "id": "actions.fold.unfold",
       "keybinding": [
-        "ctrl+numpad_add",
-        "ctrl+="
+        "cmd+numpad_add",
+        "cmd+="
       ]
     },
     {
       "id": "actions.fold.unfoldAll",
       "keybinding": [
-        "ctrl+shift+numpad_add",
-        "ctrl+shift+="
+        "cmd+shift+numpad_add",
+        "cmd+shift+="
       ]
     },
     {
       "id": "actions.fold.unfoldRecursively",
       "keybinding": [
-        "ctrl+alt+numpad_add",
-        "ctrl+alt+="
+        "cmd+alt+numpad_add",
+        "cmd+alt+="
       ]
     },
     {
       "id": "actions.git.openChanges",
-      "keybinding": "ctrl+d"
+      "keybinding": "cmd+d"
     },
     {
       "id": "actions.git.revert",
-      "keybinding": "ctrl+alt+z"
+      "keybinding": "cmd+alt+z"
     },
     {
       "id": "actions.git.unstage",
-      "keybinding": "ctrl+alt+z"
+      "keybinding": "cmd+alt+z"
     },
     {
       "id": "actions.go.back",
-      "keybinding": "ctrl+alt+left"
+      "keybinding": "cmd+alt+left"
     },
     {
       "id": "actions.go.bracket",
-      "keybinding": "ctrl+shift+m"
+      "keybinding": "cmd+shift+m"
     },
     {
       "id": "actions.go.breadcrumbsFocus",
@@ -335,15 +335,15 @@
     },
     {
       "id": "actions.go.definitionPeek",
-      "keybinding": "ctrl+shift+i"
+      "keybinding": "cmd+shift+i"
     },
     {
       "id": "actions.go.fileFinder",
-      "keybinding": "ctrl+shift+n"
+      "keybinding": "cmd+shift+n"
     },
     {
       "id": "actions.go.forward",
-      "keybinding": "ctrl+alt+right"
+      "keybinding": "cmd+alt+right"
     },
     {
       "id": "actions.go.goToDeclaration",
@@ -354,23 +354,23 @@
     },
     {
       "id": "actions.go.goToSuper",
-      "keybinding": "ctrl+u"
+      "keybinding": "cmd+u"
     },
     {
       "id": "actions.go.goToTest",
-      "keybinding": "ctrl+shift+t"
+      "keybinding": "cmd+shift+t"
     },
     {
       "id": "actions.go.implementations",
-      "keybinding": "ctrl+alt+b"
+      "keybinding": "cmd+alt+b"
     },
     {
       "id": "actions.go.lastEditLocation",
-      "keybinding": "ctrl+shift+backspace"
+      "keybinding": "cmd+shift+backspace"
     },
     {
       "id": "actions.go.line",
-      "keybinding": "ctrl+g"
+      "keybinding": "cmd+g"
     },
     {
       "id": "actions.go.nextChange",
@@ -390,7 +390,7 @@
     },
     {
       "id": "actions.go.referencePeek",
-      "keybinding": "ctrl+alt+f7"
+      "keybinding": "cmd+alt+f7"
     },
     {
       "id": "actions.go.references",
@@ -398,11 +398,11 @@
     },
     {
       "id": "actions.go.symbolFinder",
-      "keybinding": "ctrl+n"
+      "keybinding": "cmd+n"
     },
     {
       "id": "actions.go.symbolFinderInEditor",
-      "keybinding": "ctrl+f12"
+      "keybinding": "cmd+f12"
     },
     {
       "id": "actions.go.typeDefinition",
@@ -435,23 +435,23 @@
     },
     {
       "id": "actions.notebook.cell.moveDown",
-      "keybinding": "ctrl+shift+down"
+      "keybinding": "cmd+shift+down"
     },
     {
       "id": "actions.notebook.cell.moveUp",
-      "keybinding": "ctrl+shift+up"
+      "keybinding": "cmd+shift+up"
     },
     {
-      "id": "actions.refactor.organizeImports",
-      "keybinding": "ctrl+alt+o"
-    },
-    {
-      "id": "actions.refactor.quickFix",
+      "id": "actions.refactor.codeAction",
       "keybinding": "alt+enter"
     },
     {
+      "id": "actions.refactor.organizeImports",
+      "keybinding": "cmd+alt+o"
+    },
+    {
       "id": "actions.refactor.refactor",
-      "keybinding": "ctrl+shift+alt+t"
+      "keybinding": "cmd+shift+alt+t"
     },
     {
       "id": "actions.refactor.rename",
@@ -459,7 +459,7 @@
     },
     {
       "id": "actions.refactor.triggerParameterHint",
-      "keybinding": "ctrl+p"
+      "keybinding": "cmd+p"
     },
     {
       "id": "actions.run.configureTaskRunner",
@@ -513,11 +513,11 @@
     },
     {
       "id": "actions.run.stopDebugging",
-      "keybinding": "ctrl+f2"
+      "keybinding": "cmd+f2"
     },
     {
       "id": "actions.run.toggleBreakpoint",
-      "keybinding": "ctrl+f8"
+      "keybinding": "cmd+f8"
     },
     {
       "id": "actions.selection.addCursorsToLineEnds",
@@ -532,11 +532,11 @@
     },
     {
       "id": "actions.selection.copyLineDown",
-      "keybinding": "ctrl+d"
+      "keybinding": "cmd+d"
     },
     {
       "id": "actions.selection.expand",
-      "keybinding": "ctrl+w"
+      "keybinding": "cmd+w"
     },
     {
       "id": "actions.selection.moveLineDown",
@@ -555,7 +555,7 @@
     },
     {
       "id": "actions.selection.shrink",
-      "keybinding": "ctrl+shift+w"
+      "keybinding": "cmd+shift+w"
     },
     {
       "id": "actions.selection.toggleColumnSelectionMode",
@@ -581,7 +581,7 @@
     },
     {
       "id": "actions.terminal.runBuildTask",
-      "keybinding": "ctrl+f9"
+      "keybinding": "cmd+f9"
     },
     {
       "id": "actions.view.focusNextSplit",
@@ -593,7 +593,7 @@
     },
     {
       "id": "actions.view.maximizeEditor",
-      "keybinding": "ctrl+shift+f12"
+      "keybinding": "cmd+shift+f12"
     },
     {
       "id": "actions.view.selectTheme",
@@ -601,7 +601,7 @@
     },
     {
       "id": "actions.view.showCommandPalette",
-      "keybinding": "ctrl+shift+a"
+      "keybinding": "cmd+shift+a"
     },
     {
       "id": "actions.view.showTesting",
