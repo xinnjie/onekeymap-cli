@@ -3,54 +3,44 @@
   "keymaps": [
     {
       "id": "actions.clipboard.copy",
-      "keybinding": "cmd+c"
-    },
-    {
-      "id": "actions.clipboard.copyFilePath",
       "keybinding": [
-        "cmd+alt+c",
-        "cmd+k cmd+alt+c"
+        "ctrl+insert",
+        "ctrl+c"
       ]
     },
     {
+      "id": "actions.clipboard.copyFilePath",
+      "keybinding": "shift+alt+c"
+    },
+    {
       "id": "actions.clipboard.cut",
-      "keybinding": "cmd+x"
+      "keybinding": [
+        "shift+delete",
+        "ctrl+x"
+      ]
     },
     {
       "id": "actions.clipboard.paste",
-      "keybinding": "cmd+v"
-    },
-    {
-      "id": "actions.cursor.lineEnd",
-      "keybinding": "ctrl+e"
-    },
-    {
-      "id": "actions.cursor.lineEndSelect",
-      "keybinding": "ctrl+shift+e"
-    },
-    {
-      "id": "actions.cursor.lineStart",
-      "keybinding": "ctrl+a"
-    },
-    {
-      "id": "actions.cursor.lineStartSelect",
-      "keybinding": "ctrl+shift+a"
+      "keybinding": [
+        "shift+insert",
+        "ctrl+v"
+      ]
     },
     {
       "id": "actions.cursor.moveToBottom",
-      "keybinding": "cmd+down"
+      "keybinding": "ctrl+end"
     },
     {
       "id": "actions.cursor.moveToBottomSelect",
-      "keybinding": "cmd+shift+down"
+      "keybinding": "ctrl+shift+end"
     },
     {
       "id": "actions.cursor.moveToTop",
-      "keybinding": "cmd+up"
+      "keybinding": "ctrl+home"
     },
     {
       "id": "actions.cursor.moveToTopSelect",
-      "keybinding": "cmd+shift+up"
+      "keybinding": "ctrl+shift+home"
     },
     {
       "id": "actions.cursor.pageDown",
@@ -70,19 +60,11 @@
     },
     {
       "id": "actions.cursor.wordLeft",
-      "keybinding": "alt+left"
+      "keybinding": "ctrl+left"
     },
     {
       "id": "actions.cursor.wordLeftSelect",
-      "keybinding": "shift+alt+left"
-    },
-    {
-      "id": "actions.cursor.wordPartRight",
-      "keybinding": "ctrl+alt+right"
-    },
-    {
-      "id": "actions.cursor.wordPartRightSelect",
-      "keybinding": "ctrl+shift+alt+right"
+      "keybinding": "ctrl+shift+left"
     },
     {
       "id": "actions.diff.nextChange",
@@ -94,31 +76,23 @@
     },
     {
       "id": "actions.edit.cursorUndo",
-      "keybinding": "cmd+u"
+      "keybinding": "ctrl+u"
     },
     {
       "id": "actions.edit.deleteLines",
-      "keybinding": "cmd+shift+k"
+      "keybinding": "ctrl+shift+k"
     },
     {
       "id": "actions.edit.deleteWordLeft",
-      "keybinding": "alt+backspace"
-    },
-    {
-      "id": "actions.edit.deleteWordPartLeft",
-      "keybinding": "ctrl+alt+backspace"
-    },
-    {
-      "id": "actions.edit.deleteWordPartRight",
-      "keybinding": "ctrl+alt+delete"
+      "keybinding": "ctrl+backspace"
     },
     {
       "id": "actions.edit.find",
-      "keybinding": "cmd+f"
+      "keybinding": "ctrl+f"
     },
     {
       "id": "actions.edit.findInFiles",
-      "keybinding": "cmd+shift+f"
+      "keybinding": "ctrl+shift+f"
     },
     {
       "id": "actions.edit.formatDocument",
@@ -126,7 +100,7 @@
     },
     {
       "id": "actions.edit.formatSelection",
-      "keybinding": "cmd+k cmd+f"
+      "keybinding": "ctrl+k ctrl+f"
     },
     {
       "id": "actions.edit.inlineSuggest.next",
@@ -138,25 +112,16 @@
     },
     {
       "id": "actions.edit.insertLineAfter",
-      "keybinding": "cmd+enter"
+      "keybinding": "ctrl+enter"
     },
     {
       "id": "actions.edit.insertLineBefore",
-      "keybinding": "cmd+shift+enter"
-    },
-    {
-      "id": "actions.edit.joinLines",
-      "keybinding": "ctrl+j"
-    },
-    {
-      "id": "actions.edit.lineBreakInsert",
-      "keybinding": "ctrl+o"
+      "keybinding": "ctrl+shift+enter"
     },
     {
       "id": "actions.edit.nextMatchFindAction",
       "keybinding": [
         "f3",
-        "cmd+g",
         "enter"
       ]
     },
@@ -164,27 +129,28 @@
       "id": "actions.edit.previousMatchFindAction",
       "keybinding": [
         "shift+f3",
-        "cmd+shift+g",
         "shift+enter"
       ]
     },
     {
       "id": "actions.edit.redo",
-      "keybinding": "cmd+shift+z"
+      "keybinding": [
+        "ctrl+shift+z",
+        "ctrl+y"
+      ]
     },
     {
       "id": "actions.edit.replace",
-      "keybinding": "cmd+alt+f"
+      "keybinding": "ctrl+h"
     },
     {
       "id": "actions.edit.replaceInFiles",
-      "keybinding": "cmd+shift+h"
+      "keybinding": "ctrl+shift+h"
     },
     {
       "id": "actions.edit.suggest.show",
       "keybinding": [
-        "cmd+i",
-        "alt+escape",
+        "ctrl+i",
         "ctrl+space"
       ]
     },
@@ -194,34 +160,37 @@
     },
     {
       "id": "actions.edit.toggleLineComment",
-      "keybinding": "cmd+/"
+      "keybinding": "ctrl+/"
     },
     {
       "id": "actions.edit.undo",
-      "keybinding": "cmd+z"
+      "keybinding": "ctrl+z"
     },
     {
       "id": "actions.file.closeEditor",
-      "keybinding": "cmd+w"
+      "keybinding": [
+        "ctrl+w",
+        "ctrl+f4"
+      ]
     },
     {
       "id": "actions.file.closeWindow",
       "keybinding": [
-        "cmd+shift+w",
-        "cmd+w"
+        "ctrl+shift+w",
+        "alt+f4"
       ]
     },
     {
       "id": "actions.file.newFile",
-      "keybinding": "cmd+n"
+      "keybinding": "ctrl+n"
     },
     {
       "id": "actions.file.newWindow",
-      "keybinding": "cmd+shift+n"
+      "keybinding": "ctrl+shift+n"
     },
     {
       "id": "actions.file.openFile",
-      "keybinding": "cmd+o"
+      "keybinding": "ctrl+o"
     },
     {
       "id": "actions.file.openRecent",
@@ -229,63 +198,63 @@
     },
     {
       "id": "actions.file.save",
-      "keybinding": "cmd+s"
+      "keybinding": "ctrl+s"
     },
     {
       "id": "actions.file.saveAs",
-      "keybinding": "cmd+shift+s"
+      "keybinding": "ctrl+shift+s"
     },
     {
       "id": "actions.fold.fold",
-      "keybinding": "cmd+alt+["
+      "keybinding": "ctrl+shift+["
     },
     {
       "id": "actions.fold.foldAll",
-      "keybinding": "cmd+k cmd+0"
+      "keybinding": "ctrl+k ctrl+0"
     },
     {
       "id": "actions.fold.foldRecursively",
-      "keybinding": "cmd+k cmd+["
+      "keybinding": "ctrl+k ctrl+["
     },
     {
       "id": "actions.fold.toggleFold",
-      "keybinding": "cmd+k cmd+l"
+      "keybinding": "ctrl+k ctrl+l"
     },
     {
       "id": "actions.fold.unfold",
-      "keybinding": "cmd+alt+]"
+      "keybinding": "ctrl+shift+]"
     },
     {
       "id": "actions.fold.unfoldAll",
-      "keybinding": "cmd+k cmd+j"
+      "keybinding": "ctrl+k ctrl+j"
     },
     {
       "id": "actions.fold.unfoldRecursively",
-      "keybinding": "cmd+k cmd+]"
+      "keybinding": "ctrl+k ctrl+]"
     },
     {
       "id": "actions.git.revert",
-      "keybinding": "cmd+k cmd+r"
+      "keybinding": "ctrl+k ctrl+r"
     },
     {
       "id": "actions.git.stage",
-      "keybinding": "cmd+k cmd+alt+s"
+      "keybinding": "ctrl+k ctrl+alt+s"
     },
     {
       "id": "actions.git.unstage",
-      "keybinding": "cmd+k cmd+n"
+      "keybinding": "ctrl+k ctrl+n"
     },
     {
       "id": "actions.go.back",
-      "keybinding": "ctrl+-"
+      "keybinding": "alt+left"
     },
     {
       "id": "actions.go.bracket",
-      "keybinding": "cmd+shift+\\"
+      "keybinding": "ctrl+shift+\\"
     },
     {
       "id": "actions.go.breadcrumbsFocus",
-      "keybinding": "cmd+shift+;"
+      "keybinding": "ctrl+shift+;"
     },
     {
       "id": "actions.go.callHierarchy",
@@ -299,7 +268,7 @@
       "id": "actions.go.definition",
       "keybinding": [
         "f12",
-        "cmd+f12"
+        "ctrl+f12"
       ]
     },
     {
@@ -308,19 +277,22 @@
     },
     {
       "id": "actions.go.fileFinder",
-      "keybinding": "cmd+p"
+      "keybinding": [
+        "ctrl+e",
+        "ctrl+p"
+      ]
     },
     {
       "id": "actions.go.forward",
-      "keybinding": "ctrl+shift+-"
+      "keybinding": "alt+right"
     },
     {
       "id": "actions.go.implementations",
-      "keybinding": "cmd+f12"
+      "keybinding": "ctrl+f12"
     },
     {
       "id": "actions.go.lastEditLocation",
-      "keybinding": "cmd+k cmd+q"
+      "keybinding": "ctrl+k ctrl+q"
     },
     {
       "id": "actions.go.line",
@@ -348,15 +320,15 @@
     },
     {
       "id": "actions.go.symbolFinder",
-      "keybinding": "cmd+t"
+      "keybinding": "ctrl+t"
     },
     {
       "id": "actions.go.symbolFinderInEditor",
-      "keybinding": "cmd+shift+o"
+      "keybinding": "ctrl+shift+o"
     },
     {
       "id": "actions.hover.showHover",
-      "keybinding": "cmd+k cmd+i"
+      "keybinding": "ctrl+k ctrl+i"
     },
     {
       "id": "actions.notebook.cell.edit",
@@ -364,7 +336,7 @@
     },
     {
       "id": "actions.notebook.cell.execute",
-      "keybinding": "ctrl+enter"
+      "keybinding": "ctrl+alt+enter"
     },
     {
       "id": "actions.notebook.cell.executeAndInsertBelow",
@@ -376,11 +348,11 @@
     },
     {
       "id": "actions.notebook.cell.insertCodeCellAbove",
-      "keybinding": "cmd+shift+enter"
+      "keybinding": "ctrl+shift+enter"
     },
     {
       "id": "actions.notebook.cell.insertCodeCellBelow",
-      "keybinding": "cmd+enter"
+      "keybinding": "ctrl+enter"
     },
     {
       "id": "actions.notebook.cell.moveDown",
@@ -394,22 +366,16 @@
       "id": "actions.notebook.cell.quitEdit",
       "keybinding": [
         "escape",
-        "ctrl+enter"
+        "ctrl+alt+enter"
       ]
     },
     {
       "id": "actions.notebook.focusBottom",
-      "keybinding": [
-        "cmd+end",
-        "cmd+down"
-      ]
+      "keybinding": "ctrl+end"
     },
     {
       "id": "actions.notebook.focusTop",
-      "keybinding": [
-        "cmd+home",
-        "cmd+up"
-      ]
+      "keybinding": "ctrl+home"
     },
     {
       "id": "actions.refactor.organizeImports",
@@ -417,7 +383,7 @@
     },
     {
       "id": "actions.refactor.quickFix",
-      "keybinding": "cmd+."
+      "keybinding": "ctrl+."
     },
     {
       "id": "actions.refactor.refactor",
@@ -429,7 +395,7 @@
     },
     {
       "id": "actions.refactor.triggerParameterHint",
-      "keybinding": "cmd+shift+space"
+      "keybinding": "ctrl+shift+space"
     },
     {
       "id": "actions.run.continue",
@@ -437,7 +403,7 @@
     },
     {
       "id": "actions.run.restartDebugging",
-      "keybinding": "cmd+shift+f5"
+      "keybinding": "ctrl+shift+f5"
     },
     {
       "id": "actions.run.startDebugging",
@@ -465,11 +431,11 @@
     },
     {
       "id": "actions.selection.addCursorAbove",
-      "keybinding": "cmd+alt+up"
+      "keybinding": "ctrl+alt+up"
     },
     {
       "id": "actions.selection.addCursorBelow",
-      "keybinding": "cmd+alt+down"
+      "keybinding": "ctrl+alt+down"
     },
     {
       "id": "actions.selection.addCursorsToLineEnds",
@@ -477,7 +443,7 @@
     },
     {
       "id": "actions.selection.addNextOccurrence",
-      "keybinding": "cmd+d"
+      "keybinding": "ctrl+d"
     },
     {
       "id": "actions.selection.copyLineDown",
@@ -489,10 +455,7 @@
     },
     {
       "id": "actions.selection.expand",
-      "keybinding": [
-        "ctrl+shift+right",
-        "cmd+ctrl+shift+right"
-      ]
+      "keybinding": "shift+alt+right"
     },
     {
       "id": "actions.selection.moveLineDown",
@@ -504,24 +467,21 @@
     },
     {
       "id": "actions.selection.selectAll",
-      "keybinding": "cmd+a"
+      "keybinding": "ctrl+a"
     },
     {
       "id": "actions.selection.selectAllOccurrences",
-      "keybinding": "cmd+shift+l"
+      "keybinding": "ctrl+shift+l"
     },
     {
       "id": "actions.selection.shrink",
-      "keybinding": [
-        "ctrl+shift+left",
-        "cmd+ctrl+shift+left"
-      ]
+      "keybinding": "shift+alt+left"
     },
     {
       "id": "actions.tabSwitcher.next",
       "keybinding": [
         "ctrl+tab",
-        "cmd+shift+]"
+        "ctrl+pagedown"
       ]
     },
     {
@@ -534,82 +494,81 @@
     },
     {
       "id": "actions.terminal.runBuildTask",
-      "keybinding": "cmd+shift+b"
+      "keybinding": "ctrl+shift+b"
     },
     {
       "id": "actions.view.openKeyboardShortcuts",
-      "keybinding": "cmd+k cmd+s"
+      "keybinding": "ctrl+k ctrl+s"
     },
     {
       "id": "actions.view.selectTheme",
-      "keybinding": "cmd+k cmd+t"
+      "keybinding": "ctrl+k ctrl+t"
     },
     {
       "id": "actions.view.showCommandPalette",
       "keybinding": [
         "f1",
-        "cmd+shift+p"
+        "ctrl+shift+p"
       ]
     },
     {
       "id": "actions.view.showDebugOutputConsole",
-      "keybinding": "cmd+shift+y"
+      "keybinding": "ctrl+shift+y"
     },
     {
       "id": "actions.view.showExtensions",
-      "keybinding": "cmd+shift+x"
+      "keybinding": "ctrl+shift+x"
     },
     {
       "id": "actions.view.splitDown",
-      "keybinding": "cmd+k cmd+\\"
+      "keybinding": "ctrl+k ctrl+\\"
     },
     {
       "id": "actions.view.splitLeft",
-      "keybinding": "cmd+k cmd+\\"
+      "keybinding": "ctrl+k ctrl+\\"
     },
     {
       "id": "actions.view.splitRight",
       "keybinding": [
-        "cmd+k cmd+\\",
-        "ctrl+shift+5",
-        "cmd+\\"
+        "ctrl+k ctrl+\\",
+        "ctrl+shift+5"
       ]
     },
     {
       "id": "actions.view.splitUp",
-      "keybinding": "cmd+k cmd+\\"
+      "keybinding": "ctrl+k ctrl+\\"
     },
     {
       "id": "actions.view.toggleBottomDock",
-      "keybinding": "cmd+j"
+      "keybinding": "ctrl+j"
     },
     {
       "id": "actions.view.toggleDebugPanel",
-      "keybinding": "cmd+shift+d"
+      "keybinding": "ctrl+shift+d"
     },
     {
       "id": "actions.view.toggleExplorer",
-      "keybinding": "cmd+shift+e"
+      "keybinding": "ctrl+shift+e"
     },
     {
       "id": "actions.view.toggleFullScreen",
-      "keybinding": "cmd+ctrl+f"
+      "keybinding": "f11"
     },
     {
       "id": "actions.view.toggleOutput",
-      "keybinding": "cmd+shift+u"
+      "keybinding": "ctrl+shift+u"
     },
     {
       "id": "actions.view.toggleProblems",
-      "keybinding": "cmd+shift+m"
+      "keybinding": "ctrl+shift+m"
     },
     {
       "id": "actions.view.toggleRightSideBar",
-      "keybinding": "cmd+alt+b"
+      "keybinding": "ctrl+alt+b"
     },
     {
       "id": "actions.view.toggleSearch",
-      "keybinding": "cmd+shift+f"
+      "keybinding": "ctrl+shift+f"
     },
     {
       "id": "actions.view.toggleSourceControl",

@@ -8,6 +8,7 @@ import (
 	"log/slog"
 
 	"github.com/tailscale/hujson"
+	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
@@ -77,6 +78,8 @@ func (i *vscodeImporter) Import(
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
 	}
+
+	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
 
 	return setting, nil
 }

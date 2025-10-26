@@ -1,12 +1,12 @@
-package internal
+package internal_test
 
 import (
 	"bytes"
-	"context"
 	"io"
 	"log/slog"
 	"testing"
 
+	"github.com/xinnjie/onekeymap-cli/internal"
 	vscodeplugin "github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 
 	"github.com/google/go-cmp/cmp"
@@ -50,7 +50,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	registry := plugins.NewRegistry()
 	registry.Register(vscodeplugin.New(mappingConfig, logger))
-	service := NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
+	service := internal.NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
 
 	// VSCode keybindings.json content (comments stripped by importer)
 	// Note that "ctrl+alt+shift+l" is different from "ctrl+shift+alt+l"
@@ -75,7 +75,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 		Base:        base,
 	}
 
-	res, err := service.Import(context.Background(), opts)
+	res, err := service.Import(t.Context(), opts)
 	require.NoError(t, err)
 	require.NotNil(t, res)
 

@@ -1,3 +1,3 @@
-intellij base keymap
+# Intellij Base Keymap
 
-https://github.com/JetBrains/intellij-community/tree/master/platform/platform-resources/src/keymaps
+From https://github.com/JetBrains/intellij-community/tree/master/platform/platform-resources/src/keymaps

@@ -54,6 +54,17 @@ PRESETS = {
         ],
         "target_dir": pathlib.Path("chore") / "zed",
     },
+    "vscode": {
+        "base_url": (
+            "https://raw.githubusercontent.com/codebling/vs-code-default-keybindings/refs/heads/master"
+        ),
+        "files": [
+            "linux.keybindings.json",
+            "macos.keybindings.json",
+            "windows.keybindings.json",
+        ],
+        "target_dir": pathlib.Path("chore") / "vscode",
+    },
 }
 
 

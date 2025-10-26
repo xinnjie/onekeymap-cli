@@ -40,3 +40,6 @@ update-intellij-keymaps:
 
 update-zed-keymaps:
 	@python3 scripts/update_keymaps.py --preset zed
+
+update-vscode-keymaps:
+	@python3 scripts/update_keymaps.py --preset vscode

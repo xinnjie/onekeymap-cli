@@ -16,16 +16,25 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	ij "github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
 type devGenerateBaseFlags struct {
 	IntelliJSourceDir string
+	VSCodeSourceDir   string
 	ZedSourceDir      string
 	OutDir            string
 	Editor            string
 }
+
+const (
+	editorAll      = "all"
+	editorIntelliJ = "intellij"
+	editorVSCode   = "vscode"
+	editorZed      = "zed"
+)
 
 func NewCmdDevGenerateBase() *cobra.Command {
 	f := devGenerateBaseFlags{}
@@ -38,9 +47,12 @@ func NewCmdDevGenerateBase() *cobra.Command {
 	cmd.Flags().
 		StringVar(&f.IntelliJSourceDir, "intellij-source-dir", "chore/intellij", "Directory containing IntelliJ keymap XML files")
 	cmd.Flags().
+		StringVar(&f.VSCodeSourceDir, "vscode-source-dir", "chore/vscode", "Directory containing VSCode keymap JSON files")
+	cmd.Flags().
 		StringVar(&f.ZedSourceDir, "zed-source-dir", "chore/zed", "Directory containing Zed keymap JSON files")
 	cmd.Flags().StringVar(&f.OutDir, "out-dir", "config/base", "Directory to write base JSON files")
-	cmd.Flags().StringVar(&f.Editor, "editor", "all", "Editor to generate base keymap for (intellij, zed, or all)")
+	cmd.Flags().
+		StringVar(&f.Editor, "editor", editorAll, "Editor to generate base keymap for (intellij, vscode, zed, or all)")
 	return cmd
 }
 
@@ -63,13 +75,15 @@ func devGenerateBaseRun(
 			os.Exit(1)
 		}
 
-		// Generate IntelliJ base keymaps
-		if f.Editor == "all" || f.Editor == "intellij" {
+		if f.Editor == editorAll || f.Editor == editorIntelliJ {
 			generateIntelliJBase(ctx, f, mc, logger)
 		}
 
-		// Generate Zed base keymaps
-		if f.Editor == "all" || f.Editor == "zed" {
+		if f.Editor == editorAll || f.Editor == editorVSCode {
+			generateVSCodeBase(ctx, f, mc, logger)
+		}
+
+		if f.Editor == editorAll || f.Editor == editorZed {
 			generateZedBase(ctx, f, mc, logger)
 		}
 	}
@@ -155,47 +169,38 @@ func generateIntelliJBase(
 	}
 }
 
-func generateZedBase(ctx context.Context, f *devGenerateBaseFlags, mc *mappings.MappingConfig, logger *slog.Logger) {
-	plugin := zed.New(mc, logger)
-	imp, err := plugin.Importer()
-	if err != nil {
-		logger.ErrorContext(ctx, "get zed importer", "error", err)
-		os.Exit(1)
-	}
+type genTask struct {
+	name     string
+	source   string
+	outfile  string
+	platform platform.Platform
+}
 
-	tasks := []struct {
-		name     string
-		source   string
-		outfile  string
-		platform platform.Platform
-	}{
-		{name: "mac", source: "default-macos.json", outfile: "zed-mac.json", platform: platform.PlatformMacOS},
-		{
-			name:     "windows",
-			source:   "default-windows.json",
-			outfile:  "zed-windows.json",
-			platform: platform.PlatformWindows,
-		},
-		{name: "linux", source: "default-linux.json", outfile: "zed-linux.json", platform: platform.PlatformLinux},
-	}
-
+func generateOnekeymapBase(
+	ctx context.Context,
+	sourceDir string,
+	outDir string,
+	imp pluginapi.PluginImporter,
+	logger *slog.Logger,
+	tasks []genTask,
+) {
 	for _, t := range tasks {
-		logger.InfoContext(ctx, "generating zed base", "platform", t.name, "src", t.source)
-		sourcePath := filepath.Join(f.ZedSourceDir, t.source)
+		logger.InfoContext(ctx, "generating base", "platform", t.name, "src", t.source)
+		sourcePath := filepath.Join(sourceDir, t.source)
 		sourceFile, err := os.Open(sourcePath)
 		if err != nil {
-			logger.ErrorContext(ctx, "open zed source", "path", sourcePath, "error", err)
+			logger.ErrorContext(ctx, "open source", "path", sourcePath, "error", err)
 			os.Exit(1)
 		}
 
 		km, err := imp.Import(ctx, sourceFile, pluginapi.PluginImportOption{})
 		_ = sourceFile.Close()
 		if err != nil {
-			logger.ErrorContext(ctx, "import zed json", "src", t.source, "error", err)
+			logger.ErrorContext(ctx, "import json", "src", t.source, "error", err)
 			os.Exit(1)
 		}
 
-		outPath := filepath.Join(f.OutDir, t.outfile)
+		outPath := filepath.Join(outDir, t.outfile)
 		fp, err := os.Create(outPath)
 		if err != nil {
 			logger.ErrorContext(ctx, "create output", "path", outPath, "error", err)
@@ -209,8 +214,55 @@ func generateZedBase(ctx context.Context, f *devGenerateBaseFlags, mc *mappings.
 		if err := fp.Close(); err != nil {
 			logger.WarnContext(ctx, "close file", "path", outPath, "error", err)
 		}
-		logger.InfoContext(ctx, "wrote zed base", "path", outPath)
+		logger.InfoContext(ctx, "wrote base", "path", outPath)
 	}
+}
+
+func generateVSCodeBase(ctx context.Context, f *devGenerateBaseFlags, mc *mappings.MappingConfig, logger *slog.Logger) {
+	plugin := vscode.New(mc, logger)
+	imp, err := plugin.Importer()
+	if err != nil {
+		logger.ErrorContext(ctx, "get vscode importer", "error", err)
+		os.Exit(1)
+	}
+
+	tasks := []genTask{
+		{name: "mac", source: "macos.keybindings.json", outfile: "vscode-mac.json", platform: platform.PlatformMacOS},
+		{
+			name:     "windows",
+			source:   "windows.keybindings.json",
+			outfile:  "vscode-windows.json",
+			platform: platform.PlatformWindows,
+		},
+		{
+			name:     "linux",
+			source:   "linux.keybindings.json",
+			outfile:  "vscode-linux.json",
+			platform: platform.PlatformLinux,
+		},
+	}
+	generateOnekeymapBase(ctx, f.VSCodeSourceDir, f.OutDir, imp, logger, tasks)
+}
+
+func generateZedBase(ctx context.Context, f *devGenerateBaseFlags, mc *mappings.MappingConfig, logger *slog.Logger) {
+	plugin := zed.New(mc, logger)
+	imp, err := plugin.Importer()
+	if err != nil {
+		logger.ErrorContext(ctx, "get zed importer", "error", err)
+		os.Exit(1)
+	}
+
+	tasks := []genTask{
+		{name: "mac", source: "default-macos.json", outfile: "zed-mac.json", platform: platform.PlatformMacOS},
+		{
+			name:     "windows",
+			source:   "default-windows.json",
+			outfile:  "zed-windows.json",
+			platform: platform.PlatformWindows,
+		},
+		{name: "linux", source: "default-linux.json", outfile: "zed-linux.json", platform: platform.PlatformLinux},
+	}
+	generateOnekeymapBase(ctx, f.ZedSourceDir, f.OutDir, imp, logger, tasks)
 }
 
 func loadAndFlattenIJXML(_ context.Context, dir, file string) (*ij.KeymapXML, *keymapMetadata, error) {
@@ -328,12 +380,9 @@ func replaceControlWithMeta(keystroke string) string {
 		return keystroke
 	}
 
-	// Replace word boundaries to avoid replacing "control" in the middle of other words
-	// IntelliJ uses space-separated tokens like "control C", "control alt S", etc.
 	result := strings.ReplaceAll(keystroke, "control ", "meta ")
 	result = strings.ReplaceAll(result, "CONTROL ", "meta ")
 
-	// Handle case where "control" is the last token (no trailing space)
 	if strings.HasSuffix(result, "control") {
 		result = strings.TrimSuffix(result, "control") + "meta"
 	}
