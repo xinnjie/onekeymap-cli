@@ -16,6 +16,8 @@ var (
 	_ tea.Model = (*ImportFormModel)(nil)
 )
 
+const selectOtherOption = "Other (manual input)"
+
 // ImportFormModel represents the import form UI model.
 type ImportFormModel struct {
 	form *huh.Form
@@ -29,8 +31,6 @@ type ImportFormModel struct {
 	EditorKeymapConfigInput    *string
 	OnekeymapConfigOutput      *string
 	OnekeymapConfigPlaceHolder string
-
-	configPathSelection string
 }
 
 func NewImportFormModel(
@@ -171,8 +171,6 @@ func (m *ImportFormModel) fillPlaceholders() {
 }
 
 func (m *ImportFormModel) createInputGroup() []*huh.Group {
-	const otherOption = "Other (manual input)"
-
 	multipleConfigAvailableSelect := huh.NewGroup(
 		huh.NewSelect[string]().
 			TitleFunc(func() string {
@@ -184,10 +182,10 @@ func (m *ImportFormModel) createInputGroup() []*huh.Group {
 				for _, path := range configs {
 					opts = append(opts, huh.NewOption(path, path))
 				}
-				opts = append(opts, huh.NewOption(otherOption, otherOption))
+				opts = append(opts, huh.NewOption(selectOtherOption, selectOtherOption))
 				return opts
 			}, &m.Editor).
-			Value(&m.configPathSelection),
+			Value(m.EditorKeymapConfigInput),
 	).WithHideFunc(func() bool {
 		configs := m.configPaths()
 		return len(configs) <= 1
@@ -210,7 +208,7 @@ func (m *ImportFormModel) createInputGroup() []*huh.Group {
 			Value(m.EditorKeymapConfigInput),
 	).WithHideFunc(func() bool {
 		configs := m.configPaths()
-		return len(configs) <= 1 || m.configPathSelection != otherOption
+		return len(configs) <= 1 || *m.EditorKeymapConfigInput != selectOtherOption
 	})
 
 	lessConfigAvailableInput := huh.NewGroup(
@@ -219,15 +217,14 @@ func (m *ImportFormModel) createInputGroup() []*huh.Group {
 				return "Input config path for " + *m.Editor
 			}, &m.Editor).
 			PlaceholderFunc(func() string {
-				configs := m.configPaths()
-				if len(configs) > 0 {
-					return configs[0]
-				}
-				return ""
+				return m.placeholder()
 			}, &m.Editor).
 			// Ensure the input file exists
 			Validate(func(s string) error {
 				filePath := s
+				if filePath == "" {
+					filePath = m.placeholder()
+				}
 				if _, err := os.Stat(filePath); os.IsNotExist(err) {
 					return fmt.Errorf("file does not exist: %s", filePath)
 				}
@@ -253,4 +250,12 @@ func (m *ImportFormModel) configPaths() []string {
 		}
 	}
 	return []string{}
+}
+
+func (m *ImportFormModel) placeholder() string {
+	configs := m.configPaths()
+	if len(configs) > 0 {
+		return configs[0]
+	}
+	return ""
 }

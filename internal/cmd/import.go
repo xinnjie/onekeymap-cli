@@ -274,7 +274,7 @@ func handleInteractiveImportFlags(
 	f *importFlags,
 	onekeymapConfig string,
 	pluginRegistry *plugins.Registry,
-	_ *slog.Logger,
+	logger *slog.Logger,
 ) error {
 	needSelectEditor := !cmd.Flags().Changed("from") || f.from == ""
 	needInput := !cmd.Flags().Changed("input") || f.input == ""
@@ -294,6 +294,8 @@ func handleInteractiveImportFlags(
 			return err
 		}
 	}
+
+	logger.DebugContext(cmd.Context(), "after input propmt", "from", f.from, "input", f.input, "output", f.output)
 	return nil
 }
 
