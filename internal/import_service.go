@@ -71,7 +71,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 	// Normalize: merge same-action entries and deduplicate identical bindings before downstream logic
 	if setting != nil && len(setting.GetActions()) > 0 {
-		setting.Actions = dedupKeyBindings(setting.GetActions())
+		setting.Actions = DedupKeyBindings(setting.GetActions())
 	}
 
 	s.recorder.RecordCommandProcessed(ctx, string(opts.EditorType), setting)
@@ -101,7 +101,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 
 	// If baseline provided, first union baseline chords into current setting so unchanged chords are retained.
 	setting = unionWithBase(opts.Base, setting)
-	setting.Actions = dedupKeyBindings(setting.GetActions())
+	setting.Actions = DedupKeyBindings(setting.GetActions())
 	// Re-decorate after union so metadata (Name/Description/Category) and readable chords are present
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 
@@ -109,7 +109,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	changes := s.calculateChanges(opts.Base, setting)
 
 	// Safety: ensure dedup on output as well
-	setting.Actions = dedupKeyBindings(setting.GetActions())
+	setting.Actions = DedupKeyBindings(setting.GetActions())
 	return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
 }
 

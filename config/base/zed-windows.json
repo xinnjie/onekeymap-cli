@@ -1,0 +1,413 @@
+{
+  "version": "1.0",
+  "keymaps": [
+    {
+      "id": "actions.clipboard.copy",
+      "keybinding": [
+        "ctrl+c",
+        "ctrl+insert",
+        "ctrl+shift+c"
+      ]
+    },
+    {
+      "id": "actions.clipboard.cut",
+      "keybinding": [
+        "ctrl+x",
+        "shift+delete"
+      ]
+    },
+    {
+      "id": "actions.clipboard.paste",
+      "keybinding": [
+        "ctrl+v",
+        "shift+insert",
+        "ctrl+shift+v"
+      ]
+    },
+    {
+      "id": "actions.cursor.moveToBottom",
+      "keybinding": "ctrl+end"
+    },
+    {
+      "id": "actions.cursor.moveToBottomSelect",
+      "keybinding": "ctrl+shift+end"
+    },
+    {
+      "id": "actions.cursor.moveToTop",
+      "keybinding": "ctrl+home"
+    },
+    {
+      "id": "actions.cursor.moveToTopSelect",
+      "keybinding": "ctrl+shift+home"
+    },
+    {
+      "id": "actions.cursor.pageDown",
+      "keybinding": "alt+pagedown"
+    },
+    {
+      "id": "actions.cursor.pageDownSelect",
+      "keybinding": "shift+pagedown"
+    },
+    {
+      "id": "actions.cursor.pageUp",
+      "keybinding": "alt+pageup"
+    },
+    {
+      "id": "actions.cursor.pageUpSelect",
+      "keybinding": "shift+pageup"
+    },
+    {
+      "id": "actions.cursor.wordLeft",
+      "keybinding": "ctrl+left"
+    },
+    {
+      "id": "actions.cursor.wordLeftSelect",
+      "keybinding": "ctrl+shift+left"
+    },
+    {
+      "id": "actions.cursor.wordPartLeft",
+      "keybinding": "ctrl+alt+left"
+    },
+    {
+      "id": "actions.cursor.wordPartLeftSelect",
+      "keybinding": "ctrl+shift+alt+left"
+    },
+    {
+      "id": "actions.cursor.wordPartRight",
+      "keybinding": "ctrl+alt+right"
+    },
+    {
+      "id": "actions.cursor.wordPartRightSelect",
+      "keybinding": "ctrl+shift+alt+right"
+    },
+    {
+      "id": "actions.cursor.wordRight",
+      "keybinding": "ctrl+right"
+    },
+    {
+      "id": "actions.cursor.wordRightSelect",
+      "keybinding": "ctrl+shift+right"
+    },
+    {
+      "id": "actions.diff.compareTwoFiles",
+      "keybinding": "alt+d"
+    },
+    {
+      "id": "actions.diff.nextChange",
+      "keybinding": "ctrl+shift+alt+backspace"
+    },
+    {
+      "id": "actions.diff.previousChange",
+      "keybinding": "ctrl+shift+backspace"
+    },
+    {
+      "id": "actions.edit.cursorUndo",
+      "keybinding": "ctrl+u"
+    },
+    {
+      "id": "actions.edit.deleteLines",
+      "keybinding": "ctrl+shift+k"
+    },
+    {
+      "id": "actions.edit.deleteWordPartLeft",
+      "keybinding": [
+        "ctrl+alt+backspace",
+        "shift+alt+h"
+      ]
+    },
+    {
+      "id": "actions.edit.deleteWordPartRight",
+      "keybinding": [
+        "ctrl+alt+delete",
+        "shift+alt+d"
+      ]
+    },
+    {
+      "id": "actions.edit.findInFiles",
+      "keybinding": "ctrl+shift+f"
+    },
+    {
+      "id": "actions.edit.formatDocument",
+      "keybinding": "shift+alt+f"
+    },
+    {
+      "id": "actions.edit.inlineSuggest.next",
+      "keybinding": "alt+]"
+    },
+    {
+      "id": "actions.edit.inlineSuggest.previous",
+      "keybinding": "alt+["
+    },
+    {
+      "id": "actions.edit.joinLines",
+      "keybinding": "ctrl+shift+j"
+    },
+    {
+      "id": "actions.edit.redo",
+      "keybinding": [
+        "ctrl+shift+z",
+        "ctrl+y"
+      ]
+    },
+    {
+      "id": "actions.edit.replaceInFiles",
+      "keybinding": "ctrl+shift+h"
+    },
+    {
+      "id": "actions.edit.suggest.show",
+      "keybinding": "ctrl+space"
+    },
+    {
+      "id": "actions.edit.undo",
+      "keybinding": "ctrl+z"
+    },
+    {
+      "id": "actions.file.newFile",
+      "keybinding": "ctrl+n"
+    },
+    {
+      "id": "actions.file.newWindow",
+      "keybinding": "ctrl+shift+n"
+    },
+    {
+      "id": "actions.file.save",
+      "keybinding": "ctrl+s"
+    },
+    {
+      "id": "actions.file.saveAll",
+      "keybinding": "ctrl+k s"
+    },
+    {
+      "id": "actions.file.saveAs",
+      "keybinding": "ctrl+shift+s"
+    },
+    {
+      "id": "actions.fold.fold",
+      "keybinding": "ctrl+shift+["
+    },
+    {
+      "id": "actions.fold.foldAll",
+      "keybinding": "ctrl+k ctrl+0"
+    },
+    {
+      "id": "actions.fold.foldRecursively",
+      "keybinding": "ctrl+k ctrl+["
+    },
+    {
+      "id": "actions.fold.toggleFold",
+      "keybinding": "ctrl+k ctrl+l"
+    },
+    {
+      "id": "actions.fold.unfold",
+      "keybinding": "ctrl+shift+]"
+    },
+    {
+      "id": "actions.fold.unfoldAll",
+      "keybinding": "ctrl+k ctrl+j"
+    },
+    {
+      "id": "actions.fold.unfoldRecursively",
+      "keybinding": "ctrl+k ctrl+]"
+    },
+    {
+      "id": "actions.git.blameHover",
+      "keybinding": "ctrl+k ctrl+b"
+    },
+    {
+      "id": "actions.git.openChanges",
+      "keybinding": "alt+g m"
+    },
+    {
+      "id": "actions.git.stage",
+      "keybinding": "alt+y"
+    },
+    {
+      "id": "actions.git.unstage",
+      "keybinding": "shift+alt+y"
+    },
+    {
+      "id": "actions.go.bracket",
+      "keybinding": [
+        "ctrl+m",
+        "ctrl+shift+\\"
+      ]
+    },
+    {
+      "id": "actions.go.definition",
+      "keybinding": "f12"
+    },
+    {
+      "id": "actions.go.fileFinder",
+      "keybinding": [
+        "ctrl+e",
+        "ctrl+p"
+      ]
+    },
+    {
+      "id": "actions.go.implementations",
+      "keybinding": "ctrl+f12"
+    },
+    {
+      "id": "actions.go.nextProblem",
+      "keybinding": "f8"
+    },
+    {
+      "id": "actions.go.peekDeclaration",
+      "keybinding": [
+        "alt+f12",
+        "ctrl+shift+f10"
+      ]
+    },
+    {
+      "id": "actions.go.previousProblem",
+      "keybinding": "shift+f8"
+    },
+    {
+      "id": "actions.go.references",
+      "keybinding": "shift+alt+f12"
+    },
+    {
+      "id": "actions.go.symbolFinder",
+      "keybinding": "ctrl+t"
+    },
+    {
+      "id": "actions.go.typeDefinition",
+      "keybinding": "shift+f12"
+    },
+    {
+      "id": "actions.hover.showHover",
+      "keybinding": "ctrl+k ctrl+i"
+    },
+    {
+      "id": "actions.refactor.codeAction",
+      "keybinding": "ctrl+."
+    },
+    {
+      "id": "actions.refactor.organizeImports",
+      "keybinding": "shift+alt+o"
+    },
+    {
+      "id": "actions.refactor.rename",
+      "keybinding": "f2"
+    },
+    {
+      "id": "actions.refactor.triggerParameterHint",
+      "keybinding": "ctrl+i"
+    },
+    {
+      "id": "actions.run.reRunTask",
+      "keybinding": "alt+t"
+    },
+    {
+      "id": "actions.run.restartDebugging",
+      "keybinding": "ctrl+shift+f5"
+    },
+    {
+      "id": "actions.run.startDebugging",
+      "keybinding": "f4"
+    },
+    {
+      "id": "actions.run.stopDebugging",
+      "keybinding": "shift+f5"
+    },
+    {
+      "id": "actions.run.toggleBreakpoint",
+      "keybinding": "f9"
+    },
+    {
+      "id": "actions.selection.copyLineDown",
+      "keybinding": "shift+alt+down"
+    },
+    {
+      "id": "actions.selection.copyLineUp",
+      "keybinding": "shift+alt+up"
+    },
+    {
+      "id": "actions.selection.expand",
+      "keybinding": "shift+alt+right"
+    },
+    {
+      "id": "actions.selection.moveLineDown",
+      "keybinding": "alt+down"
+    },
+    {
+      "id": "actions.selection.moveLineUp",
+      "keybinding": "alt+up"
+    },
+    {
+      "id": "actions.selection.selectAll",
+      "keybinding": "ctrl+a"
+    },
+    {
+      "id": "actions.selection.selectAllOccurrences",
+      "keybinding": [
+        "ctrl+f2",
+        "ctrl+shift+l"
+      ]
+    },
+    {
+      "id": "actions.selection.shrink",
+      "keybinding": "shift+alt+left"
+    },
+    {
+      "id": "actions.tabSwitcher.next",
+      "keybinding": "ctrl+tab"
+    },
+    {
+      "id": "actions.tabSwitcher.previous",
+      "keybinding": "ctrl+shift+tab"
+    },
+    {
+      "id": "actions.terminal.new",
+      "keybinding": "ctrl+shift+`"
+    },
+    {
+      "id": "actions.view.openGlobalSettings",
+      "keybinding": "ctrl+,"
+    },
+    {
+      "id": "actions.view.openKeyboardShortcuts",
+      "keybinding": "ctrl+k ctrl+s"
+    },
+    {
+      "id": "actions.view.selectTheme",
+      "keybinding": "ctrl+k ctrl+t"
+    },
+    {
+      "id": "actions.view.showExtensions",
+      "keybinding": "ctrl+shift+x"
+    },
+    {
+      "id": "actions.view.splitRight",
+      "keybinding": "ctrl+\\"
+    },
+    {
+      "id": "actions.view.toggleBottomDock",
+      "keybinding": "ctrl+j"
+    },
+    {
+      "id": "actions.view.toggleDebugPanel",
+      "keybinding": "ctrl+shift+d"
+    },
+    {
+      "id": "actions.view.toggleExplorer",
+      "keybinding": "ctrl+shift+e"
+    },
+    {
+      "id": "actions.view.toggleFullScreen",
+      "keybinding": "f11"
+    },
+    {
+      "id": "actions.view.toggleProblems",
+      "keybinding": "ctrl+shift+m"
+    },
+    {
+      "id": "actions.view.toggleRightSideBar",
+      "keybinding": "ctrl+alt+b"
+    },
+    {
+      "id": "actions.view.toggleSourceControl",
+      "keybinding": "ctrl+shift+g"
+    }
+  ]
+}

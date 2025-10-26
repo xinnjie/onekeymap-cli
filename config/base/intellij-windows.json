@@ -298,10 +298,6 @@
       "keybinding": "ctrl+alt+h"
     },
     {
-      "id": "actions.go.definitionPeek",
-      "keybinding": "ctrl+shift+i"
-    },
-    {
       "id": "actions.go.fileFinder",
       "keybinding": "ctrl+shift+n"
     },
@@ -340,6 +336,10 @@
     {
       "id": "actions.go.nextProblem",
       "keybinding": "f2"
+    },
+    {
+      "id": "actions.go.peekDeclaration",
+      "keybinding": "ctrl+shift+i"
     },
     {
       "id": "actions.go.previousChange",
@@ -394,12 +394,12 @@
       "keybinding": "ctrl+shift+up"
     },
     {
-      "id": "actions.refactor.codeAction",
-      "keybinding": "alt+enter"
-    },
-    {
       "id": "actions.refactor.organizeImports",
       "keybinding": "ctrl+alt+o"
+    },
+    {
+      "id": "actions.refactor.quickFix",
+      "keybinding": "alt+enter"
     },
     {
       "id": "actions.refactor.refactor",

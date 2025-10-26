@@ -442,12 +442,12 @@
       "keybinding": "cmd+shift+up"
     },
     {
-      "id": "actions.refactor.codeAction",
-      "keybinding": "alt+enter"
-    },
-    {
       "id": "actions.refactor.organizeImports",
       "keybinding": "cmd+alt+o"
+    },
+    {
+      "id": "actions.refactor.quickFix",
+      "keybinding": "alt+enter"
     },
     {
       "id": "actions.refactor.refactor",
@@ -486,10 +486,7 @@
     },
     {
       "id": "actions.run.runToCursor",
-      "keybinding": [
-        "alt+f9",
-        "alt+f9"
-      ]
+      "keybinding": "alt+f9"
     },
     {
       "id": "actions.run.selectionToRepl",

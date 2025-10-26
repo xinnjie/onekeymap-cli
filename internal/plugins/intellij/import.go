@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 
+	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
@@ -66,6 +67,8 @@ func (p *intellijImporter) Import(
 			setting.Actions = append(setting.Actions, newBinding)
 		}
 	}
+
+	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
 	return setting, nil
 }
 

@@ -1,4 +1,4 @@
-.PHONY: all build lint format test completion docs generate-base
+.PHONY: all build lint format test completion docs generate-base update-intellij-keymaps update-zed-keymaps
 
 .DEFAULT_GOAL := all
 
@@ -34,3 +34,9 @@ docs:
 
 generate-base:
 	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli dev generateBase
+
+update-intellij-keymaps:
+	@python3 scripts/update_keymaps.py --preset intellij
+
+update-zed-keymaps:
+	@python3 scripts/update_keymaps.py --preset zed

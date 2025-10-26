@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/tailscale/hujson"
+	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
@@ -101,5 +102,6 @@ func (p *zedImporter) Import(
 			setting.Actions = append(setting.Actions, keymapEntry)
 		}
 	}
+	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
 	return setting, nil
 }

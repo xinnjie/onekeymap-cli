@@ -75,9 +75,9 @@ func mergeIntoExistingAction(existing, kb *keymapv1.Action) {
 	}
 }
 
-// dedupKeyBindings removes duplicate keybindings based on (Action, KeyChords)
+// DedupKeyBindings removes duplicate keybindings based on (Action, KeyChords)
 // using a deterministic signature. The first occurrence is kept and order is preserved.
-func dedupKeyBindings(keybindings []*keymapv1.Action) []*keymapv1.Action {
+func DedupKeyBindings(keybindings []*keymapv1.Action) []*keymapv1.Action {
 	if len(keybindings) == 0 {
 		return keybindings
 	}

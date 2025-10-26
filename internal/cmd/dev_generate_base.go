@@ -11,29 +11,36 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	ij "github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
 type devGenerateBaseFlags struct {
-	SourceDir string
-	OutDir    string
+	IntelliJSourceDir string
+	ZedSourceDir      string
+	OutDir            string
+	Editor            string
 }
 
 func NewCmdDevGenerateBase() *cobra.Command {
 	f := devGenerateBaseFlags{}
 	cmd := &cobra.Command{
 		Use:   "generateBase",
-		Short: "Generate base keymap JSONs from IntelliJ keymap XMLs",
+		Short: "Generate base keymap JSONs from editor-specific keymap files",
 		Run:   devGenerateBaseRun(&f, func() *slog.Logger { return cmdLogger }),
 		Args:  cobra.ExactArgs(0),
 	}
 	cmd.Flags().
-		StringVar(&f.SourceDir, "source-dir", "chore/intellij", "Directory containing IntelliJ keymap XML files")
+		StringVar(&f.IntelliJSourceDir, "intellij-source-dir", "chore/intellij", "Directory containing IntelliJ keymap XML files")
+	cmd.Flags().
+		StringVar(&f.ZedSourceDir, "zed-source-dir", "chore/zed", "Directory containing Zed keymap JSON files")
 	cmd.Flags().StringVar(&f.OutDir, "out-dir", "config/base", "Directory to write base JSON files")
+	cmd.Flags().StringVar(&f.Editor, "editor", "all", "Editor to generate base keymap for (intellij, zed, or all)")
 	return cmd
 }
 
@@ -51,83 +58,158 @@ func devGenerateBaseRun(
 			os.Exit(1)
 		}
 
-		plugin := ij.New(mc, logger)
-		imp, err := plugin.Importer()
-		if err != nil {
-			logger.ErrorContext(ctx, "get intellij importer", "error", err)
-			os.Exit(1)
-		}
-
 		if err := os.MkdirAll(f.OutDir, 0o750); err != nil {
 			logger.ErrorContext(ctx, "ensure out-dir", "dir", f.OutDir, "error", err)
 			os.Exit(1)
 		}
 
-		tasks := []struct {
-			name     string
-			source   string
-			outfile  string
-			platform platform.Platform
-		}{
-			{name: "mac", source: "Mac OS X.xml", outfile: "intellij-mac.json", platform: platform.PlatformMacOS},
-			{
-				name:     "windows",
-				source:   "$default.xml",
-				outfile:  "intellij-windows.json",
-				platform: platform.PlatformWindows,
-			},
-			{
-				name:     "linux",
-				source:   "Default for GNOME.xml",
-				outfile:  "intellij-linux.json",
-				platform: platform.PlatformLinux,
-			},
+		// Generate IntelliJ base keymaps
+		if f.Editor == "all" || f.Editor == "intellij" {
+			generateIntelliJBase(ctx, f, mc, logger)
 		}
 
-		for _, t := range tasks {
-			logger.Info("generating base", "platform", t.name, "src", t.source)
-			xmlDoc, meta, err := loadAndFlattenIJXML(ctx, f.SourceDir, t.source)
-			if err != nil {
-				logger.ErrorContext(ctx, "flatten xml", "src", t.source, "error", err)
-				os.Exit(1)
-			}
-
-			// For macOS: convert 'control' to 'meta' for inherited actions only
-			// This matches IntelliJ's runtime behavior: actions inherited from $default.xml
-			// have control->command mapping, while actions explicitly defined in Mac OS X.xml
-			// keep their control keys as-is (e.g., control SPACE for code completion)
-			if t.platform == platform.PlatformMacOS && meta != nil {
-				convertControlToMetaForMac(xmlDoc, meta)
-			}
-
-			buf := &bytes.Buffer{}
-			if err := xml.NewEncoder(buf).Encode(xmlDoc); err != nil {
-				logger.ErrorContext(ctx, "encode xml", "error", err)
-				os.Exit(1)
-			}
-
-			km, err := imp.Import(ctx, bytes.NewReader(buf.Bytes()), pluginapi.PluginImportOption{})
-			if err != nil {
-				logger.ErrorContext(ctx, "import intellij xml", "src", t.source, "error", err)
-				os.Exit(1)
-			}
-
-			outPath := filepath.Join(f.OutDir, t.outfile)
-			fp, err := os.Create(outPath)
-			if err != nil {
-				logger.ErrorContext(ctx, "create output", "path", outPath, "error", err)
-				os.Exit(1)
-			}
-			if err := keymap.Save(fp, km, keymap.SaveOptions{Platform: t.platform}); err != nil {
-				_ = fp.Close()
-				logger.ErrorContext(ctx, "write base json", "path", outPath, "error", err)
-				os.Exit(1)
-			}
-			if err := fp.Close(); err != nil {
-				logger.WarnContext(ctx, "close file", "path", outPath, "error", err)
-			}
-			logger.Info("wrote base", "path", outPath)
+		// Generate Zed base keymaps
+		if f.Editor == "all" || f.Editor == "zed" {
+			generateZedBase(ctx, f, mc, logger)
 		}
+	}
+}
+
+func generateIntelliJBase(
+	ctx context.Context,
+	f *devGenerateBaseFlags,
+	mc *mappings.MappingConfig,
+	logger *slog.Logger,
+) {
+	plugin := ij.New(mc, logger)
+	imp, err := plugin.Importer()
+	if err != nil {
+		logger.ErrorContext(ctx, "get intellij importer", "error", err)
+		os.Exit(1)
+	}
+
+	tasks := []struct {
+		name     string
+		source   string
+		outfile  string
+		platform platform.Platform
+	}{
+		{name: "mac", source: "Mac OS X.xml", outfile: "intellij-mac.json", platform: platform.PlatformMacOS},
+		{
+			name:     "windows",
+			source:   "$default.xml",
+			outfile:  "intellij-windows.json",
+			platform: platform.PlatformWindows,
+		},
+		{
+			name:     "linux",
+			source:   "Default for GNOME.xml",
+			outfile:  "intellij-linux.json",
+			platform: platform.PlatformLinux,
+		},
+	}
+
+	for _, t := range tasks {
+		logger.InfoContext(ctx, "generating intellij base", "platform", t.name, "src", t.source)
+		xmlDoc, meta, err := loadAndFlattenIJXML(ctx, f.IntelliJSourceDir, t.source)
+		if err != nil {
+			logger.ErrorContext(ctx, "flatten xml", "src", t.source, "error", err)
+			os.Exit(1)
+		}
+
+		// For macOS: convert 'control' to 'meta' for inherited actions only
+		// This matches IntelliJ's runtime behavior: actions inherited from $default.xml
+		// have control->command mapping, while actions explicitly defined in Mac OS X.xml
+		// keep their control keys as-is (e.g., control SPACE for code completion)
+		if t.platform == platform.PlatformMacOS && meta != nil {
+			convertControlToMetaForMac(xmlDoc, meta)
+		}
+
+		buf := &bytes.Buffer{}
+		if err := xml.NewEncoder(buf).Encode(xmlDoc); err != nil {
+			logger.ErrorContext(ctx, "encode xml", "error", err)
+			os.Exit(1)
+		}
+
+		km, err := imp.Import(ctx, bytes.NewReader(buf.Bytes()), pluginapi.PluginImportOption{})
+		if err != nil {
+			logger.ErrorContext(ctx, "import intellij xml", "src", t.source, "error", err)
+			os.Exit(1)
+		}
+
+		outPath := filepath.Join(f.OutDir, t.outfile)
+		fp, err := os.Create(outPath)
+		if err != nil {
+			logger.ErrorContext(ctx, "create output", "path", outPath, "error", err)
+			os.Exit(1)
+		}
+		if err := keymap.Save(fp, km, keymap.SaveOptions{Platform: t.platform}); err != nil {
+			_ = fp.Close()
+			logger.ErrorContext(ctx, "write base json", "path", outPath, "error", err)
+			os.Exit(1)
+		}
+		if err := fp.Close(); err != nil {
+			logger.WarnContext(ctx, "close file", "path", outPath, "error", err)
+		}
+		logger.InfoContext(ctx, "wrote intellij base", "path", outPath)
+	}
+}
+
+func generateZedBase(ctx context.Context, f *devGenerateBaseFlags, mc *mappings.MappingConfig, logger *slog.Logger) {
+	plugin := zed.New(mc, logger)
+	imp, err := plugin.Importer()
+	if err != nil {
+		logger.ErrorContext(ctx, "get zed importer", "error", err)
+		os.Exit(1)
+	}
+
+	tasks := []struct {
+		name     string
+		source   string
+		outfile  string
+		platform platform.Platform
+	}{
+		{name: "mac", source: "default-macos.json", outfile: "zed-mac.json", platform: platform.PlatformMacOS},
+		{
+			name:     "windows",
+			source:   "default-windows.json",
+			outfile:  "zed-windows.json",
+			platform: platform.PlatformWindows,
+		},
+		{name: "linux", source: "default-linux.json", outfile: "zed-linux.json", platform: platform.PlatformLinux},
+	}
+
+	for _, t := range tasks {
+		logger.InfoContext(ctx, "generating zed base", "platform", t.name, "src", t.source)
+		sourcePath := filepath.Join(f.ZedSourceDir, t.source)
+		sourceFile, err := os.Open(sourcePath)
+		if err != nil {
+			logger.ErrorContext(ctx, "open zed source", "path", sourcePath, "error", err)
+			os.Exit(1)
+		}
+
+		km, err := imp.Import(ctx, sourceFile, pluginapi.PluginImportOption{})
+		_ = sourceFile.Close()
+		if err != nil {
+			logger.ErrorContext(ctx, "import zed json", "src", t.source, "error", err)
+			os.Exit(1)
+		}
+
+		outPath := filepath.Join(f.OutDir, t.outfile)
+		fp, err := os.Create(outPath)
+		if err != nil {
+			logger.ErrorContext(ctx, "create output", "path", outPath, "error", err)
+			os.Exit(1)
+		}
+		if err := keymap.Save(fp, km, keymap.SaveOptions{Platform: t.platform}); err != nil {
+			_ = fp.Close()
+			logger.ErrorContext(ctx, "write base json", "path", outPath, "error", err)
+			os.Exit(1)
+		}
+		if err := fp.Close(); err != nil {
+			logger.WarnContext(ctx, "close file", "path", outPath, "error", err)
+		}
+		logger.InfoContext(ctx, "wrote zed base", "path", outPath)
 	}
 }
 

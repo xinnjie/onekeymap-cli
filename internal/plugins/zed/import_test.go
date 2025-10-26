@@ -49,18 +49,17 @@ func TestImportZedKeymap(t *testing.T) {
 		{
 			name: "Bind one action to multiple keys",
 			input: `[
-				{
-					"context": "Editor",
-					"bindings": {
-						"cmd-c": "editor::Copy",
-						"ctrl-c": "editor::Copy"
-					}
-				}
-			]`,
+                {
+                    "context": "Editor",
+                    "bindings": {
+                        "cmd-c": "editor::Copy",
+                        "ctrl-c": "editor::Copy"
+                    }
+                }
+            ]`,
 			expected: &keymapv1.Keymap{
 				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
-					keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c", "ctrl+c"),
 				},
 			},
 			expectErr: false,
@@ -113,7 +112,6 @@ func TestImportZedKeymap(t *testing.T) {
 			expected: &keymapv1.Keymap{
 				Actions: []*keymapv1.Action{
 					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
-					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
 				},
 			},
 		},
@@ -136,8 +134,7 @@ func TestImportZedKeymap(t *testing.T) {
 	]`,
 			expected: &keymapv1.Keymap{
 				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+1"),
-					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
+					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+1", "alt+3"),
 				},
 			},
 		},
