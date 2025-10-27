@@ -11,6 +11,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -20,6 +21,7 @@ type exportService struct {
 	registry      *plugins.Registry
 	mappingConfig *mappings.MappingConfig
 	logger        *slog.Logger
+	recorder      metrics.Recorder
 }
 
 // NewExportService creates a new default export service.
@@ -27,11 +29,13 @@ func NewExportService(
 	registry *plugins.Registry,
 	config *mappings.MappingConfig,
 	logger *slog.Logger,
+	recorder metrics.Recorder,
 ) exportapi.Exporter {
 	return &exportService{
 		registry:      registry,
 		mappingConfig: config,
 		logger:        logger,
+		recorder:      recorder,
 	}
 }
 
@@ -42,6 +46,9 @@ func (s *exportService) Export(
 	setting *keymapv1.Keymap,
 	opts exportapi.ExportOptions,
 ) (*exportapi.ExportReport, error) {
+	counter := s.recorder.Counter(metricExportCalls)
+	counter.Add(ctx, 1)
+
 	plugin, ok := s.registry.Get(opts.EditorType)
 	if !ok {
 		return nil, fmt.Errorf("no plugin found for editor type '%s'", opts.EditorType)

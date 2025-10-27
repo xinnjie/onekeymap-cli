@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -125,13 +126,22 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 
 		cmdRecorder = metrics.NewNoop()
 		if f.enableTelemetry {
-			if viper.GetString("otel.exporter.otlp.endpoint") == "" {
+			endpoint := viper.GetString("telemetry.endpoint")
+			if endpoint == "" {
 				cmd.PrintErrln(
-					"Warning: --telemetry is enabled, but otel.exporter.otlp.endpoint is not set. Telemetry data will not be sent.",
+					"Warning: --telemetry is enabled, but telemetry.endpoint is not set. Telemetry data will not be sent.",
 				)
 			}
 
-			cmdRecorder, err = metrics.New(cmd.Context(), version, cmdLogger, cmdMappingConfig)
+			headersStr := viper.GetString("telemetry.headers")
+			headers := parseHeaders(headersStr)
+			insecure := viper.GetBool("telemetry.insecure")
+
+			cmdRecorder, err = metrics.New(cmd.Context(), version, cmdLogger, metrics.RecorderOption{
+				Endpoint: endpoint,
+				Headers:  headers,
+				Insecure: insecure,
+			})
 			if err != nil {
 				cmd.PrintErrf("failed to initialize telemetry: %v\n", err)
 				os.Exit(1)
@@ -196,7 +206,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		cmdPluginRegistry.Register(basekeymap.New())
 
 		cmdImportService = internal.NewImportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
-		cmdExportService = internal.NewExportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger)
+		cmdExportService = internal.NewExportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
 
 		// Start async update check only in interactive mode and when not in sandbox
 		if f.interactive && !f.sandbox && !f.skipUpdateCheck {
@@ -262,4 +272,30 @@ func buildVersionString() string {
 	}
 
 	return version
+}
+
+const (
+	headerKeyValueParts = 2
+)
+
+// parseHeaders parses a comma-separated string of key=value pairs into a map.
+// Format: "key1=value1,key2=value2"
+func parseHeaders(headersStr string) map[string]string {
+	if headersStr == "" {
+		return nil
+	}
+
+	headers := make(map[string]string)
+	pairs := strings.Split(headersStr, ",")
+	for _, pair := range pairs {
+		pair = strings.TrimSpace(pair)
+		if pair == "" {
+			continue
+		}
+		parts := strings.SplitN(pair, "=", headerKeyValueParts)
+		if len(parts) == headerKeyValueParts {
+			headers[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		}
+	}
+	return headers
 }

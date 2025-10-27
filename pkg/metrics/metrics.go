@@ -3,60 +3,48 @@ package metrics
 import (
 	"context"
 	"log/slog"
+	"runtime"
 	"time"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
-	"go.opentelemetry.io/otel/metric"
+	otelmetric "go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/noop"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
-
-	mappings "github.com/xinnjie/onekeymap-cli/internal/mappings"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
+	"google.golang.org/grpc/credentials"
 )
 
-// Metric names.
 const (
-	commandProcessedName = "onekeymap.import.commands.processed"
+	metricExportIntervalSeconds = 15
 )
 
-const metricExportIntervalSeconds = 15
-
-// Attribute keys.
-const (
-	attrKeyEditor  = "editor"
-	attrKeyCommand = "command"
-	attrKeyMapped  = "mapped"
-)
+// Metric represents a metric that can be collected.
+type Metric struct {
+	Name        string
+	Unit        string
+	Description string
+}
 
 // Recorder is the interface for recording metrics.
 type Recorder interface {
-	RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.Keymap)
+	Histogram(metric Metric) otelmetric.Int64Histogram
+	Counter(metric Metric) otelmetric.Int64Counter
 	Shutdown(ctx context.Context) error
 }
 
 // recorder implements the Recorder interface and sends metrics to an OTLP endpoint.
 type recorder struct {
-	logger         *slog.Logger
-	commandCounter metric.Int64Counter
-	provider       *sdkmetric.MeterProvider
-	mappingConfig  *mappings.MappingConfig
+	logger   *slog.Logger
+	provider *sdkmetric.MeterProvider
+	meter    otelmetric.Meter
 }
 
-// noopRecorder implements the Recorder interface but does nothing.
-type noopRecorder struct{}
-
-// RecordCommandProcessed is a no-op.
-func (r *noopRecorder) RecordCommandProcessed(_ context.Context, _ string, _ *keymapv1.Keymap) {
-}
-
-// Shutdown is a no-op.
-func (r *noopRecorder) Shutdown(_ context.Context) error { return nil }
-
-// NewNoop returns a no-op Recorder.
-func NewNoop() Recorder {
-	return &noopRecorder{}
+// RecorderOption holds configuration for creating a Recorder.
+type RecorderOption struct {
+	Endpoint string
+	Headers  map[string]string
+	Insecure bool
 }
 
 // New creates a new Recorder and initializes the OpenTelemetry provider.
@@ -64,17 +52,34 @@ func New(
 	ctx context.Context,
 	version string,
 	logger *slog.Logger,
-	mappingConfig *mappings.MappingConfig,
+	option RecorderOption,
 ) (Recorder, error) {
-	exporter, err := otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure())
+	opts := []otlpmetricgrpc.Option{}
+
+	if option.Endpoint != "" {
+		opts = append(opts, otlpmetricgrpc.WithEndpoint(option.Endpoint))
+	}
+
+	if len(option.Headers) > 0 {
+		opts = append(opts, otlpmetricgrpc.WithHeaders(option.Headers))
+	}
+
+	if option.Insecure {
+		opts = append(opts, otlpmetricgrpc.WithInsecure())
+	} else {
+		opts = append(opts, otlpmetricgrpc.WithTLSCredentials(credentials.NewClientTLSFromCert(nil, "")))
+	}
+
+	exporter, err := otlpmetricgrpc.New(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}
 
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
-			attribute.String("service.name", "onekeymap-cli"),
-			attribute.String("service.version", version),
+			semconv.ServiceName("onekeymap-cli"),
+			semconv.ServiceVersion(version),
+			semconv.OSName(runtime.GOOS),
 		),
 	)
 	if err != nil {
@@ -87,41 +92,47 @@ func New(
 			sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(metricExportIntervalSeconds*time.Second)),
 		),
 	)
-	otel.SetMeterProvider(provider)
 
-	meter := provider.Meter("onekeymap.import.service")
-	commandCounter, err := meter.Int64Counter(
-		commandProcessedName,
-		metric.WithDescription("The number of keybinding commands processed during import."),
-		metric.WithUnit("{command}"),
-	)
-	if err != nil {
-		return nil, err
-	}
+	meter := provider.Meter("onekeymap-cli")
 
 	recorder := &recorder{
-		logger:         logger,
-		commandCounter: commandCounter,
-		provider:       provider,
-		mappingConfig:  mappingConfig,
+		logger:   logger,
+		provider: provider,
+		meter:    meter,
 	}
 
 	return recorder, nil
 }
 
-// RecordCommandProcessed records that a command has been processed.
-func (r *recorder) RecordCommandProcessed(ctx context.Context, editor string, setting *keymapv1.Keymap) {
-	if r.commandCounter == nil || setting == nil {
-		return
+// Histogram creates a new int64 histogram metric.
+func (r *recorder) Histogram(metric Metric) otelmetric.Int64Histogram { //nolint:ireturn
+	histogram, err := r.meter.Int64Histogram(
+		metric.Name,
+		otelmetric.WithDescription(metric.Description),
+		otelmetric.WithUnit(metric.Unit),
+	)
+
+	if err != nil {
+		r.logger.Warn("failed to create histogram", "error", err)
+		return noop.Int64Histogram{}
 	}
-	for _, binding := range setting.GetActions() {
-		isMapped := r.mappingConfig.IsActionMapped(binding.GetName())
-		r.commandCounter.Add(ctx, 1, metric.WithAttributes(
-			attribute.String(attrKeyEditor, editor),
-			attribute.String(attrKeyCommand, binding.GetName()),
-			attribute.Bool(attrKeyMapped, isMapped),
-		))
+
+	return histogram
+}
+
+// Counter creates a new int64 up down counter metric.
+func (r *recorder) Counter(metric Metric) otelmetric.Int64Counter { //nolint:ireturn
+	counter, err := r.meter.Int64Counter(
+		metric.Name,
+		otelmetric.WithDescription(metric.Description),
+		otelmetric.WithUnit(metric.Unit),
+	)
+
+	if err != nil {
+		r.logger.Warn("failed to create counter", "error", err)
+		return noop.Int64Counter{}
 	}
+	return counter
 }
 
 // Shutdown shuts down the OpenTelemetry provider.

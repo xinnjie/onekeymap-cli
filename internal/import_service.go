@@ -51,6 +51,9 @@ func NewImportService(
 
 // Import is the method implementation for the default service.
 func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions) (*importapi.ImportResult, error) {
+	counter := s.recorder.Counter(metricImportCalls)
+	counter.Add(ctx, 1)
+
 	if opts.InputStream == nil {
 		return nil, errors.New("input stream is required")
 	}
@@ -73,8 +76,6 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	if setting != nil && len(setting.GetActions()) > 0 {
 		setting.Actions = DedupKeyBindings(setting.GetActions())
 	}
-
-	s.recorder.RecordCommandProcessed(ctx, string(opts.EditorType), setting)
 
 	// Sort by action for determinism
 	sort.Slice(setting.GetActions(), func(i, j int) bool {

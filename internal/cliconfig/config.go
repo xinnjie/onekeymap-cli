@@ -11,6 +11,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	//nolint:gochecknoglobals // use go build -ldflags "-X github.com/xinnjie/onekeymap-cli/internal/cliconfig.telemetryEndpoint=${TELEMETRY_ENDPOINT}"
+	telemetryEndpoint = ""
+	//nolint:gochecknoglobals // use go build -ldflags "-X github.com/xinnjie/onekeymap-cli/internal/cliconfig.telemetryHeaders=${TELEMETRY_HEADERS}"
+	telemetryHeaders = ""
+)
+
 // EditorConfig holds per-editor configuration settings.
 type EditorConfig struct {
 	// KeymapPath is the path to the editor's keymap file.
@@ -18,6 +25,20 @@ type EditorConfig struct {
 	// TODO(xinnjie): Sync command is not implement yet
 	// SyncEnabled specifies whether keymap syncing is enabled for this editor.
 	SyncEnabled bool `mapstructure:"sync_enabled"`
+}
+
+// TelemetryConfig holds OpenTelemetry configuration.
+type TelemetryConfig struct {
+	// Enabled controls whether telemetry is enabled (default: false).
+	Enabled bool `mapstructure:"enabled"`
+	// Endpoint is the OTLP exporter endpoint (host:port, without http:// or https://).
+	// Example: "otlp-gateway-prod-us-central-0.grafana.net:443"
+	Endpoint string `mapstructure:"endpoint"`
+	// Headers are custom headers for OTLP exporter (e.g., for authentication).
+	// Format: "key1=value1,key2=value2"
+	Headers string `mapstructure:"headers"`
+	// Insecure disables TLS verification (default: false, use TLS).
+	Insecure bool `mapstructure:"insecure"`
 }
 
 type Config struct {
@@ -29,8 +50,8 @@ type Config struct {
 	Sandbox bool `mapstructure:"sandbox"`
 	// OneKeyMap is the path to the main onekeymap configuration file.
 	OneKeyMap string `mapstructure:"onekeymap"`
-	// OtelExporterOtlpEndpoint is the OpenTelemetry OTLP exporter endpoint.
-	OtelExporterOtlpEndpoint string `mapstructure:"otel.exporter.otlp.endpoint"`
+	// Telemetry holds OpenTelemetry configuration.
+	Telemetry TelemetryConfig `mapstructure:"telemetry"`
 	// ServerListen is the server listen address (e.g., "tcp://127.0.0.1:50051" or "unix:///tmp/onekeymap.sock").
 	ServerListen string `mapstructure:"server.listen"`
 	// Editors holds configuration for different editors.
@@ -47,7 +68,10 @@ type Config struct {
 // - ONEKEYMAP_VERBOSE -> verbose (bool)
 // - ONEKEYMAP_QUIET -> quiet (bool)
 // - ONEKEYMAP_ONEKEYMAP -> onekeymap (string, file path)
-// - ONEKEYMAP_OTEL_EXPORTER_OTLP_ENDPOINT -> otel.exporter.otlp.endpoint (string)
+// - ONEKEYMAP_TELEMETRY_ENABLED -> telemetry.enabled (bool)
+// - ONEKEYMAP_TELEMETRY_ENDPOINT -> telemetry.endpoint (string)
+// - ONEKEYMAP_TELEMETRY_HEADERS -> telemetry.headers (string, "key1=value1,key2=value2")
+// - ONEKEYMAP_TELEMETRY_INSECURE -> telemetry.insecure (bool)
 // - ONEKEYMAP_SERVER_LISTEN -> server.listen (string, e.g. "tcp://127.0.0.1:50051" or "unix:///tmp/onekeymap.sock")
 
 // NewConfig initializes and returns a new Config object.
@@ -70,7 +94,10 @@ func NewConfig(cmd *cobra.Command) (*Config, error) {
 		}
 		viper.SetDefault("onekeymap", filepath.Join(homeDir, ".config", "onekeymap", "onekeymap.json"))
 	}
-	viper.SetDefault("otel.exporter.otlp.endpoint", "")
+	viper.SetDefault("telemetry.enabled", false)
+	viper.SetDefault("telemetry.endpoint", telemetryEndpoint)
+	viper.SetDefault("telemetry.headers", telemetryHeaders)
+	viper.SetDefault("telemetry.insecure", false)
 	viper.SetDefault("server.listen", "")
 
 	// Set environment variable handling

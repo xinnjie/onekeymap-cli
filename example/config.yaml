@@ -25,14 +25,30 @@ sandbox: false
 # Default: ~/.config/onekeymap/onekeymap.json
 onekeymap: ~/.config/onekeymap/onekeymap.json
 
-# OpenTelemetry OTLP exporter endpoint for telemetry
-# Only used when --telemetry flag is enabled
-# Can be overridden with ONEKEYMAP_OTEL_EXPORTER_OTLP_ENDPOINT environment variable
-# Example: http://localhost:4318
-otel:
-  exporter:
-    otlp:
-      endpoint: ""
+# OpenTelemetry configuration for telemetry
+telemetry:
+  # Enable telemetry (default: false)
+  # Can also be enabled with --telemetry flag
+  # Can be overridden with ONEKEYMAP_TELEMETRY_ENABLED
+  enabled: false
+
+  # OTLP endpoint (without http:// or https://, just host:port)
+  # For Grafana Cloud: otlp-gateway-prod-us-central-0.grafana.net:443
+  # For local collector: localhost:4317
+  # Can be overridden with ONEKEYMAP_TELEMETRY_ENDPOINT
+  endpoint: ""
+
+  # Custom headers for authentication (comma-separated key=value pairs)
+  # For Grafana Cloud, you need to set Authorization header with your API token:
+  # Example: "Authorization=Bearer <your-api-token>"
+  # Can be overridden with ONEKEYMAP_TELEMETRY_HEADERS
+  headers: ""
+
+  # Disable TLS verification (default: false, which means TLS is enabled)
+  # Set to true only for local development without TLS
+  # For Grafana Cloud, keep this false (use TLS)
+  # Can be overridden with ONEKEYMAP_TELEMETRY_INSECURE
+  insecure: false
 
 # Per-editor configuration settings
 editors:
@@ -100,6 +116,9 @@ editors:
 # - ONEKEYMAP_VERBOSE -> verbose
 # - ONEKEYMAP_QUIET -> quiet
 # - ONEKEYMAP_ONEKEYMAP -> onekeymap
-# - ONEKEYMAP_OTEL_EXPORTER_OTLP_ENDPOINT -> otel.exporter.otlp.endpoint
+# - ONEKEYMAP_TELEMETRY_ENABLED -> telemetry.enabled
+# - ONEKEYMAP_TELEMETRY_ENDPOINT -> telemetry.endpoint
+# - ONEKEYMAP_TELEMETRY_HEADERS -> telemetry.headers
+# - ONEKEYMAP_TELEMETRY_INSECURE -> telemetry.insecure
 # - ONEKEYMAP_SERVER_LISTEN -> server.listen
 # - ONEKEYMAP_EDITORS_VSCODE_KEYMAP_PATH -> editors.vscode.keymap_path

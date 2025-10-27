@@ -13,6 +13,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -69,7 +70,13 @@ func newTestExportService(
 	r := plugins.NewRegistry()
 	r.Register(&testExportPlugin{editorType: editorType, exporter: exporter})
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	return NewExportService(r, &mappings.MappingConfig{Mappings: map[string]mappings.ActionMappingConfig{}}, logger)
+	recorder := metrics.NewNoop()
+	return NewExportService(
+		r,
+		&mappings.MappingConfig{Mappings: map[string]mappings.ActionMappingConfig{}},
+		logger,
+		recorder,
+	)
 }
 
 func TestExportService_Diff_Unified(t *testing.T) {
