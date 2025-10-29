@@ -6,17 +6,18 @@ import (
 	"runtime"
 	"time"
 
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
+	"github.com/microsoft/go-deviceid"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	otelmetric "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
-	"google.golang.org/grpc/credentials"
 )
 
 const (
-	metricExportIntervalSeconds = 15
+	metricExportIntervalSeconds = 1
 )
 
 // Metric represents a metric that can be collected.
@@ -38,13 +39,15 @@ type recorder struct {
 	logger   *slog.Logger
 	provider *sdkmetric.MeterProvider
 	meter    otelmetric.Meter
+	reader   sdkmetric.Reader
+	exporter sdkmetric.Exporter
 }
 
 // RecorderOption holds configuration for creating a Recorder.
 type RecorderOption struct {
 	Endpoint string
 	Headers  map[string]string
-	Insecure bool
+	UseDelta bool
 }
 
 // New creates a new Recorder and initializes the OpenTelemetry provider.
@@ -54,43 +57,55 @@ func New(
 	logger *slog.Logger,
 	option RecorderOption,
 ) (Recorder, error) {
-	opts := []otlpmetricgrpc.Option{}
+	opts := []otlpmetrichttp.Option{}
 
 	if option.Endpoint != "" {
-		opts = append(opts, otlpmetricgrpc.WithEndpoint(option.Endpoint))
+		opts = append(opts, otlpmetrichttp.WithEndpoint(option.Endpoint))
 	}
 
 	if len(option.Headers) > 0 {
-		opts = append(opts, otlpmetricgrpc.WithHeaders(option.Headers))
+		opts = append(opts, otlpmetrichttp.WithHeaders(option.Headers))
 	}
 
-	if option.Insecure {
-		opts = append(opts, otlpmetricgrpc.WithInsecure())
-	} else {
-		opts = append(opts, otlpmetricgrpc.WithTLSCredentials(credentials.NewClientTLSFromCert(nil, "")))
-	}
-
-	exporter, err := otlpmetricgrpc.New(ctx, opts...)
+	exporter, err := otlpmetrichttp.New(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}
+
+	deviceID := getDeviceID(logger)
 
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			semconv.ServiceName("onekeymap-cli"),
 			semconv.ServiceVersion(version),
 			semconv.OSName(runtime.GOOS),
+			semconv.ServiceInstanceID(deviceID),
 		),
 	)
 	if err != nil {
 		return nil, err
 	}
 
+	var reader sdkmetric.Reader
+
+	// Only manual reader support delta temporality
+	if option.UseDelta {
+		manualOpts := []sdkmetric.ManualReaderOption{}
+		manualOpts = append(
+			manualOpts,
+			sdkmetric.WithTemporalitySelector(func(_ sdkmetric.InstrumentKind) metricdata.Temporality {
+				return metricdata.DeltaTemporality
+			}),
+		)
+		reader = sdkmetric.NewManualReader(manualOpts...)
+		logger.DebugContext(ctx, "Using manual reader for metric provider because delta temporality is set.")
+	} else {
+		reader = sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(metricExportIntervalSeconds*time.Second))
+	}
+
 	provider := sdkmetric.NewMeterProvider(
 		sdkmetric.WithResource(res),
-		sdkmetric.WithReader(
-			sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(metricExportIntervalSeconds*time.Second)),
-		),
+		sdkmetric.WithReader(reader),
 	)
 
 	meter := provider.Meter("onekeymap-cli")
@@ -99,6 +114,8 @@ func New(
 		logger:   logger,
 		provider: provider,
 		meter:    meter,
+		reader:   reader,
+		exporter: exporter,
 	}
 
 	return recorder, nil
@@ -107,7 +124,7 @@ func New(
 // Histogram creates a new int64 histogram metric.
 func (r *recorder) Histogram(metric Metric) otelmetric.Int64Histogram { //nolint:ireturn
 	histogram, err := r.meter.Int64Histogram(
-		metric.Name,
+		"onekeymap_"+metric.Name,
 		otelmetric.WithDescription(metric.Description),
 		otelmetric.WithUnit(metric.Unit),
 	)
@@ -123,7 +140,7 @@ func (r *recorder) Histogram(metric Metric) otelmetric.Int64Histogram { //nolint
 // Counter creates a new int64 up down counter metric.
 func (r *recorder) Counter(metric Metric) otelmetric.Int64Counter { //nolint:ireturn
 	counter, err := r.meter.Int64Counter(
-		metric.Name,
+		"onekeymap_"+metric.Name,
 		otelmetric.WithDescription(metric.Description),
 		otelmetric.WithUnit(metric.Unit),
 	)
@@ -137,8 +154,41 @@ func (r *recorder) Counter(metric Metric) otelmetric.Int64Counter { //nolint:ire
 
 // Shutdown shuts down the OpenTelemetry provider.
 func (r *recorder) Shutdown(ctx context.Context) error {
-	if r.provider == nil {
+	if err := r.collect(ctx); err != nil {
+		r.logger.WarnContext(ctx, "failed to collect metrics during shutdown", "error", err)
+	}
+
+	return r.provider.Shutdown(ctx)
+}
+
+// collect triggers immediate collection and export
+func (r *recorder) collect(ctx context.Context) error {
+	manualReader, ok := r.reader.(*sdkmetric.ManualReader)
+	if !ok {
 		return nil
 	}
-	return r.provider.Shutdown(ctx)
+	var rm metricdata.ResourceMetrics
+	if err := manualReader.Collect(ctx, &rm); err != nil {
+		r.logger.ErrorContext(ctx, "Failed to collect from manual reader", "error", err)
+		return err
+	}
+
+	if err := r.exporter.Export(ctx, &rm); err != nil {
+		r.logger.ErrorContext(ctx, "Failed to export collected metrics", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+// getDeviceID returns a stable device identifier for this machine.
+// It uses the github.com/microsoft/go-deviceid library to generate a consistent ID.
+func getDeviceID(logger *slog.Logger) string {
+	deviceID, err := deviceid.Get()
+	if err != nil {
+		logger.Warn("Failed to get device ID, using fallback", "error", err)
+		// Fallback to a generic identifier
+		return "unknown-device"
+	}
+	return deviceID
 }

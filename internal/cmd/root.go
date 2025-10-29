@@ -19,9 +19,9 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
 
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 )
 
 var (
@@ -61,11 +61,14 @@ func NewCmdRoot() *cobra.Command {
 	f := rootFlags{}
 
 	cmd := &cobra.Command{
-		Use:               "onekeymap-cli",
-		Short:             "A tool to import, export, and synchronize keyboard shortcuts between editors.",
-		Version:           buildVersionString(),
-		PersistentPreRun:  rootPersistentPreRun(&f),
-		PersistentPostRun: rootPersistentPostRun(&f),
+		Use:              "onekeymap-cli",
+		Short:            "A tool to import, export, and synchronize keyboard shortcuts between editors.",
+		Version:          buildVersionString(),
+		PersistentPreRun: rootPersistentPreRun(&f),
+		PersistentPostRun: rootPersistentPostRun(
+			&f,
+			func() (*slog.Logger, metrics.Recorder) { return cmdLogger, cmdRecorder },
+		),
 	}
 
 	cmd.PersistentFlags().BoolVarP(&f.verbose, "verbose", "v", false, "Enable verbose output")
@@ -82,24 +85,12 @@ func NewCmdRoot() *cobra.Command {
 	cmd.PersistentFlags().
 		StringVar(&f.onekeymap, "onekeymap", "", "Path to onekeymap.json file (overrides config file setting)")
 
-	if err := viper.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose")); err != nil {
-		cmd.PrintErrf("Error binding verbose flag: %v\n", err)
-		os.Exit(1)
-	}
-	if err := viper.BindPFlag("quiet", cmd.PersistentFlags().Lookup("quiet")); err != nil {
-		cmd.PrintErrf("Error binding quiet flag: %v\n", err)
-		os.Exit(1)
-	}
-	if err := viper.BindPFlag("log-json", cmd.PersistentFlags().Lookup("log-json")); err != nil {
-		cmd.PrintErrf("Error binding log-json flag: %v\n", err)
-		os.Exit(1)
-	}
-	if err := viper.BindPFlag("sandbox", cmd.PersistentFlags().Lookup("sandbox")); err != nil {
-		cmd.PrintErrf("Error binding sandbox flag: %v\n", err)
-		os.Exit(1)
-	}
 	if err := viper.BindPFlag("onekeymap", cmd.PersistentFlags().Lookup("onekeymap")); err != nil {
 		cmd.PrintErrf("Error binding onekeymap flag: %v\n", err)
+		os.Exit(1)
+	}
+	if err := viper.BindPFlag("telemetry.enabled", cmd.PersistentFlags().Lookup("telemetry")); err != nil {
+		cmd.PrintErrf("Error binding telemetry flag: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -108,44 +99,24 @@ func NewCmdRoot() *cobra.Command {
 
 func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 	return func(cmd *cobra.Command, _ []string) {
-		_, err := cliconfig.NewConfig(cmd)
+		_, err := cliconfig.NewConfig(f.sandbox)
 		if err != nil {
 			cmd.PrintErrf("Error initializing configuration: %v\n", err)
 			os.Exit(1)
 		}
 
-		verbose := viper.GetBool("verbose")
-		quiet := viper.GetBool("quiet")
-		logJSON := viper.GetBool("log-json")
+		verbose := f.verbose
+		quiet := f.quiet
+		logJSON := f.logJSON
+		telemetryEnabled := viper.GetBool("telemetry.enabled")
+		telemetryEndpoint := viper.GetString("telemetry.endpoint")
+		telemetryHeaders := viper.GetString("telemetry.headers")
+		ctx := cmd.Context()
 
 		cmdMappingConfig, err = mappings.NewMappingConfig()
 		if err != nil {
 			cmd.PrintErrf("failed to initialize mapping config: %v\n", err)
 			os.Exit(1)
-		}
-
-		cmdRecorder = metrics.NewNoop()
-		if f.enableTelemetry {
-			endpoint := viper.GetString("telemetry.endpoint")
-			if endpoint == "" {
-				cmd.PrintErrln(
-					"Warning: --telemetry is enabled, but telemetry.endpoint is not set. Telemetry data will not be sent.",
-				)
-			}
-
-			headersStr := viper.GetString("telemetry.headers")
-			headers := parseHeaders(headersStr)
-			insecure := viper.GetBool("telemetry.insecure")
-
-			cmdRecorder, err = metrics.New(cmd.Context(), version, cmdLogger, metrics.RecorderOption{
-				Endpoint: endpoint,
-				Headers:  headers,
-				Insecure: insecure,
-			})
-			if err != nil {
-				cmd.PrintErrf("failed to initialize telemetry: %v\n", err)
-				os.Exit(1)
-			}
 		}
 
 		// Set up logger based on the final configuration.
@@ -180,6 +151,30 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		}
 
 		cmdLogger = slog.New(handler)
+		logger := cmdLogger
+
+		cmdRecorder = metrics.NewNoop()
+		if telemetryEnabled {
+			logger.DebugContext(ctx, "Telemetry enabled")
+			if telemetryEndpoint == "" {
+				logger.WarnContext(
+					ctx,
+					"telemetry is enabled, but telemetry.endpoint is not set. Telemetry data will not be sent.",
+				)
+			}
+
+			headers := parseHeaders(telemetryHeaders)
+
+			cmdRecorder, err = metrics.New(ctx, version, logger, metrics.RecorderOption{
+				Endpoint: telemetryEndpoint,
+				Headers:  headers,
+				UseDelta: true, // Use delta temporality for short-lived CLI application
+			})
+			if err != nil {
+				logger.WarnContext(ctx, "failed to initialize telemetry", "error", err)
+				os.Exit(1)
+			}
+		}
 
 		cmdPluginRegistry = plugins.NewRegistry()
 
@@ -235,10 +230,16 @@ func Execute() {
 	}
 }
 
-func rootPersistentPostRun(_ *rootFlags) func(cmd *cobra.Command, _ []string) {
+func rootPersistentPostRun(
+	_ *rootFlags,
+	dependencies func() (*slog.Logger, metrics.Recorder),
+) func(cmd *cobra.Command, _ []string) {
 	return func(cmd *cobra.Command, _ []string) {
-		if err := cmdRecorder.Shutdown(cmd.Context()); err != nil {
-			cmdLogger.Error("failed to shutdown telemetry", "error", err)
+		logger, recorder := dependencies()
+		ctx := cmd.Context()
+
+		if err := recorder.Shutdown(ctx); err != nil {
+			logger.ErrorContext(ctx, "failed to shutdown telemetry", "error", err)
 		}
 
 		// Try to get update message from async check (non-blocking)
@@ -249,8 +250,7 @@ func rootPersistentPostRun(_ *rootFlags) func(cmd *cobra.Command, _ []string) {
 					cmd.Print(msg)
 				}
 			default:
-				// Update check not completed yet, skip printing
-				cmdLogger.Debug("update check not completed, skipping notification")
+				logger.Debug("update check not completed, skipping notification")
 			}
 		}
 	}

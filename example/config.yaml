@@ -32,9 +32,8 @@ telemetry:
   # Can be overridden with ONEKEYMAP_TELEMETRY_ENABLED
   enabled: false
 
-  # OTLP endpoint (without http:// or https://, just host:port)
-  # For Grafana Cloud: otlp-gateway-prod-us-central-0.grafana.net:443
-  # For local collector: localhost:4317
+  # OTLP HTTP endpoint
+  # For local collector: localhost:4318
   # Can be overridden with ONEKEYMAP_TELEMETRY_ENDPOINT
   endpoint: ""
 

@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -37,8 +36,6 @@ type TelemetryConfig struct {
 	// Headers are custom headers for OTLP exporter (e.g., for authentication).
 	// Format: "key1=value1,key2=value2"
 	Headers string `mapstructure:"headers"`
-	// Insecure disables TLS verification (default: false, use TLS).
-	Insecure bool `mapstructure:"insecure"`
 }
 
 type Config struct {
@@ -76,17 +73,7 @@ type Config struct {
 
 // NewConfig initializes and returns a new Config object.
 // It sets defaults, binds environment variables, reads config files, and unmarshals the result.
-func NewConfig(cmd *cobra.Command) (*Config, error) {
-	sandbox, err := cmd.Flags().GetBool("sandbox")
-	if err != nil {
-		return nil, fmt.Errorf("failed to get sandbox flag: %w", err)
-	}
-
-	// Set default values
-	viper.SetDefault("verbose", false)
-	viper.SetDefault("quiet", false)
-	viper.SetDefault("sandbox", false)
-
+func NewConfig(sandbox bool) (*Config, error) {
 	if !sandbox {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
@@ -97,7 +84,6 @@ func NewConfig(cmd *cobra.Command) (*Config, error) {
 	viper.SetDefault("telemetry.enabled", false)
 	viper.SetDefault("telemetry.endpoint", telemetryEndpoint)
 	viper.SetDefault("telemetry.headers", telemetryHeaders)
-	viper.SetDefault("telemetry.insecure", false)
 	viper.SetDefault("server.listen", "")
 
 	// Set environment variable handling

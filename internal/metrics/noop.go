@@ -20,6 +20,9 @@ func (r *noopRecorder) Counter(_ Metric) otelmetric.Int64Counter { //nolint:iret
 	return noop.Int64Counter{}
 }
 
+// Collect is a no-op.
+func (r *noopRecorder) Collect(_ context.Context) error { return nil }
+
 // Shutdown is a no-op.
 func (r *noopRecorder) Shutdown(_ context.Context) error { return nil }
 

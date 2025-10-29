@@ -69,12 +69,12 @@ func New(currentVersion string, logger *slog.Logger) *Checker {
 // Returns empty string if no update is available or if check should be skipped.
 func (c *Checker) CheckForUpdateMessage(ctx context.Context) string {
 	if c.currentVersion == "dev" {
-		c.logger.DebugContext(ctx, "skipping update check for dev version")
+		c.logger.DebugContext(ctx, "Skipping update check for dev version")
 		return ""
 	}
 
 	if !c.shouldCheck() {
-		c.logger.DebugContext(ctx, "skipping update check, checked recently")
+		c.logger.DebugContext(ctx, "Skipping update check, checked recently")
 		return ""
 	}
 
@@ -83,7 +83,7 @@ func (c *Checker) CheckForUpdateMessage(ctx context.Context) string {
 
 	msg, err := c.checkAndGetMessage(checkCtx)
 	if err != nil {
-		c.logger.DebugContext(checkCtx, "update check failed", "error", err)
+		c.logger.DebugContext(checkCtx, "Update check failed", "error", err)
 		return ""
 	}
 
