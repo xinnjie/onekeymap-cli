@@ -75,8 +75,6 @@ func (d *ActionDetailsViewModel) collectEditorSupport(mapping *mappings.ActionMa
 func (d *ActionDetailsViewModel) View() string {
 	var b strings.Builder
 
-	labelStyle := lipgloss.NewStyle().Bold(true)
-
 	b.WriteString("\n")
 	fmt.Fprintf(&b, "%s %s\n", labelStyle.Render("Action:"), d.actionID)
 	if d.description != "" {
@@ -89,17 +87,14 @@ func (d *ActionDetailsViewModel) View() string {
 	// Display editor support
 	if len(d.editorSupport) > 0 {
 		b.WriteString("\n")
-		b.WriteString(d.renderEditorSupport(labelStyle))
+		b.WriteString(d.renderEditorSupport())
 	}
 
 	return b.String()
 }
 
-func (d *ActionDetailsViewModel) renderEditorSupport(labelStyle lipgloss.Style) string {
+func (d *ActionDetailsViewModel) renderEditorSupport() string {
 	var b strings.Builder
-
-	supportedStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("10"))   // Green
-	notSupportedStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("9")) // Red
 
 	b.WriteString(labelStyle.Render("Editor Support:") + "\n")
 

@@ -10,60 +10,6 @@ import (
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
-const (
-	blue   = lipgloss.Color("12")
-	white  = lipgloss.Color("7")
-	red    = lipgloss.Color("9")
-	yellow = lipgloss.Color("11")
-	cyan   = lipgloss.Color("14")
-	green  = lipgloss.Color("10")
-	gray   = lipgloss.Color("8")
-
-	issuePaddingLeft = 2
-)
-
-var (
-	//nolint:gochecknoglobals // style reused across TUI
-	titleStyle = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(blue).
-			Padding(0, 1)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	summaryStyle = lipgloss.NewStyle().
-			Foreground(white).
-			Padding(0, 1)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	errorHeader = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(red).
-			Padding(1, 1)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	warningHeader = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(yellow).
-			Padding(1, 1)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	issueStyle = lipgloss.NewStyle().
-			PaddingLeft(issuePaddingLeft)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	keyStyle = lipgloss.NewStyle().
-			Foreground(cyan)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	actionStyle = lipgloss.NewStyle().
-			Foreground(green)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	helpStyle = lipgloss.NewStyle().
-			Foreground(gray).
-			Padding(1, 1)
-)
-
 type ValidationReportModel struct {
 	report   *keymapv1.ValidationReport
 	viewport viewport.Model
@@ -141,14 +87,14 @@ func (m ValidationReportModel) renderReport() string {
 	b.WriteString("\n")
 
 	if len(m.report.GetIssues()) > 0 {
-		b.WriteString(errorHeader.Render(fmt.Sprintf("Issues (%d)", len(m.report.GetIssues()))))
+		b.WriteString(errorHeaderStyle.Render(fmt.Sprintf("Issues (%d)", len(m.report.GetIssues()))))
 		for _, issue := range m.report.GetIssues() {
 			b.WriteString(renderIssue(issue))
 		}
 	}
 
 	if len(m.report.GetWarnings()) > 0 {
-		b.WriteString(warningHeader.Render(fmt.Sprintf("Warnings (%d)", len(m.report.GetWarnings()))))
+		b.WriteString(warningHeaderStyle.Render(fmt.Sprintf("Warnings (%d)", len(m.report.GetWarnings()))))
 		for _, warning := range m.report.GetWarnings() {
 			b.WriteString(renderIssue(warning))
 		}

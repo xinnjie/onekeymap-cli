@@ -28,13 +28,13 @@ type serveFlags struct {
 	listen string
 }
 
-func NewCmdServe() *cobra.Command {
+func NewCmdServe(rootFlags *rootFlags) *cobra.Command {
 	f := serveFlags{}
 	cmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Start the gRPC server",
 		Run: serveRun(
-			&f,
+			&f, rootFlags,
 			func() (*slog.Logger, *plugins.Registry, importapi.Importer, exportapi.Exporter, *mappings.MappingConfig) {
 				return cmdLogger, cmdPluginRegistry, cmdImportService, cmdExportService, cmdMappingConfig
 			},
@@ -54,13 +54,16 @@ func NewCmdServe() *cobra.Command {
 
 func serveRun(
 	f *serveFlags,
+	rootFlags *rootFlags,
 	dependencies func() (*slog.Logger, *plugins.Registry, importapi.Importer, exportapi.Exporter, *mappings.MappingConfig),
 ) func(cmd *cobra.Command, _ []string) {
 	return func(cmd *cobra.Command, _ []string) {
 		logger, pluginRegistry, importService, exportService, mappingConfig := dependencies()
 		// Prefer explicit listen address from config/flag; fallback to --port
 		addr := viper.GetString("server.listen")
-		sandbox := viper.GetBool("sandbox")
+		sandbox := rootFlags.sandbox
+		verbose := rootFlags.verbose
+		quiet := rootFlags.quiet
 		if addr == "" {
 			addr = fmt.Sprintf(":%d", f.port)
 		}
@@ -82,9 +85,6 @@ func serveRun(
 		}
 
 		logEvents := func() []grpc_logging.LoggableEvent {
-			verbose := viper.GetBool("verbose")
-			quiet := viper.GetBool("quiet")
-
 			if quiet {
 				return []grpc_logging.LoggableEvent{}
 			}

@@ -4,21 +4,6 @@
 # - ~/.config/onekeymap/config.yaml (user config directory)
 # - /etc/onekeymap/config.yaml (system-wide config)
 
-# Enable verbose output for debugging
-# Can be overridden with --verbose or -v flag
-# Default: false
-verbose: false
-
-# Suppress all output except errors
-# Can be overridden with --quiet or -q flag
-# Default: false
-quiet: false
-
-# Enable macOS sandbox mode (restricts file access)
-# Can be overridden with --sandbox flag
-# Default: false
-sandbox: false
-
 # Path to the main onekeymap.json configuration file
 # This is where your unified keymap settings are stored
 # Can be overridden with --onekeymap flag or ONEKEYMAP_ONEKEYMAP environment variable
@@ -27,27 +12,26 @@ onekeymap: ~/.config/onekeymap/onekeymap.json
 
 # OpenTelemetry configuration for telemetry
 telemetry:
-  # Enable telemetry (default: false)
   # Can also be enabled with --telemetry flag
   # Can be overridden with ONEKEYMAP_TELEMETRY_ENABLED
-  enabled: false
+  # enabled: false
 
   # OTLP HTTP endpoint
   # For local collector: localhost:4318
   # Can be overridden with ONEKEYMAP_TELEMETRY_ENDPOINT
-  endpoint: ""
+  # endpoint: ""
 
   # Custom headers for authentication (comma-separated key=value pairs)
   # For Grafana Cloud, you need to set Authorization header with your API token:
   # Example: "Authorization=Bearer <your-api-token>"
   # Can be overridden with ONEKEYMAP_TELEMETRY_HEADERS
-  headers: ""
+  # headers: ""
 
   # Disable TLS verification (default: false, which means TLS is enabled)
   # Set to true only for local development without TLS
   # For Grafana Cloud, keep this false (use TLS)
   # Can be overridden with ONEKEYMAP_TELEMETRY_INSECURE
-  insecure: false
+  # insecure: false
 
 # Per-editor configuration settings
 editors:

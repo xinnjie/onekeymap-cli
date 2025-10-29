@@ -29,6 +29,8 @@ type EditorConfig struct {
 // TelemetryConfig holds OpenTelemetry configuration.
 type TelemetryConfig struct {
 	// Enabled controls whether telemetry is enabled (default: false).
+	// When this field is explicitly set in config (true or false), no prompt will be shown.
+	// When not set, a prompt will be displayed to ask user's preference.
 	Enabled bool `mapstructure:"enabled"`
 	// Endpoint is the OTLP exporter endpoint (host:port, without http:// or https://).
 	// Example: "otlp-gateway-prod-us-central-0.grafana.net:443"
@@ -39,12 +41,6 @@ type TelemetryConfig struct {
 }
 
 type Config struct {
-	// Verbose enables verbose output.
-	Verbose bool `mapstructure:"verbose"`
-	// Quiet suppresses all output except for errors.
-	Quiet bool `mapstructure:"quiet"`
-	// Sandbox enables macOS sandbox mode, which restricts file access.
-	Sandbox bool `mapstructure:"sandbox"`
 	// OneKeyMap is the path to the main onekeymap configuration file.
 	OneKeyMap string `mapstructure:"onekeymap"`
 	// Telemetry holds OpenTelemetry configuration.
@@ -81,7 +77,7 @@ func NewConfig(sandbox bool) (*Config, error) {
 		}
 		viper.SetDefault("onekeymap", filepath.Join(homeDir, ".config", "onekeymap", "onekeymap.json"))
 	}
-	viper.SetDefault("telemetry.enabled", false)
+	// Note: We don't set default for telemetry.enabled to detect if it's explicitly configured
 	viper.SetDefault("telemetry.endpoint", telemetryEndpoint)
 	viper.SetDefault("telemetry.headers", telemetryHeaders)
 	viper.SetDefault("server.listen", "")
@@ -124,8 +120,10 @@ func NewConfig(sandbox bool) (*Config, error) {
 
 // Validate checks if the configuration is valid.
 func (c *Config) Validate() error {
-	if c.Verbose && c.Quiet {
-		return errors.New("verbose and quiet modes cannot be enabled simultaneously")
-	}
 	return nil
+}
+
+// IsTelemetryExplicitlySet returns true if telemetry.enabled is explicitly set in config or environment.
+func IsTelemetryExplicitlySet() bool {
+	return viper.IsSet("telemetry.enabled")
 }

@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
 	"strings"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/onekeymap-cli/internal"
@@ -18,6 +20,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
+	"github.com/xinnjie/onekeymap-cli/internal/views"
 
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
@@ -57,7 +60,7 @@ type rootFlags struct {
 	onekeymap       string
 }
 
-func NewCmdRoot() *cobra.Command {
+func newCmdRoot() (*cobra.Command, *rootFlags) {
 	f := rootFlags{}
 
 	cmd := &cobra.Command{
@@ -94,7 +97,7 @@ func NewCmdRoot() *cobra.Command {
 		os.Exit(1)
 	}
 
-	return cmd
+	return cmd, &f
 }
 
 func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
@@ -103,6 +106,15 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		if err != nil {
 			cmd.PrintErrf("Error initializing configuration: %v\n", err)
 			os.Exit(1)
+		}
+
+		// Show telemetry prompt in interactive mode if telemetry is not explicitly configured
+		// and not explicitly enabled via flag
+		if f.interactive && !cliconfig.IsTelemetryExplicitlySet() && !f.enableTelemetry {
+			if err := showTelemetryPrompt(); err != nil {
+				cmd.PrintErrf("Error showing telemetry prompt: %v\n", err)
+				// Continue execution even if prompt fails
+			}
 		}
 
 		verbose := f.verbose
@@ -212,7 +224,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 }
 
 func Execute() {
-	rootCmd := NewCmdRoot()
+	rootCmd, rootFlags := newCmdRoot()
 
 	devCmd := NewCmdDev()
 	rootCmd.AddCommand(devCmd)
@@ -221,7 +233,7 @@ func Execute() {
 	devCmd.AddCommand(NewCmdDevListUnmappedActions())
 	devCmd.AddCommand(NewCmdDevGenerateBase())
 	rootCmd.AddCommand(NewCmdView())
-	rootCmd.AddCommand(NewCmdServe())
+	rootCmd.AddCommand(NewCmdServe(rootFlags))
 	rootCmd.AddCommand(NewCmdMigrate())
 	rootCmd.AddCommand(NewCmdImport())
 	rootCmd.AddCommand(NewCmdExport())
@@ -298,4 +310,34 @@ func parseHeaders(headersStr string) map[string]string {
 		}
 	}
 	return headers
+}
+
+// showTelemetryPrompt displays the telemetry consent prompt and updates config based on user choice
+func showTelemetryPrompt() error {
+	model := views.NewTelemetryPrompt()
+	program := tea.NewProgram(model)
+
+	finalModel, err := program.Run()
+	if err != nil {
+		return fmt.Errorf("failed to run telemetry prompt: %w", err)
+	}
+
+	// Cast back to our model type
+	m, ok := finalModel.(views.TelemetryPromptModel)
+	if !ok {
+		return errors.New("unexpected model type")
+	}
+
+	// Only update config if user made a selection (didn't quit)
+	if m.WasSelected() {
+		enabled := m.GetChoice()
+		if err := cliconfig.UpdateTelemetrySettings(enabled); err != nil {
+			return fmt.Errorf("failed to update telemetry settings: %w", err)
+		}
+
+		// Update viper in-memory values for current session
+		viper.Set("telemetry.enabled", enabled)
+	}
+
+	return nil
 }
