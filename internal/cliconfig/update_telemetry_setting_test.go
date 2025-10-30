@@ -26,6 +26,22 @@ server:
   listen: ":8080"
 `
 
+// nolint:gochecknoglobals // TestConfig for testing - all comments case
+var testAllCommentsConfig = `# OneKeyMap CLI Configuration Example
+# This file should be placed in one of the following locations:
+# - ./config.yaml (current directory)
+# - ~/.config/onekeymap/config.yaml (user config directory)
+# - /etc/onekeymap/config.yaml (system-wide config)
+
+# Path to the main onekeymap.json configuration file
+# onekeymap: ~/.config/onekeymap/onekeymap.json
+
+# OpenTelemetry configuration for telemetry
+# telemetry:
+  # Can also be enabled with --telemetry flag
+  # enabled: false
+`
+
 func setupTestDir(t *testing.T) string {
 	t.Helper()
 	return t.TempDir()
@@ -159,6 +175,42 @@ telemetry:
 			},
 			wantError: true,
 		},
+		{
+			name:    "create new config from all-comments template with telemetry enabled",
+			enabled: true,
+			getConfigFile: func() string {
+				return "" // no existing config
+			},
+			getHomeDir: func() (string, error) {
+				return "/tmp/test", nil
+			},
+			mkdirAll: os.MkdirAll,
+			getTemplate: func() ([]byte, error) {
+				return []byte(testAllCommentsConfig), nil
+			},
+			wantConfigExists: true,
+			wantConfig: `telemetry:
+  enabled: true
+`,
+		},
+		{
+			name:    "create new config from all-comments template with telemetry disabled",
+			enabled: false,
+			getConfigFile: func() string {
+				return "" // no existing config
+			},
+			getHomeDir: func() (string, error) {
+				return "/tmp/test", nil
+			},
+			mkdirAll: os.MkdirAll,
+			getTemplate: func() ([]byte, error) {
+				return []byte(testAllCommentsConfig), nil
+			},
+			wantConfigExists: true,
+			wantConfig: `telemetry:
+  enabled: false
+`,
+		},
 	}
 
 	for _, tt := range tests {
@@ -167,7 +219,9 @@ telemetry:
 
 			// Override functions for tests that create new configs
 			if tt.name == "create new config with telemetry enabled" ||
-				tt.name == "create new config with telemetry disabled" {
+				tt.name == "create new config with telemetry disabled" ||
+				tt.name == "create new config from all-comments template with telemetry enabled" ||
+				tt.name == "create new config from all-comments template with telemetry disabled" {
 				tt.getHomeDir = func() (string, error) {
 					return tempDir, nil
 				}

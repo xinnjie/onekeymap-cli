@@ -217,8 +217,26 @@ func updateTelemetryEnabledInNode(node *yaml.Node, enabled bool) (bool, error) {
 
 // addTelemetrySection adds a new telemetry section to the root document.
 func addTelemetrySection(root *yaml.Node, enabled bool) error {
-	if root.Kind != yaml.DocumentNode || len(root.Content) == 0 {
-		return errors.New("invalid document structure")
+	// Handle empty document (all comments case)
+	if root.Kind != yaml.DocumentNode {
+		// Create a proper document structure
+		*root = yaml.Node{
+			Kind: yaml.DocumentNode,
+			Content: []*yaml.Node{
+				{
+					Kind:    yaml.MappingNode,
+					Content: []*yaml.Node{},
+				},
+			},
+		}
+	} else if len(root.Content) == 0 {
+		// Document exists but has no content, add a mapping node
+		root.Content = []*yaml.Node{
+			{
+				Kind:    yaml.MappingNode,
+				Content: []*yaml.Node{},
+			},
+		}
 	}
 
 	docNode := root.Content[0]
