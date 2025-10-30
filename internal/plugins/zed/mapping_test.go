@@ -8,11 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 )
 
 func TestActionIDFromZedWithArgs(t *testing.T) {
 	mappingConfig, _ := mappings.NewTestMappingConfig()
-	zedImporter := newImporter(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)))
+	zedImporter := newImporter(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)), metrics.NewNoop())
 
 	tests := []struct {
 		name          string

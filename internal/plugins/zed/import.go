@@ -11,6 +11,7 @@ import (
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -18,12 +19,14 @@ import (
 type zedImporter struct {
 	mappingConfig *mappings.MappingConfig
 	logger        *slog.Logger
+	reporter      *metrics.UnknownActionReporter
 }
 
-func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *zedImporter {
+func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, recorder metrics.Recorder) *zedImporter {
 	return &zedImporter{
 		mappingConfig: mappingConfig,
 		logger:        logger,
+		reporter:      metrics.NewUnknownActionReporter(recorder),
 	}
 }
 
@@ -90,6 +93,7 @@ func (p *zedImporter) Import(
 					"error",
 					err,
 				)
+				p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeZed, actionStr)
 				continue
 			}
 			keymapEntry := &keymapv1.Action{

@@ -5,6 +5,7 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
@@ -21,10 +22,12 @@ type zedPlugin struct {
 }
 
 // New creates a new ZedPlugin instance.
-func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
+func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger, recorder metrics.Recorder) pluginapi.Plugin {
+	importer := newImporter(mappingConfig, logger, recorder)
+
 	return &zedPlugin{
 		mappingConfig: mappingConfig,
-		importer:      newImporter(mappingConfig, logger),
+		importer:      importer,
 		exporter:      newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer()),
 		logger:        logger,
 	}

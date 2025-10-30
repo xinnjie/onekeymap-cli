@@ -5,6 +5,7 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
@@ -17,14 +18,20 @@ type vsCodePlugin struct {
 }
 
 // New creates a new VSCodePlugin instance.
-func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
-	return newVSCodePlugin(mappingConfig, logger)
+func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger, recorder metrics.Recorder) pluginapi.Plugin {
+	return newVSCodePlugin(mappingConfig, logger, recorder)
 }
 
-func newVSCodePlugin(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *vsCodePlugin {
+func newVSCodePlugin(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) *vsCodePlugin {
+	importer := newImporter(mappingConfig, logger, recorder)
+
 	return &vsCodePlugin{
 		mappingConfig: mappingConfig,
-		importer:      newImporter(mappingConfig, logger),
+		importer:      importer,
 		exporter:      newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer()),
 		logger:        logger,
 	}

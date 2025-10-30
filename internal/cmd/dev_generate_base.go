@@ -14,6 +14,7 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	ij "github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
@@ -41,7 +42,7 @@ func NewCmdDevGenerateBase() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "generateBase",
 		Short: "Generate base keymap JSONs from editor-specific keymap files",
-		Run:   devGenerateBaseRun(&f, func() *slog.Logger { return cmdLogger }),
+		Run:   devGenerateBaseRun(&f, func() (*slog.Logger, metrics.Recorder) { return cmdLogger, cmdRecorder }),
 		Args:  cobra.ExactArgs(0),
 	}
 	cmd.Flags().
@@ -58,10 +59,10 @@ func NewCmdDevGenerateBase() *cobra.Command {
 
 func devGenerateBaseRun(
 	f *devGenerateBaseFlags,
-	dependencies func() *slog.Logger,
+	dependencies func() (*slog.Logger, metrics.Recorder),
 ) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, _ []string) {
-		logger := dependencies()
+		logger, recorder := dependencies()
 		ctx := cmd.Context()
 
 		mc, err := mappings.NewMappingConfig()
@@ -76,15 +77,15 @@ func devGenerateBaseRun(
 		}
 
 		if f.Editor == editorAll || f.Editor == editorIntelliJ {
-			generateIntelliJBase(ctx, f, mc, logger)
+			generateIntelliJBase(ctx, f, mc, logger, recorder)
 		}
 
 		if f.Editor == editorAll || f.Editor == editorVSCode {
-			generateVSCodeBase(ctx, f, mc, logger)
+			generateVSCodeBase(ctx, f, mc, logger, recorder)
 		}
 
 		if f.Editor == editorAll || f.Editor == editorZed {
-			generateZedBase(ctx, f, mc, logger)
+			generateZedBase(ctx, f, mc, logger, recorder)
 		}
 	}
 }
@@ -94,8 +95,9 @@ func generateIntelliJBase(
 	f *devGenerateBaseFlags,
 	mc *mappings.MappingConfig,
 	logger *slog.Logger,
+	recorder metrics.Recorder,
 ) {
-	plugin := ij.New(mc, logger)
+	plugin := ij.New(mc, logger, recorder)
 	imp, err := plugin.Importer()
 	if err != nil {
 		logger.ErrorContext(ctx, "get intellij importer", "error", err)
@@ -218,8 +220,14 @@ func generateOnekeymapBase(
 	}
 }
 
-func generateVSCodeBase(ctx context.Context, f *devGenerateBaseFlags, mc *mappings.MappingConfig, logger *slog.Logger) {
-	plugin := vscode.New(mc, logger)
+func generateVSCodeBase(
+	ctx context.Context,
+	f *devGenerateBaseFlags,
+	mc *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) {
+	plugin := vscode.New(mc, logger, recorder)
 	imp, err := plugin.Importer()
 	if err != nil {
 		logger.ErrorContext(ctx, "get vscode importer", "error", err)
@@ -244,8 +252,14 @@ func generateVSCodeBase(ctx context.Context, f *devGenerateBaseFlags, mc *mappin
 	generateOnekeymapBase(ctx, f.VSCodeSourceDir, f.OutDir, imp, logger, tasks)
 }
 
-func generateZedBase(ctx context.Context, f *devGenerateBaseFlags, mc *mappings.MappingConfig, logger *slog.Logger) {
-	plugin := zed.New(mc, logger)
+func generateZedBase(
+	ctx context.Context,
+	f *devGenerateBaseFlags,
+	mc *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) {
+	plugin := zed.New(mc, logger, recorder)
 	imp, err := plugin.Importer()
 	if err != nil {
 		logger.ErrorContext(ctx, "get zed importer", "error", err)

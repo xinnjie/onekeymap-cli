@@ -436,6 +436,11 @@ linters:
       # Default: false
       os-temp-dir: true
 
+    promlinter:
+      disabled-linters:
+      # OTEL metric do not have help text
+        - Help
+
   exclusions:
     # Log a warning if an exclusion rule is unused.
     # Default: false

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
@@ -18,9 +19,10 @@ func newVSCodeVariantPlugin(
 	editorType pluginapi.EditorType,
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
+	recorder metrics.Recorder,
 ) pluginapi.Plugin {
 	return &vsCodeVariantPlugin{
-		vsCodePlugin: newVSCodePlugin(mappingConfig, logger),
+		vsCodePlugin: newVSCodePlugin(mappingConfig, logger, recorder),
 		editorType:   editorType,
 	}
 }
@@ -59,16 +61,24 @@ func (p *vsCodeVariantPlugin) ConfigDetect(
 }
 
 // NewWindsurf creates a Windsurf plugin instance.
-func NewWindsurf(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
-	return newVSCodeVariantPlugin(pluginapi.EditorTypeWindsurf, mappingConfig, logger)
+func NewWindsurf(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) pluginapi.Plugin {
+	return newVSCodeVariantPlugin(pluginapi.EditorTypeWindsurf, mappingConfig, logger, recorder)
 }
 
 // NewWindsurfNext creates a Windsurf-Next plugin instance.
-func NewWindsurfNext(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
-	return newVSCodeVariantPlugin(pluginapi.EditorTypeWindsurfNext, mappingConfig, logger)
+func NewWindsurfNext(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) pluginapi.Plugin {
+	return newVSCodeVariantPlugin(pluginapi.EditorTypeWindsurfNext, mappingConfig, logger, recorder)
 }
 
 // NewCursor creates a Cursor plugin instance.
-func NewCursor(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
-	return newVSCodeVariantPlugin(pluginapi.EditorTypeCursor, mappingConfig, logger)
+func NewCursor(mappingConfig *mappings.MappingConfig, logger *slog.Logger, recorder metrics.Recorder) pluginapi.Plugin {
+	return newVSCodeVariantPlugin(pluginapi.EditorTypeCursor, mappingConfig, logger, recorder)
 }

@@ -49,7 +49,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 	// Use real VSCode plugin importer for this scenario
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	registry := plugins.NewRegistry()
-	registry.Register(vscodeplugin.New(mappingConfig, logger))
+	registry.Register(vscodeplugin.New(mappingConfig, logger, metrics.NewNoop()))
 	service := internal.NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
 
 	// VSCode keybindings.json content (comments stripped by importer)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -16,10 +17,19 @@ import (
 type intellijImporter struct {
 	mappingConfig *mappings.MappingConfig
 	logger        *slog.Logger
+	reporter      *metrics.UnknownActionReporter
 }
 
-func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *intellijImporter {
-	return &intellijImporter{mappingConfig: mappingConfig, logger: logger}
+func newImporter(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) *intellijImporter {
+	return &intellijImporter{
+		mappingConfig: mappingConfig,
+		logger:        logger,
+		reporter:      metrics.NewUnknownActionReporter(recorder),
+	}
 }
 
 // Import converts IntelliJ keymap XML into the universal KeymapSetting.
@@ -48,6 +58,7 @@ func (p *intellijImporter) Import(
 		if err != nil {
 			// Not found in mapping, skip quietly
 			p.logger.DebugContext(ctx, "no universal mapping for intellij action", "action", act.ID)
+			p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeIntelliJ, act.ID)
 			continue
 		}
 

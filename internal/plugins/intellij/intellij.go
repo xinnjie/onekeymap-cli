@@ -5,6 +5,7 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
@@ -16,14 +17,20 @@ type intellijPlugin struct {
 }
 
 // New creates a new IntelliJ plugin instance.
-func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
-	return newIntellijPlugin(mappingConfig, logger)
+func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger, recorder metrics.Recorder) pluginapi.Plugin {
+	return newIntellijPlugin(mappingConfig, logger, recorder)
 }
 
-func newIntellijPlugin(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *intellijPlugin {
+func newIntellijPlugin(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) *intellijPlugin {
+	importer := newImporter(mappingConfig, logger, recorder)
+
 	return &intellijPlugin{
 		mappingConfig: mappingConfig,
-		importer:      newImporter(mappingConfig, logger),
+		importer:      importer,
 		exporter:      newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer()),
 		logger:        logger,
 	}

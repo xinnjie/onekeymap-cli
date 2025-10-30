@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 )
 
@@ -22,7 +23,7 @@ func TestConfigDetect_Darwin(t *testing.T) {
 		t.Fatal(err)
 	}
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	plugin := New(mappingConfig, logger)
+	plugin := New(mappingConfig, logger, metrics.NewNoop())
 
 	t.Run("no keymap directories -> error", func(t *testing.T) {
 		home := t.TempDir()

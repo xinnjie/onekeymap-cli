@@ -21,11 +21,12 @@ import (
 
 // importService is the default implementation of the Importer interface.
 type importService struct {
-	registry      *plugins.Registry
-	mappingConfig *mappings.MappingConfig
-	logger        *slog.Logger
-	validator     *validateapi.Validator
-	recorder      metrics.Recorder
+	registry        *plugins.Registry
+	mappingConfig   *mappings.MappingConfig
+	logger          *slog.Logger
+	validator       *validateapi.Validator
+	recorder        metrics.Recorder
+	serviceReporter *metrics.ServiceReporter
 }
 
 // NewImportService creates a new default import service.
@@ -43,7 +44,8 @@ func NewImportService(
 			validateapi.NewKeybindConflictRule(),
 			validateapi.NewDanglingActionRule(config),
 		),
-		recorder: recorder,
+		recorder:        recorder,
+		serviceReporter: metrics.NewServiceReporter(recorder),
 	}
 
 	return service
@@ -51,8 +53,7 @@ func NewImportService(
 
 // Import is the method implementation for the default service.
 func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions) (*importapi.ImportResult, error) {
-	counter := s.recorder.Counter(metricImportCalls)
-	counter.Add(ctx, 1)
+	s.serviceReporter.ReportImportCall(ctx)
 
 	if opts.InputStream == nil {
 		return nil, errors.New("input stream is required")

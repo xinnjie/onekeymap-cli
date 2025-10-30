@@ -191,24 +191,24 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		cmdPluginRegistry = plugins.NewRegistry()
 
 		// VSCode family
-		cmdPluginRegistry.Register(vscode.New(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(vscode.NewWindsurf(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(vscode.NewWindsurfNext(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(vscode.NewCursor(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(vscode.New(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(vscode.NewWindsurf(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(vscode.NewWindsurfNext(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(vscode.NewCursor(cmdMappingConfig, cmdLogger, cmdRecorder))
 
 		// IntelliJ family
-		cmdPluginRegistry.Register(intellij.New(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(intellij.NewPycharm(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(intellij.NewIntelliJCommunity(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(intellij.NewWebStorm(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(intellij.NewClion(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(intellij.NewPhpStorm(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(intellij.NewRubyMine(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(intellij.NewGoLand(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(intellij.NewRustRover(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(intellij.New(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(intellij.NewPycharm(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(intellij.NewIntelliJCommunity(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(intellij.NewWebStorm(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(intellij.NewClion(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(intellij.NewPhpStorm(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(intellij.NewRubyMine(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(intellij.NewGoLand(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(intellij.NewRustRover(cmdMappingConfig, cmdLogger, cmdRecorder))
 
 		cmdPluginRegistry.Register(helix.New(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger))
+		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger, cmdRecorder))
 
 		cmdPluginRegistry.Register(basekeymap.New())
 

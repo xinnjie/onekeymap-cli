@@ -18,10 +18,11 @@ import (
 
 // exportService is the default implementation of the Exporter interface.
 type exportService struct {
-	registry      *plugins.Registry
-	mappingConfig *mappings.MappingConfig
-	logger        *slog.Logger
-	recorder      metrics.Recorder
+	registry        *plugins.Registry
+	mappingConfig   *mappings.MappingConfig
+	logger          *slog.Logger
+	recorder        metrics.Recorder
+	serviceReporter *metrics.ServiceReporter
 }
 
 // NewExportService creates a new default export service.
@@ -32,10 +33,11 @@ func NewExportService(
 	recorder metrics.Recorder,
 ) exportapi.Exporter {
 	return &exportService{
-		registry:      registry,
-		mappingConfig: config,
-		logger:        logger,
-		recorder:      recorder,
+		registry:        registry,
+		mappingConfig:   config,
+		logger:          logger,
+		recorder:        recorder,
+		serviceReporter: metrics.NewServiceReporter(recorder),
 	}
 }
 
@@ -46,8 +48,7 @@ func (s *exportService) Export(
 	setting *keymapv1.Keymap,
 	opts exportapi.ExportOptions,
 ) (*exportapi.ExportReport, error) {
-	counter := s.recorder.Counter(metricExportCalls)
-	counter.Add(ctx, 1)
+	s.serviceReporter.ReportExportCall(ctx)
 
 	plugin, ok := s.registry.Get(opts.EditorType)
 	if !ok {

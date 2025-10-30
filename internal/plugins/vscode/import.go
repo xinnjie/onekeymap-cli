@@ -10,6 +10,7 @@ import (
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -18,12 +19,18 @@ import (
 type vscodeImporter struct {
 	mappingConfig *mappings.MappingConfig
 	logger        *slog.Logger
+	reporter      *metrics.UnknownActionReporter
 }
 
-func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger) *vscodeImporter {
+func newImporter(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) *vscodeImporter {
 	return &vscodeImporter{
 		mappingConfig: mappingConfig,
 		logger:        logger,
+		reporter:      metrics.NewUnknownActionReporter(recorder),
 	}
 }
 
@@ -63,6 +70,10 @@ func (i *vscodeImporter) Import(
 				"args",
 				binding.Args,
 			)
+			// Report unknown command metric
+			if i.reporter != nil {
+				i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeVSCode, binding.Command)
+			}
 			continue
 		}
 

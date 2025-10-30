@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -90,7 +91,7 @@ func TestExportZedKeymap(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := New(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)))
+			p := New(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)), metrics.NewNoop())
 			var buf bytes.Buffer
 			exporter, err := p.Exporter()
 			require.NoError(t, err)
@@ -313,7 +314,7 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := New(mappingConfig, slog.New(slog.NewTextHandler(io.Discard, nil)))
+			p := New(mappingConfig, slog.New(slog.NewTextHandler(io.Discard, nil)), metrics.NewNoop())
 			exporter, err := p.Exporter()
 			require.NoError(t, err)
 
@@ -357,7 +358,7 @@ func TestExportZedKeymap_OrderByBaseContext(t *testing.T) {
 		},
 	}
 
-	p := New(mappingConfig, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	p := New(mappingConfig, slog.New(slog.NewTextHandler(io.Discard, nil)), metrics.NewNoop())
 	exporter, err := p.Exporter()
 	require.NoError(t, err)
 

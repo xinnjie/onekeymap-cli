@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/protobuf/proto"
@@ -20,7 +21,7 @@ func TestImporter_Import(t *testing.T) {
 	mappingConfig, err := mappings.NewTestMappingConfig()
 	require.NoError(t, err)
 
-	plugin := New(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)))
+	plugin := New(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)), metrics.NewNoop())
 	importer, err := plugin.Importer()
 	require.NoError(t, err)
 
