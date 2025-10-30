@@ -124,7 +124,7 @@ func New(
 // Histogram creates a new int64 histogram metric.
 func (r *recorder) Histogram(metric Metric) otelmetric.Int64Histogram { //nolint:ireturn
 	histogram, err := r.meter.Int64Histogram(
-		"onekeymap_"+metric.Name,
+		"onekeymap."+metric.Name,
 		otelmetric.WithDescription(metric.Description),
 		otelmetric.WithUnit(metric.Unit),
 	)
@@ -140,7 +140,7 @@ func (r *recorder) Histogram(metric Metric) otelmetric.Int64Histogram { //nolint
 // Counter creates a new int64 up down counter metric.
 func (r *recorder) Counter(metric Metric) otelmetric.Int64Counter { //nolint:ireturn
 	counter, err := r.meter.Int64Counter(
-		"onekeymap_"+metric.Name,
+		"onekeymap."+metric.Name,
 		otelmetric.WithDescription(metric.Description),
 		otelmetric.WithUnit(metric.Unit),
 	)

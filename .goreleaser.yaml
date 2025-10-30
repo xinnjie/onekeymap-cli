@@ -151,8 +151,8 @@ winget:
       branch: "onekeymap-cli-{{.Version}}"
       token: "{{ .Env.WINGET_GITHUB_TOKEN }}"
       pull_request:
-        enabled: false
-        draft: false
+        enabled: true
+        draft: true
         base:
           owner: microsoft
           name: winget-pkgs

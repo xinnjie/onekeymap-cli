@@ -63,6 +63,7 @@ func (m TelemetryPromptModel) View() string {
 			"  • Commands usage\n" +
 			"\n" +
 			"No personal data, file contents, or keystrokes are collected.\n" +
+			"More info: https://github.com/onekeymap/onekeymap-cli/blob/main/docs/telemetry.md\n" +
 			"Would you like to help?",
 	)
 

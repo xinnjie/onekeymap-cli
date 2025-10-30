@@ -63,8 +63,10 @@ func newCmdRoot() (*cobra.Command, *rootFlags) {
 	f := rootFlags{}
 
 	cmd := &cobra.Command{
-		Use:              "onekeymap-cli",
-		Short:            "A tool to import, export, and synchronize keyboard shortcuts between editors.",
+		Use:   "onekeymap-cli",
+		Short: "A tool to import, export, and synchronize keyboard shortcuts between editors.",
+		Long: "A tool to import, export, and synchronize keyboard shortcuts between editors.\n" +
+			"If you encounter any issues, please open an issue at https://github.com/xinnjie/onekeymap-cli.",
 		Version:          buildVersionString(),
 		PersistentPreRun: rootPersistentPreRun(&f),
 		PersistentPostRun: rootPersistentPostRun(
@@ -333,9 +335,6 @@ func showTelemetryPrompt() error {
 		if err := cliconfig.UpdateTelemetrySettings(enabled); err != nil {
 			return fmt.Errorf("failed to update telemetry settings: %w", err)
 		}
-
-		// Update viper in-memory values for current session
-		viper.Set("telemetry.enabled", enabled)
 	}
 
 	return nil

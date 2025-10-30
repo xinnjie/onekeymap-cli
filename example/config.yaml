@@ -8,10 +8,10 @@
 # This is where your unified keymap settings are stored
 # Can be overridden with --onekeymap flag or ONEKEYMAP_ONEKEYMAP environment variable
 # Default: ~/.config/onekeymap/onekeymap.json
-onekeymap: ~/.config/onekeymap/onekeymap.json
+# onekeymap: ~/.config/onekeymap/onekeymap.json
 
 # OpenTelemetry configuration for telemetry
-telemetry:
+# telemetry:
   # Can also be enabled with --telemetry flag
   # Can be overridden with ONEKEYMAP_TELEMETRY_ENABLED
   # enabled: false
@@ -34,59 +34,59 @@ telemetry:
   # insecure: false
 
 # Per-editor configuration settings
-editors:
-  # VSCode configuration
-  vscode:
-    # Path to VSCode's keybindings.json file
-    # If not specified, the CLI will auto-detect the default location
-    keymap_path: ""
-    # Enable automatic syncing for this editor (not implemented yet)
-    sync_enabled: false
+# editors:
+#   # VSCode configuration
+#   vscode:
+#     # Path to VSCode's keybindings.json file
+#     # If not specified, the CLI will auto-detect the default location
+#     keymap_path: ""
+#     # Enable automatic syncing for this editor (not implemented yet)
+#     sync_enabled: false
 
-  # Windsurf configuration
-  windsurf:
-    keymap_path: ""
-    sync_enabled: false
+#   # Windsurf configuration
+#   windsurf:
+#     keymap_path: ""
+#     sync_enabled: false
 
-  # Cursor configuration
-  cursor:
-    keymap_path: ""
-    sync_enabled: false
+#   # Cursor configuration
+#   cursor:
+#     keymap_path: ""
+#     sync_enabled: false
 
-  # IntelliJ IDEA configuration
-  intellij:
-    keymap_path: ""
-    sync_enabled: false
+#   # IntelliJ IDEA configuration
+#   intellij:
+#     keymap_path: ""
+#     sync_enabled: false
 
-  # PyCharm configuration
-  pycharm:
-    keymap_path: ""
-    sync_enabled: false
+#   # PyCharm configuration
+#   pycharm:
+#     keymap_path: ""
+#     sync_enabled: false
 
-  # WebStorm configuration
-  webstorm:
-    keymap_path: ""
-    sync_enabled: false
+#   # WebStorm configuration
+#   webstorm:
+#     keymap_path: ""
+#     sync_enabled: false
 
-  # GoLand configuration
-  goland:
-    keymap_path: ""
-    sync_enabled: false
+#   # GoLand configuration
+#   goland:
+#     keymap_path: ""
+#     sync_enabled: false
 
-  # CLion configuration
-  clion:
-    keymap_path: ""
-    sync_enabled: false
+#   # CLion configuration
+#   clion:
+#     keymap_path: ""
+#     sync_enabled: false
 
-  # Helix configuration
-  helix:
-    keymap_path: ""
-    sync_enabled: false
+#   # Helix configuration
+#   helix:
+#     keymap_path: ""
+#     sync_enabled: false
 
-  # Zed configuration
-  zed:
-    keymap_path: ""
-    sync_enabled: false
+#   # Zed configuration
+#   zed:
+#     keymap_path: ""
+#     sync_enabled: false
 # Configuration Priority (from highest to lowest):
 # 1. Command-line flags (e.g., --onekeymap, --verbose)
 # 2. Environment variables (e.g., ONEKEYMAP_ONEKEYMAP, ONEKEYMAP_VERBOSE)
