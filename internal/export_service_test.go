@@ -1,4 +1,4 @@
-package internal
+package internal_test
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
@@ -71,7 +72,7 @@ func newTestExportService(
 	r.Register(&testExportPlugin{editorType: editorType, exporter: exporter})
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	recorder := metrics.NewNoop()
-	return NewExportService(
+	return internal.NewExportService(
 		r,
 		&mappings.MappingConfig{Mappings: map[string]mappings.ActionMappingConfig{}},
 		logger,

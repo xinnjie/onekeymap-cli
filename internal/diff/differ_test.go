@@ -1,14 +1,15 @@
-package diff
+package diff_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/xinnjie/onekeymap-cli/internal/diff"
 )
 
 func TestJsonDiffer_NoChange_ReturnsEmpty(t *testing.T) {
-	d := NewJSONDiffer()
+	d := diff.NewJSONDiffer()
 
 	before := map[string]any{"a": 1, "b": map[string]any{"c": 2}}
 	after := map[string]any{"a": 1, "b": map[string]any{"c": 2}}
@@ -19,7 +20,7 @@ func TestJsonDiffer_NoChange_ReturnsEmpty(t *testing.T) {
 }
 
 func TestJsonDiffer_MapChanged_ReturnsDiff(t *testing.T) {
-	d := NewJSONDiffer()
+	d := diff.NewJSONDiffer()
 
 	before := map[string]any{"a": 1}
 	after := map[string]any{"a": 2}
@@ -32,7 +33,7 @@ func TestJsonDiffer_MapChanged_ReturnsDiff(t *testing.T) {
 }
 
 func TestJsonDiffer_ArrayChanged_ReturnsDiff(t *testing.T) {
-	d := NewJSONDiffer()
+	d := diff.NewJSONDiffer()
 
 	var before []any
 	after := []any{"x"}
@@ -44,7 +45,7 @@ func TestJsonDiffer_ArrayChanged_ReturnsDiff(t *testing.T) {
 }
 
 func TestJsonDiffer_TypeMismatch_ReturnsError(t *testing.T) {
-	d := NewJSONDiffer()
+	d := diff.NewJSONDiffer()
 
 	before := map[string]any{"a": 1}
 	after := []any{"x"}
@@ -54,7 +55,7 @@ func TestJsonDiffer_TypeMismatch_ReturnsError(t *testing.T) {
 }
 
 func TestJsonDiffer_TypedNilSliceHandled(t *testing.T) {
-	d := NewJSONDiffer()
+	d := diff.NewJSONDiffer()
 	var before []string
 	after := []string{"x"}
 
@@ -64,7 +65,7 @@ func TestJsonDiffer_TypedNilSliceHandled(t *testing.T) {
 }
 
 func TestJsonDiffer_TypedNilMapHandled(t *testing.T) {
-	d := NewJSONDiffer()
+	d := diff.NewJSONDiffer()
 	var before map[string]string
 	after := map[string]string{"a": "1"}
 

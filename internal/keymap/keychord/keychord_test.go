@@ -1,4 +1,4 @@
-package keychord
+package keychord_test
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/xinnjie/onekeymap-cli/internal/keymap/keychord"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap/keycode"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
@@ -142,7 +143,7 @@ func TestParse(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			actual, err := Parse(tc.input, "+")
+			actual, err := keychord.Parse(tc.input, "+")
 
 			if tc.expectError {
 				require.Error(t, err)
@@ -195,7 +196,7 @@ func TestParseMinus(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			actual, err := Parse(tc.input, "-")
+			actual, err := keychord.Parse(tc.input, "-")
 
 			if tc.expectError {
 				require.Error(t, err)
@@ -296,7 +297,7 @@ func TestFormat(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			keyChord := NewKeyChord(tc.input)
+			keyChord := keychord.NewKeyChord(tc.input)
 			actual, err := keyChord.Format(platform.PlatformMacOS)
 			if tc.expectError {
 				require.Error(t, err)

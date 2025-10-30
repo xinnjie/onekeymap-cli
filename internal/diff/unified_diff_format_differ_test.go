@@ -1,14 +1,15 @@
-package diff
+package diff_test
 
 import (
 	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/xinnjie/onekeymap-cli/internal/diff"
 )
 
 func TestGitDiffer_NoChange_ReturnsEqualDelta(t *testing.T) {
-	d := NewUnifiedDiffFormatDiffer()
+	d := diff.NewUnifiedDiffFormatDiffer()
 	text := "hello world"
 	got, err := d.Diff(bytes.NewBufferString(text), bytes.NewBufferString(text), "test")
 	if err != nil {
@@ -20,7 +21,7 @@ func TestGitDiffer_NoChange_ReturnsEqualDelta(t *testing.T) {
 }
 
 func TestGitDiffer_OnlyInsert(t *testing.T) {
-	d := NewUnifiedDiffFormatDiffer()
+	d := diff.NewUnifiedDiffFormatDiffer()
 	before := "line1\n"
 	after := "line1\nline2\n"
 	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after), "test")
@@ -32,7 +33,7 @@ func TestGitDiffer_OnlyInsert(t *testing.T) {
 }
 
 func TestGitDiffer_OnlyDelete(t *testing.T) {
-	d := NewUnifiedDiffFormatDiffer()
+	d := diff.NewUnifiedDiffFormatDiffer()
 	before := "abc"
 	after := ""
 	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after), "test")
@@ -45,7 +46,7 @@ func TestGitDiffer_OnlyDelete(t *testing.T) {
 }
 
 func TestGitDiffer_ReplaceMiddleChar(t *testing.T) {
-	d := NewUnifiedDiffFormatDiffer()
+	d := diff.NewUnifiedDiffFormatDiffer()
 	before := "abc"
 	after := "axc"
 	got, err := d.Diff(bytes.NewBufferString(before), bytes.NewBufferString(after), "test")

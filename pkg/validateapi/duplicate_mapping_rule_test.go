@@ -1,4 +1,4 @@
-package validateapi
+package validateapi_test
 
 import (
 	"context"
@@ -8,11 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestDuplicateMappingRule_Validate_WithDuplicates(t *testing.T) {
-	validator := NewValidator(NewDuplicateMappingRule())
+	validator := validateapi.NewValidator(validateapi.NewDuplicateMappingRule())
 
 	// Create keymaps with duplicate mappings
 	setting := &keymapv1.Keymap{
@@ -38,7 +39,7 @@ func TestDuplicateMappingRule_Validate_WithDuplicates(t *testing.T) {
 }
 
 func TestDuplicateMappingRule_Validate_NoDuplicates(t *testing.T) {
-	validator := NewValidator(NewDuplicateMappingRule())
+	validator := validateapi.NewValidator(validateapi.NewDuplicateMappingRule())
 
 	setting := &keymapv1.Keymap{
 		Actions: []*keymapv1.Action{
@@ -58,7 +59,7 @@ func TestDuplicateMappingRule_Validate_NoDuplicates(t *testing.T) {
 }
 
 func TestDuplicateMappingRule_Validate_SameActionDifferentKeys(t *testing.T) {
-	validator := NewValidator(NewDuplicateMappingRule())
+	validator := validateapi.NewValidator(validateapi.NewDuplicateMappingRule())
 
 	// Same action with different keys should not be flagged as duplicate
 	setting := &keymapv1.Keymap{

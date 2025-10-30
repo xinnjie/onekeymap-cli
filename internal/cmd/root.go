@@ -13,6 +13,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/cliconfig"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/basekeymap"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/helix"
@@ -21,8 +22,6 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
-
-	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
 )

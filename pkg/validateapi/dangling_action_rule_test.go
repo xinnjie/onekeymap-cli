@@ -1,4 +1,4 @@
-package validateapi
+package validateapi_test
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -22,7 +23,7 @@ func TestValidator_Validate_WithDanglingAction(t *testing.T) {
 		},
 	}
 
-	validator := NewValidator(NewDanglingActionRule(mappingConfig))
+	validator := validateapi.NewValidator(validateapi.NewDanglingActionRule(mappingConfig))
 
 	setting := &keymapv1.Keymap{
 		Actions: []*keymapv1.Action{

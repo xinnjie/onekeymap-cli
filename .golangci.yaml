@@ -24,10 +24,9 @@ formatters:
   enable:
     - goimports # checks if the code and import statements are formatted according to the 'goimports' command
     - golines # checks if code is formatted, and fixes long lines
-
+    - gci # checks if code and import statements are formatted, with additional rules
+    - gofmt # checks if the code is formatted according to 'gofmt' command
     ## you may want to enable
-    #- gci # checks if code and import statements are formatted, with additional rules
-    #- gofmt # checks if the code is formatted according to 'gofmt' command
     #- gofumpt # enforces a stricter format than 'gofmt', while being backwards compatible
     #- swaggo # formats swaggo comments
 
@@ -127,7 +126,7 @@ linters:
     # TODO(xinnjie): Temporarily disable 'nonamedreturns' due to many violations; fix and re-enable
     - nonamedreturns
     # TODO(xinnjie): Temporarily disable 'testpackage' due to many violations; fix and re-enable
-    - testpackage
+    # - testpackage
     # TODO(xinnjie): Temporarily disable 'gocognit' due to many violations; fix and re-enable
     - gocognit
 
@@ -481,3 +480,15 @@ linters:
         linters: [sloglint]
       - text: 'shadow: declaration of "(err|ctx|ok)" shadows declaration at'
         linters: [govet]
+      # These test files need to stay in the same package to access unexported functions
+      - path: 'internal/cmd/.*_test\.go'
+        text: 'package should be `cmd_test` instead of `cmd`'
+        linters: [testpackage]
+      # TODO(xinnjie): refactor
+      - path: 'internal/mappings/.*_test\.go'
+        text: 'package should be `mappings_test` instead of `mappings`'
+        linters: [testpackage]
+      # TODO(xinnjie): refactor
+      - path: 'internal/plugins/.*/.*_test\.go'
+        text: 'package should be `.*_test` instead of `.*`'
+        linters: [testpackage]

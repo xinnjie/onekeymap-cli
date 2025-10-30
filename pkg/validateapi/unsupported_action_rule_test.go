@@ -1,4 +1,4 @@
-package validateapi
+package validateapi_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -36,7 +37,7 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 		},
 	}
 
-	validator := NewValidator(NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
+	validator := validateapi.NewValidator(validateapi.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
 	setting := &keymapv1.Keymap{
 		Actions: []*keymapv1.Action{
@@ -74,7 +75,7 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 		},
 	}
 
-	validator := NewValidator(NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
+	validator := validateapi.NewValidator(validateapi.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
 	setting := &keymapv1.Keymap{
 		Actions: []*keymapv1.Action{
@@ -105,7 +106,9 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 	}
 
 	// Test with VSCode target - should pass
-	validatorVSCode := NewValidator(NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeVSCode))
+	validatorVSCode := validateapi.NewValidator(
+		validateapi.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeVSCode),
+	)
 	setting := &keymapv1.Keymap{
 		Actions: []*keymapv1.Action{
 			keymap.NewActioinBinding("actions.test", "ctrl+t"),
@@ -121,7 +124,9 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 	assert.Empty(t, report.GetIssues())
 
 	// Test with Zed target - should fail
-	validatorZed := NewValidator(NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
+	validatorZed := validateapi.NewValidator(
+		validateapi.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed),
+	)
 	opts.EditorType = "zed"
 
 	report, err = validatorZed.Validate(context.Background(), setting, opts)

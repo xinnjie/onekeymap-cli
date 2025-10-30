@@ -1,4 +1,4 @@
-package validateapi
+package validateapi_test
 
 import (
 	"context"
@@ -8,11 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestValidator_Validate_WithKeybindConflict(t *testing.T) {
-	validator := NewValidator(NewKeybindConflictRule())
+	validator := validateapi.NewValidator(validateapi.NewKeybindConflictRule())
 
 	// Create keymaps with conflicting keybindings
 	setting := &keymapv1.Keymap{

@@ -1,4 +1,4 @@
-package internal
+package internal_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
@@ -468,7 +469,7 @@ func TestImportService_Import(t *testing.T) {
 			}
 
 			logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-			service := NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
+			service := internal.NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
 
 			opts := importapi.ImportOptions{
 				EditorType:  pluginapi.EditorTypeVSCode,

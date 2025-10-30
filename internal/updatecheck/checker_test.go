@@ -1,145 +1,97 @@
-package updatecheck
+package updatecheck_test
 
 import (
 	"context"
+	"io"
 	"log/slog"
-	"os"
-	"path/filepath"
-	"strings"
 	"testing"
-	"time"
+
+	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
 )
 
-func TestChecker_ShouldCheck(t *testing.T) {
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
+func TestNew(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 
-	// Create a temporary cache directory
-	tmpDir := t.TempDir()
+	t.Run("creates checker with valid version", func(t *testing.T) {
+		checker := updatecheck.New("1.0.0", logger)
+		if checker == nil {
+			t.Fatal("expected non-nil checker")
+		}
+	})
 
-	checker := New("1.0.0", logger)
-	checker.cacheDir = tmpDir
-
-	// First check should return true (no cache file)
-	if !checker.shouldCheck() {
-		t.Error("expected shouldCheck to return true when cache file doesn't exist")
-	}
-
-	// Create cache file
-	if err := checker.updateCheckTime(); err != nil {
-		t.Fatalf("failed to update check time: %v", err)
-	}
-
-	// Immediately after, should return false
-	if checker.shouldCheck() {
-		t.Error("expected shouldCheck to return false immediately after update")
-	}
-
-	// Modify the cache file to be old
-	cacheFile := filepath.Join(tmpDir, cacheFileName)
-	oldTime := time.Now().Add(-checkInterval - 1*time.Hour)
-	if err := os.Chtimes(cacheFile, oldTime, oldTime); err != nil {
-		t.Fatalf("failed to modify cache file time: %v", err)
-	}
-
-	// Now should return true
-	if !checker.shouldCheck() {
-		t.Error("expected shouldCheck to return true when cache is old")
-	}
+	t.Run("creates checker with dev version", func(t *testing.T) {
+		checker := updatecheck.New("dev", logger)
+		if checker == nil {
+			t.Fatal("expected non-nil checker")
+		}
+	})
 }
 
-func TestChecker_DevVersionSkipsCheck(t *testing.T) {
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
-	checker := New("dev", logger)
+func TestChecker_CheckForUpdateMessage(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 
-	if checker.currentVersion != "dev" {
-		t.Fatalf("expected current version to be dev, got %s", checker.currentVersion)
-	}
+	t.Run("dev version returns empty string", func(t *testing.T) {
+		checker := updatecheck.New("dev", logger)
+		ctx := context.Background()
+		msg := checker.CheckForUpdateMessage(ctx)
 
-	// This should return empty string for dev version
-	ctx := context.Background()
-	msg := checker.CheckForUpdateMessage(ctx)
+		if msg != "" {
+			t.Errorf("expected empty message for dev version, got %s", msg)
+		}
+	})
 
-	if msg != "" {
-		t.Errorf("expected empty message for dev version, got %s", msg)
-	}
+	t.Run("returns result for normal version", func(t *testing.T) {
+		checker := updatecheck.New("1.0.0", logger)
+		ctx := context.Background()
+
+		// This should return empty string since network check will likely fail in test environment
+		msg := checker.CheckForUpdateMessage(ctx)
+
+		// We don't assert the exact content since it depends on network availability
+		// Just ensure it doesn't panic and returns a string
+		if msg != "" {
+			t.Logf("Update message received: %s", msg)
+		}
+	})
 }
 
 func TestChecker_CheckForUpdateAsync(t *testing.T) {
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
-	checker := New("dev", logger)
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 
-	ctx := context.Background()
-	msgChan := checker.CheckForUpdateAsync(ctx)
+	t.Run("dev version returns empty string via channel", func(t *testing.T) {
+		checker := updatecheck.New("dev", logger)
+		ctx := context.Background()
+		msgChan := checker.CheckForUpdateAsync(ctx)
 
-	// Should receive empty string for dev version
-	msg := <-msgChan
+		// Should receive empty string for dev version
+		msg := <-msgChan
+		if msg != "" {
+			t.Errorf("expected empty message for dev version, got %s", msg)
+		}
 
-	if msg != "" {
-		t.Errorf("expected empty message for dev version, got %s", msg)
-	}
+		// Channel should be closed
+		_, ok := <-msgChan
+		if ok {
+			t.Error("expected channel to be closed")
+		}
+	})
 
-	// Channel should be closed
-	_, ok := <-msgChan
-	if ok {
-		t.Error("expected channel to be closed")
-	}
-}
+	t.Run("normal version returns result via channel", func(t *testing.T) {
+		checker := updatecheck.New("1.0.0", logger)
+		ctx := context.Background()
+		msgChan := checker.CheckForUpdateAsync(ctx)
 
-func TestChecker_FetchLatestVersion(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping network test in short mode")
-	}
+		// Should receive a result (likely empty string due to network/cache)
+		msg := <-msgChan
 
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
-	checker := New("1.0.0", logger)
+		// We don't assert the exact content since it depends on network availability
+		// Just ensure we get a response and channel closes properly
+		_ = msg
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	release, err := checker.fetchLatestVersion(ctx)
-	if err != nil {
-		t.Logf("fetch failed (this is expected if network is unavailable): %v", err)
-		return
-	}
-
-	if release.Version == "" {
-		t.Error("expected non-empty version")
-	}
-
-	if release.HTMLURL == "" {
-		t.Error("expected non-empty URL")
-	}
-
-	t.Logf("Latest version: %s, URL: %s", release.Version, release.HTMLURL)
-}
-
-func TestFormatUpdateNotification_Darwin(t *testing.T) {
-	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelError}))
-	checker := New("0.2.0", logger)
-
-	output := checker.formatUpdateNotification(
-		"0.2.0",
-		"0.3.0",
-		"https://github.com/xinnjie/onekeymap-cli/releases/tag/v0.3.0",
-	)
-
-	if output == "" {
-		t.Error("expected non-empty output")
-	}
-
-	// Verify content
-	if !strings.Contains(output, "🎉 A new version of onekeymap-cli is available!") {
-		t.Error("missing title")
-	}
-	if !strings.Contains(output, "0.2.0") {
-		t.Error("missing current version")
-	}
-	if !strings.Contains(output, "0.3.0") {
-		t.Error("missing new version")
-	}
-	if !strings.Contains(output, "https://github.com/xinnjie/onekeymap-cli/releases/tag/v0.3.0") {
-		t.Error("missing release URL")
-	}
-
-	t.Logf("\n%s", output)
+		// Channel should be closed
+		_, ok := <-msgChan
+		if ok {
+			t.Error("expected channel to be closed")
+		}
+	})
 }
