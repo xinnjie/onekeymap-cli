@@ -181,6 +181,7 @@ func BuildEditorSupportFromMapping(mapping *mappings.ActionMappingConfig) []*key
 		pluginapi.EditorTypeIntelliJ,
 		pluginapi.EditorTypeZed,
 		pluginapi.EditorTypeVim,
+		pluginapi.EditorTypeXcode,
 		pluginapi.EditorTypeHelix,
 	}
 

@@ -84,6 +84,16 @@ mappings:
     helix:
       command: "paste_clipboard_after"
       mode: "insert"
+    xcode:
+      action: "specialPaste:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.SpecialPaste"
+      group: "Edit Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Paste"
+      title: "Paste Special"
   - id: "actions.clipboard.copyFilePath"
     name: "Copy file path"
     description: "Copy file path"

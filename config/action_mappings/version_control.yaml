@@ -11,6 +11,15 @@ mappings:
     zed:
       action: "git::Commit"
       context: "Editor"
+    xcode:
+      action: "commitCommand:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.CommitCommand"
+      group: "Integrate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Commit…"
   - id: "actions.git.openChanges"
     name: "Open changes"
     description: "Open all git changed files"

@@ -29,6 +29,15 @@ mappings:
     helix:
       command: "search_next"
       mode: "insert"
+    xcode:
+      action: "selectNextOccurrence:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.SelectNextOccurrence"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Select Next Occurrence"
   - id: "actions.edit.previousMatchFindAction"
     name: "Find previous"
     description: "Find Previous"

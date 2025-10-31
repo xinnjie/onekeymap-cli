@@ -13,7 +13,7 @@
 ---
 **Sync your keyboard shortcuts across all your code editors.**
 
-OneKeymap CLI is a powerful command-line tool that lets you import, export, and synchronize keyboard shortcuts between VSCode, IntelliJ IDEA, Zed, Helix, and more. Stop reconfiguring keybindings every time you switch editors—maintain one universal keymap and deploy it everywhere.
+OneKeymap CLI is a powerful command-line tool that lets you import, export, and synchronize keyboard shortcuts between VSCode, IntelliJ IDEA, Zed, Xcode, Helix, and more. Stop reconfiguring keybindings every time you switch editors—maintain one universal keymap and deploy it everywhere.
 
 | Import Keymap | View Keymap | Export Keymap |
 |---|---|---|
@@ -38,18 +38,18 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
 
 - **Debian/Ubuntu (.deb)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.4.0/onekeymap-cli_0.4.0_x86_64.deb
-  sudo dpkg -i onekeymap-cli_0.4.0_x86_64.deb
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.5.1/onekeymap-cli_0.5.1_x86_64.deb
+  sudo dpkg -i onekeymap-cli_0.5.1_x86_64.deb
   ```
 - **Fedora/RHEL/CentOS (.rpm)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.4.0/onekeymap-cli_0.4.0_x86_64.rpm
-  sudo rpm -i onekeymap-cli_0.4.0_x86_64.rpm
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.5.1/onekeymap-cli_0.5.1_x86_64.rpm
+  sudo rpm -i onekeymap-cli_0.5.1_x86_64.rpm
   ```
 - **Alpine (.apk)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.4.0/onekeymap-cli_0.4.0_x86_64.apk
-  sudo apk add --allow-untrusted onekeymap-cli_0.4.0_x86_64.apk
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.5.1/onekeymap-cli_0.5.1_x86_64.apk
+  sudo apk add --allow-untrusted onekeymap-cli_0.5.1_x86_64.apk
   ```
 
 #### Windows
@@ -142,6 +142,7 @@ editors:
 | **VSCode** | ✅ | ✅ |  |
 | **Zed** | ✅ | ✅ |  |
 | **IntelliJ IDEA** | ✅ | ✅ |  |
+| **Xcode** | ✅ | ✅ | shortcut coverage is still limited (see [Action Support Matrix](action-support-matrix.md)) |
 | **Helix** | ❌ | ✅ | TOML configuration support; shortcut coverage is still limited (see [Action Support Matrix](action-support-matrix.md)) |
 | **Vim/Neovim** | 🚧 | 🚧 | Planned |
 

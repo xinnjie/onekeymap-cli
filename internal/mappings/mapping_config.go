@@ -42,6 +42,7 @@ type ActionMappingConfig struct {
 	IntelliJ    IntelliJMappingConfig `yaml:"intellij"`
 	Vim         VimMappingConfig      `yaml:"vim"`
 	Helix       HelixConfig           `yaml:"helix"`
+	Xcode       XcodeConfigs          `yaml:"xcode"`
 }
 
 // IsSupported checks if the action is supported by the given editor type.
@@ -86,6 +87,16 @@ func (am *ActionMappingConfig) IsSupported(editorType pluginapi.EditorType) (boo
 		}
 		hasMapping := slices.ContainsFunc(am.Helix, func(hc HelixMappingConfig) bool {
 			return hc.Command != ""
+		})
+		return hasMapping, ""
+	case pluginapi.EditorTypeXcode:
+		for _, xc := range am.Xcode {
+			if xc.NotSupported {
+				return false, xc.NotSupportedReason
+			}
+		}
+		hasMapping := slices.ContainsFunc(am.Xcode, func(xc XcodeMappingConfig) bool {
+			return xc.Action != ""
 		})
 		return hasMapping, ""
 	default:
@@ -176,6 +187,9 @@ func checkDuplicateEditorConfigs(mappings map[string]ActionMappingConfig) error 
 		return err
 	}
 	if err := checkZedDuplicateConfig(mappings); err != nil {
+		return err
+	}
+	if err := checkXcodeDuplicateConfig(mappings); err != nil {
 		return err
 	}
 	return nil

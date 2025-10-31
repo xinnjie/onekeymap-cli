@@ -73,6 +73,15 @@ mappings:
     intellij:
       notSupported: true
       notSupportedReason: "There is not `Go to definition` in intellij, use `Go to declaration` instead"
+    xcode:
+      action: "editorContext_jumpToDefinition:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.JumpToDefinition"
+      group: "Navigate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "YES"
+      title: "Jump to Definition"
   - id: "actions.go.definitionPeek"
     name: "Peek definition"
     description: "Peek definition"

@@ -19,6 +19,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/helix"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/xcode"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
@@ -170,7 +171,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		if telemetryEnabled {
 			logger.DebugContext(ctx, "Telemetry enabled")
 			if telemetryEndpoint == "" {
-				logger.WarnContext(
+				logger.DebugContext(
 					ctx,
 					"telemetry is enabled, but telemetry.endpoint is not set. Telemetry data will not be sent.",
 				)
@@ -210,6 +211,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 
 		cmdPluginRegistry.Register(helix.New(cmdMappingConfig, cmdLogger))
 		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger, cmdRecorder))
+		cmdPluginRegistry.Register(xcode.New(cmdMappingConfig, cmdLogger, cmdRecorder))
 
 		cmdPluginRegistry.Register(basekeymap.New())
 

@@ -155,7 +155,7 @@ func (r *recorder) Counter(metric Metric) otelmetric.Int64Counter { //nolint:ire
 // Shutdown shuts down the OpenTelemetry provider.
 func (r *recorder) Shutdown(ctx context.Context) error {
 	if err := r.collect(ctx); err != nil {
-		r.logger.WarnContext(ctx, "failed to collect metrics during shutdown", "error", err)
+		r.logger.DebugContext(ctx, "failed to collect metrics during shutdown", "error", err)
 	}
 
 	return r.provider.Shutdown(ctx)
@@ -174,7 +174,7 @@ func (r *recorder) collect(ctx context.Context) error {
 	}
 
 	if err := r.exporter.Export(ctx, &rm); err != nil {
-		r.logger.ErrorContext(ctx, "Failed to export collected metrics", "error", err)
+		r.logger.DebugContext(ctx, "Failed to export collected metrics", "error", err)
 		return err
 	}
 

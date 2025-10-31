@@ -20,6 +20,17 @@ mappings:
     helix:
       command: "rename_symbol"
       mode: "insert"
+    xcode:
+      action: "renameRefactor:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.Refactor.Rename"
+      commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.Refactor.Rename"
+      group: "Editor Menu for Source Code"
+      groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Refactor"
+      title: "Rename…"
   - id: "actions.refactor.refactor"
     name: "Refactor code"
     description: "Refactor This..."

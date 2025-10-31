@@ -45,6 +45,17 @@ mappings:
     helix:
       command: "move_line_up"
       mode: "insert"
+    xcode:
+      action: "moveCurrentLineUp:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.MoveLineUp"
+      commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.MoveLineUp"
+      group: "Editor Menu for Source Code"
+      groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Structure"
+      title: "Move Line Up"
   - id: "actions.selection.moveLineDown"
     name: "Move line down"
     description: "Move current line down"
@@ -59,3 +70,14 @@ mappings:
       action: "MoveLineDown"
     helix:
       notSupported: true
+    xcode:
+      action: "moveCurrentLineDown:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.MoveLineDown"
+      commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.MoveLineDown"
+      group: "Editor Menu for Source Code"
+      groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Structure"
+      title: "Move Line Down"

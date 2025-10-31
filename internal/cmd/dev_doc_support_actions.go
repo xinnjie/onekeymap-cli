@@ -23,7 +23,7 @@ func NewCmdDevDocSupportActions() *cobra.Command {
 		Use:   "docSupportActions",
 		Short: "Generate markdown table showing action support across editors",
 		Long: `Reads all action mappings and generates a markdown table showing which editors
-support each action. The table includes columns for VSCode, Zed, IntelliJ, and Helix.`,
+support each action. The table includes columns for VSCode, Zed, IntelliJ, Helix, and Xcode.`,
 		Run: devDocSupportActionsRun(&f, func() *slog.Logger {
 			return cmdLogger
 		}),
@@ -53,6 +53,7 @@ func devDocSupportActionsRun(
 			VSCode      string
 			Zed         string
 			IntelliJ    string
+			Xcode       string
 			Helix       string
 			Description string
 			ActionID    string
@@ -75,6 +76,7 @@ func devDocSupportActionsRun(
 			vscodeSupport, vscodeReason := mapping.IsSupported(pluginapi.EditorTypeVSCode)
 			zedSupport, zedReason := mapping.IsSupported(pluginapi.EditorTypeZed)
 			intellijSupport, intellijReason := mapping.IsSupported(pluginapi.EditorTypeIntelliJ)
+			xcodeSupport, xcodeReason := mapping.IsSupported(pluginapi.EditorTypeXcode)
 			helixSupport, helixReason := mapping.IsSupported(pluginapi.EditorTypeHelix)
 
 			// Format description for markdown (escape pipes and newlines)
@@ -89,6 +91,7 @@ func devDocSupportActionsRun(
 				VSCode:      formatSupport(vscodeSupport, vscodeReason),
 				Zed:         formatSupport(zedSupport, zedReason),
 				IntelliJ:    formatSupport(intellijSupport, intellijReason),
+				Xcode:       formatSupport(xcodeSupport, xcodeReason),
 				Helix:       formatSupport(helixSupport, helixReason),
 				Description: description,
 				ActionID:    id,
@@ -123,10 +126,10 @@ func devDocSupportActionsRun(
 
 ## {{ .Category }}
 
-| Action | VSCode | Zed | IntelliJ | Helix | Description | Action ID |
-|--------|--------|-----|----------|-------|-------------|-----------|
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|
 {{- range .Rows }}
-| {{ .Action }} | {{ .VSCode }} | {{ .Zed }} | {{ .IntelliJ }} | {{ .Helix }} | {{ .Description }} | {{ .ActionID }} |
+| {{ .Action }} | {{ .VSCode }} | {{ .Zed }} | {{ .IntelliJ }} | {{ .Xcode }} | {{ .Helix }} | {{ .Description }} | {{ .ActionID }} |
 {{- end }}
 {{- end }}
 `
