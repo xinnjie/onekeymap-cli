@@ -4,7 +4,7 @@
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
-| Show documentation hover | ✅ | ✅ | ✅ | N/A | ✅ | Show documentation hover | actions.hover.showHover |
+| Show documentation hover | ✅ | ✅ | ✅ | ✅ | ✅ | Show documentation hover | actions.hover.showHover |
 | Parameter hints | ✅ | ✅ | ✅ | N/A | ✅ | Trigger Parameter Hints | actions.refactor.triggerParameterHint |
 
 ## Code.Go
@@ -61,7 +61,7 @@
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 | Continue | ✅ | ✅ | ✅ | N/A | ✅ | Continue | actions.run.continue |
-| Run to cursor | ✅ | ✅ | ✅ | N/A | N/A | Run to Cursor | actions.run.runToCursor |
+| Run to cursor | ✅ | ✅ | ✅ | ✅ | N/A | Run to Cursor | actions.run.runToCursor |
 | Step into | ✅ | ✅ | ✅ | N/A | ✅ | Step Into | actions.run.stepInto |
 | Step out | ✅ | ✅ | ✅ | N/A | ✅ | Step Out | actions.run.stepOut |
 | Step over | ✅ | ✅ | ✅ | N/A | ✅ | Step Over | actions.run.stepOver |
@@ -193,7 +193,7 @@
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
-| Close file | ✅ | ✅ | ✅ | N/A | ✅ | Close the active editor | actions.file.closeEditor |
+| Close file | ✅ | ✅ | ✅ | ✅ | ✅ | Close the active editor | actions.file.closeEditor |
 | New file | ✅ | ✅ | ✅ | N/A | N/A | Create a new file | actions.file.newFile |
 | Open file | ✅ | ✅ | ✅ | N/A | ✅ | Open file dialog | actions.file.openFile |
 | Open recent | ✅ | ✅ | ✅ | N/A | ✅ | Open Recent | actions.file.openRecent |
@@ -289,10 +289,10 @@
 | Blame hover | ❌ (vscode support blame inline, see `Toggle blame inline`) | ✅ | N/A | N/A | N/A | Show blame information on hover | actions.git.blameHover |
 | Commit all | ✅ | ✅ | ✅ | ✅ | N/A | Commit All | actions.git.commitAll |
 | Open changes | ✅ | ✅ | ✅ | N/A | N/A | Open all git changed files | actions.git.openChanges |
-| Push changes | ✅ | ✅ | ✅ | N/A | N/A | Push Changes | actions.git.push |
+| Push changes | ✅ | ✅ | ✅ | ✅ | N/A | Push Changes | actions.git.push |
 | Revert changes | ✅ | ✅ | ✅ | N/A | N/A | Revert Changes | actions.git.revert |
 | Stage changes | ✅ | ✅ | ✅ | N/A | N/A | Stage Changes | actions.git.stage |
-| Sync changes | ✅ | ✅ | ✅ | N/A | N/A | Sync (Pull, Push) | actions.git.sync |
+| Pull changes | ✅ | ✅ | ✅ | ✅ | N/A | Pull changes | actions.git.sync |
 | Toggle blame | ❌ (vscode support toggle blame inline, see `Toggle blame inline`) | ✅ | ❌ (intellij can only toggle blame in actions) | N/A | N/A | Toggle Blame in left of editor | actions.git.toggleBlame |
 | Toggle blame inline | ✅ | ✅ | N/A | N/A | N/A | Toggle blame inline, next to editor content | actions.git.toggleBlameInline |
 | Toggle blame status bar | ✅ | ❌ (not supported yet, see [`Optional Git Blame in status bar instead of inline` discussion](https://github.com/zed-industries/zed/discussions/26127)) | N/A | N/A | N/A | Toggle blame in status bar | actions.git.toggleBlameStatusBar |
@@ -350,6 +350,6 @@
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 | Close window | ✅ | ✅ | ✅ | N/A | ✅ | Close the current window | actions.file.closeWindow |
-| New window | ✅ | ✅ | N/A | N/A | N/A | Open a new window | actions.file.newWindow |
+| New window | ✅ | ✅ | N/A | ✅ | N/A | Open a new window | actions.file.newWindow |
 | Maximize editor | ✅ | N/A | ✅ | N/A | N/A | Maximize editor (hide other windows) | actions.view.maximizeEditor |
 | Toggle full screen | ✅ | ✅ | ✅ | N/A | N/A | Toggle full screen | actions.view.toggleFullScreen |

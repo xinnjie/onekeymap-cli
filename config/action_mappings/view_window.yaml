@@ -52,3 +52,14 @@ mappings:
       context: "Workspace"
     intellij:
       notSupported: true
+    xcode:
+      action: "newWindow:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.NewWindow"
+      commandID: "Xcode.IDEKit.CmdDefinition.NewWindow"
+      group: "File Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "New"
+      title: "Window"

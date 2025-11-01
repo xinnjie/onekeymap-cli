@@ -14,3 +14,13 @@ mappings:
     helix:
       command: ":buffer-close"
       mode: "insert"
+    xcode:
+      action: "dvt_closeActiveEditorTab:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.CloseEditorTab"
+      commandID: "Xcode.IDEKit.CmdDefinition.CloseEditorTab"
+      group: "File Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Close Tab, Editor Pane, Window Tab, or Window"

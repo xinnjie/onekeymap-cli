@@ -77,3 +77,12 @@ mappings:
     helix:
       command: "hover"
       mode: "insert"
+    xcode:
+      action: "showQuickHelp:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.IDEQuickHelp"
+      group: "Help Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Show Quick Help for Selected Item"

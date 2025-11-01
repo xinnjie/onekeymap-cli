@@ -73,3 +73,13 @@ mappings:
       context: "Workspace"
     helix:
       notSupported: true
+    xcode:
+      action: "continueToCurrentLine:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.ContinueToCurrentLine"
+      commandID: "Xcode.IDEKit.CmdDefinition.ContinueToCurrentLine"
+      group: "Debug Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Continue To Current Line"

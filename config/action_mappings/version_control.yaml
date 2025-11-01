@@ -80,9 +80,19 @@ mappings:
     zed:
       action: "git::Push"
       context: "Editor"
+    xcode:
+      action: "pushCommand:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.PushCommand"
+      commandID: "Xcode.IDEKit.CmdDefinition.PushCommand"
+      group: "Integrate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Push…"
   - id: "actions.git.sync"
-    name: "Sync changes"
-    description: "Sync (Pull, Push)"
+    name: "Pull changes"
+    description: "Pull changes"
     category: "Version Control"
     vscode:
       command: "git.sync"
@@ -92,6 +102,16 @@ mappings:
     zed:
       action: "git::Pull"
       context: "Editor"
+    xcode:
+      action: "updateCommand:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.UpdateCommand"
+      commandID: "Xcode.IDEKit.CmdDefinition.UpdateCommand"
+      group: "Integrate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Pull…"
   - id: "actions.git.toggleBlame"
     name: "Toggle blame"
     description: "Toggle Blame in left of editor"

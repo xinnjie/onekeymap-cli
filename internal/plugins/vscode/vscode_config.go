@@ -5,6 +5,7 @@ import (
 	"log/slog"
 )
 
+// vscodeKeybindingConfig represents the complete VSCode keybindings configuration
 type vscodeKeybindingConfig = []vscodeKeybinding
 
 // vscodeKeybinding represents a single keybinding in VSCode's keybindings.json.
