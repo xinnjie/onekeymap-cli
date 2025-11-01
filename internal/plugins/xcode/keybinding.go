@@ -31,6 +31,13 @@ func formatKeybinding(keybind *keymap.KeyBinding) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	// Check if this is a key chord (contains spaces)
+	// Xcode doesn't support key chords, so return empty string for multi-chord bindings
+	if strings.Contains(formatted, " ") {
+		return "", fmt.Errorf("xcode doesn't support key chords: %s", formatted)
+	}
+
 	return denormalizeXcodeKeybind(formatted)
 }
 

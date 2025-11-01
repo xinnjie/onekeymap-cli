@@ -235,6 +235,8 @@ func Execute() {
 	devCmd.AddCommand(NewCmdDevDoctor())
 	devCmd.AddCommand(NewCmdDevListUnmappedActions())
 	devCmd.AddCommand(NewCmdDevGenerateBase())
+	devCmd.AddCommand(NewCmdDevLookup())
+	devCmd.AddCommand(NewCmdDevMapping())
 	rootCmd.AddCommand(NewCmdView())
 	rootCmd.AddCommand(NewCmdServe(rootFlags))
 	rootCmd.AddCommand(NewCmdMigrate())
