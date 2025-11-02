@@ -49,23 +49,26 @@ func devDocSupportActionsRun(
 
 		// Prepare data structures for template rendering
 		type supportRow struct {
-			Action      string
-			VSCode      string
-			Zed         string
-			IntelliJ    string
-			Xcode       string
-			Helix       string
-			Description string
-			ActionID    string
+			Action         string
+			VSCode         string
+			Zed            string
+			IntelliJ       string
+			Xcode          string
+			Helix          string
+			Description    string
+			ActionID       string
+			FeaturedReason string
 		}
 
 		type categorySection struct {
-			Category string
-			Rows     []supportRow
+			Category     string
+			Rows         []supportRow
+			FeaturedRows []supportRow
 		}
 
-		// Group actions by category
+		// Group actions by category, separating common and featured
 		categoryMap := make(map[string][]supportRow)
+		featuredCategoryMap := make(map[string][]supportRow)
 		for id, mapping := range mappingConfig.Mappings {
 			category := mapping.Category
 			if category == "" {
@@ -86,23 +89,45 @@ func devDocSupportActionsRun(
 				description = "-"
 			}
 
-			row := supportRow{
-				Action:      mapping.Name,
-				VSCode:      formatSupport(vscodeSupport, vscodeReason),
-				Zed:         formatSupport(zedSupport, zedReason),
-				IntelliJ:    formatSupport(intellijSupport, intellijReason),
-				Xcode:       formatSupport(xcodeSupport, xcodeReason),
-				Helix:       formatSupport(helixSupport, helixReason),
-				Description: description,
-				ActionID:    id,
+			// Format featured reason for markdown (escape pipes and newlines)
+			featuredReason := strings.ReplaceAll(mapping.FeaturedReason, "|", "\\|")
+			featuredReason = strings.ReplaceAll(featuredReason, "\n", " ")
+			if featuredReason == "" {
+				featuredReason = "-"
 			}
 
-			categoryMap[category] = append(categoryMap[category], row)
+			row := supportRow{
+				Action:         mapping.Name,
+				VSCode:         formatSupport(vscodeSupport, vscodeReason),
+				Zed:            formatSupport(zedSupport, zedReason),
+				IntelliJ:       formatSupport(intellijSupport, intellijReason),
+				Xcode:          formatSupport(xcodeSupport, xcodeReason),
+				Helix:          formatSupport(helixSupport, helixReason),
+				Description:    description,
+				ActionID:       id,
+				FeaturedReason: featuredReason,
+			}
+
+			// Separate common and featured actions
+			if mapping.Featured {
+				featuredCategoryMap[category] = append(featuredCategoryMap[category], row)
+			} else {
+				categoryMap[category] = append(categoryMap[category], row)
+			}
 		}
 
 		// Sort categories and rows within each category
-		categories := make([]string, 0, len(categoryMap))
+		// Collect all categories (from both common and featured)
+		allCategories := make(map[string]bool)
 		for category := range categoryMap {
+			allCategories[category] = true
+		}
+		for category := range featuredCategoryMap {
+			allCategories[category] = true
+		}
+
+		categories := make([]string, 0, len(allCategories))
+		for category := range allCategories {
 			categories = append(categories, category)
 		}
 		sort.Strings(categories)
@@ -111,13 +136,20 @@ func devDocSupportActionsRun(
 		sections := make([]categorySection, 0, len(categories))
 		for _, category := range categories {
 			rows := categoryMap[category]
+			featuredRows := featuredCategoryMap[category]
+
 			// Sort rows by ActionID within each category
 			sort.Slice(rows, func(i, j int) bool {
 				return rows[i].ActionID < rows[j].ActionID
 			})
+			sort.Slice(featuredRows, func(i, j int) bool {
+				return featuredRows[i].ActionID < featuredRows[j].ActionID
+			})
+
 			sections = append(sections, categorySection{
-				Category: category,
-				Rows:     rows,
+				Category:     category,
+				Rows:         rows,
+				FeaturedRows: featuredRows,
 			})
 		}
 
@@ -125,11 +157,26 @@ func devDocSupportActionsRun(
 {{- range . }}
 
 ## {{ .Category }}
+{{- if .Rows }}
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 {{- range .Rows }}
 | {{ .Action }} | {{ .VSCode }} | {{ .Zed }} | {{ .IntelliJ }} | {{ .Xcode }} | {{ .Helix }} | {{ .Description }} | {{ .ActionID }} |
+{{- end }}
+{{- end }}
+{{- if .FeaturedRows }}
+
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+{{- range .FeaturedRows }}
+| {{ .Action }} | {{ .VSCode }} | {{ .Zed }} | {{ .IntelliJ }} | {{ .Xcode }} | {{ .Helix }} | {{ .Description }} | {{ .ActionID }} | {{ .FeaturedReason }} |
+{{- end }}
+</details>
+
 {{- end }}
 {{- end }}
 `

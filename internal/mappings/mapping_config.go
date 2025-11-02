@@ -33,16 +33,20 @@ func NewMappingConfig() (*MappingConfig, error) {
 
 // ActionMappingConfig holds the complete mapping information for a single action ID.
 type ActionMappingConfig struct {
-	ID          string                `yaml:"id"`
-	Description string                `yaml:"description"`
-	Name        string                `yaml:"name"`
-	Category    string                `yaml:"category"`
-	VSCode      VscodeConfigs         `yaml:"vscode"`
-	Zed         ZedConfigs            `yaml:"zed"`
-	IntelliJ    IntelliJMappingConfig `yaml:"intellij"`
-	Vim         VimMappingConfig      `yaml:"vim"`
-	Helix       HelixConfig           `yaml:"helix"`
-	Xcode       XcodeConfigs          `yaml:"xcode"`
+	ID          string `yaml:"id"`
+	Description string `yaml:"description"`
+	Name        string `yaml:"name"`
+	// Featured means that this action is implemented within one or few editors and is not portable
+	Featured bool `yaml:"featured"`
+	// FeaturedReason: Why this action is not common across editors, or recommand users to use another portable actioin of similar utility.
+	FeaturedReason string                `yaml:"featuredReason"`
+	Category       string                `yaml:"category"`
+	VSCode         VscodeConfigs         `yaml:"vscode"`
+	Zed            ZedConfigs            `yaml:"zed"`
+	IntelliJ       IntelliJMappingConfig `yaml:"intellij"`
+	Vim            VimMappingConfig      `yaml:"vim"`
+	Helix          HelixConfig           `yaml:"helix"`
+	Xcode          XcodeConfigs          `yaml:"xcode"`
 }
 
 // IsSupported checks if the action is supported by the given editor type.

@@ -51,8 +51,8 @@ mappings:
     name: "Split left"
     description: "Split editor to left"
     category: "View Management.Split"
-    priority: "low"
-    priorityReason: "Not all editors support split left, use `Split right` instead."
+    featured: true
+    featuredReason: "Not all editors support split left, use `Split right` instead."
     vscode:
       command: "workbench.action.splitEditorLeft"
       when: "editorFocus"
@@ -68,8 +68,8 @@ mappings:
     name: "Split up"
     description: "Split editor to up"
     category: "View Management.Split"
-    priority: "low"
-    priorityReason: "Not all editors support split up, use `Split down` instead."
+    featured: true
+    featuredReason: "Not all editors support split up, use `Split down` instead."
     vscode:
       command: "workbench.action.splitEditorUp"
       when: "editorFocus"

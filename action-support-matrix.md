@@ -199,8 +199,15 @@
 | Open recent | ✅ | ✅ | ✅ | N/A | ✅ | Open Recent | actions.file.openRecent |
 | Save file | ✅ | ✅ | ✅ | N/A | ✅ | Save current file | actions.file.save |
 | Save all | ✅ | ✅ | ✅ | N/A | ✅ | Save all open files | actions.file.saveAll |
-| Save as | ✅ | ✅ | ❌ (intellij do not have save as, you can use `Save file`.) | N/A | N/A | Save current file with a new name | actions.file.saveAs |
 | Show in new window | ✅ | ❌ (Not support, no issue tracked) | ✅ | N/A | N/A | Show opened file in new window | actions.file.showOpenedFileInNewWindow |
+
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Save as | ✅ | ✅ | ❌ (intellij do not have save as, you can use `Save file`.) | N/A | N/A | Save current file with a new name | actions.file.saveAs | Use `Save file` instead. Not all editors support `Save as`. |
+</details>
 
 ## Navigation
 
@@ -316,7 +323,6 @@
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
-| Show debug console | ✅ | ❌ (zed do not have debug console) | ❌ (intellij have debug output with DebugPanel) | N/A | N/A | Show Debug Output Console view | actions.view.showDebugOutputConsole |
 | Show extensions | ✅ | ✅ | ✅ | N/A | N/A | Show Extensions view | actions.view.showExtensions |
 | Show testing | ✅ | ❌ (zed do not have testing view) | ✅ | N/A | N/A | Show Testing view | actions.view.showTesting |
 | Toggle debug panel | ✅ | ✅ | ✅ | N/A | N/A | Toggle Debug Panel | actions.view.toggleDebugPanel |
@@ -327,6 +333,14 @@
 | Toggle source control | ✅ | ✅ | ✅ | N/A | ✅ | Toggle Source Control view | actions.view.toggleSourceControl |
 | Toggle terminal | ✅ | ✅ | ✅ | N/A | N/A | Toggle Terminal view | actions.view.toggleTerminal |
 
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Show debug console | ✅ | ❌ (zed do not have debug console) | ❌ (intellij have debug output with DebugPanel) | N/A | N/A | Show Debug Output Console view | actions.view.showDebugOutputConsole | Not all editors have debug console |
+</details>
+
 ## View Management.Split
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
@@ -334,9 +348,16 @@
 | Focus next split | ✅ | ✅ | ✅ | N/A | ✅ | Focus next editor split | actions.view.focusNextSplit |
 | Focus previous split | ✅ | ✅ | ✅ | N/A | ✅ | Focus previous editor split | actions.view.focusPreviousSplit |
 | Split down | ✅ | ✅ | ✅ | N/A | N/A | Split editor to down | actions.view.splitDown |
-| Split left | ✅ | ✅ | ❌ (intellij do not have split left, use `Split right` instead.) | N/A | N/A | Split editor to left | actions.view.splitLeft |
 | Split right | ✅ | ✅ | ✅ | N/A | N/A | Split editor to right | actions.view.splitRight |
-| Split up | ✅ | ✅ | ❌ (intellij do not have split up, use `Split down` instead.) | N/A | N/A | Split editor to up | actions.view.splitUp |
+
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Split left | ✅ | ✅ | ❌ (intellij do not have split left, use `Split right` instead.) | N/A | N/A | Split editor to left | actions.view.splitLeft | Not all editors support split left, use `Split right` instead. |
+| Split up | ✅ | ✅ | ❌ (intellij do not have split up, use `Split down` instead.) | N/A | N/A | Split editor to up | actions.view.splitUp | Not all editors support split up, use `Split down` instead. |
+</details>
 
 ## View Management.Tab
 

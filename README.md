@@ -169,7 +169,7 @@ Contributions are welcome! Check out the [Contributing Guide](CONTRIBUTING.md) f
 ---
 
 <details>
-<summary><strong>How It Works</strong></summary>
+<summary>How It Works</summary>
 
 OneKeymap uses a **universal keymap format** that represents keyboard shortcuts in an editor-agnostic way. Here's the workflow:
 

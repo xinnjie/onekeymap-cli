@@ -146,8 +146,8 @@ mappings:
     name: "Show debug console"
     description: "Show Debug Output Console view"
     category: "View Management.Pannels"
-    priority: "low"
-    priorityReason: "Not all editors have debug console"
+    featured: true
+    featuredReason: "Not all editors have debug console"
     vscode:
       command: "workbench.debug.action.toggleRepl"
       when: "workbench.panel.repl.view.active"

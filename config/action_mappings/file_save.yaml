@@ -13,22 +13,6 @@ mappings:
     helix:
       command: ":write"
       mode: "insert"
-  - id: "actions.file.saveAs"
-    name: "Save as"
-    description: "Save current file with a new name"
-    category: "File"
-    priority: "low"
-    priorityReason: "Use `Save file` instead. Not all editors support `Save as`."
-    vscode:
-      command: "workbench.action.files.saveAs"
-    zed:
-      action: "workspace::SaveAs"
-      context: "Workspace"
-    intellij:
-      notSupported: true
-      notSupportedReason: "intellij do not have save as, you can use `Save file`."
-    helix:
-      notSupported: true
   - id: "actions.file.saveAll"
     name: "Save all"
     description: "Save all open files"
@@ -43,3 +27,19 @@ mappings:
     helix:
       command: ":write-all"
       mode: "insert"
+  - id: "actions.file.saveAs"
+    name: "Save as"
+    description: "Save current file with a new name"
+    category: "File"
+    featured: true
+    featuredReason: "Use `Save file` instead. Not all editors support `Save as`."
+    vscode:
+      command: "workbench.action.files.saveAs"
+    zed:
+      action: "workspace::SaveAs"
+      context: "Workspace"
+    intellij:
+      notSupported: true
+      notSupportedReason: "intellij do not have save as, you can use `Save file`."
+    helix:
+      notSupported: true
