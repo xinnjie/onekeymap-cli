@@ -154,17 +154,19 @@ editors:
 
 Contributions are welcome! Check out the [Contributing Guide](CONTRIBUTING.md) for more details on how to get started. Here are some ways you can help:
 
-- **Add Editor Support**: Implement a new editor plugin
-- **Improve Mappings**: [Enhance the action mapping configuration](CONTRIBUTING.md#enhancing-the-action-mapping-configuration)
-- **Report Bugs**: Open an issue with reproduction steps
-- **Documentation**: Improve docs and examples
+- Add Editor Support: Implement a new editor plugin
+- Improve Mappings: [Enhance the action mapping configuration](CONTRIBUTING.md#enhancing-the-action-mapping-configuration)
+- Report Bugs: Open an issue with reproduction steps
+- Documentation: Improve docs and examples
+
+For development setup and building from source, see the [Development section in CONTRIBUTING.md](CONTRIBUTING.md#development).
 
 ---
 
 ## Support
 
-- **Issues**: [![GitHub Issues](https://img.shields.io/github/issues/xinnjie/onekeymap-cli?logo=github&label=Issues)](https://github.com/xinnjie/onekeymap-cli/issues)
-- **Discussions**: [![Discord](https://img.shields.io/badge/Discord-Join%20the%20chat-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/fW3TWuXj9A)
+- Issues: [![GitHub Issues](https://img.shields.io/github/issues/xinnjie/onekeymap-cli?logo=github&label=Issues)](https://github.com/xinnjie/onekeymap-cli/issues)
+- Discussions: [![Discord](https://img.shields.io/badge/Discord-Join%20the%20chat-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/fW3TWuXj9A)
 
 ---
 

@@ -1,4 +1,4 @@
-.PHONY: all build lint format test completion docs generate-base update-intellij-keymaps update-zed-keymaps
+.PHONY: all build lint format test completion docs generate-base update-intellij-keymaps update-zed-keymaps image release-image
 
 .DEFAULT_GOAL := all
 
@@ -9,6 +9,10 @@ GO_ENV := GO111MODULE=on GOFLAGS=-mod=mod
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null)
 GIT_DIRTY := $(shell if test -n "$$(git status --porcelain 2>/dev/null)"; then echo "true"; else echo "false"; fi)
 GO_LDFLAGS := -X github.com/xinnjie/onekeymap-cli/internal/cmd.commit=$(GIT_COMMIT) -X github.com/xinnjie/onekeymap-cli/internal/cmd.dirty=$(GIT_DIRTY)
+
+# ko configuration
+KO_DOCKER_REPO ?= ghcr.io/xinnjie/onekeymap-cli
+KO_PLATFORMS ?= linux/amd64,linux/arm64
 
 build:
 	@mkdir -p .bin
@@ -43,3 +47,28 @@ update-zed-keymaps:
 
 update-vscode-keymaps:
 	@python3 scripts/update_keymaps.py --preset vscode
+
+# release-image: Build and push release container images with version tags
+# Usage: VERSION=0.5.1 make release-image
+# For local testing: KO_DOCKER_REPO=ko.local VERSION=0.0.1-test make release-image
+release-image:
+	@if [ -z "$(VERSION)" ]; then \
+		echo "Error: VERSION is required. Usage: VERSION=0.5.1 make release-image"; \
+		exit 1; \
+	fi
+	@echo "Building and pushing multi-platform images to $(KO_DOCKER_REPO)"
+	@echo "Version: $(VERSION)"
+	@echo "Commit: $(GIT_COMMIT)"
+	@echo "Platforms: $(KO_PLATFORMS)"
+	VERSION=$(VERSION) \
+	GIT_COMMIT=$(GIT_COMMIT) \
+	GIT_DIRTY=false \
+	KO_DOCKER_REPO=$(KO_DOCKER_REPO) \
+	ko build \
+		--bare \
+		--platform=$(KO_PLATFORMS) \
+		--sbom=none \
+		--tags=$(VERSION) \
+		--tags=$(GIT_COMMIT) \
+		--tags=latest \
+		github.com/xinnjie/onekeymap-cli/cmd/onekeymap-cli

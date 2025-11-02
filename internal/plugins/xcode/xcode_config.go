@@ -18,7 +18,7 @@ type xcodeKeybinding struct {
 	// CommandID is the Xcode command ID for menu bindings
 	CommandID string `plist:"CommandID"         json:"CommandID"`
 	// KeyboardShortcut is the key binding string, e.g. "@k", "^g"
-	KeyboardShortcut string `plist:"Keyboard Shortcut" json:"Keyboard Shortcut"`
+	KeyboardShortcut string `plist:"Keyboard Shortcut" json:"KeyboardShortcut"`
 	// Title is the display title of the action
 	Title string `plist:"Title"             json:"Title"`
 	// Alternate indicates if this is an alternate key binding

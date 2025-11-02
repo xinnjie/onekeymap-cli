@@ -101,3 +101,46 @@ During import, the plugin will recognize either of the VSCode commands as matchi
 6.  **Submit a Pull Request**: Open a PR with your changes. We'll review it and merge it in.
 
 Thank you for helping make OneKeymap better!
+
+---
+
+## Development
+
+### Building from Source
+
+#### Local Build
+```bash
+make build
+```
+The binary will be created in `.bin/onekeymap-cli`.
+
+#### Container Images with ko
+
+This project uses [ko](https://ko.build/) for efficient container image builds.
+
+**Build and publish release images with version:**
+```bash
+# For releases (requires VERSION parameter)
+VERSION=0.5.1 make release-image
+
+# Set custom registry (default: ghcr.io/xinnjie/onekeymap-cli)
+KO_DOCKER_REPO=harbor.xinnjiedev.com/onekeymap VERSION=0.5.1 make release-image
+```
+
+**Configuration:**
+- `KO_DOCKER_REPO`: Container registry (default: `ghcr.io/xinnjie/onekeymap-cli`)
+- `KO_PLATFORMS`: Target platforms (default: `linux/amd64,linux/arm64`)
+- `VERSION`: Version tag for release images (required for `release-image`)
+
+See `.ko.yaml` for additional build configuration.
+
+### Running Tests
+```bash
+make test
+```
+
+### Code Quality
+```bash
+make lint    # Run linter
+make format  # Format code
+```

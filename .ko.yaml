@@ -1,0 +1,24 @@
+# ko configuration for onekeymap-cli
+# Doc: https://ko.build/configuration/
+
+# Use minimal static base image for smaller image size
+defaultBaseImage: cgr.dev/chainguard/static:latest
+
+# Default platforms for multi-arch builds
+defaultPlatforms:
+  - linux/amd64
+  - linux/arm64
+
+# Build-time configuration
+builds:
+  - id: github.com/xinnjie/onekeymap-cli/cmd/onekeymap-cli
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      - -X github.com/xinnjie/onekeymap-cli/internal/cmd.version={{.Env.VERSION}}
+      - -X github.com/xinnjie/onekeymap-cli/internal/cmd.commit={{.Env.GIT_COMMIT}}
+      - -X github.com/xinnjie/onekeymap-cli/internal/cmd.dirty={{.Env.GIT_DIRTY}}
