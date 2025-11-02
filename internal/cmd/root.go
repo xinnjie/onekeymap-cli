@@ -25,6 +25,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"golang.org/x/term"
 )
 
 var (
@@ -111,8 +112,12 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		}
 
 		// Show telemetry prompt in interactive mode if telemetry is not explicitly configured
-		// and not explicitly enabled via flag
-		if f.interactive && !cliconfig.IsTelemetryExplicitlySet() && !f.enableTelemetry {
+		// and not explicitly enabled via flag, and running in a TTY environment
+		isTTY := term.IsTerminal(int(os.Stdin.Fd()))
+		if !isTTY {
+			f.interactive = false
+		}
+		if f.interactive && isTTY && !cliconfig.IsTelemetryExplicitlySet() && !f.enableTelemetry {
 			if err := showTelemetryPrompt(); err != nil {
 				cmd.PrintErrf("Error showing telemetry prompt: %v\n", err)
 				// Continue execution even if prompt fails
