@@ -9,7 +9,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
 	grpc_logging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	grpc_selector "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
@@ -19,6 +21,8 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 const defaultGRPCPort = 50051
@@ -111,10 +115,16 @@ func serveRun(
 
 		s := grpc.NewServer(
 			grpc.ChainUnaryInterceptor(
-				grpc_logging.UnaryServerInterceptor(grpcLogger(logger), opt...),
+				grpc_selector.UnaryServerInterceptor(
+					grpc_logging.UnaryServerInterceptor(grpcLogger(logger), opt...),
+					grpc_selector.MatchFunc(skipHealthCheckRequests),
+				),
 			),
 			grpc.ChainStreamInterceptor(
-				grpc_logging.StreamServerInterceptor(grpcLogger(logger), opt...),
+				grpc_selector.StreamServerInterceptor(
+					grpc_logging.StreamServerInterceptor(grpcLogger(logger), opt...),
+					grpc_selector.MatchFunc(skipHealthCheckRequests),
+				),
 			),
 		)
 		keymapv1.RegisterOnekeymapServiceServer(
@@ -128,6 +138,12 @@ func serveRun(
 				service.ServerOption{Sandbox: sandbox},
 			),
 		)
+
+		// Register gRPC health check service
+		healthServer := health.NewServer()
+		healthServer.SetServingStatus("keymap.v1.OnekeymapService", healthv1.HealthCheckResponse_SERVING)
+		healthv1.RegisterHealthServer(s, healthServer)
+
 		if err := s.Serve(lis); err != nil {
 			logger.ErrorContext(ctx, "failed to serve", "err", err)
 			os.Exit(1)
@@ -189,6 +205,11 @@ func setupTCPListener(ctx context.Context, addr string, logger *slog.Logger) (ne
 	logger.InfoContext(ctx, "server listening", "address", "tcp://"+lis.Addr().String())
 
 	return lis, "", nil
+}
+
+// skipHealthCheckRequests filters out health check requests from logging.
+func skipHealthCheckRequests(_ context.Context, c interceptors.CallMeta) bool {
+	return c.FullMethod() != healthv1.Health_Check_FullMethodName
 }
 
 // grpcLogger adapts slog to grpc_logging.Logger.
