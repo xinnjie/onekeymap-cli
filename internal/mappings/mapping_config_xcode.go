@@ -11,6 +11,9 @@ import (
 type XcodeMappingConfig struct {
 	EditorActionMapping `yaml:",inline"`
 
+	// The Xcode text action name for Text Key Bindings (e.g., "pageDown:", "deleteBackward:")
+	TextAction string `yaml:"textAction,omitempty"`
+
 	// The Xcode action name (e.g., "moveWordLeft:", "selectWord:")
 	Action string `yaml:"action"`
 	// The command group ID
@@ -65,30 +68,46 @@ func (x *XcodeConfigs) UnmarshalYAML(node *yaml.Node) error {
 }
 
 func checkXcodeDuplicateConfig(mappings map[string]ActionMappingConfig) error {
-	seen := make(map[struct{ Action, CommandID string }]string)
+	seenMenuBindings := make(map[struct{ Action, CommandID string }]string)
+	seenTextBindings := make(map[string]string)
 	dups := make(map[string][]string) // key string -> list of universal action IDs
+
 	for id, mapping := range mappings {
 		for _, xcodeConfig := range mapping.Xcode {
-			if xcodeConfig.Action == "" {
-				continue
-			}
 			// Skip configs that are disabled for import (export-only)
 			if xcodeConfig.DisableImport {
 				continue
 			}
 
-			key := struct{ Action, CommandID string }{xcodeConfig.Action, xcodeConfig.CommandID}
-			if originalID, exists := seen[key]; exists {
-				dupKey := fmt.Sprintf(`{"action":%q,"commandID":%q}`, key.Action, key.CommandID)
-				if _, ok := dups[dupKey]; !ok {
-					dups[dupKey] = []string{originalID}
+			// Check Menu Key Bindings (Action + CommandID)
+			if xcodeConfig.Action != "" {
+				key := struct{ Action, CommandID string }{xcodeConfig.Action, xcodeConfig.CommandID}
+				if originalID, exists := seenMenuBindings[key]; exists {
+					dupKey := fmt.Sprintf(`{"action":%q,"commandID":%q}`, key.Action, key.CommandID)
+					if _, ok := dups[dupKey]; !ok {
+						dups[dupKey] = []string{originalID}
+					}
+					dups[dupKey] = append(dups[dupKey], id)
+				} else {
+					seenMenuBindings[key] = id
 				}
-				dups[dupKey] = append(dups[dupKey], id)
-				continue
 			}
-			seen[key] = id
+
+			// Check Text Key Bindings (TextAction)
+			if xcodeConfig.TextAction != "" {
+				if originalID, exists := seenTextBindings[xcodeConfig.TextAction]; exists {
+					dupKey := fmt.Sprintf(`{"textAction":%q}`, xcodeConfig.TextAction)
+					if _, ok := dups[dupKey]; !ok {
+						dups[dupKey] = []string{originalID}
+					}
+					dups[dupKey] = append(dups[dupKey], id)
+				} else {
+					seenTextBindings[xcodeConfig.TextAction] = id
+				}
+			}
 		}
 	}
+
 	if len(dups) == 0 {
 		return nil
 	}

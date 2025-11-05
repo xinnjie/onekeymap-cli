@@ -15,3 +15,15 @@ func (i *xcodeImporter) FindByXcodeAction(action string) *mappings.ActionMapping
 	}
 	return nil
 }
+
+// FindByXcodeTextAction searches for a mapping by Xcode text action.
+func (i *xcodeImporter) FindByXcodeTextAction(textAction string) *mappings.ActionMappingConfig {
+	for _, mapping := range i.mappingConfig.Mappings {
+		for _, xc := range mapping.Xcode {
+			if xc.TextAction == textAction && !xc.DisableImport {
+				return &mapping
+			}
+		}
+	}
+	return nil
+}

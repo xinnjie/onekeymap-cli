@@ -39,6 +39,36 @@ func TestParseKeybinding(t *testing.T) {
 			wantErr:  false,
 			expected: keymap.MustParseKeyBinding("alt+tab"),
 		},
+		{
+			name:     "Ctrl+Up Arrow",
+			input:    "^\uF700",
+			wantErr:  false,
+			expected: keymap.MustParseKeyBinding("ctrl+up"),
+		},
+		{
+			name:     "Option+Page Down",
+			input:    "~\uF72D",
+			wantErr:  false,
+			expected: keymap.MustParseKeyBinding("alt+pagedown"),
+		},
+		{
+			name:     "Cmd+Shift+Down Arrow",
+			input:    "@$\uF701",
+			wantErr:  false,
+			expected: keymap.MustParseKeyBinding("cmd+shift+down"),
+		},
+		{
+			name:     "F5",
+			input:    "\uF708",
+			wantErr:  false,
+			expected: keymap.MustParseKeyBinding("f5"),
+		},
+		{
+			name:     "Cmd+Home",
+			input:    "@\uF729",
+			wantErr:  false,
+			expected: keymap.MustParseKeyBinding("cmd+home"),
+		},
 	}
 
 	for _, tt := range tests {
@@ -75,6 +105,21 @@ func TestFormatKeybinding(t *testing.T) {
 			name:     "Complex combination",
 			input:    keymap.MustParseKeyBinding("alt+cmd+l"),
 			expected: "@~l",
+		},
+		{
+			name:     "Page Down",
+			input:    keymap.MustParseKeyBinding("pagedown"),
+			expected: "\uF72D",
+		},
+		{
+			name:     "Ctrl+Up Arrow",
+			input:    keymap.MustParseKeyBinding("ctrl+up"),
+			expected: "^\uF700",
+		},
+		{
+			name:     "Cmd+F5",
+			input:    keymap.MustParseKeyBinding("cmd+f5"),
+			expected: "@\uF708",
 		},
 	}
 

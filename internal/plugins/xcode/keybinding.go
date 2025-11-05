@@ -9,6 +9,10 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 )
 
+const (
+	escapeRune rune = '\x1B'
+)
+
 // Xcode uses specific symbols for modifier keys:
 // @ = Cmd (Command)
 // ^ = Ctrl (Control)
@@ -55,18 +59,31 @@ func normalizeXcodeKeybind(xcodeKeybind string) (string, error) {
 	var mainKey string
 	i := len(runes) - 1
 
-	// Handle special cases like tab character
+	// Handle special cases
 	if i >= 0 {
 		lastRune := runes[i]
 		switch {
 		case lastRune == '\t':
 			mainKey = "tab"
+		case lastRune == '\r':
+			mainKey = "enter"
+		case lastRune == '\b':
+			mainKey = "backspace"
+		case lastRune == escapeRune: // ESC
+			mainKey = "escape"
+		case lastRune == ' ':
+			mainKey = "space"
 		case lastRune >= 'a' && lastRune <= 'z':
 			mainKey = string(lastRune)
 		case lastRune >= 'A' && lastRune <= 'Z':
 			mainKey = strings.ToLower(string(lastRune))
 		default:
-			mainKey = string(lastRune)
+			// Check if it's a special function key (Unicode private use area)
+			if keyName, ok := getKeyNameFromCode(lastRune); ok {
+				mainKey = keyName
+			} else {
+				mainKey = string(lastRune)
+			}
 		}
 		i--
 	}
@@ -124,10 +141,24 @@ func denormalizeXcodeKeybind(standardKeybind string) (string, error) {
 	}
 
 	// Add main key
-	if mainKey == "tab" {
+	switch strings.ToLower(mainKey) {
+	case "tab":
 		xcodeFormat.WriteRune('\t')
-	} else {
-		xcodeFormat.WriteString(mainKey)
+	case "enter", "return":
+		xcodeFormat.WriteRune('\r')
+	case "backspace":
+		xcodeFormat.WriteRune('\b')
+	case "escape", "esc":
+		xcodeFormat.WriteRune(escapeRune)
+	case "space":
+		xcodeFormat.WriteRune(' ')
+	default:
+		// Check if it's a special function key
+		if code, ok := getCodeFromKeyName(strings.ToLower(mainKey)); ok {
+			xcodeFormat.WriteRune(code)
+		} else {
+			xcodeFormat.WriteString(mainKey)
+		}
 	}
 
 	return xcodeFormat.String(), nil

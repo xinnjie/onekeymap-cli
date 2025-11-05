@@ -91,6 +91,46 @@ func (i *xcodeImporter) Import(
 		setting.Actions = append(setting.Actions, newKeymap)
 	}
 
+	// Process Text Key Bindings
+	for key, value := range plistData.TextKeyBindings.KeyBindings {
+		textAction, ok := value.(string)
+		if !ok {
+			// Text action can be an array of actions, we skip complex bindings for now
+			continue
+		}
+
+		mapping := i.FindByXcodeTextAction(textAction)
+		if mapping == nil {
+			i.logger.DebugContext(
+				ctx,
+				"Skipping text keybinding with unknown action",
+				"textAction",
+				textAction,
+			)
+			i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeXcode, textAction)
+			continue
+		}
+
+		kb, err := parseKeybinding(key)
+		if err != nil {
+			i.logger.WarnContext(
+				ctx,
+				"Skipping text keybinding with unparsable key",
+				"key",
+				key,
+				"error",
+				err,
+			)
+			continue
+		}
+
+		newKeymap := &keymapv1.Action{
+			Name:     mapping.ID,
+			Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
+		}
+		setting.Actions = append(setting.Actions, newKeymap)
+	}
+
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
 
 	return setting, nil

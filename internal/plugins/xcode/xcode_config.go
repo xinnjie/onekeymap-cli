@@ -3,13 +3,23 @@ package xcode
 // xcodeKeybindingsPlist represents the structure of Xcode .idekeybindings plist file
 type xcodeKeybindingsPlist struct {
 	MenuKeyBindings menuKeyBindings `plist:"Menu Key Bindings"`
+	TextKeyBindings textKeyBindings `plist:"Text Key Bindings"`
 }
 
 type menuKeyBindings struct {
 	KeyBindings []xcodeKeybinding `plist:"Key Bindings"`
 }
 
+type textKeyBindings struct {
+	KeyBindings map[string]xcodeTextAction `plist:"Key Bindings"`
+}
+
+// xcodeTextAction represents a text action value in Text Key Bindings.
+// It can be either a single action (string) or multiple actions ([]string).
+type xcodeTextAction interface{}
+
 type xcodeKeybindingConfig = []xcodeKeybinding
+type xcodeTextKeybinding = map[string]xcodeTextAction
 
 // xcodeKeybinding represents a single keybinding in Xcode's .idekeybindings file.
 type xcodeKeybinding struct {
