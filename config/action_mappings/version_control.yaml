@@ -146,9 +146,19 @@ mappings:
     name: "Blame hover"
     description: "Show blame information on hover"
     category: "Version Control"
+    featured: true
     vscode:
       notSupported: true
       notSupportedReason: "vscode support blame inline, see `Toggle blame inline`"
     zed:
       action: "editor::BlameHover"
       context: "Editor"
+  - id: "action.git.jumpSource"
+    name: "Jump to Source"
+    description: "Jump to Source"
+    category: "Version Control"
+    vscode:
+      command: "git.openFile"
+      when: "config.git.enabled && isInDiffEditor"
+    intellij:
+      action: "EditSource"

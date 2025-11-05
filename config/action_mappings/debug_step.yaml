@@ -14,6 +14,16 @@ mappings:
     helix:
       command: "dap_next"
       mode: "insert"
+    xcode:
+      action: "stepOver:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.StepOver"
+      commandID: "Xcode.IDEKit.CmdDefinition.StepOver"
+      group: "Debug Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Step Over"
   - id: "actions.run.stepInto"
     name: "Step into"
     description: "Step Into"
@@ -44,6 +54,15 @@ mappings:
     helix:
       command: "dap_step_out"
       mode: "insert"
+    xcode:
+      action: "stepOut:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.StepOut"
+      group: "Debug Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Step Out"
   - id: "actions.run.continue"
     name: "Continue"
     description: "Continue"

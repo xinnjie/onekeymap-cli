@@ -30,6 +30,15 @@ mappings:
     helix:
       command: "copy_selection_on_next_line"
       mode: "insert"
+    xcode:
+      action: "duplicate:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.Duplicate"
+      group: "Edit Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Duplicate"
   - id: "actions.selection.moveLineUp"
     name: "Move line up"
     description: "Move current line up"

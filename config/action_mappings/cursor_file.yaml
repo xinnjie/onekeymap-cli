@@ -74,6 +74,8 @@ mappings:
     helix:
       command: "page_down"
       mode: "insert"
+    xcode:
+      textAction: "pageDown:"
   - id: "actions.cursor.pageDownSelect"
     name: "Select page down"
     description: "Select down by one page"
@@ -103,6 +105,8 @@ mappings:
     helix:
       command: "page_up"
       mode: "insert"
+    xcode:
+      textAction: "pageUp:"
   - id: "actions.cursor.pageUpSelect"
     name: "Select page up"
     description: "Select up by one page"

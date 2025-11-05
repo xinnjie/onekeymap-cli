@@ -14,6 +14,8 @@ mappings:
     helix:
       command: "goto_line_start"
       mode: "insert"
+    xcode:
+      textAction: "moveToBeginningOfLine:"
   - id: "actions.cursor.lineEnd"
     name: "Move to line end"
     description: "Move cursor to the end of the line"
@@ -29,6 +31,8 @@ mappings:
     helix:
       command: "goto_line_end"
       mode: "insert"
+    xcode:
+      textAction: "moveToEndOfLine:"
   - id: "actions.cursor.lineStartSelect"
     name: "Select line start"
     description: "Select from cursor to the beginning of the line"

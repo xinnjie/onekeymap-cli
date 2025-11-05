@@ -12,8 +12,7 @@
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 | Go to bracket | ✅ | ✅ | ✅ | N/A | N/A | Go to bracket | actions.go.bracket |
-| Call hierarchy | ✅ | ❌ (not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)) | ✅ | N/A | N/A | Show call hierarchy | actions.go.callHierarchy |
-| Peek call hierarchy | ✅ | ❌ (not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)) | ❌ (not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)) | N/A | N/A | Peek call hierarchy | actions.go.callHierarchyPeek |
+| Call hierarchy | ✅ | ❌ (not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)) | ✅ | ✅ | N/A | Show call hierarchy | actions.go.callHierarchy |
 | Go to definition | ✅ | ✅ | ❌ (There is not `Go to definition` in intellij, use `Go to declaration` instead) | ✅ | N/A | Go to definition | actions.go.definition |
 | Peek definition | ✅ | ❌ (Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)) | ✅ | N/A | N/A | Peek definition | actions.go.definitionPeek |
 | Go to declaration | ✅ | ✅ | ✅ | N/A | N/A | Go to declaration or usages | actions.go.goToDeclaration |
@@ -22,20 +21,32 @@
 | Go to implementations | ✅ | ✅ | ✅ | N/A | N/A | Go to implementations, For an interface, this shows all the implementors of that interface and for abstract methods, this shows all concrete implementations of that method. | actions.go.implementations |
 | Peek declaration | ✅ | ✅ | ✅ | N/A | N/A | Peek declaration | actions.go.peekDeclaration |
 | Reference peek | ✅ | ❌ (Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)) | ✅ | N/A | N/A | Show usages / reference search | actions.go.referencePeek |
-| Go to references | ✅ | ✅ | ✅ | N/A | N/A | Go to references | actions.go.references |
+| Go to references | ✅ | ✅ | ✅ | ✅ | N/A | Go to references | actions.go.references |
 | Go to type definition | ✅ | ✅ | ✅ | N/A | N/A | Go to type definition | actions.go.typeDefinition |
 | Peek type definition | ✅ | ❌ (Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)) | ✅ | N/A | N/A | Peek type definition | actions.go.typeDefinitionPeek |
 | Type hierarchy | ✅ | ❌ (Not supported yet, see [`Type hierarchy (class inheritance tree) support` discussion](https://github.com/zed-industries/zed/discussions/16348)) | ✅ | N/A | N/A | Show type hierarchy | actions.go.typeHierarchy |
+
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Peek call hierarchy | ✅ | ❌ (not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)) | ❌ (Use `CallHierarchy` instead) | N/A | N/A | Peek call hierarchy | actions.go.callHierarchyPeek | Use `CallHierarchy` instead |
+| Jump to next counterpart | N/A | N/A | N/A | ✅ | N/A | Jump to next counterpart, like switching between .cpp file and .h file | actions.go.jumpToNextCounterpart | - |
+</details>
 
 ## Code.Refactor
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
+| Extract to method | N/A | N/A | N/A | ✅ | N/A | Extract to method | action.refactor.extractMethod |
+| Extract to variable | N/A | N/A | N/A | ✅ | N/A | Extract to variable | action.refactor.extractVariable |
 | Code action | ✅ | ✅ | ✅ | N/A | ✅ | Code Action... | actions.refactor.codeAction |
 | Organize imports | ✅ | ✅ | ✅ | N/A | N/A | Organize Imports | actions.refactor.organizeImports |
 | Quick fix | ✅ | ❌ (not supported yet, no issue tracked) | ✅ | N/A | N/A | Quick Fix... | actions.refactor.quickFix |
 | Refactor code | ✅ | ❌ (not supported yet, see [Code refactoring in Zed ](https://github.com/zed-industries/zed/discussions/8623)) | ✅ | N/A | ✅ | Refactor This... | actions.refactor.refactor |
 | Rename symbol | ✅ | ✅ | ✅ | ✅ | ✅ | Rename | actions.refactor.rename |
+| Generate codes | ✅ | ❌ (Use `Code action` instead) | ✅ | N/A | N/A | Generate code... (Getters, Setters, Constructors, hashCode/equals, toString) | actions.refactor.sourceAction |
 
 ## Code.Suggestion
 
@@ -56,6 +67,14 @@
 | Stop debugging | ✅ | ✅ | ✅ | N/A | ✅ | Stop Debugging | actions.run.stopDebugging |
 | Toggle breakpoint | ✅ | ✅ | ✅ | N/A | ✅ | Toggle Breakpoint | actions.run.toggleBreakpoint |
 
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Show debug console | ✅ | ❌ (zed do not have debug console) | ❌ (intellij have debug output with DebugPanel) | N/A | N/A | Show Debug Output Console view | actions.view.showDebugOutputConsole | Not all editors have debug console |
+</details>
+
 ## Debug.Step
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
@@ -63,20 +82,35 @@
 | Continue | ✅ | ✅ | ✅ | N/A | ✅ | Continue | actions.run.continue |
 | Run to cursor | ✅ | ✅ | ✅ | ✅ | N/A | Run to Cursor | actions.run.runToCursor |
 | Step into | ✅ | ✅ | ✅ | N/A | ✅ | Step Into | actions.run.stepInto |
-| Step out | ✅ | ✅ | ✅ | N/A | ✅ | Step Out | actions.run.stepOut |
-| Step over | ✅ | ✅ | ✅ | N/A | ✅ | Step Over | actions.run.stepOver |
+| Step out | ✅ | ✅ | ✅ | ✅ | ✅ | Step Out | actions.run.stepOut |
+| Step over | ✅ | ✅ | ✅ | ✅ | ✅ | Step Over | actions.run.stepOver |
 
 ## Editor
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 | Find in file | ✅ | ✅ | ✅ | N/A | ✅ | Find in current file | actions.edit.find |
-| Find in project | ✅ | ✅ | ✅ | N/A | ✅ | Find in all files in the project | actions.edit.findInFiles |
+| Find in project | ✅ | ✅ | ✅ | ✅ | ✅ | Find in all files in the project | actions.edit.findInFiles |
 | Format document | ✅ | ✅ | ✅ | N/A | N/A | Format Document | actions.edit.formatDocument |
 | Format selection | ✅ | ✅ | ✅ | N/A | N/A | Format Selection | actions.edit.formatSelection |
 | Replace in file | ✅ | ✅ | ✅ | N/A | N/A | Replace in current file | actions.edit.replace |
-| Replace in project | ✅ | ✅ | ✅ | N/A | N/A | Replace in all files in the project | actions.edit.replaceInFiles |
-| Toggle word wrap | ✅ | ✅ | ❌ (intellij has a `Soft-Wrap` configuration in settings) | N/A | N/A | Toggle word wrap in the editor | actions.view.toggleWordWrap |
+| Replace in project | ✅ | ✅ | ✅ | ✅ | N/A | Replace in all files in the project | actions.edit.replaceInFiles |
+
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Re-Indent code | N/A | N/A | N/A | ✅ | N/A | Re-Indent code | actions.edit.reIndent | Use `FormatSelections` instead |
+| Toggle word wrap | ✅ | ✅ | ❌ (intellij has a `Soft-Wrap` configuration in settings) | N/A | N/A | Toggle word wrap in the editor | actions.view.toggleWordWrap | - |
+</details>
+
+## Editor.Appearance
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|
+| Decrease font size | N/A | N/A | N/A | ✅ | N/A | Decrease font size | actions.appearance.decreaseFontSize |
+| Increase font size | N/A | N/A | N/A | ✅ | N/A | Increase font size | actions.appearance.increaseFontSize |
 
 ## Editor.Clipboard
 
@@ -167,7 +201,7 @@
 | Insert line before | ✅ | ✅ | ✅ | N/A | N/A | Insert a new line before the current line | actions.edit.insertLineBefore |
 | Join lines | ✅ | ✅ | ✅ | N/A | N/A | Join lines | actions.edit.joinLines |
 | Insert line break | ✅ | ✅ | ✅ | N/A | N/A | Insert line break | actions.edit.lineBreakInsert |
-| Copy line down | ✅ | ✅ | ✅ | N/A | ✅ | Copy current line down | actions.selection.copyLineDown |
+| Copy line down | ✅ | ✅ | ✅ | ✅ | ✅ | Copy current line down | actions.selection.copyLineDown |
 | Copy line up | ✅ | ✅ | ❌ (not supported, no ticket tracked) | N/A | ✅ | Copy current line up | actions.selection.copyLineUp |
 | Move line down | ✅ | ✅ | ✅ | ✅ | N/A | Move current line down | actions.selection.moveLineDown |
 | Move line up | ✅ | ✅ | ✅ | ✅ | ✅ | Move current line up | actions.selection.moveLineUp |
@@ -188,6 +222,7 @@
 | Delete previous word | ✅ | ✅ | ✅ | N/A | N/A | Delete to the start of the previous word | actions.edit.deleteWordLeft |
 | Delete previous subword | ✅ | ✅ | ❌ (behaviour is controlled by `CamelHumps` setting) | N/A | N/A | Delete to the start of the previous subword (hump) | actions.edit.deleteWordPartLeft |
 | Delete next subword | ✅ | ✅ | ❌ (behaviour is controlled by `CamelHumps` setting) | N/A | N/A | Delete to the end of the next subword (hump) | actions.edit.deleteWordPartRight |
+| Delete next word | ✅ | ✅ | ✅ | N/A | N/A | Delete to the end of the next word | actions.edit.deleteWordRight |
 
 ## File
 
@@ -196,7 +231,7 @@
 | Close file | ✅ | ✅ | ✅ | ✅ | ✅ | Close the active editor | actions.file.closeEditor |
 | New file | ✅ | ✅ | ✅ | N/A | N/A | Create a new file | actions.file.newFile |
 | Open file | ✅ | ✅ | ✅ | N/A | ✅ | Open file dialog | actions.file.openFile |
-| Open recent | ✅ | ✅ | ✅ | N/A | ✅ | Open Recent | actions.file.openRecent |
+| Open recent | ✅ | ✅ | ✅ | ✅ | ✅ | Open Recent | actions.file.openRecent |
 | Save file | ✅ | ✅ | ✅ | N/A | ✅ | Save current file | actions.file.save |
 | Save all | ✅ | ✅ | ✅ | N/A | ✅ | Save all open files | actions.file.saveAll |
 | Show in new window | ✅ | ❌ (Not support, no issue tracked) | ✅ | N/A | N/A | Show opened file in new window | actions.file.showOpenedFileInNewWindow |
@@ -215,7 +250,7 @@
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 | Find next | ✅ | ✅ | ✅ | ✅ | ✅ | Find Next | actions.edit.nextMatchFindAction |
 | Find previous | ✅ | ✅ | ✅ | N/A | ✅ | Find Previous | actions.edit.previousMatchFindAction |
-| Focus breadcrumbs | ✅ | ❌ (Not support, no issue tracked) | ✅ | N/A | N/A | Jump to Navigation Bar | actions.go.breadcrumbsFocus |
+| Jump to Navigation Bar | ✅ | ❌ (Not support, no issue tracked) | ✅ | N/A | N/A | Jump to Navigation Bar | actions.go.breadcrumbsFocus |
 | Find file | ✅ | ✅ | ✅ | N/A | N/A | Go to file | actions.go.fileFinder |
 | Go to line | ✅ | ✅ | ✅ | N/A | N/A | Go to Line/Column | actions.go.line |
 | Find symbol | ✅ | ✅ | ✅ | N/A | N/A | Go to symbol in workspace, across files in the workspace | actions.go.symbolFinder |
@@ -232,8 +267,8 @@
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
-| Go back | ✅ | ✅ | ✅ | N/A | N/A | Go to previous cursor location | actions.go.back |
-| Go forward | ✅ | ✅ | ✅ | N/A | N/A | Go to next cursor location | actions.go.forward |
+| Go back | ✅ | ✅ | ✅ | ✅ | N/A | Go to previous cursor location | actions.go.back |
+| Go forward | ✅ | ✅ | ✅ | ✅ | N/A | Go to next cursor location | actions.go.forward |
 | Go to last edit location | ✅ | ❌ (not supported yet, see [Implement "Go To Last Edit Location" issue](https://github.com/zed-industries/zed/issues/19731)) | ✅ | N/A | N/A | Go to last edit location | actions.go.lastEditLocation |
 
 ## Navigation.Problems
@@ -256,8 +291,8 @@
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 | Configure tasks | ✅ | ✅ | ✅ | N/A | N/A | Configure Task Runner | actions.run.configureTaskRunner |
 | Re-run task | ✅ | ✅ | ✅ | N/A | N/A | Re-run last Task | actions.run.reRunTask |
+| Run build task | ✅ | N/A | ✅ | ✅ | N/A | Run the default build task | actions.run.runBuildTask |
 | Run task | ✅ | ✅ | ✅ | N/A | N/A | Run Task | actions.run.runTask |
-| Run build task | ✅ | N/A | ✅ | N/A | N/A | Run the default build task | actions.terminal.runBuildTask |
 
 ## Terminal
 
@@ -293,7 +328,7 @@
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
-| Blame hover | ❌ (vscode support blame inline, see `Toggle blame inline`) | ✅ | N/A | N/A | N/A | Show blame information on hover | actions.git.blameHover |
+| Jump to Source | ✅ | N/A | ✅ | N/A | N/A | Jump to Source | action.git.jumpSource |
 | Commit all | ✅ | ✅ | ✅ | ✅ | N/A | Commit All | actions.git.commitAll |
 | Open changes | ✅ | ✅ | ✅ | N/A | N/A | Open all git changed files | actions.git.openChanges |
 | Push changes | ✅ | ✅ | ✅ | ✅ | N/A | Push Changes | actions.git.push |
@@ -307,6 +342,14 @@
 | Accept current | ✅ | N/A | ✅ | N/A | N/A | Accept current change (keep left side) | actions.merge.acceptCurrent |
 | Accept incoming | ✅ | N/A | ✅ | N/A | N/A | Accept incoming change (take right side) | actions.merge.acceptIncoming |
 
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Blame hover | ❌ (vscode support blame inline, see `Toggle blame inline`) | ✅ | N/A | N/A | N/A | Show blame information on hover | actions.git.blameHover | - |
+</details>
+
 ## View Management
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
@@ -317,7 +360,14 @@
 | Show command palette | ✅ | ✅ | ✅ | N/A | ✅ | Show Command Palette | actions.view.showCommandPalette |
 | Toggle bottom dock | ✅ | ✅ | N/A | N/A | N/A | Toggle Bottom Dock visibility | actions.view.toggleBottomDock |
 | Toggle right sidebar | ✅ | ✅ | N/A | N/A | N/A | Toggle Right Side Bar visibility | actions.view.toggleRightSideBar |
-| Toggle status bar | ✅ | ❌ (Not support, see [Add options to hide title and status bar issue](https://github.com/zed-industries/zed/issues/5120)) | N/A | N/A | N/A | Toggle Status Bar visibility | actions.view.toggleStatusBar |
+
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Toggle status bar | ✅ | ❌ (Not support, see [Add options to hide title and status bar issue](https://github.com/zed-industries/zed/issues/5120)) | N/A | N/A | N/A | Toggle Status Bar visibility | actions.view.toggleStatusBar | - |
+</details>
 
 ## View Management.Pannels
 
@@ -332,14 +382,6 @@
 | Toggle search | ✅ | ✅ | ✅ | N/A | ✅ | Toggle Search view | actions.view.toggleSearch |
 | Toggle source control | ✅ | ✅ | ✅ | N/A | ✅ | Toggle Source Control view | actions.view.toggleSourceControl |
 | Toggle terminal | ✅ | ✅ | ✅ | N/A | N/A | Toggle Terminal view | actions.view.toggleTerminal |
-
-<details>
-<summary>Featured Actions</summary>
-
-| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
-|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
-| Show debug console | ✅ | ❌ (zed do not have debug console) | ❌ (intellij have debug output with DebugPanel) | N/A | N/A | Show Debug Output Console view | actions.view.showDebugOutputConsole | Not all editors have debug console |
-</details>
 
 ## View Management.Split
 
@@ -363,8 +405,8 @@
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
-| Next tab | ✅ | ✅ | ✅ | N/A | N/A | Switch to next tab | actions.tabSwitcher.next |
-| Previous tab | ✅ | ✅ | ✅ | N/A | N/A | Switch to previous tab | actions.tabSwitcher.previous |
+| Next tab | ✅ | ✅ | ✅ | ✅ | N/A | Switch to next tab | actions.tabSwitcher.next |
+| Previous tab | ✅ | ✅ | ✅ | ✅ | N/A | Switch to previous tab | actions.tabSwitcher.previous |
 
 ## View Management.Window
 

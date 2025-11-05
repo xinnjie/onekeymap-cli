@@ -44,3 +44,12 @@ mappings:
     helix:
       command: "buffer_picker"
       mode: "insert"
+    xcode:
+      action: "openQuickly:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.OpenQuickly"
+      group: "File Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Open Quickly…"

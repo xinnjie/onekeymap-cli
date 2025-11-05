@@ -82,6 +82,15 @@ mappings:
     helix:
       command: "global_search"
       mode: "insert"
+    xcode:
+      action: "findInWorkspace:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.FindInWorkspace"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Find in Workspace…"
   - id: "actions.edit.replaceInFiles"
     name: "Replace in project"
     description: "Replace in all files in the project"
@@ -98,3 +107,12 @@ mappings:
       action: "ReplaceInPath"
     helix:
       notSupported: true
+    xcode:
+      action: "findAndReplaceInWorkspace:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.FindAndReplaceInWorkspace"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Find and Replace in Workspace…"

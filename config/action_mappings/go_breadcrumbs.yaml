@@ -1,11 +1,13 @@
 mappings:
   - id: "actions.go.breadcrumbsFocus"
-    name: "Focus breadcrumbs"
+    name: "Jump to Navigation Bar"
     description: "Jump to Navigation Bar"
     category: "Navigation"
     vscode:
-      command: "breadcrumbs.focus"
-      when: "breadcrumbsPossible && breadcrumbsVisible"
+      - command: "breadcrumbs.focus"
+        when: "breadcrumbsPossible && breadcrumbsVisible"
+      - command: "notebook.focusTop"
+        when: "notebookEditorFocused && !inputFocus"
     intellij:
       action: "ShowNavBar"
     zed:

@@ -10,6 +10,16 @@ mappings:
       action: "pane::GoBack"
     intellij:
       action: "Back"
+    xcode:
+      action: "goBackInHistoryByCommand:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.GoBack"
+      commandID: "Xcode.IDEKit.CmdDefinition.GoBack"
+      group: "Navigate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "YES"
+      title: "Show Previous Location in History"
   - id: "actions.go.forward"
     name: "Go forward"
     description: "Go to next cursor location"
@@ -21,6 +31,16 @@ mappings:
       action: "pane::GoForward"
     intellij:
       action: "Forward"
+    xcode:
+      action: "goForwardInHistoryByCommand:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.GoForward"
+      commandID: "Xcode.IDEKit.CmdDefinition.GoForward"
+      group: "Navigate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "YES"
+      title: "Show Next Location in History"
   - id: "actions.go.lastEditLocation"
     name: "Go to last edit location"
     description: "Go to last edit location"

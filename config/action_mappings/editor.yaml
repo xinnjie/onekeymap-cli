@@ -3,6 +3,7 @@ mappings:
     name: "Toggle word wrap"
     description: "Toggle word wrap in the editor"
     category: "Editor"
+    featured: true
     vscode:
       command: "editor.action.toggleWordWrap"
     zed:

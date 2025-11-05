@@ -142,20 +142,3 @@ mappings:
       action: "ActivateDebugToolWindow"
     helix:
       notSupported: true
-  - id: "actions.view.showDebugOutputConsole"
-    name: "Show debug console"
-    description: "Show Debug Output Console view"
-    category: "View Management.Pannels"
-    featured: true
-    featuredReason: "Not all editors have debug console"
-    vscode:
-      command: "workbench.debug.action.toggleRepl"
-      when: "workbench.panel.repl.view.active"
-    zed:
-      notSupported: true
-      notSupportedReason: "zed do not have debug console"
-    intellij:
-      notSupported: true
-      notSupportedReason: "intellij have debug output with DebugPanel"
-    helix:
-      notSupported: true

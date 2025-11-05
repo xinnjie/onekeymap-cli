@@ -130,6 +130,15 @@ mappings:
       context: "Editor"
     intellij:
       action: "FindUsages"
+    xcode:
+      action: "findSelectedSymbolInWorkspace:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.FindSelectedSymbolInWorkspace"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Find Selected Symbol in Workspace"
   - id: "actions.go.referencePeek"
     name: "Reference peek"
     description: "Show usages / reference search"
@@ -154,10 +163,21 @@ mappings:
     zed:
       notSupported: true
       notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
+    xcode:
+      action: "callHierarchy:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.CallHierarchy"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Find Call Hierarchy"
   - id: "actions.go.callHierarchyPeek"
     name: "Peek call hierarchy"
     description: "Peek call hierarchy"
     category: "Code.Go"
+    featured: true
+    featuredReason: "Use `CallHierarchy` instead"
     vscode:
       command: "editor.showCallHierarchy"
       when: "editorHasCallHierarchyProvider && editorTextFocus && !inReferenceSearchEditor"
@@ -166,7 +186,7 @@ mappings:
       notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
     intellij:
       notSupported: true
-      notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
+      notSupportedReason: "Use `CallHierarchy` instead"
   - id: "actions.go.typeHierarchy"
     name: "Type hierarchy"
     description: "Show type hierarchy"
@@ -191,3 +211,18 @@ mappings:
       context: "Editor"
     intellij:
       action: "EditorMatchBrace"
+  - id: "actions.go.jumpToNextCounterpart"
+    name: "Jump to next counterpart"
+    description: "Jump to next counterpart, like switching between .cpp file and .h file"
+    category: "Code.Go"
+    featured: true
+    xcode:
+      action: "jumpToNextCounterpart:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.JumpToNextCounterpart"
+      commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.JumpToNextCounterpart"
+      group: "Navigate Menu for Asset Catalog Comparison"
+      groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Navigate"
+      groupedAlternate: "NO"
+      navigation: "YES"
+      title: "Jump to Next Counterpart"

@@ -19,6 +19,15 @@ mappings:
       context: "Workspace"
     intellij:
       action: "NextTab"
+    xcode:
+      action: "_showNextEditorTab:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.ShowNextEditorTab"
+      group: "Navigate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "YES"
+      title: "Show Next Tab"
   - id: "actions.tabSwitcher.previous"
     name: "Previous tab"
     description: "Switch to previous tab"
@@ -39,3 +48,12 @@ mappings:
         select_last: true
     intellij:
       action: "PreviousTab"
+    xcode:
+      action: "_showPreviousEditorTab:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.ShowPreviousEditorTab"
+      group: "Navigate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "YES"
+      title: "Show Previous Tab"

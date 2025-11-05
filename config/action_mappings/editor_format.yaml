@@ -29,3 +29,20 @@ mappings:
       context: "Editor"
     intellij:
       action: "ReformatCode"
+  - id: "actions.edit.reIndent"
+    name: "Re-Indent code"
+    description: "Re-Indent code"
+    category: "Editor"
+    featured: true
+    featuredReason: "Use `FormatSelections` instead"
+    xcode:
+      action: "indentSelection:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ReIndent"
+      commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ReIndent"
+      group: "Editor Menu for Source Code"
+      groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Structure"
+      title: "Re-Indent"

@@ -42,3 +42,35 @@ mappings:
     helix:
       command: "dap_restart"
       mode: "insert"
+  - id: "actions.run.toggleBreakpoint"
+    name: "Toggle breakpoint"
+    description: "Toggle Breakpoint"
+    category: "Debug"
+    vscode:
+      command: "editor.debug.action.toggleBreakpoint"
+      when: "debuggersAvailable && disassemblyViewFocus || debuggersAvailable && editorTextFocus"
+    zed:
+      action: "editor::ToggleBreakpoint"
+      context: "Editor"
+    intellij:
+      action: "ToggleLineBreakpoint"
+    helix:
+      command: "dap_toggle_breakpoint"
+      mode: "insert"
+  - id: "actions.view.showDebugOutputConsole"
+    name: "Show debug console"
+    description: "Show Debug Output Console view"
+    category: "Debug"
+    featured: true
+    featuredReason: "Not all editors have debug console"
+    vscode:
+      command: "workbench.debug.action.toggleRepl"
+      when: "workbench.panel.repl.view.active"
+    zed:
+      notSupported: true
+      notSupportedReason: "zed do not have debug console"
+    intellij:
+      notSupported: true
+      notSupportedReason: "intellij have debug output with DebugPanel"
+    helix:
+      notSupported: true

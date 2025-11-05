@@ -37,3 +37,15 @@ mappings:
     intellij:
       notSupported: true
       notSupportedReason: "behaviour is controlled by `CamelHumps` setting"
+  - id: "actions.edit.deleteWordRight"
+    name: "Delete next word"
+    description: "Delete to the end of the next word"
+    category: "Editor.Word"
+    vscode:
+      command: "deleteWordRight"
+      when: "textInputFocus && !editorReadonly"
+    zed:
+      action: "editor::DeleteToNextWordEnd"
+      context: "Editor"
+    intellij:
+      action: "EditorDeleteToWordEnd"

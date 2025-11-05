@@ -34,7 +34,7 @@ mappings:
       action: "ShowProjectStructureSettings"
     zed:
       action: "zed::OpenTasks"
-  - id: "actions.terminal.runBuildTask"
+  - id: "actions.run.runBuildTask"
     name: "Run build task"
     description: "Run the default build task"
     category: "Run"
@@ -45,3 +45,12 @@ mappings:
       notSupported: true
     intellij:
       action: "CompileDirty"
+    xcode:
+      action: "buildActiveRunContext:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.Build"
+      group: "Product Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Build"
