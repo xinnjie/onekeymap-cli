@@ -7,10 +7,10 @@ import (
 
 const vscodeKeyChordSeparator = "+"
 
-func parseKeybinding(keybind string) (*keymap.KeyBinding, error) {
+func ParseKeybinding(keybind string) (*keymap.KeyBinding, error) {
 	return keymap.ParseKeyBinding(keybind, vscodeKeyChordSeparator)
 }
 
-func formatKeybinding(keybind *keymap.KeyBinding) (string, error) {
+func FormatKeybinding(keybind *keymap.KeyBinding) (string, error) {
 	return keybind.Format(platform.PlatformMacOS, vscodeKeyChordSeparator)
 }

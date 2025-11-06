@@ -66,7 +66,7 @@ func (p *intellijImporter) Import(
 			if ks.First == "" {
 				continue
 			}
-			kb, err := parseKeyBinding(ks)
+			kb, err := ParseKeyBinding(ks)
 			if err != nil {
 				p.logger.WarnContext(ctx, "failed to parse key binding", "binding", ks, "error", err)
 				continue

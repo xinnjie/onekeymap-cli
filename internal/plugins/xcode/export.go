@@ -15,6 +15,10 @@ import (
 	"howett.net/plist"
 )
 
+const (
+	xcodeVersion = 3
+)
+
 var (
 	_ pluginapi.PluginExporter = (*xcodeExporter)(nil)
 )
@@ -118,9 +122,11 @@ func (e *xcodeExporter) Export(
 	plistData := xcodeKeybindingsPlist{
 		MenuKeyBindings: menuKeyBindings{
 			KeyBindings: finalKeybindings,
+			Version:     xcodeVersion,
 		},
 		TextKeyBindings: textKeyBindings{
 			KeyBindings: finalTextKeybindings,
+			Version:     xcodeVersion,
 		},
 	}
 
@@ -189,7 +195,7 @@ func (e *xcodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []x
 				continue
 			}
 			binding := keymap.NewKeyBinding(b)
-			keys, err := formatKeybinding(binding)
+			keys, err := FormatKeybinding(binding)
 			if err != nil {
 				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
 				continue
@@ -201,6 +207,7 @@ func (e *xcodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []x
 				xcodeKeybindings = append(xcodeKeybindings, xcodeKeybinding{
 					Action:           xcodeConfig.Action,
 					CommandID:        xcodeConfig.CommandID,
+					CommandGroupID:   xcodeConfig.CommandGroupID,
 					KeyboardShortcut: keys,
 					Title:            xcodeConfig.Title,
 					Alternate:        xcodeConfig.Alternate,
@@ -271,7 +278,7 @@ func (e *xcodeExporter) generateTextKeyBindings(
 				continue
 			}
 			binding := keymap.NewKeyBinding(b)
-			keys, err := formatKeybinding(binding)
+			keys, err := FormatKeybinding(binding)
 			if err != nil {
 				e.logger.Warn("Skipping text keybinding with un-formattable key", "action", km.GetName(), "error", err)
 				continue

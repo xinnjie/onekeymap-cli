@@ -1,4 +1,4 @@
-package xcode
+package xcode_test
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/xcode"
 )
 
 func TestParseKeybinding(t *testing.T) {
@@ -73,7 +74,7 @@ func TestParseKeybinding(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			kb, err := parseKeybinding(tt.input)
+			kb, err := xcode.ParseKeybinding(tt.input)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -125,7 +126,7 @@ func TestFormatKeybinding(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			formatted, err := formatKeybinding(tt.input)
+			formatted, err := xcode.FormatKeybinding(tt.input)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expected, formatted)
 		})

@@ -42,7 +42,7 @@ func (h *xcodeKeybindingLookup) Lookup(
 
 	// Format the target keybinding to Xcode format for comparison
 	// Use existing formatKeybinding function which handles Xcode's format
-	targetKey, err := formatKeybinding(keybinding)
+	targetKey, err := FormatKeybinding(keybinding)
 	if err != nil {
 		return nil, err
 	}

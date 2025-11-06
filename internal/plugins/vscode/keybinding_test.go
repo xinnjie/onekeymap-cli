@@ -1,4 +1,4 @@
-package vscode
+package vscode_test
 
 import (
 	"testing"
@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 )
 
 func TestVSCode_FormatKeybinding(t *testing.T) {
@@ -25,7 +26,7 @@ func TestVSCode_FormatKeybinding(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			kb := keymap.MustParseKeyBinding(tc.in)
-			out, err := formatKeybinding(kb)
+			out, err := vscode.FormatKeybinding(kb)
 			require.NoError(t, err)
 			assert.Equal(t, tc.want, out)
 		})
@@ -50,7 +51,7 @@ func TestVSCode_ParseKeybinding(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kb, err := parseKeybinding(tc.in)
+			kb, err := vscode.ParseKeybinding(tc.in)
 			if tc.wantErr {
 				require.Error(t, err)
 				assert.Nil(t, kb)

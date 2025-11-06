@@ -77,7 +77,7 @@ func (i *vscodeImporter) Import(
 			continue
 		}
 
-		kb, err := parseKeybinding(binding.Key)
+		kb, err := ParseKeybinding(binding.Key)
 		if err != nil {
 			i.logger.WarnContext(ctx, "Skipping keybinding with unparsable key", "key", binding.Key, "error", err)
 			continue

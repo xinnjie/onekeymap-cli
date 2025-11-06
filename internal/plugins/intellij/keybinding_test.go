@@ -1,4 +1,4 @@
-package intellij
+package intellij_test
 
 import (
 	"testing"
@@ -7,29 +7,34 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestParseKeyBinding_Table(t *testing.T) {
 	tests := []struct {
 		name    string
-		in      KeyboardShortcutXML
+		in      intellij.KeyboardShortcutXML
 		want    string
 		wantErr bool
 	}{
-		{name: "SingleChord", in: KeyboardShortcutXML{First: "alt HOME"}, want: "alt+home"},
-		{name: "TwoChords", in: KeyboardShortcutXML{First: "control E", Second: "control S"}, want: "ctrl+e ctrl+s"},
-		{name: "InvalidFirst", in: KeyboardShortcutXML{First: "control UNKNOWN_KEY"}, wantErr: true},
+		{name: "SingleChord", in: intellij.KeyboardShortcutXML{First: "alt HOME"}, want: "alt+home"},
+		{
+			name: "TwoChords",
+			in:   intellij.KeyboardShortcutXML{First: "control E", Second: "control S"},
+			want: "ctrl+e ctrl+s",
+		},
+		{name: "InvalidFirst", in: intellij.KeyboardShortcutXML{First: "control UNKNOWN_KEY"}, wantErr: true},
 		{
 			name:    "InvalidSecond",
-			in:      KeyboardShortcutXML{First: "alt HOME", Second: "control UNKNOWN_KEY"},
+			in:      intellij.KeyboardShortcutXML{First: "alt HOME", Second: "control UNKNOWN_KEY"},
 			wantErr: true,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kb, err := parseKeyBinding(tc.in)
+			kb, err := intellij.ParseKeyBinding(tc.in)
 			if tc.wantErr {
 				require.Error(t, err)
 				assert.Nil(t, kb)
@@ -72,7 +77,7 @@ func TestFormatKeybinding_Table(t *testing.T) {
 			} else {
 				kb = keymap.MustParseKeyBinding(tc.in)
 			}
-			ks, err := formatKeybinding(kb)
+			ks, err := intellij.FormatKeybinding(kb)
 			if tc.wantErr {
 				require.Error(t, err)
 				assert.Nil(t, ks)

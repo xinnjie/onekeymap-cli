@@ -156,7 +156,7 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.Keymap) zedKe
 			if b == nil {
 				continue
 			}
-			keys, err := formatZedKeybind(keymap.NewKeyBinding(b))
+			keys, err := FormatZedKeybind(keymap.NewKeyBinding(b))
 			if err != nil {
 				p.logger.Warn("failed to format key binding", "error", err)
 				continue

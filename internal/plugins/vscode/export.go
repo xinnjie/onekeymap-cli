@@ -179,7 +179,7 @@ func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []
 				continue
 			}
 			binding := keymap.NewKeyBinding(b)
-			keys, err := formatKeybinding(binding)
+			keys, err := FormatKeybinding(binding)
 			if err != nil {
 				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
 				continue

@@ -13,7 +13,7 @@ import (
 
 const maxIntellijChords = 2
 
-func parseKeyBinding(ks KeyboardShortcutXML) (*keymap.KeyBinding, error) {
+func ParseKeyBinding(ks KeyboardShortcutXML) (*keymap.KeyBinding, error) {
 	parts1, err := parseKeyStroke(ks.First)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func parseKeyBinding(ks KeyboardShortcutXML) (*keymap.KeyBinding, error) {
 	return keymap.ParseKeyBinding(first+" "+second, "+")
 }
 
-func formatKeybinding(keybind *keymap.KeyBinding) (*KeyboardShortcutXML, error) {
+func FormatKeybinding(keybind *keymap.KeyBinding) (*KeyboardShortcutXML, error) {
 	// Only support up to two chords for IntelliJ (first and optional second keystroke).
 	chords := keybind.GetKeyChords().GetChords()
 	if len(chords) > maxIntellijChords {

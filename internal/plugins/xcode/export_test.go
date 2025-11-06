@@ -95,12 +95,16 @@ func TestExporter_Export_MenuKeyBindings(t *testing.T) {
 					<string/>
 				</dict>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
 			<key>Key Bindings</key>
 			<dict>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -187,12 +191,16 @@ func TestExporter_Export_MenuKeyBindings(t *testing.T) {
 					<string/>
 				</dict>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
 			<key>Key Bindings</key>
 			<dict>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -255,12 +263,16 @@ func TestExporter_Export_MenuKeyBindings(t *testing.T) {
 					<string/>
 				</dict>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
 			<key>Key Bindings</key>
 			<dict>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -318,6 +330,8 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 			<key>Key Bindings</key>
 			<array>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
@@ -326,6 +340,8 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 				<key>^v</key>
 				<string>pageDown:</string>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -365,6 +381,8 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 			<key>Key Bindings</key>
 			<array>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
@@ -375,6 +393,8 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 				<key>^v</key>
 				<string>pageDown:</string>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -414,6 +434,8 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 			<key>Key Bindings</key>
 			<array>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
@@ -422,6 +444,8 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 				<key>^v</key>
 				<string>pageDown:</string>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -544,12 +568,16 @@ func TestExporter_OrderByBaseCommand(t *testing.T) {
 					<string/>
 				</dict>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
 			<key>Key Bindings</key>
 			<dict>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -672,12 +700,16 @@ func TestExporter_MergeKeybindings(t *testing.T) {
 					<string/>
 				</dict>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
 			<key>Key Bindings</key>
 			<dict>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -740,12 +772,16 @@ func TestExporter_MergeKeybindings(t *testing.T) {
 					<string/>
 				</dict>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
 			<key>Key Bindings</key>
 			<dict>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,
@@ -906,12 +942,16 @@ func TestExporter_IdentifyUnmanagedKeybindings(t *testing.T) {
 					<string/>
 				</dict>
 			</array>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 		<key>Text Key Bindings</key>
 		<dict>
 			<key>Key Bindings</key>
 			<dict>
 			</dict>
+			<key>Version</key>
+			<integer>3</integer>
 		</dict>
 	</dict>
 </plist>`,

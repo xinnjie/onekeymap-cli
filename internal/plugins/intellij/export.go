@@ -129,7 +129,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap) []Ac
 			if b == nil {
 				continue
 			}
-			shortcutXML, err := formatKeybinding(keymap.NewKeyBinding(b))
+			shortcutXML, err := FormatKeybinding(keymap.NewKeyBinding(b))
 			if err != nil {
 				e.logger.Warn("failed to format keybinding", "action", km.GetName(), "error", err)
 				continue

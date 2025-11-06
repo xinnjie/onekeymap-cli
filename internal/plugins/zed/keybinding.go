@@ -7,10 +7,10 @@ import (
 
 const zedKeyChordSeparator = "-"
 
-func parseZedKeybind(keybind string) (*keymap.KeyBinding, error) {
+func ParseZedKeybind(keybind string) (*keymap.KeyBinding, error) {
 	return keymap.ParseKeyBinding(keybind, zedKeyChordSeparator)
 }
 
-func formatZedKeybind(keybind *keymap.KeyBinding) (string, error) {
+func FormatZedKeybind(keybind *keymap.KeyBinding) (string, error) {
 	return keybind.Format(platform.PlatformMacOS, zedKeyChordSeparator)
 }

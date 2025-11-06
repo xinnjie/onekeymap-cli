@@ -62,7 +62,7 @@ func (p *zedImporter) Import(
 		sort.Strings(keys)
 		for _, key := range keys {
 			action := zk.Bindings[key]
-			kb, err := parseZedKeybind(key)
+			kb, err := ParseZedKeybind(key)
 			if err != nil {
 				p.logger.WarnContext(ctx, "failed to parse keychord", "key", key, "error", err)
 				continue

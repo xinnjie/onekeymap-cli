@@ -71,7 +71,7 @@ func (i *xcodeImporter) Import(
 			continue
 		}
 
-		kb, err := parseKeybinding(binding.KeyboardShortcut)
+		kb, err := ParseKeybinding(binding.KeyboardShortcut)
 		if err != nil {
 			i.logger.WarnContext(
 				ctx,
@@ -111,7 +111,7 @@ func (i *xcodeImporter) Import(
 			continue
 		}
 
-		kb, err := parseKeybinding(key)
+		kb, err := ParseKeybinding(key)
 		if err != nil {
 			i.logger.WarnContext(
 				ctx,

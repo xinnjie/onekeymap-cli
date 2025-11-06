@@ -85,6 +85,7 @@ mappings:
     xcode:
       action: "findInWorkspace:"
       alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.FindInWorkspace"
       commandID: "Xcode.IDEKit.CmdDefinition.FindInWorkspace"
       group: "Find Menu"
       groupID: "Xcode.IDEKit.MenuDefinition.Main"
