@@ -2,6 +2,7 @@ package mappings
 
 import (
 	"fmt"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -14,16 +15,123 @@ type XcodeMappingConfig struct {
 	// A Xcode action is either a Text Action or a Menu Action.
 	// Only one of TextAction and MenuAction should be set.
 
-	// The Xcode text action name for Text Key Bindings (e.g., "pageDown:", "deleteBackward:")
+	// The Xcode text action name(s) for Text Key Bindings. Accepts a string or array in YAML.
 	TextAction XcodeTextAction `yaml:",inline"`
 
 	// The Xcode menu action name for Menu Key Bindings (e.g., "moveWordLeft:", "selectWord:")
 	MenuAction XcodeMenuAction `yaml:",inline"`
 }
 
+func checkTextBindings(items []string, id string, seen map[string]string, dups map[string][]string) {
+	for _, action := range items {
+		action = ensureTrailingColon(action)
+		if action == "" {
+			continue
+		}
+		if originalID, exists := seen[action]; exists {
+			dupKey := fmt.Sprintf(`{"textAction":%q}`, action)
+			if _, ok := dups[dupKey]; !ok {
+				dups[dupKey] = []string{originalID}
+			}
+			dups[dupKey] = append(dups[dupKey], id)
+		} else {
+			seen[action] = id
+		}
+	}
+}
+
+func checkXcodeTextActionFormat(mappings map[string]ActionMappingConfig) error {
+	var invalidIDs []string
+	for id, mapping := range mappings {
+		for _, xc := range mapping.Xcode {
+			if len(xc.TextAction.TextAction.Items) == 0 {
+				continue
+			}
+			for _, a := range xc.TextAction.TextAction.Items {
+				if a == "" {
+					continue
+				}
+				if !strings.HasSuffix(a, ":") {
+					invalidIDs = append(invalidIDs, id)
+					break
+				}
+			}
+		}
+	}
+	if len(invalidIDs) > 0 {
+		return fmt.Errorf("xcode textAction must end with ':' for ids: %v", invalidIDs)
+	}
+	return nil
+}
+
+// checkXcodeImportConstraints enforces that when a textAction defines multiple actions
+// (i.e., an array with length > 1), the config must be export-only: disableImport: true.
+func checkXcodeImportConstraints(mappings map[string]ActionMappingConfig) error {
+	var invalidIDs []string
+	for id, mapping := range mappings {
+		for _, xc := range mapping.Xcode {
+			if len(xc.TextAction.TextAction.Items) > 1 && !xc.DisableImport {
+				invalidIDs = append(invalidIDs, id)
+				break
+			}
+		}
+	}
+	if len(invalidIDs) > 0 {
+		return fmt.Errorf("xcode textAction with multiple items requires disableImport: true for ids: %v", invalidIDs)
+	}
+	return nil
+}
+
 type XcodeTextAction struct {
-	// The Xcode text action name for Text Key Bindings (e.g., "pageDown:", "deleteBackward:")
-	TextAction string `yaml:"textAction,omitempty"`
+	TextAction StringOrSlice `yaml:"textAction,omitempty"`
+}
+
+// StringOrSlice supports unmarshalling a YAML field that may be a single string
+// or a sequence of strings.
+type StringOrSlice struct {
+	Items []string
+}
+
+func (s *StringOrSlice) UnmarshalYAML(node *yaml.Node) error {
+	if node == nil || node.Kind == 0 {
+		s.Items = nil
+		return nil
+	}
+	switch node.Kind {
+	case yaml.ScalarNode:
+		var str string
+		if err := node.Decode(&str); err != nil {
+			return err
+		}
+		s.Items = []string{str}
+		return nil
+	case yaml.SequenceNode:
+		var arr []string
+		if err := node.Decode(&arr); err != nil {
+			return err
+		}
+		s.Items = arr
+		return nil
+	case yaml.MappingNode:
+		// Not expected for a textAction value
+		return fmt.Errorf("cannot unmarshal mapping node for textAction (line %d, col %d)", node.Line, node.Column)
+	default:
+		return fmt.Errorf(
+			"cannot unmarshal (line %d, col %d): unexpected node kind for textAction",
+			node.Line,
+			node.Column,
+		)
+	}
+}
+
+func ensureTrailingColon(s string) string {
+	if s == "" {
+		return s
+	}
+	if strings.HasSuffix(s, ":") {
+		return s
+	}
+	return s + ":"
 }
 
 type XcodeMenuAction struct {
@@ -109,18 +217,8 @@ func checkXcodeDuplicateConfig(mappings map[string]ActionMappingConfig) error {
 				}
 			}
 
-			// Check Text Key Bindings (TextAction)
-			if xcodeConfig.TextAction.TextAction != "" {
-				if originalID, exists := seenTextBindings[xcodeConfig.TextAction.TextAction]; exists {
-					dupKey := fmt.Sprintf(`{"textAction":%q}`, xcodeConfig.TextAction.TextAction)
-					if _, ok := dups[dupKey]; !ok {
-						dups[dupKey] = []string{originalID}
-					}
-					dups[dupKey] = append(dups[dupKey], id)
-				} else {
-					seenTextBindings[xcodeConfig.TextAction.TextAction] = id
-				}
-			}
+			// Check Text Key Bindings (each TextAction item)
+			checkTextBindings(xcodeConfig.TextAction.TextAction.Items, id, seenTextBindings, dups)
 		}
 	}
 

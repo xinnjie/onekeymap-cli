@@ -182,7 +182,10 @@ func (am *ActionMappingConfig) isSupportedXcode() (bool, string) {
 		}
 	}
 	hasMapping := slices.ContainsFunc(am.Xcode, func(xc XcodeMappingConfig) bool {
-		return xc.MenuAction.Action != "" || xc.TextAction.TextAction != ""
+		if xc.MenuAction.Action != "" {
+			return true
+		}
+		return len(xc.TextAction.TextAction.Items) > 0
 	})
 	return hasMapping, strings.Join(notes, ", ")
 }
@@ -238,7 +241,7 @@ func load(reader io.Reader) (*MappingConfig, error) {
 		}
 	}
 
-	if err := checkDuplicateEditorConfigs(mergedMappings); err != nil {
+	if err := checkEditorConfigs(mergedMappings); err != nil {
 		return nil, err
 	}
 
@@ -259,7 +262,7 @@ func (mc *MappingConfig) IsActionMapped(action string) bool {
 	return exists
 }
 
-func checkDuplicateEditorConfigs(mappings map[string]ActionMappingConfig) error {
+func checkEditorConfigs(mappings map[string]ActionMappingConfig) error {
 	if err := checkVscodeDuplicateConfig(mappings); err != nil {
 		return err
 	}
@@ -273,6 +276,12 @@ func checkDuplicateEditorConfigs(mappings map[string]ActionMappingConfig) error 
 		return err
 	}
 	if err := checkXcodeDuplicateConfig(mappings); err != nil {
+		return err
+	}
+	if err := checkXcodeTextActionFormat(mappings); err != nil {
+		return err
+	}
+	if err := checkXcodeImportConstraints(mappings); err != nil {
 		return err
 	}
 	return nil

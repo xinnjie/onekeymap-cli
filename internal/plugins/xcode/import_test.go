@@ -112,6 +112,30 @@ func TestImporter_Import(t *testing.T) {
 			wantErr:  false,
 		},
 		{
+			name: "Text Key Bindings single action but mapping is multi-item (skipped)",
+			xmlData: `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Menu Key Bindings</key>
+	<dict>
+		<key>Key Bindings</key>
+		<array/>
+	</dict>
+	<key>Text Key Bindings</key>
+	<dict>
+		<key>Key Bindings</key>
+		<dict>
+			<key>@d</key>
+			<string>moveToEndOfLine:</string>
+		</dict>
+	</dict>
+</dict>
+</plist>`,
+			expected: &keymapv1.Keymap{},
+			wantErr:  false,
+		},
+		{
 			name: "Text Key Bindings with single action",
 			xmlData: `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

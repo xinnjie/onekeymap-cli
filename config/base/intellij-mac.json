@@ -2,6 +2,10 @@
   "version": "1.0",
   "keymaps": [
     {
+      "id": "action.git.jumpSource",
+      "keybinding": "f4"
+    },
+    {
       "id": "actions.clipboard.copy",
       "keybinding": [
         "cmd+c",
@@ -145,6 +149,13 @@
       ]
     },
     {
+      "id": "actions.edit.deleteWordRight",
+      "keybinding": [
+        "ctrl+delete",
+        "alt+delete"
+      ]
+    },
+    {
       "id": "actions.edit.find",
       "keybinding": [
         "cmd+f",
@@ -174,10 +185,6 @@
     {
       "id": "actions.edit.joinLines",
       "keybinding": "ctrl+shift+j"
-    },
-    {
-      "id": "actions.edit.lineBreakInsert",
-      "keybinding": "cmd+enter"
     },
     {
       "id": "actions.edit.nextMatchFindAction",
@@ -330,12 +337,15 @@
       "keybinding": "alt+home"
     },
     {
-      "id": "actions.go.callHierarchy",
+      "id": "actions.go.callHierarchyPeek",
       "keybinding": "ctrl+alt+h"
     },
     {
-      "id": "actions.go.definitionPeek",
-      "keybinding": "cmd+shift+i"
+      "id": "actions.go.definition",
+      "keybinding": [
+        "ctrl+b",
+        "cmd+b"
+      ]
     },
     {
       "id": "actions.go.fileFinder",
@@ -344,13 +354,6 @@
     {
       "id": "actions.go.forward",
       "keybinding": "cmd+alt+right"
-    },
-    {
-      "id": "actions.go.goToDeclaration",
-      "keybinding": [
-        "ctrl+b",
-        "cmd+b"
-      ]
     },
     {
       "id": "actions.go.goToSuper",
@@ -379,6 +382,10 @@
     {
       "id": "actions.go.nextProblem",
       "keybinding": "f2"
+    },
+    {
+      "id": "actions.go.peekDeclaration",
+      "keybinding": "cmd+shift+i"
     },
     {
       "id": "actions.go.previousChange",
@@ -458,6 +465,14 @@
       "keybinding": "shift+f6"
     },
     {
+      "id": "actions.refactor.sourceAction",
+      "keybinding": [
+        "alt+insert",
+        "ctrl+n",
+        "ctrl+enter"
+      ]
+    },
+    {
       "id": "actions.refactor.triggerParameterHint",
       "keybinding": "cmd+p"
     },
@@ -479,6 +494,10 @@
     {
       "id": "actions.run.restartDebugging",
       "keybinding": "ctrl+f5"
+    },
+    {
+      "id": "actions.run.runBuildTask",
+      "keybinding": "cmd+f9"
     },
     {
       "id": "actions.run.runTask",
@@ -575,10 +594,6 @@
         "alt+left",
         "ctrl+left"
       ]
-    },
-    {
-      "id": "actions.terminal.runBuildTask",
-      "keybinding": "cmd+f9"
     },
     {
       "id": "actions.view.focusNextSplit",

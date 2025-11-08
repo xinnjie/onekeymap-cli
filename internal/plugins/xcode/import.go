@@ -92,12 +92,12 @@ func (i *xcodeImporter) Import(
 	}
 
 	// Process Text Key Bindings
-	for key, value := range plistData.TextKeyBindings.KeyBindings {
-		textAction, ok := value.(string)
-		if !ok {
-			// Text action can be an array of actions, we skip complex bindings for now
+	for key, val := range plistData.TextKeyBindings.KeyBindings {
+		// Only import when there is exactly one text action; skip arrays and empty
+		if len(val.Items) != 1 {
 			continue
 		}
+		textAction := val.Items[0]
 
 		mapping := i.FindByXcodeTextAction(textAction)
 		if mapping == nil {

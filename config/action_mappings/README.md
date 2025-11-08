@@ -55,7 +55,7 @@ mappings:
   - These sections contain the specific implementation details for each editor. For editors that support multiple configurations for a single action (like VSCode), this is a list of mappings.
   - **`disableImport`** (optional): If `true`, this mapping will only be used for exporting keymaps and will be ignored during import.
   - **`notSupported`** (optional): If `true`, this action is explicitly marked as not supported for the editor.
-  - **`notSupportedReason`** (optional): A string explaining why the action is not supported.
+  - **`note`** (optional): A string explaining why the action is not supported.
 
 ## Supported Editors
 

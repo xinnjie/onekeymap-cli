@@ -122,6 +122,11 @@ func TestFormatKeybinding(t *testing.T) {
 			input:    keymap.MustParseKeyBinding("cmd+f5"),
 			expected: "@\uF708",
 		},
+		{
+			name:     "shift+alt+left",
+			input:    keymap.MustParseKeyBinding("shift+alt+left"),
+			expected: "$~\uf702",
+		},
 	}
 
 	for _, tt := range tests {

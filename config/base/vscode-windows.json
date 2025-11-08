@@ -87,6 +87,10 @@
       "keybinding": "ctrl+backspace"
     },
     {
+      "id": "actions.edit.deleteWordRight",
+      "keybinding": "ctrl+delete"
+    },
+    {
       "id": "actions.edit.find",
       "keybinding": "ctrl+f"
     },
@@ -254,7 +258,10 @@
     },
     {
       "id": "actions.go.breadcrumbsFocus",
-      "keybinding": "ctrl+shift+;"
+      "keybinding": [
+        "ctrl+shift+;",
+        "ctrl+home"
+      ]
     },
     {
       "id": "actions.go.callHierarchy",
@@ -374,10 +381,6 @@
       "keybinding": "ctrl+end"
     },
     {
-      "id": "actions.notebook.focusTop",
-      "keybinding": "ctrl+home"
-    },
-    {
       "id": "actions.refactor.organizeImports",
       "keybinding": "shift+alt+o"
     },
@@ -404,6 +407,10 @@
     {
       "id": "actions.run.restartDebugging",
       "keybinding": "ctrl+shift+f5"
+    },
+    {
+      "id": "actions.run.runBuildTask",
+      "keybinding": "ctrl+shift+b"
     },
     {
       "id": "actions.run.startDebugging",
@@ -491,10 +498,6 @@
     {
       "id": "actions.terminal.new",
       "keybinding": "ctrl+shift+`"
-    },
-    {
-      "id": "actions.terminal.runBuildTask",
-      "keybinding": "ctrl+shift+b"
     },
     {
       "id": "actions.view.openKeyboardShortcuts",

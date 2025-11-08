@@ -12,16 +12,52 @@ type menuKeyBindings struct {
 }
 
 type textKeyBindings struct {
-	KeyBindings map[string]xcodeTextAction `plist:"Key Bindings"`
+	KeyBindings map[string]textActionValue `plist:"Key Bindings"`
 	Version     int                        `plist:"Version"`
 }
 
-// xcodeTextAction represents a text action value in Text Key Bindings.
-// It can be either a single action (string) or multiple actions ([]string).
-type xcodeTextAction interface{}
+// textActionValue represents a text action value in Text Key Bindings.
+// It supports both a single action (string) and multiple actions ([]string)
+// via custom plist marshal/unmarshal.
+type textActionValue struct {
+	Items []string
+}
+
+// MarshalPlist implements howett.net/plist Marshaler.
+func (v *textActionValue) MarshalPlist() (interface{}, error) {
+	switch len(v.Items) {
+	case 0:
+		// Should not normally be emitted; return empty string to avoid nil
+		return "", nil
+	case 1:
+		return v.Items[0], nil
+	default:
+		return v.Items, nil
+	}
+}
+
+// UnmarshalPlist implements howett.net/plist Unmarshaler.
+// It accepts either a single string or an array of strings.
+func (v *textActionValue) UnmarshalPlist(unmarshal func(interface{}) error) error {
+	// Try string first
+	var s string
+	if err := unmarshal(&s); err == nil {
+		v.Items = []string{s}
+		return nil
+	}
+	// Then try []string
+	var arr []string
+	if err := unmarshal(&arr); err == nil {
+		v.Items = arr
+		return nil
+	}
+	// Fallback: empty
+	v.Items = nil
+	return nil
+}
 
 type xcodeKeybindingConfig = []xcodeKeybinding
-type xcodeTextKeybinding = map[string]xcodeTextAction
+type xcodeTextKeybinding = map[string]textActionValue
 
 // xcodeKeybinding represents a single keybinding in Xcode's .idekeybindings file.
 type xcodeKeybinding struct {

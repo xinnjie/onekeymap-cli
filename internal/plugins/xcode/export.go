@@ -285,11 +285,11 @@ func (e *xcodeExporter) generateTextKeyBindings(
 			}
 
 			for _, xcodeConfig := range xcodeConfigs {
-				if xcodeConfig.TextAction.TextAction == "" {
+				items := xcodeConfig.TextAction.TextAction.Items
+				if len(items) == 0 {
 					continue
 				}
-				// Managed text bindings override existing ones with same key
-				result[keys] = xcodeConfig.TextAction.TextAction
+				result[keys] = textActionValue{Items: items}
 			}
 		}
 	}

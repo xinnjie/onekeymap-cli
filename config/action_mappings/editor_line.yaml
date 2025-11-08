@@ -35,6 +35,12 @@ mappings:
       context: "Editor"
     intellij:
       action: "EditorStartNewLine"
+    # compound action https://stackoverflow.com/a/71672753/7609067
+    xcode:
+      disableImport: true
+      textAction:
+        - "moveToEndOfLine:"
+        - "insertLineBreak:"
   - id: "actions.edit.deleteLines"
     name: "Delete line"
     description: "Delete line"

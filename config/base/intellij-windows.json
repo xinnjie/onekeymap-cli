@@ -2,6 +2,10 @@
   "version": "1.0",
   "keymaps": [
     {
+      "id": "action.git.jumpSource",
+      "keybinding": "f4"
+    },
+    {
       "id": "actions.clipboard.copy",
       "keybinding": [
         "ctrl+c",
@@ -115,6 +119,10 @@
       "keybinding": "ctrl+backspace"
     },
     {
+      "id": "actions.edit.deleteWordRight",
+      "keybinding": "ctrl+delete"
+    },
+    {
       "id": "actions.edit.find",
       "keybinding": [
         "ctrl+f",
@@ -144,10 +152,6 @@
     {
       "id": "actions.edit.joinLines",
       "keybinding": "ctrl+shift+j"
-    },
-    {
-      "id": "actions.edit.lineBreakInsert",
-      "keybinding": "ctrl+enter"
     },
     {
       "id": "actions.edit.nextMatchFindAction",
@@ -294,7 +298,7 @@
       "keybinding": "alt+home"
     },
     {
-      "id": "actions.go.callHierarchy",
+      "id": "actions.go.callHierarchyPeek",
       "keybinding": "ctrl+alt+h"
     },
     {
@@ -394,12 +398,12 @@
       "keybinding": "ctrl+shift+up"
     },
     {
-      "id": "actions.refactor.codeAction",
-      "keybinding": "alt+enter"
-    },
-    {
       "id": "actions.refactor.organizeImports",
       "keybinding": "ctrl+alt+o"
+    },
+    {
+      "id": "actions.refactor.quickFix",
+      "keybinding": "alt+enter"
     },
     {
       "id": "actions.refactor.refactor",
@@ -408,6 +412,10 @@
     {
       "id": "actions.refactor.rename",
       "keybinding": "shift+f6"
+    },
+    {
+      "id": "actions.refactor.sourceAction",
+      "keybinding": "alt+insert"
     },
     {
       "id": "actions.refactor.triggerParameterHint",
@@ -428,6 +436,10 @@
     {
       "id": "actions.run.restartDebugging",
       "keybinding": "ctrl+f5"
+    },
+    {
+      "id": "actions.run.runBuildTask",
+      "keybinding": "ctrl+f9"
     },
     {
       "id": "actions.run.runTask",
@@ -508,10 +520,6 @@
     {
       "id": "actions.tabSwitcher.previous",
       "keybinding": "alt+left"
-    },
-    {
-      "id": "actions.terminal.runBuildTask",
-      "keybinding": "ctrl+f9"
     },
     {
       "id": "actions.view.maximizeEditor",

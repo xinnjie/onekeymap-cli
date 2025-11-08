@@ -38,7 +38,18 @@ func testMappingConfig() *mappings.MappingConfig {
 				Xcode: []mappings.XcodeMappingConfig{
 					{
 						TextAction: mappings.XcodeTextAction{
-							TextAction: "pageDown:",
+							TextAction: mappings.StringOrSlice{Items: []string{"pageDown:"}},
+						},
+					},
+				},
+			},
+			"actions.edit.insertLineAfter": {
+				ID:          "actions.edit.insertLineAfter",
+				Description: "Insert line after",
+				Xcode: []mappings.XcodeMappingConfig{
+					{
+						TextAction: mappings.XcodeTextAction{
+							TextAction: mappings.StringOrSlice{Items: []string{"moveToEndOfLine:", "insertNewline:"}},
 						},
 					},
 				},
@@ -447,6 +458,41 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 			<dict>
 				<key>^v</key>
 				<string>pageDown:</string>
+			</dict>
+			<key>Version</key>
+			<integer>3</integer>
+		</dict>
+	</dict>
+</plist>`,
+		},
+		{
+			name: "exports array text actions",
+			keymapSetting: &keymapv1.Keymap{
+				Actions: []*keymapv1.Action{
+					keymap.NewActioinBinding("actions.edit.insertLineAfter", "meta+d"),
+				},
+			},
+			expectedConfig: `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>Menu Key Bindings</key>
+		<dict>
+			<key>Key Bindings</key>
+			<array>
+			</array>
+			<key>Version</key>
+			<integer>3</integer>
+		</dict>
+		<key>Text Key Bindings</key>
+		<dict>
+			<key>Key Bindings</key>
+			<dict>
+				<key>@d</key>
+				<array>
+					<string>moveToEndOfLine:</string>
+					<string>insertNewline:</string>
+				</array>
 			</dict>
 			<key>Version</key>
 			<integer>3</integer>

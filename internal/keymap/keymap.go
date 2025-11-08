@@ -187,12 +187,12 @@ func BuildEditorSupportFromMapping(mapping *mappings.ActionMappingConfig) []*key
 
 	var result []*keymapv1.EditorSupport
 	for _, editorType := range editorTypes {
-		supported, notSupportedReason := mapping.IsSupported(editorType)
+		supported, note := mapping.IsSupported(editorType)
 
 		result = append(result, &keymapv1.EditorSupport{
 			EditorType: editorType.ToAPI(),
 			Supported:  supported,
-			Note:       notSupportedReason,
+			Note:       note,
 		})
 	}
 
