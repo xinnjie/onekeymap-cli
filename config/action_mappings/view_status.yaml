@@ -9,9 +9,11 @@ mappings:
       when: ""
     zed:
       notSupported: true
-      notSupportedReason: "Not support, see [Add options to hide title and status bar issue](https://github.com/zed-industries/zed/issues/5120)"
+      note: "Not support, see [Add options to hide title and status bar issue](https://github.com/zed-industries/zed/issues/5120)"
     # intellij need configure in settings
     intellij:
       notSupported: true
     helix:
+      notSupported: true
+    xcode:
       notSupported: true

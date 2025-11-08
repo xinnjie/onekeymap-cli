@@ -191,7 +191,13 @@ func devDocSupportActionsRun(
 
 func formatSupport(supported bool, reason string) string {
 	if supported {
+		if reason != "" {
+			return fmt.Sprintf("✅ (%s)", reason)
+		}
 		return "✅"
+	}
+	if reason == "__explicitly_not_supported__" {
+		return "❌"
 	}
 	if reason != "" {
 		return fmt.Sprintf("❌ (%s)", reason)

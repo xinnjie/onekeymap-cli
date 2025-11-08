@@ -11,9 +11,22 @@ import (
 type XcodeMappingConfig struct {
 	EditorActionMapping `yaml:",inline"`
 
+	// A Xcode action is either a Text Action or a Menu Action.
+	// Only one of TextAction and MenuAction should be set.
+
+	// The Xcode text action name for Text Key Bindings (e.g., "pageDown:", "deleteBackward:")
+	TextAction XcodeTextAction `yaml:",inline"`
+
+	// The Xcode menu action name for Menu Key Bindings (e.g., "moveWordLeft:", "selectWord:")
+	MenuAction XcodeMenuAction `yaml:",inline"`
+}
+
+type XcodeTextAction struct {
 	// The Xcode text action name for Text Key Bindings (e.g., "pageDown:", "deleteBackward:")
 	TextAction string `yaml:"textAction,omitempty"`
+}
 
+type XcodeMenuAction struct {
 	// The Xcode action name (e.g., "moveWordLeft:", "selectWord:")
 	Action string `yaml:"action"`
 	// The command group ID
@@ -80,8 +93,11 @@ func checkXcodeDuplicateConfig(mappings map[string]ActionMappingConfig) error {
 			}
 
 			// Check Menu Key Bindings (Action + CommandID)
-			if xcodeConfig.Action != "" {
-				key := struct{ Action, CommandID string }{xcodeConfig.Action, xcodeConfig.CommandID}
+			if xcodeConfig.MenuAction.Action != "" {
+				key := struct{ Action, CommandID string }{
+					xcodeConfig.MenuAction.Action,
+					xcodeConfig.MenuAction.CommandID,
+				}
 				if originalID, exists := seenMenuBindings[key]; exists {
 					dupKey := fmt.Sprintf(`{"action":%q,"commandID":%q}`, key.Action, key.CommandID)
 					if _, ok := dups[dupKey]; !ok {
@@ -94,15 +110,15 @@ func checkXcodeDuplicateConfig(mappings map[string]ActionMappingConfig) error {
 			}
 
 			// Check Text Key Bindings (TextAction)
-			if xcodeConfig.TextAction != "" {
-				if originalID, exists := seenTextBindings[xcodeConfig.TextAction]; exists {
-					dupKey := fmt.Sprintf(`{"textAction":%q}`, xcodeConfig.TextAction)
+			if xcodeConfig.TextAction.TextAction != "" {
+				if originalID, exists := seenTextBindings[xcodeConfig.TextAction.TextAction]; exists {
+					dupKey := fmt.Sprintf(`{"textAction":%q}`, xcodeConfig.TextAction.TextAction)
 					if _, ok := dups[dupKey]; !ok {
 						dups[dupKey] = []string{originalID}
 					}
 					dups[dupKey] = append(dups[dupKey], id)
 				} else {
-					seenTextBindings[xcodeConfig.TextAction] = id
+					seenTextBindings[xcodeConfig.TextAction.TextAction] = id
 				}
 			}
 		}

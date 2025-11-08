@@ -11,7 +11,7 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupportedReason: "behaviour is controlled by `CamelHumps` setting"
+      note: "behaviour is controlled by `CamelHumps` setting"
   - id: "actions.edit.deleteWordLeft"
     name: "Delete previous word"
     description: "Delete to the start of the previous word"
@@ -36,7 +36,7 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupportedReason: "behaviour is controlled by `CamelHumps` setting"
+      note: "behaviour is controlled by `CamelHumps` setting"
   - id: "actions.edit.deleteWordRight"
     name: "Delete next word"
     description: "Delete to the end of the next word"

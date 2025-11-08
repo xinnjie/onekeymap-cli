@@ -13,3 +13,5 @@ mappings:
       context: "Editor"
     helix:
       notSupported: true
+    xcode:
+      notSupported: false

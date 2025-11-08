@@ -11,7 +11,7 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupportedReason: "not supported, no ticket tracked"
+      note: "not supported, no ticket tracked"
     helix:
       command: "copy_selection_on_prev_line"
       mode: "insert"

@@ -14,6 +14,39 @@ mappings:
     helix:
       command: "toggle_line_comments"
       mode: "insert"
+    xcode:
+      - action: "toggleComments:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.CommentUncomment"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.CommentUncomment"
+        group: "Editor Menu for Asset Catalog Comparison"
+        groupID: "Xcode.DeltaComparisonEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        parentTitle: "Structure"
+        title: "Comment Selection"
+        disableImport: true
+      - action: "toggleComments:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.CommentUncomment"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.CommentUncomment"
+        group: "Editor Menu for Playground"
+        groupID: "Xcode.IDEPlaygroundEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        parentTitle: "Structure"
+        title: "Comment Selection"
+        disableImport: true
+      - action: "toggleComments:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.CommentUncomment"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.CommentUncomment"
+        group: "Editor Menu for Source Code"
+        groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        parentTitle: "Structure"
+        title: "Comment Selection"
   - id: "actions.edit.toggleBlockComment"
     name: "Toggle block comment"
     description: "Toggle block comment"
@@ -23,9 +56,12 @@ mappings:
       when: "editorTextFocus && !editorReadonly"
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, see [`Toggle block comment` discussion](https://github.com/zed-industries/zed/discussions/4751)"
+      note: "not supported yet, see [`Toggle block comment` discussion](https://github.com/zed-industries/zed/discussions/4751)"
     intellij:
       action: "CommentByBlockComment"
     helix:
       command: "toggle_block_comments"
       mode: "insert"
+    xcode:
+      notSupported: true
+      note: "use `ToggleLineComment` instead"

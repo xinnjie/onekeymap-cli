@@ -23,6 +23,16 @@ mappings:
     helix:
       command: "delete_selection"
       mode: "insert"
+    xcode:
+      action: "cut:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.Cut"
+      commandID: "Xcode.IDEKit.CmdDefinition.Cut"
+      group: "Edit Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Cut"
   - id: "actions.clipboard.copy"
     name: "Copy text"
     description: "Copy selected text/file"
@@ -57,6 +67,17 @@ mappings:
     helix:
       command: "yank_to_clipboard"
       mode: "insert"
+    xcode:
+      action: "copy:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.Copy"
+      commandID: "Xcode.IDEKit.CmdDefinition.Copy"
+      group: "Edit Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Copy"
+      title: "Copy"
   - id: "actions.clipboard.paste"
     name: "Paste text"
     description: "Paste text/file"
@@ -107,4 +128,6 @@ mappings:
     intellij:
       action: "CopyPaths"
     helix:
+      notSupported: true
+    xcode:
       notSupported: true

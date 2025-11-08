@@ -15,3 +15,13 @@ mappings:
     helix:
       command: "command_palette"
       mode: "insert"
+    xcode:
+      action: "showQuickActions:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.ShowQuickActions"
+      commandID: "Xcode.IDEKit.CmdDefinition.ShowQuickActions"
+      group: "View Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Show Quick Actions…"

@@ -166,8 +166,8 @@ func (e *xcodeExporter) identifyUnmanagedKeybindings(existingKeybindings []xcode
 func (e *xcodeExporter) findMappingByXcodeKeybinding(kb xcodeKeybinding) *mappings.ActionMappingConfig {
 	for _, mapping := range e.mappingConfig.Mappings {
 		for _, xcodeConfig := range mapping.Xcode {
-			if xcodeConfig.Action == kb.Action &&
-				xcodeConfig.CommandID == kb.CommandID {
+			if xcodeConfig.MenuAction.Action == kb.Action &&
+				xcodeConfig.MenuAction.CommandID == kb.CommandID {
 				return &mapping
 			}
 		}
@@ -201,20 +201,20 @@ func (e *xcodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []x
 				continue
 			}
 			for _, xcodeConfig := range xcodeConfigs {
-				if xcodeConfig.Action == "" {
+				if xcodeConfig.MenuAction.Action == "" {
 					continue
 				}
 				xcodeKeybindings = append(xcodeKeybindings, xcodeKeybinding{
-					Action:           xcodeConfig.Action,
-					CommandID:        xcodeConfig.CommandID,
-					CommandGroupID:   xcodeConfig.CommandGroupID,
+					Action:           xcodeConfig.MenuAction.Action,
+					CommandID:        xcodeConfig.MenuAction.CommandID,
+					CommandGroupID:   xcodeConfig.MenuAction.CommandGroupID,
 					KeyboardShortcut: keys,
-					Title:            xcodeConfig.Title,
-					Alternate:        xcodeConfig.Alternate,
-					Group:            xcodeConfig.Group,
-					GroupID:          xcodeConfig.GroupID,
-					GroupedAlternate: xcodeConfig.GroupedAlternate,
-					Navigation:       xcodeConfig.Navigation,
+					Title:            xcodeConfig.MenuAction.Title,
+					Alternate:        xcodeConfig.MenuAction.Alternate,
+					Group:            xcodeConfig.MenuAction.Group,
+					GroupID:          xcodeConfig.MenuAction.GroupID,
+					GroupedAlternate: xcodeConfig.MenuAction.GroupedAlternate,
+					Navigation:       xcodeConfig.MenuAction.Navigation,
 				})
 			}
 		}
@@ -285,11 +285,11 @@ func (e *xcodeExporter) generateTextKeyBindings(
 			}
 
 			for _, xcodeConfig := range xcodeConfigs {
-				if xcodeConfig.TextAction == "" {
+				if xcodeConfig.TextAction.TextAction == "" {
 					continue
 				}
 				// Managed text bindings override existing ones with same key
-				result[keys] = xcodeConfig.TextAction
+				result[keys] = xcodeConfig.TextAction.TextAction
 			}
 		}
 	}

@@ -11,3 +11,6 @@ mappings:
       context: "Editor"
     intellij:
       action: "GotoLine"
+    xcode:
+      notSupported: true
+      note: "Use `Cmd+L` to go to line, this keybinding is not configurable"

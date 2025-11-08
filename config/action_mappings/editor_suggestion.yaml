@@ -62,6 +62,10 @@ mappings:
     helix:
       command: "signature_help"
       mode: "insert"
+    xcode:
+      textAction: "complete:"
+      note: "Need leave text input on function name."
+      disableImport: true
   - id: "actions.hover.showHover"
     name: "Show documentation hover"
     description: "Show documentation hover"

@@ -11,6 +11,9 @@ mappings:
     zed:
       action: "editor::GoToDeclaration"
       context: "Editor"
+    xcode:
+      notSupported: true
+      note: "Use `Go to Definition` instead"
   - id: "actions.go.peekDeclaration"
     name: "Peek declaration"
     description: "Peek declaration"
@@ -24,6 +27,9 @@ mappings:
     zed:
       action: "editor::GoToDefinitionSplit"
       context: "Editor"
+    xcode:
+      notSupported: true
+      note: "Use `Go to Implementation` instead"
   - id: "actions.go.implementations"
     name: "Go to implementations"
     description: "Go to implementations, For an interface, this shows all the implementors of that interface and for abstract methods, this shows all concrete implementations of that method."
@@ -36,10 +42,14 @@ mappings:
       context: "Editor"
     intellij:
       action: "GotoImplementation"
+    xcode:
+      notSupported: true
+      note: "Use `Go to Definition` instead"
   - id: "actions.go.goToTest"
     name: "Go to test"
     description: "Go to test"
     category: "Code.Go"
+    featured: true
     vscode:
       command: "java.test.goToTest"
       when: "editorTextFocus && java:testRunnerActivated"
@@ -47,19 +57,27 @@ mappings:
       action: "GotoTest"
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, see [`Go to test` discussion](https://github.com/zed-industries/zed/discussions/40859)"
+      note: "not supported yet, see [`Go to test` discussion](https://github.com/zed-industries/zed/discussions/40859)"
+    xcode:
+      notSupported: true
+      note: "Not supported"
   - id: "actions.go.goToSuper"
     name: "Go to super"
     description: "Go to super class/super method"
     category: "Code.Go"
+    featured: true
+    featuredReason: "Use `Type hierarchy` instead"
     vscode:
       command: "dart.goToSuper"
       when: "editorTextFocus && dart.isTestFile != true && dart.isTestFile != true"
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, no issue tracked"
+      note: "not supported yet, no issue tracked"
     intellij:
       action: "GotoSuperMethod"
+    xcode:
+      notSupported: true
+      note: "Use `Type hierarchy` instead"
   - id: "actions.go.definition"
     name: "Go to definition"
     description: "Go to definition"
@@ -71,8 +89,9 @@ mappings:
       action: "editor::GoToDefinition"
       context: "Editor"
     intellij:
-      notSupported: true
-      notSupportedReason: "There is not `Go to definition` in intellij, use `Go to declaration` instead"
+      action: "GotoDeclaration"
+      disableImport: true
+      note: "There is not `Go to definition` in intellij, use `Go to declaration` instead"
     xcode:
       action: "editorContext_jumpToDefinition:"
       alternate: "NO"
@@ -86,14 +105,19 @@ mappings:
     name: "Peek definition"
     description: "Peek definition"
     category: "Code.Go"
+    featured: true
+    featuredReason: "Use `Go to definition` instead"
     vscode:
       command: "editor.action.peekDefinition"
       when: "ditorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor"
     zed:
       notSupported: true
-      notSupportedReason: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
+      note: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
     intellij:
       action: "QuickImplementations"
+    xcode:
+      notSupported: true
+      note: "Use `Go to definition` instead"
   - id: "actions.go.typeDefinition"
     name: "Go to type definition"
     description: "Go to type definition"
@@ -106,6 +130,9 @@ mappings:
       context: "Editor"
     intellij:
       action: "GotoTypeDeclaration"
+    xcode:
+      notSupported: true
+      note: "Use `Go to type definition` instead"
   - id: "actions.go.typeDefinitionPeek"
     name: "Peek type definition"
     description: "Peek type definition"
@@ -115,9 +142,12 @@ mappings:
       when: "editorTextFocus"
     zed:
       notSupported: true
-      notSupportedReason: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
+      note: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
     intellij:
       action: "QuickTypeDefinition"
+    xcode:
+      notSupported: true
+      note: "Use `Go to definition` instead"
   - id: "actions.go.references"
     name: "Go to references"
     description: "Go to references"
@@ -150,7 +180,10 @@ mappings:
       action: "ShowUsages"
     zed:
       notSupported: true
-      notSupportedReason: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
+      note: "Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)"
+    xcode:
+      notSupported: true
+      note: "Use `Go to references` instead"
   - id: "actions.go.callHierarchy"
     name: "Call hierarchy"
     description: "Show call hierarchy"
@@ -162,7 +195,7 @@ mappings:
       action: "CallHierarchy"
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
+      note: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
     xcode:
       action: "callHierarchy:"
       alternate: "NO"
@@ -183,10 +216,14 @@ mappings:
       when: "editorHasCallHierarchyProvider && editorTextFocus && !inReferenceSearchEditor"
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
+      note: "not supported yet, see [`Support 'Show Call Hierarchy' as an LSP action` issue](https://github.com/zed-industries/zed/issues/14203)"
     intellij:
+      action: "CallHierarchy"
+      note: "`Peek call hierarchy` will call `CallHierarchy` instead"
+      disableImport: true
+    xcode:
       notSupported: true
-      notSupportedReason: "Use `CallHierarchy` instead"
+      note: "Use `CallHierarchy` instead"
   - id: "actions.go.typeHierarchy"
     name: "Type hierarchy"
     description: "Show type hierarchy"
@@ -198,7 +235,17 @@ mappings:
       action: "TypeHierarchy"
     zed:
       notSupported: true
-      notSupportedReason: "Not supported yet, see [`Type hierarchy (class inheritance tree) support` discussion](https://github.com/zed-industries/zed/discussions/16348)"
+      note: "Not supported yet, see [`Type hierarchy (class inheritance tree) support` discussion](https://github.com/zed-industries/zed/discussions/16348)"
+    xcode:
+      action: "findAncestorTypes:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.FindAncestorTypes"
+      commandID: "Xcode.IDEKit.CmdDefinition.FindAncestorTypes"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Find Ancestor Types"
   - id: "actions.go.bracket"
     name: "Go to bracket"
     description: "Go to bracket"
@@ -211,6 +258,39 @@ mappings:
       context: "Editor"
     intellij:
       action: "EditorMatchBrace"
+    xcode:
+      - action: "balance:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.BalanceDelimiter"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.BalanceDelimiter"
+        group: "Editor Menu for Asset Catalog Comparison"
+        groupID: "Xcode.DeltaComparisonEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        parentTitle: "Selection"
+        title: "Balance Delimiters"
+        disableImport: true
+      - action: "balance:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.BalanceDelimiter"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.BalanceDelimiter"
+        group: "Editor Menu for Playground"
+        groupID: "Xcode.IDEPlaygroundEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        parentTitle: "Selection"
+        title: "Balance Delimiters"
+        disableImport: true
+      - action: "balance:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.BalanceDelimiter"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.BalanceDelimiter"
+        group: "Editor Menu for Source Code"
+        groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        parentTitle: "Selection"
+        title: "Balance Delimiters"
   - id: "actions.go.jumpToNextCounterpart"
     name: "Jump to next counterpart"
     description: "Jump to next counterpart, like switching between .cpp file and .h file"

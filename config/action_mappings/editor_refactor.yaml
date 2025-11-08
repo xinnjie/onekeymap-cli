@@ -42,7 +42,7 @@ mappings:
       action: "Refactorings.QuickListPopupAction"
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, see [Code refactoring in Zed ](https://github.com/zed-industries/zed/discussions/8623)"
+      note: "not supported yet, see [Code refactoring in Zed ](https://github.com/zed-industries/zed/discussions/8623)"
     helix:
       command: "code_action"
       mode: "insert"
@@ -72,9 +72,39 @@ mappings:
       disableImport: true
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, no issue tracked"
+      note: "not supported yet, no issue tracked"
     helix:
       notSupported: true
+    xcode:
+      - action: "fixAllIssues:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.FixAllInScope"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.FixAllInScope"
+        group: "Editor Menu for Asset Catalog Comparison"
+        groupID: "Xcode.DeltaComparisonEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        title: "Fix All Issues"
+        disableImport: true
+      - action: "fixAllIssues:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.FixAllInScope"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.FixAllInScope"
+        group: "Editor Menu for Playground"
+        groupID: "Xcode.IDEPlaygroundEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        title: "Fix All Issues"
+        disableImport: true
+      - action: "fixAllIssues:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.FixAllInScope"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.FixAllInScope"
+        group: "Editor Menu for Source Code"
+        groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        title: "Fix All Issues"
   - id: "actions.refactor.codeAction"
     name: "Code action"
     description: "Code Action..."
@@ -91,6 +121,8 @@ mappings:
     helix:
       command: "code_action"
       mode: "insert"
+    xcode:
+      notSupported: true
   - id: "actions.refactor.sourceAction"
     name: "Generate codes"
     description: "Generate code... (Getters, Setters, Constructors, hashCode/equals, toString)"
@@ -102,7 +134,9 @@ mappings:
       action: "Generate"
     zed:
       notSupported: true
-      notSupportedReason: "Use `Code action` instead"
+      note: "Use `Code action` instead"
+    xcode:
+      noteSupported: true
   - id: "action.refactor.extractVariable"
     name: "Extract to variable"
     description: "Extract to variable"

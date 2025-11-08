@@ -56,6 +56,10 @@ func checkVscodeDuplicateConfig(mappings map[string]ActionMappingConfig) error {
 			if vscodeConfig.Command == "" {
 				continue
 			}
+			// Skip configs that are disabled for import (export-only)
+			if vscodeConfig.DisableImport {
+				continue
+			}
 			// Serialize args to string for comparison
 			var argsStr string
 			if vscodeConfig.Args != nil {

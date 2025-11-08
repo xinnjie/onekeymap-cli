@@ -36,7 +36,7 @@ type OnekeymapServiceClient interface {
 	//
 	//	aip.dev/not-precedent: OnekeymapService only support grpc --)
 	//
-	// ImportKeymap imports a keymap from a file.
+	// ImportKeymap imports editor-specific config file
 	ImportKeymap(ctx context.Context, in *ImportKeymapRequest, opts ...grpc.CallOption) (*ImportKeymapResponse, error)
 	// (-- api-linter: core::0127::http-annotation=disabled
 	//
@@ -144,7 +144,7 @@ type OnekeymapServiceServer interface {
 	//
 	//	aip.dev/not-precedent: OnekeymapService only support grpc --)
 	//
-	// ImportKeymap imports a keymap from a file.
+	// ImportKeymap imports editor-specific config file
 	ImportKeymap(context.Context, *ImportKeymapRequest) (*ImportKeymapResponse, error)
 	// (-- api-linter: core::0127::http-annotation=disabled
 	//

@@ -17,6 +17,17 @@ mappings:
     helix:
       command: "file_explorer"
       mode: "insert"
+    xcode:
+      action: "toggleStructureNavigator:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.NavigatorsStructure"
+      commandID: "Xcode.IDEKit.CmdDefinition.NavigatorsStructure"
+      group: "View Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Navigators"
+      title: "Project"
   - id: "actions.view.toggleSearch"
     name: "Toggle search"
     description: "Toggle Search view"
@@ -35,6 +46,17 @@ mappings:
     helix:
       command: "global_search"
       mode: "insert"
+    xcode:
+      action: "toggleFindNavigator:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.NavigatorsFind"
+      commandID: "Xcode.IDEKit.CmdDefinition.NavigatorsFind"
+      group: "View Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Navigators"
+      title: "Find"
   - id: "actions.view.toggleSourceControl"
     name: "Toggle source control"
     description: "Toggle Source Control view"
@@ -53,6 +75,17 @@ mappings:
     helix:
       command: "changed_file_picker"
       mode: "insert"
+    xcode:
+      action: "toggleWorkingCopiesNavigator:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.NavigatorsWorkingCopies"
+      commandID: "Xcode.IDEKit.CmdDefinition.NavigatorsWorkingCopies"
+      group: "View Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Navigators"
+      title: "Source Control"
   - id: "actions.view.showExtensions"
     name: "Show extensions"
     description: "Show Extensions view"
@@ -76,11 +109,22 @@ mappings:
       when: ""
     zed:
       notSupported: true
-      notSupportedReason: "zed do not have testing view"
+      note: "zed do not have testing view"
     intellij:
       action: "ActivateUnitTestsToolWindow"
     helix:
       notSupported: true
+    xcode:
+      action: "toggleTestNavigator:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.NavigatorsTest"
+      commandID: "Xcode.IDEKit.CmdDefinition.NavigatorsTest"
+      group: "View Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Navigators"
+      title: "Tests"
   - id: "actions.view.toggleProblems"
     name: "Toggle problems"
     description: "Toggle Problems view"
@@ -97,6 +141,17 @@ mappings:
     helix:
       command: "workspace_diagnostics_picker"
       mode: "insert"
+    xcode:
+      action: "toggleIssuesNavigator:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.NavigatorsIssues"
+      commandID: "Xcode.IDEKit.CmdDefinition.NavigatorsIssues"
+      group: "View Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Navigators"
+      title: "Issues"
   - id: "actions.view.toggleOutput"
     name: "Toggle output"
     description: "Toggle Output view"
@@ -106,7 +161,7 @@ mappings:
       when: "workbench.panel.output.active"
     zed:
       notSupported: true
-      notSupportedReason: "zed do not have output view"
+      note: "zed do not have output view"
     intellij:
       action: "ActivateRunToolWindow"
     helix:
@@ -142,3 +197,14 @@ mappings:
       action: "ActivateDebugToolWindow"
     helix:
       notSupported: true
+    xcode:
+      action: "toggleDebuggerVisibility:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.DebuggerToggleVisibility"
+      commandID: "Xcode.IDEKit.CmdDefinition.DebuggerToggleVisibility"
+      group: "View Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Debug Area"
+      title: "Show Debug Area"

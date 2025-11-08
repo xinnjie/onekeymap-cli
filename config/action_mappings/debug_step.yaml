@@ -39,6 +39,16 @@ mappings:
     helix:
       command: "dap_step_in"
       mode: "insert"
+    xcode:
+      action: "stepInto:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.StepInto"
+      commandID: "Xcode.IDEKit.CmdDefinition.StepInto"
+      group: "Debug Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Step Into"
   - id: "actions.run.stepOut"
     name: "Step out"
     description: "Step Out"
@@ -78,6 +88,16 @@ mappings:
     helix:
       command: "dap_continue"
       mode: "insert"
+    xcode:
+      action: "pauseOrContinue:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.PauseContinue"
+      commandID: "Xcode.IDEKit.CmdDefinition.PauseContinue"
+      group: "Debug Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Pause / Continue"
   - id: "actions.run.runToCursor"
     name: "Run to cursor"
     description: "Run to Cursor"

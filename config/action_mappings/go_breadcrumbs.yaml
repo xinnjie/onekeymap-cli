@@ -12,4 +12,4 @@ mappings:
       action: "ShowNavBar"
     zed:
       notSupported: true
-      notSupportedReason: "Not support, no issue tracked"
+      note: "Not support, no issue tracked"

@@ -13,6 +13,16 @@ mappings:
     helix:
       command: "dap_launch"
       mode: "insert"
+    xcode:
+      action: "runActiveRunContext:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.Run"
+      commandID: "Xcode.IDEKit.CmdDefinition.Run"
+      group: "Product Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Run"
   - id: "actions.run.stopDebugging"
     name: "Stop debugging"
     description: "Stop Debugging"
@@ -27,6 +37,9 @@ mappings:
     helix:
       command: "dap_terminate"
       mode: "insert"
+    xcode:
+      notSupported: true
+      note: "Use `Start debugging` instead"
   - id: "actions.run.restartDebugging"
     name: "Restart debugging"
     description: "Restart Debugging"
@@ -42,6 +55,16 @@ mappings:
     helix:
       command: "dap_restart"
       mode: "insert"
+    xcode:
+      action: "cancelCurrentExecution:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.Stop"
+      commandID: "Xcode.IDEKit.CmdDefinition.Stop"
+      group: "Product Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Stop"
   - id: "actions.run.toggleBreakpoint"
     name: "Toggle breakpoint"
     description: "Toggle Breakpoint"
@@ -57,6 +80,17 @@ mappings:
     helix:
       command: "dap_toggle_breakpoint"
       mode: "insert"
+    xcode:
+      action: "toggleBreakpointAtCurrentLine:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.ToggleBreakpointAtCurrentLine"
+      commandID: "Xcode.IDEKit.CmdDefinition.ToggleBreakpointAtCurrentLine"
+      group: "Debug Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "Breakpoints"
+      title: "Create Breakpoint at Current Line"
   - id: "actions.view.showDebugOutputConsole"
     name: "Show debug console"
     description: "Show Debug Output Console view"
@@ -68,9 +102,9 @@ mappings:
       when: "workbench.panel.repl.view.active"
     zed:
       notSupported: true
-      notSupportedReason: "zed do not have debug console"
+      note: "zed do not have debug console"
     intellij:
       notSupported: true
-      notSupportedReason: "intellij have debug output with DebugPanel"
+      note: "intellij have debug output with DebugPanel"
     helix:
       notSupported: true

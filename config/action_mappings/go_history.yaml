@@ -49,6 +49,6 @@ mappings:
       command: "workbench.action.navigateToLastEditLocation"
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, see [Implement \"Go To Last Edit Location\" issue](https://github.com/zed-industries/zed/issues/19731)"
+      note: "not supported yet, see [Implement \"Go To Last Edit Location\" issue](https://github.com/zed-industries/zed/issues/19731)"
     intellij:
       action: "JumpToLastChange"

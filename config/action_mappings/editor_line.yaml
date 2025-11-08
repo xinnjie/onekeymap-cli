@@ -23,18 +23,6 @@ mappings:
     zed:
       action: "editor::JoinLines"
       context: "Editor"
-  - id: "actions.edit.lineBreakInsert"
-    name: "Insert line break"
-    description: "Insert line break"
-    category: "Editor.Line"
-    vscode:
-      command: "lineBreakInsert"
-      when: "textInputFocus && !editorReadonly"
-    intellij:
-      action: "EditorSplitLine"
-    zed:
-      action: "editor::Newline"
-      context: "Editor"
   - id: "actions.edit.insertLineAfter"
     name: "Insert line after"
     description: "Insert a new line after the current line"
@@ -59,3 +47,5 @@ mappings:
     zed:
       action: "editor::DeleteLine"
       context: "Editor"
+    xcode:
+      textAction: "deleteLine:"

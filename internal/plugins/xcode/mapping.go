@@ -8,7 +8,7 @@ import (
 func (i *xcodeImporter) FindByXcodeAction(action string) *mappings.ActionMappingConfig {
 	for _, mapping := range i.mappingConfig.Mappings {
 		for _, xc := range mapping.Xcode {
-			if xc.Action == action && !xc.DisableImport {
+			if xc.MenuAction.Action == action && !xc.DisableImport {
 				return &mapping
 			}
 		}
@@ -20,7 +20,7 @@ func (i *xcodeImporter) FindByXcodeAction(action string) *mappings.ActionMapping
 func (i *xcodeImporter) FindByXcodeTextAction(textAction string) *mappings.ActionMappingConfig {
 	for _, mapping := range i.mappingConfig.Mappings {
 		for _, xc := range mapping.Xcode {
-			if xc.TextAction == textAction && !xc.DisableImport {
+			if xc.TextAction.TextAction == textAction && !xc.DisableImport {
 				return &mapping
 			}
 		}

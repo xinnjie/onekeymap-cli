@@ -10,7 +10,7 @@ mappings:
       action: "NotebookEnterCell"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.execute"
     name: "Execute cell"
     description: "Execute Cell"
@@ -22,7 +22,7 @@ mappings:
       action: "NotebookRunCell"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.executeAndInsertBelow"
     name: "Execute and insert"
     description: "Execute Cell and Insert Below"
@@ -34,7 +34,7 @@ mappings:
       action: "RunCellAndInsertBelowAction"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.executeAndSelectBelow"
     name: "Execute and select"
     description: "Execute Cell and Select Below"
@@ -46,7 +46,7 @@ mappings:
       action: "NotebookRunCellAndSelectBelow"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.insertCodeCellAbove"
     name: "Insert above"
     description: "Insert Code Cell Above"
@@ -58,7 +58,7 @@ mappings:
       action: "NotebookInsertCodeCellAbove"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.insertCodeCellBelow"
     name: "Insert below"
     description: "Insert Code Cell Below"
@@ -70,7 +70,7 @@ mappings:
       action: "NotebookInsertCodeCellBelow"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.moveDown"
     name: "Move down"
     description: "Move Cell Down"
@@ -82,7 +82,7 @@ mappings:
       action: "MoveStatementDown"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.moveUp"
     name: "Move up"
     description: "Move Cell Up"
@@ -94,7 +94,7 @@ mappings:
       action: "MoveStatementUp"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.cell.quitEdit"
     name: "Quit edit"
     description: "Stop Editing Cell"
@@ -106,7 +106,7 @@ mappings:
       action: "NotebookExitEditMode"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.focusBottom"
     name: "Focus bottom"
     description: "Focus Bottom"
@@ -118,7 +118,7 @@ mappings:
       action: "NotebookSelectLastCell"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
   - id: "actions.notebook.focusTop"
     name: "Focus top"
     description: "Focus Top"
@@ -130,4 +130,4 @@ mappings:
       action: "NotebookSelectFirstCell"
     zed:
       notSupported: true
-      notSupportedReason: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"
+      note: "Notebook not supported yet see [issue](https://github.com/zed-industries/zed/discussions/25936)"

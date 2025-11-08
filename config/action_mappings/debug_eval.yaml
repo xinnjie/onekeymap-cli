@@ -13,3 +13,5 @@ mappings:
       context: "Workspace"
     helix:
       notSupported: true
+    xcode:
+      notSupported: true

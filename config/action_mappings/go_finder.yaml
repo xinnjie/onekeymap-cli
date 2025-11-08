@@ -11,6 +11,15 @@ mappings:
       context: "Workspace"
     intellij:
       action: "GotoFile"
+    xcode:
+      action: "openQuickly:"
+      alternate: "NO"
+      commandID: "Xcode.IDEKit.CmdDefinition.OpenQuickly"
+      group: "File Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Open Quickly…"
   - id: "actions.go.symbolFinder"
     name: "Find symbol"
     description: "Go to symbol in workspace, across files in the workspace"

@@ -11,3 +11,14 @@ mappings:
       context: "Workspace"
     intellij:
       action: "NewScratchFile"
+    xcode:
+      action: "newFileFromTemplate:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.NewFileFromTemplate"
+      commandID: "Xcode.IDEKit.CmdDefinition.NewFileFromTemplate"
+      group: "File Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      parentTitle: "New"
+      title: "File from Template…"

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"slices"
+	"strings"
 
 	actionmappings "github.com/xinnjie/onekeymap-cli/config/action_mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -49,63 +50,141 @@ type ActionMappingConfig struct {
 	Xcode          XcodeConfigs          `yaml:"xcode"`
 }
 
+const explicitlyNotSupported = "__explicitly_not_supported__"
+
 // IsSupported checks if the action is supported by the given editor type.
-// Returns (supported, notSupportedReason).
+// Returns (supported, note).
 func (am *ActionMappingConfig) IsSupported(editorType pluginapi.EditorType) (bool, string) {
 	switch editorType {
 	case pluginapi.EditorTypeVSCode:
-		for _, vc := range am.VSCode {
-			if vc.NotSupported {
-				return false, vc.NotSupportedReason
-			}
-		}
-		hasMapping := slices.ContainsFunc(am.VSCode, func(vc VscodeMappingConfig) bool {
-			return vc.Command != ""
-		})
-		return hasMapping, ""
+		return am.isSupportedVSCode()
 	case pluginapi.EditorTypeIntelliJ:
-		if am.IntelliJ.NotSupported {
-			return false, am.IntelliJ.NotSupportedReason
-		}
-		return am.IntelliJ.Action != "", ""
+		return am.isSupportedIntelliJ()
 	case pluginapi.EditorTypeZed:
-		for _, zc := range am.Zed {
-			if zc.NotSupported {
-				return false, zc.NotSupportedReason
-			}
-		}
-		hasMapping := slices.ContainsFunc(am.Zed, func(zc ZedMappingConfig) bool {
-			return zc.Action != ""
-		})
-		return hasMapping, ""
+		return am.isSupportedZed()
 	case pluginapi.EditorTypeVim:
-		if am.Vim.NotSupported {
-			return false, am.Vim.NotSupportedReason
-		}
-		return am.Vim.Command != "", ""
+		return am.isSupportedVim()
 	case pluginapi.EditorTypeHelix:
-		for _, hc := range am.Helix {
-			if hc.NotSupported {
-				return false, hc.NotSupportedReason
-			}
-		}
-		hasMapping := slices.ContainsFunc(am.Helix, func(hc HelixMappingConfig) bool {
-			return hc.Command != ""
-		})
-		return hasMapping, ""
+		return am.isSupportedHelix()
 	case pluginapi.EditorTypeXcode:
-		for _, xc := range am.Xcode {
-			if xc.NotSupported {
-				return false, xc.NotSupportedReason
-			}
-		}
-		hasMapping := slices.ContainsFunc(am.Xcode, func(xc XcodeMappingConfig) bool {
-			return xc.Action != ""
-		})
-		return hasMapping, ""
+		return am.isSupportedXcode()
 	default:
 		return false, ""
 	}
+}
+
+func (am *ActionMappingConfig) isSupportedVSCode() (bool, string) {
+	if len(am.VSCode) == 0 {
+		return false, ""
+	}
+	var notes []string
+	for _, vc := range am.VSCode {
+		if vc.NotSupported {
+			if vc.Note == "" {
+				return false, explicitlyNotSupported
+			}
+			return false, vc.Note
+		}
+		if vc.Note != "" {
+			notes = append(notes, vc.Note)
+		}
+	}
+	hasMapping := slices.ContainsFunc(am.VSCode, func(vc VscodeMappingConfig) bool {
+		return vc.Command != ""
+	})
+	return hasMapping, strings.Join(notes, ", ")
+}
+
+func (am *ActionMappingConfig) isSupportedIntelliJ() (bool, string) {
+	if am.IntelliJ == (IntelliJMappingConfig{}) {
+		return false, ""
+	}
+	if am.IntelliJ.NotSupported {
+		if am.IntelliJ.Note == "" {
+			return false, explicitlyNotSupported
+		}
+		return false, am.IntelliJ.Note
+	}
+	return am.IntelliJ.Action != "", am.IntelliJ.Note
+}
+
+func (am *ActionMappingConfig) isSupportedZed() (bool, string) {
+	if len(am.Zed) == 0 {
+		return false, ""
+	}
+	var notes []string
+	for _, zc := range am.Zed {
+		if zc.NotSupported {
+			if zc.Note == "" {
+				return false, explicitlyNotSupported
+			}
+			return false, zc.Note
+		}
+		if zc.Note != "" {
+			notes = append(notes, zc.Note)
+		}
+	}
+	hasMapping := slices.ContainsFunc(am.Zed, func(zc ZedMappingConfig) bool {
+		return zc.Action != ""
+	})
+	return hasMapping, strings.Join(notes, ", ")
+}
+
+func (am *ActionMappingConfig) isSupportedVim() (bool, string) {
+	if am.Vim == (VimMappingConfig{}) {
+		return false, ""
+	}
+	if am.Vim.NotSupported {
+		if am.Vim.Note == "" {
+			return false, explicitlyNotSupported
+		}
+		return false, am.Vim.Note
+	}
+	return am.Vim.Command != "", am.Vim.Note
+}
+
+func (am *ActionMappingConfig) isSupportedHelix() (bool, string) {
+	if len(am.Helix) == 0 {
+		return false, ""
+	}
+	var notes []string
+	for _, hc := range am.Helix {
+		if hc.NotSupported {
+			if hc.Note == "" {
+				return false, explicitlyNotSupported
+			}
+			return false, hc.Note
+		}
+		if hc.Note != "" {
+			notes = append(notes, hc.Note)
+		}
+	}
+	hasMapping := slices.ContainsFunc(am.Helix, func(hc HelixMappingConfig) bool {
+		return hc.Command != ""
+	})
+	return hasMapping, strings.Join(notes, ", ")
+}
+
+func (am *ActionMappingConfig) isSupportedXcode() (bool, string) {
+	if len(am.Xcode) == 0 {
+		return false, ""
+	}
+	var notes []string
+	for _, xc := range am.Xcode {
+		if xc.NotSupported {
+			if xc.Note == "" {
+				return false, explicitlyNotSupported
+			}
+			return false, xc.Note
+		}
+		if xc.Note != "" {
+			notes = append(notes, xc.Note)
+		}
+	}
+	hasMapping := slices.ContainsFunc(am.Xcode, func(xc XcodeMappingConfig) bool {
+		return xc.MenuAction.Action != "" || xc.TextAction.TextAction != ""
+	})
+	return hasMapping, strings.Join(notes, ", ")
 }
 
 // EditorActionMapping provides extra flags for editor-specific configurations.
@@ -116,7 +195,7 @@ type EditorActionMapping struct {
 	// explicitly set to true if this config is not supported by the editor
 	NotSupported bool `yaml:"notSupported,omitempty"`
 	// reason why this config is not supported by the editor
-	NotSupportedReason string `yaml:"notSupportedReason,omitempty"`
+	Note string `yaml:"note,omitempty"`
 }
 
 // configFormat is a struct that matches the structure of each YAML file.

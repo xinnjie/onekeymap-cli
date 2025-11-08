@@ -63,7 +63,7 @@ mappings:
         context: "Terminal"
     intellij:
       notSupported: true
-      notSupportedReason: "intellij do not have split left, use `Split right` instead."
+      note: "intellij do not have split left, use `Split right` instead."
   - id: "actions.view.splitUp"
     name: "Split up"
     description: "Split editor to up"
@@ -80,7 +80,7 @@ mappings:
         context: "Terminal"
     intellij:
      notSupported: true
-     notSupportedReason: "intellij do not have split up, use `Split down` instead."
+     note: "intellij do not have split up, use `Split down` instead."
   - id: "actions.view.splitDown"
     name: "Split down"
     description: "Split editor to down"

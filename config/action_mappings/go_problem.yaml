@@ -12,6 +12,16 @@ mappings:
       context: "Editor"
     intellij:
       action: "GotoNextError"
+    xcode:
+      action: "jumpToNextIssue:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.JumpToNextIssue"
+      commandID: "Xcode.IDEKit.CmdDefinition.JumpToNextIssue"
+      group: "Navigate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "YES"
+      title: "Jump to Next Issue"
   - id: "actions.go.previousProblem"
     name: "Previous problem"
     description: "Go to Previous Problem (Error, Warning, Info)"
@@ -25,3 +35,13 @@ mappings:
       context: "Editor"
     intellij:
       action: "GotoPreviousError"
+    xcode:
+      action: "jumpToPreviousIssue:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.JumpToPreviousIssue"
+      commandID: "Xcode.IDEKit.CmdDefinition.JumpToPreviousIssue"
+      group: "Navigate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "YES"
+      title: "Jump to Previous Issue"

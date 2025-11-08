@@ -12,6 +12,16 @@ mappings:
     helix:
       command: ":config-open"
       mode: "insert"
+    xcode:
+      action: "showPreferencesPanel:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.Preferences"
+      commandID: "Xcode.IDEKit.CmdDefinition.Preferences"
+      group: "Xcode Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Settings…"
   - id: "actions.view.selectTheme"
     name: "Select theme"
     description: "Select Theme"
@@ -26,6 +36,9 @@ mappings:
     helix:
       command: ":theme"
       mode: "insert"
+    xcode:
+      notSupported: true
+      note: "Xcode does not have a theme"
   - id: "actions.view.openKeyboardShortcuts"
     name: "Open keyboard shortcuts"
     description: "Open Keyboard Shortcuts Settings"
@@ -34,7 +47,10 @@ mappings:
       command: "workbench.action.openGlobalKeybindings"
     intellij:
       notSupported: true
-      notSupportedReason: "intellij do not have open keyboard shortcuts, you can open `Keymap` in command palette searching for `Keymap` and then open it."
+      note: "intellij do not have open keyboard shortcuts, you can open `Keymap` in command palette searching for `Keymap` and then open it."
     zed:
       action: "zed::OpenKeymap"
       context: "Workspace"
+    xcode:
+      notSupported: true
+      note: "use `Open global settings` instead"

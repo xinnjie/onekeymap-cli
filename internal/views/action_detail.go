@@ -26,8 +26,8 @@ type ActionDetailsViewModel struct {
 }
 
 type editorSupportInfo struct {
-	supported          bool
-	notSupportedReason string
+	supported bool
+	note      string
 }
 
 func newActionDetailsViewModel(actionID string, mc *mappings.MappingConfig) *ActionDetailsViewModel {
@@ -62,10 +62,10 @@ func newActionDetailsViewModel(actionID string, mc *mappings.MappingConfig) *Act
 
 func (d *ActionDetailsViewModel) collectEditorSupport(mapping *mappings.ActionMappingConfig) {
 	for _, editorType := range editorTypesDisplayOrder {
-		supported, notSupportedReason := mapping.IsSupported(editorType)
+		supported, note := mapping.IsSupported(editorType)
 		info := editorSupportInfo{
-			supported:          supported,
-			notSupportedReason: notSupportedReason,
+			supported: supported,
+			note:      note,
 		}
 
 		d.editorSupport[editorType] = info
@@ -121,8 +121,8 @@ func (d *ActionDetailsViewModel) formatEditorStatus(
 	}
 
 	status := notSupportedStyle.Render("✗ Not Supported")
-	if info.notSupportedReason != "" {
-		status += fmt.Sprintf(" (%s)", info.notSupportedReason)
+	if info.note != "" {
+		status += fmt.Sprintf(" (%s)", info.note)
 	}
 	return status
 }

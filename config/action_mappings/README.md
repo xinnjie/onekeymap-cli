@@ -23,10 +23,15 @@ Each YAML file follows this structure:
 ```yaml
 mappings:
   - id: "actions.category.actionName"
-    description: "Human-readable description of what this action does"
+    name: "A short, human-readable name for the action"
+    description: "A longer, more detailed description of what the action does"
+    category: "editor.editing.selection"
+    featured: false
+    featuredReason: "This action is widely supported and considered portable."
     vscode:
       command: "vscode.command.name"
       when: "contextCondition"
+      note: "optional special note of this command"
     zed:
       action: "zed::Action"
       context: "ContextName"
@@ -40,13 +45,17 @@ mappings:
 
 ### Field Definitions
 
-- **`id`**: Unique universal action identifier following the pattern `actions.category.actionName`
-- **`description`**: Clear, human-readable explanation of what the action does
-- **Editor-specific sections**:
-  - **VSCode**: `command` (the VSCode command ID) and optional `when` clause
-  - **Zed**: `action` (the Zed action name) and `context` (when the action is available)
-  - **IntelliJ**: `action` (IntelliJ action ID) and optional `context`
-  - **Vim**: `command` (vim command/key sequence) and `mode` (vim mode where applicable)
+- **`id`**: Unique universal action identifier following the pattern `actions.category.actionName`.
+- **`name`**: A short, human-readable name for the action.
+- **`description`**: A clear, human-readable explanation of what the action does.
+- **`category`**: The category of the action, used for grouping and organization.
+- **`featured`**: A boolean indicating if the action is not widely portable across editors. Set to `true` for editor-specific or non-standard actions.
+- **`featuredReason`**: An explanation for why an action is `featured`, or a recommendation to use a more portable alternative.
+- **Editor-specific sections** (`vscode`, `zed`, `intellij`, `vim`, `helix`, `xcode`):
+  - These sections contain the specific implementation details for each editor. For editors that support multiple configurations for a single action (like VSCode), this is a list of mappings.
+  - **`disableImport`** (optional): If `true`, this mapping will only be used for exporting keymaps and will be ignored during import.
+  - **`notSupported`** (optional): If `true`, this action is explicitly marked as not supported for the editor.
+  - **`notSupportedReason`** (optional): A string explaining why the action is not supported.
 
 ## Supported Editors
 

@@ -398,10 +398,10 @@ type EditorSupport struct {
 	EditorType EditorType `protobuf:"varint,1,opt,name=editor_type,json=editorType,proto3,enum=keymap.v1.EditorType" json:"editor_type,omitempty"`
 	// Whether this action is supported by the editor
 	Supported bool `protobuf:"varint,2,opt,name=supported,proto3" json:"supported,omitempty"`
-	// Reason why this action is not supported (only set when supported = false)
-	NotSupportedReason string `protobuf:"bytes,3,opt,name=not_supported_reason,json=notSupportedReason,proto3" json:"not_supported_reason,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Special note of why not supported or supportness
+	Note          string `protobuf:"bytes,3,opt,name=note,proto3" json:"note,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EditorSupport) Reset() {
@@ -448,9 +448,9 @@ func (x *EditorSupport) GetSupported() bool {
 	return false
 }
 
-func (x *EditorSupport) GetNotSupportedReason() string {
+func (x *EditorSupport) GetNote() string {
 	if x != nil {
-		return x.NotSupportedReason
+		return x.Note
 	}
 	return ""
 }
@@ -484,12 +484,12 @@ const file_keymap_v1_keymap_proto_rawDesc = "" +
 	"\fdisplay_name\x18\x01 \x01(\tR\vdisplayName\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
 	"\bcategory\x18\x03 \x01(\tR\bcategory\x12?\n" +
-	"\x0eeditor_support\x18\x04 \x03(\v2\x18.keymap.v1.EditorSupportR\reditorSupport\"\x97\x01\n" +
+	"\x0eeditor_support\x18\x04 \x03(\v2\x18.keymap.v1.EditorSupportR\reditorSupport\"y\n" +
 	"\rEditorSupport\x126\n" +
 	"\veditor_type\x18\x01 \x01(\x0e2\x15.keymap.v1.EditorTypeR\n" +
 	"editorType\x12\x1c\n" +
-	"\tsupported\x18\x02 \x01(\bR\tsupported\x120\n" +
-	"\x14not_supported_reason\x18\x03 \x01(\tR\x12notSupportedReasonB\x9c\x01\n" +
+	"\tsupported\x18\x02 \x01(\bR\tsupported\x12\x12\n" +
+	"\x04note\x18\x03 \x01(\tR\x04noteB\x9c\x01\n" +
 	"\rcom.keymap.v1B\vKeymapProtoP\x01Z9github.com/xinnjie/watchbeats/protogen/keymap/v1;keymapv1\xa2\x02\x03KXX\xaa\x02\tKeymap.V1\xca\x02\tKeymap\\V1\xe2\x02\x15Keymap\\V1\\GPBMetadata\xea\x02\n" +
 	"Keymap::V1b\x06proto3"
 

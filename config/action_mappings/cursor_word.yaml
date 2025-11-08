@@ -1,3 +1,4 @@
+# TODO(xinnjie): distinct move cursor backward/left and move word forward/right, backward != left, some languages use backward as right
 mappings:
   - id: "actions.cursor.wordRight"
     name: "Move to next word"
@@ -14,6 +15,8 @@ mappings:
     helix:
       command: "move_next_word_end"
       mode: "insert"
+    xcode:
+      textAction: "moveWordForward:"
   - id: "actions.cursor.wordPartRight"
     name: "Move to next subword"
     description: "Move cursor to the end of the next subword (hump)"
@@ -26,10 +29,12 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupportedReason: "intellij need to turn on `CamelHumps` setting"
+      note: "intellij need to turn on `CamelHumps` setting"
     helix:
       command: "move_next_sub_word_start"
       mode: "insert"
+    xcode:
+      textAction: "moveSubWordForward:"
   - id: "actions.cursor.wordLeft"
     name: "Move to previous word"
     description: "Move cursor to the start of the previous word"
@@ -45,6 +50,8 @@ mappings:
     helix:
       command: "move_prev_word_start"
       mode: "insert"
+    xcode:
+      textAction: "moveWordBackward:"
   - id: "actions.cursor.wordPartLeft"
     name: "Move to previous subword"
     description: "Move cursor to the start of the previous subword (hump)"
@@ -57,10 +64,12 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupportedReason: "intellij need to turn on `CamelHumps` setting"
+      note: "intellij need to turn on `CamelHumps` setting"
     helix:
       command: "move_prev_sub_word_start"
       mode: "insert"
+    xcode:
+      textAction: "moveSubWordBackward:"
   - id: "actions.cursor.wordRightSelect"
     name: "Select next word"
     description: "Select to the end of the next word"
@@ -75,7 +84,9 @@ mappings:
       action: "EditorNextWordWithSelection"
     helix:
       notSupported: true
-      notSupportedReason: "helix move cursor with selection by default"
+      note: "helix move cursor with selection by default"
+    xcode:
+      textAction: "moveWordForwardAndModifySelection:"
   - id: "actions.cursor.wordPartRightSelect"
     name: "Select next subword"
     description: "Select to the end of the next subword (hump)"
@@ -88,9 +99,11 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupportedReason: "intellij need to turn on `CamelHumps` setting"
+      note: "intellij need to turn on `CamelHumps` setting"
     helix:
       notSupported: true
+    xcode:
+      textAction: "moveSubWordForwardAndModifySelection:"
   - id: "actions.cursor.wordLeftSelect"
     name: "Select previous word"
     description: "Select to the start of the previous word"
@@ -105,7 +118,9 @@ mappings:
       action: "EditorPreviousWordWithSelection"
     helix:
       notSupported: true
-      notSupportedReason: "helix move cursor with selection by default"
+      note: "helix move cursor with selection by default"
+    xcode:
+      textAction: "moveWordBackwardAndModifySelection:"
   - id: "actions.cursor.wordPartLeftSelect"
     name: "Select previous subword"
     description: "Select to the start of the previous subword (hump)"
@@ -118,7 +133,9 @@ mappings:
       context: "Editor"
     intellij:
       notSupported: true
-      notSupportedReason: "intellij need to turn on `CamelHumps` setting"
+      note: "intellij need to turn on `CamelHumps` setting"
     helix:
       notSupported: true
-      notSupportedReason: "helix move cursor with selection by default"
+      note: "helix move cursor with selection by default"
+    xcode:
+      textAction: "moveSubWordBackwardAndModifySelection:"

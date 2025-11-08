@@ -9,7 +9,7 @@ mappings:
       when: "editorTextFocus"
     zed:
       notSupported: true
-      notSupportedReason: "holding shift-option and perform a cursor drag to column select, see detail in [Add support for column selection mode issue](https://github.com/zed-industries/zed/issues/7215)"
+      note: "holding shift-option and perform a cursor drag to column select, see detail in [Add support for column selection mode issue](https://github.com/zed-industries/zed/issues/7215)"
     intellij:
       action: "EditorToggleColumnMode"
     helix:

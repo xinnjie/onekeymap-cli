@@ -25,8 +25,10 @@ func testMappingConfig() *mappings.MappingConfig {
 				Description: "Jump to definition",
 				Xcode: []mappings.XcodeMappingConfig{
 					{
-						Action:    "editorContext_jumpToDefinition:",
-						CommandID: "Xcode.IDEKit.CmdDefinition.JumpToDefinition",
+						MenuAction: mappings.XcodeMenuAction{
+							Action:    "editorContext_jumpToDefinition:",
+							CommandID: "Xcode.IDEKit.CmdDefinition.JumpToDefinition",
+						},
 					},
 				},
 			},
@@ -35,7 +37,9 @@ func testMappingConfig() *mappings.MappingConfig {
 				Description: "Page down",
 				Xcode: []mappings.XcodeMappingConfig{
 					{
-						TextAction: "pageDown:",
+						TextAction: mappings.XcodeTextAction{
+							TextAction: "pageDown:",
+						},
 					},
 				},
 			},

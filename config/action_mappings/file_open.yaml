@@ -13,6 +13,16 @@ mappings:
     helix:
       command: "file_picker"
       mode: "insert"
+    xcode:
+      action: "openDocument:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.Open"
+      commandID: "Xcode.IDEKit.CmdDefinition.Open"
+      group: "File Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Open…"
   - id: "actions.file.showOpenedFileInNewWindow"
     name: "Show in new window"
     description: "Show opened file in new window"
@@ -24,7 +34,7 @@ mappings:
       action: "EditSourceInNewWindow"
     zed:
       notSupported: true
-      notSupportedReason: "Not support, no issue tracked"
+      note: "Not support, no issue tracked"
     helix:
       notSupported: true
   - id: "actions.file.openRecent"
@@ -45,11 +55,12 @@ mappings:
       command: "buffer_picker"
       mode: "insert"
     xcode:
-      action: "openQuickly:"
+      action: "openInNewWindow:"
       alternate: "NO"
-      commandID: "Xcode.IDEKit.CmdDefinition.OpenQuickly"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.OpenInNewWindow"
+      commandID: "Xcode.IDEKit.CmdDefinition.OpenInNewWindow"
       group: "File Menu"
       groupID: "Xcode.IDEKit.MenuDefinition.Main"
       groupedAlternate: "NO"
       navigation: "NO"
-      title: "Open Quickly…"
+      title: "Open in New Window"

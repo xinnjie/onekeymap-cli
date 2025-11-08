@@ -12,3 +12,6 @@ mappings:
       context: "Workspace"
     intellij:
       action: "Terminal.NewTab"
+    xcode:
+      notSupported: true
+      note: "Xcode does not have a terminal"

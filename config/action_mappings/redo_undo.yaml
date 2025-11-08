@@ -13,6 +13,8 @@ mappings:
     helix:
       command: "undo"
       mode: "insert"
+    xcode:
+      textAction: "undo:"
   - id: "actions.edit.redo"
     name: "Redo action"
     description: "Redo last undone action"
@@ -27,3 +29,5 @@ mappings:
     helix:
       command: "redo"
       mode: "insert"
+    xcode:
+      textAction: "redo:"

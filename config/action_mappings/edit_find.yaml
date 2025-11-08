@@ -14,6 +14,16 @@ mappings:
     helix:
       command: "search"
       mode: "insert"
+    xcode:
+      action: "find:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.Find"
+      commandID: "Xcode.IDEKit.CmdDefinition.Find"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Find"
   - id: "actions.edit.nextMatchFindAction"
     name: "Find next"
     description: "Find Next"
@@ -53,6 +63,16 @@ mappings:
     helix:
       command: "search_prev"
       mode: "insert"
+    xcode:
+      action: "selectPreviousOccurrence:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.SelectPreviousOccurrence"
+      commandID: "Xcode.IDEKit.CmdDefinition.SelectPreviousOccurrence"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Select Previous Occurrence"
   - id: "actions.edit.replace"
     name: "Replace in file"
     description: "Replace in current file"
@@ -67,6 +87,16 @@ mappings:
       action: "Replace"
     helix:
       notSupported: true
+    xcode:
+      action: "replace:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.Replace"
+      commandID: "Xcode.IDEKit.CmdDefinition.Replace"
+      group: "Find Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Replace"
   - id: "actions.edit.findInFiles"
     name: "Find in project"
     description: "Find in all files in the project"

@@ -32,6 +32,16 @@ mappings:
     zed:
       action: "git::OpenModifiedFiles"
       context: "Editor"
+    xcode:
+      action: "openInEditorTabs:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.OpenInEditorTabs"
+      commandID: "Xcode.IDEKit.CmdDefinition.OpenInEditorTabs"
+      group: "File Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Open in New Tabs"
   - id: "actions.git.unstage"
     name: "Unstage changes"
     description: "Unstage Changes"
@@ -44,6 +54,30 @@ mappings:
     zed:
       action: "git::UnstageAndNext"
       context: "Editor && !agent_diff"
+    xcode:
+      action: "unstageWorkingCopiesCommand:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.UnstageWorkingCopiesCommand"
+      commandID: "Xcode.IDEKit.CmdDefinition.UnstageWorkingCopiesCommand"
+      group: "Integrate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Unstage All Changes"
+  - id: "actions.git.unstageSelected"
+    name: "Unstage selected changes"
+    description: "Unstage selected changes"
+    category: "Version Control"
+    xcode:
+      action: "unstageSelectedFilesCommand:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.UnstageSelectedFilesCommand"
+      commandID: "Xcode.IDEKit.CmdDefinition.UnstageSelectedFilesCommand"
+      group: "Integrate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Unstage Selected Files"
   - id: "actions.git.revert"
     name: "Revert changes"
     description: "Revert Changes"
@@ -68,6 +102,30 @@ mappings:
     zed:
       action: "git::StageAndNext"
       context: "Editor && !agent_diff"
+    xcode:
+      action: "stageWorkingCopiesCommand:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.StageWorkingCopiesCommand"
+      commandID: "Xcode.IDEKit.CmdDefinition.StageWorkingCopiesCommand"
+      group: "Integrate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Stage All Changes"
+  - id: "actions.git.stageSelected"
+    name: "Stage selected changes"
+    description: "Stage Selected Changes"
+    category: "Version Control"
+    xcode:
+      action: "stageSelectedFilesCommand:"
+      alternate: "NO"
+      commandGroupID: "Xcode.IDEKit.CmdDefinition.StageSelectedFilesCommand"
+      commandID: "Xcode.IDEKit.CmdDefinition.StageSelectedFilesCommand"
+      group: "Integrate Menu"
+      groupID: "Xcode.IDEKit.MenuDefinition.Main"
+      groupedAlternate: "NO"
+      navigation: "NO"
+      title: "Stage Selected Files"
   - id: "actions.git.push"
     name: "Push changes"
     description: "Push Changes"
@@ -117,14 +175,35 @@ mappings:
     description: "Toggle Blame in left of editor"
     category: "Version Control"
     vscode:
-      notSupported: true
-      notSupportedReason: "vscode support toggle blame inline, see `Toggle blame inline`"
+      command: "git.blame.toggleEditorDecoration"
+      note: "toggle blame inline"
+      disableImport: true
     intellij:
       notSupported: true
-      notSupportedReason: "intellij can only toggle blame in actions"
+      note: "intellij can only toggle blame in actions"
     zed:
       action: "git::blame"
       context: "Editor"
+    xcode:
+      - action: "toggleAuthorsShown:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowAuthors"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowAuthors"
+        group: "Editor Menu for Playground"
+        groupID: "Xcode.IDEPlaygroundEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        title: "Authors"
+        disableImport: true
+      - action: "toggleAuthorsShown:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowAuthors"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowAuthors"
+        group: "Editor Menu for Source Code"
+        groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        title: "Authors"
   - id: "actions.git.toggleBlameInline"
     name: "Toggle blame inline"
     description: "Toggle blame inline, next to editor content"
@@ -133,15 +212,48 @@ mappings:
       command: "git.blame.toggleEditorDecoration"
     zed:
       action: "editor::ToggleGitBlameInline"
+    xcode:
+      - action: "blameSelectedLine:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowBlameForLine"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowBlameForLine"
+        group: "Editor Menu for Asset Catalog Comparison"
+        groupID: "Xcode.DeltaComparisonEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        title: "Show Last Change for Line"
+        disableImport: true
+      - action: "blameSelectedLine:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowBlameForLine"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowBlameForLine"
+        group: "Editor Menu for Playground"
+        groupID: "Xcode.IDEPlaygroundEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        title: "Show Last Change for Line"
+        disableImport: true
+      - action: "blameSelectedLine:"
+        alternate: "NO"
+        commandGroupID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowBlameForLine"
+        commandID: "Xcode.IDEPegasusSourceEditor.CmdDefinition.ShowBlameForLine"
+        group: "Editor Menu for Source Code"
+        groupID: "Xcode.IDEPegasusSourceEditor.MenuDefinition.Editor"
+        groupedAlternate: "NO"
+        navigation: "NO"
+        title: "Show Last Change for Line"
   - id: "actions.git.toggleBlameStatusBar"
     name: "Toggle blame status bar"
     description: "Toggle blame in status bar"
     category: "Version Control"
+    featured: true
     vscode:
       command: "git.blame.toggleStatusBarItem"
     zed:
       notSupported: true
-      notSupportedReason: "not supported yet, see [`Optional Git Blame in status bar instead of inline` discussion](https://github.com/zed-industries/zed/discussions/26127)"
+      note: "not supported yet, see [`Optional Git Blame in status bar instead of inline` discussion](https://github.com/zed-industries/zed/discussions/26127)"
+    xcode:
+      notSupported: true
   - id: "actions.git.blameHover"
     name: "Blame hover"
     description: "Show blame information on hover"
@@ -149,12 +261,14 @@ mappings:
     featured: true
     vscode:
       notSupported: true
-      notSupportedReason: "vscode support blame inline, see `Toggle blame inline`"
+      note: "vscode support blame inline, see `Toggle blame inline`"
     zed:
       action: "editor::BlameHover"
       context: "Editor"
+    xcode:
+      notSupported: true
   - id: "action.git.jumpSource"
-    name: "Jump to Source"
+    name: "Open source file from version control panel"
     description: "Jump to Source"
     category: "Version Control"
     vscode:
