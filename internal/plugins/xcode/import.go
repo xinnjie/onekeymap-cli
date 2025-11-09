@@ -1,6 +1,7 @@
 package xcode
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -141,10 +142,33 @@ func parseXcodeConfig(xmlData []byte) (*xcodeKeybindingsPlist, error) {
 	var plistData xcodeKeybindingsPlist
 
 	// Use plist library to decode the plist data
-	_, err := plist.Unmarshal(xmlData, &plistData)
+	sanitized := sanitizeXcodePlist(xmlData)
+	_, err := plist.Unmarshal(sanitized, &plistData)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode plist: %w", err)
 	}
 
 	return &plistData, nil
+}
+
+const unknownKeyCode = 0x03
+
+// FIXME(xinnjie): plist is XML 1.0. XML 1.0 forbids most control characters (everything below 0x20 except 0x09, 0x0A, 0x0D)
+// `U+0003` is sometimes included in Xcode generated keybinding, though it is not valid XML, but is valid in Xcode idekeybindings file
+// I don't know why Xcode generates this keybinding.
+// change `U+0003` to `F20`(which is hardly used too) in xcode plist for now.
+func sanitizeXcodePlist(data []byte) []byte {
+	if bytes.IndexByte(data, unknownKeyCode) == -1 {
+		return data
+	}
+	replacement := []byte(string(rune(xcodeF24)))
+	out := make([]byte, 0, len(data))
+	for i := range data {
+		if data[i] == unknownKeyCode {
+			out = append(out, replacement...)
+		} else {
+			out = append(out, data[i])
+		}
+	}
+	return out
 }
