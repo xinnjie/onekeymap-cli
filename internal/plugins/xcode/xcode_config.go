@@ -12,8 +12,8 @@ type menuKeyBindings struct {
 }
 
 type textKeyBindings struct {
-	KeyBindings map[string]textActionValue `plist:"Key Bindings"`
-	Version     int                        `plist:"Version"`
+	KeyBindings map[string]*textActionValue `plist:"Key Bindings"`
+	Version     int                         `plist:"Version"`
 }
 
 // textActionValue represents a text action value in Text Key Bindings.
@@ -51,13 +51,21 @@ func (v *textActionValue) UnmarshalPlist(unmarshal func(interface{}) error) erro
 		v.Items = arr
 		return nil
 	}
+	// Finally, support dict wrapper with Items key
+	var wrapper struct {
+		Items []string `plist:"Items"`
+	}
+	if err := unmarshal(&wrapper); err == nil && len(wrapper.Items) > 0 {
+		v.Items = wrapper.Items
+		return nil
+	}
 	// Fallback: empty
 	v.Items = nil
 	return nil
 }
 
 type xcodeKeybindingConfig = []xcodeKeybinding
-type xcodeTextKeybinding = map[string]textActionValue
+type xcodeTextKeybinding = map[string]*textActionValue
 
 // xcodeKeybinding represents a single keybinding in Xcode's .idekeybindings file.
 type xcodeKeybinding struct {

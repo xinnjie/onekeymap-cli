@@ -8,6 +8,7 @@ import (
 	"sort"
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
+	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -108,7 +109,8 @@ func (e *xcodeExporter) Export(
 		unmanagedKeybindings = e.identifyUnmanagedKeybindings(existingKeybindings)
 	}
 
-	managedKeybindings := e.generateManagedKeybindings(setting)
+	marker := export.NewMarker(setting)
+	managedKeybindings := e.generateManagedKeybindings(setting, marker)
 
 	finalKeybindings := e.mergeKeybindings(managedKeybindings, unmanagedKeybindings)
 
@@ -116,7 +118,7 @@ func (e *xcodeExporter) Export(
 	finalKeybindings = orderByBaseCommand(finalKeybindings, existingKeybindings)
 
 	// Generate text key bindings
-	finalTextKeybindings := e.generateTextKeyBindings(setting, existingTextKeybindings)
+	finalTextKeybindings := e.generateTextKeyBindings(setting, existingTextKeybindings, marker)
 
 	// Use plist library to generate the XML
 	plistData := xcodeKeybindingsPlist{
@@ -140,6 +142,7 @@ func (e *xcodeExporter) Export(
 	return &pluginapi.PluginExportReport{
 		BaseEditorConfig:   existingKeybindings,
 		ExportEditorConfig: finalKeybindings,
+		SkipReport:         marker.Report(),
 	}, nil
 }
 
@@ -176,12 +179,22 @@ func (e *xcodeExporter) findMappingByXcodeKeybinding(kb xcodeKeybinding) *mappin
 }
 
 // generateManagedKeybindings generates Xcode keybindings from KeymapSetting.
-func (e *xcodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []xcodeKeybinding {
+func (e *xcodeExporter) generateManagedKeybindings(
+	setting *keymapv1.Keymap,
+	marker *export.Marker,
+) []xcodeKeybinding {
 	var xcodeKeybindings []xcodeKeybinding
 
 	for _, km := range setting.GetActions() {
 		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil {
+			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.NotSupportedError{Note: "Action not supported"})
+			continue
+		}
+
+		// check support status for xcode
+		if ok, note := mapping.IsSupported(pluginapi.EditorTypeXcode); !ok {
+			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.NotSupportedError{Note: note})
 			continue
 		}
 
@@ -190,6 +203,8 @@ func (e *xcodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []x
 			continue
 		}
 
+		// xcode supports at most one keybinding per action
+		hadOne := false
 		for _, b := range km.GetBindings() {
 			if b == nil {
 				continue
@@ -198,6 +213,14 @@ func (e *xcodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []x
 			keys, err := FormatKeybinding(binding)
 			if err != nil {
 				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
+				continue
+			}
+			if hadOne {
+				marker.MarkSkippedForReason(
+					km.GetName(),
+					b.GetKeyChords(),
+					&pluginapi.EditorSupportOnlyOneKeybindingPerActionError{SkipKeybinding: b.GetKeyChords()},
+				)
 				continue
 			}
 			for _, xcodeConfig := range xcodeConfigs {
@@ -216,6 +239,8 @@ func (e *xcodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []x
 					GroupedAlternate: xcodeConfig.MenuAction.GroupedAlternate,
 					Navigation:       xcodeConfig.MenuAction.Navigation,
 				})
+				marker.MarkExported(km.GetName(), b.GetKeyChords())
+				hadOne = true
 			}
 		}
 	}
@@ -254,6 +279,7 @@ func (e *xcodeExporter) mergeKeybindings(managed, unmanaged []xcodeKeybinding) [
 func (e *xcodeExporter) generateTextKeyBindings(
 	setting *keymapv1.Keymap,
 	existingTextBindings xcodeTextKeybinding,
+	marker *export.Marker,
 ) xcodeTextKeybinding {
 	// Start with existing text bindings or create new map
 	result := make(xcodeTextKeybinding)
@@ -265,6 +291,13 @@ func (e *xcodeExporter) generateTextKeyBindings(
 	for _, km := range setting.GetActions() {
 		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil {
+			marker.MarkSkippedForReason(km.GetName(), nil, pluginapi.ErrActionNotSupported)
+			continue
+		}
+
+		// check support status for xcode
+		if ok, note := mapping.IsSupported(pluginapi.EditorTypeXcode); !ok {
+			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.NotSupportedError{Note: note})
 			continue
 		}
 
@@ -273,6 +306,8 @@ func (e *xcodeExporter) generateTextKeyBindings(
 			continue
 		}
 
+		// xcode supports at most one keybinding per action
+		hadOne := false
 		for _, b := range km.GetBindings() {
 			if b == nil {
 				continue
@@ -289,7 +324,17 @@ func (e *xcodeExporter) generateTextKeyBindings(
 				if len(items) == 0 {
 					continue
 				}
-				result[keys] = textActionValue{Items: items}
+				if hadOne {
+					marker.MarkSkippedForReason(
+						km.GetName(),
+						b.GetKeyChords(),
+						&pluginapi.EditorSupportOnlyOneKeybindingPerActionError{SkipKeybinding: b.GetKeyChords()},
+					)
+					continue
+				}
+				result[keys] = &textActionValue{Items: items}
+				marker.MarkExported(km.GetName(), b.GetKeyChords())
+				hadOne = true
 			}
 		}
 	}

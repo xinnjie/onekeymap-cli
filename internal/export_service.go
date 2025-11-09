@@ -105,7 +105,7 @@ func (s *exportService) Export(
 	if err != nil {
 		return nil, err
 	}
-	return &exportapi.ExportReport{Diff: diffStr}, nil
+	return &exportapi.ExportReport{Diff: diffStr, SkipActions: report.SkipReport.SkipActions}, nil
 }
 
 // computeDiff centralizes diff generation for export results based on requested options.

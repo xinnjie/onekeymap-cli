@@ -25,6 +25,21 @@ type testExportPlugin struct {
 	exporter   pluginapi.PluginExporter
 }
 
+func TestExportService_PropagatesSkipActions(t *testing.T) {
+	exp := &testExporter{skipActions: []pluginapi.SkipAction{{Action: "a1", Error: pluginapi.ErrActionNotSupported}}}
+	service := newTestExportService(t, exp)
+
+	var out bytes.Buffer
+	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
+		EditorType: pluginapi.EditorType("test"),
+		DiffType:   keymapv1.ExportKeymapRequest_DIFF_TYPE_UNSPECIFIED,
+	})
+	require.NoError(t, err)
+	require.NotNil(t, report)
+	require.Len(t, report.SkipActions, 1)
+	assert.Equal(t, "a1", report.SkipActions[0].Action)
+}
+
 func (p *testExportPlugin) EditorType() pluginapi.EditorType { return p.editorType }
 func (p *testExportPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) ([]string, bool, error) {
 	return nil, false, pluginapi.ErrNotSupported
@@ -40,6 +55,7 @@ type testExporter struct {
 	baseEditorConfig   any
 	exportEditorConfig any
 	reportDiff         *string
+	skipActions        []pluginapi.SkipAction
 }
 
 func (e *testExporter) Export(
@@ -59,17 +75,17 @@ func (e *testExporter) Export(
 		Diff:               e.reportDiff,
 		BaseEditorConfig:   e.baseEditorConfig,
 		ExportEditorConfig: e.exportEditorConfig,
+		SkipReport:         pluginapi.SkipReport{SkipActions: e.skipActions},
 	}, nil
 }
 
 func newTestExportService(
 	t *testing.T,
 	exporter pluginapi.PluginExporter,
-	editorType pluginapi.EditorType,
 ) exportapi.Exporter {
 	t.Helper()
 	r := plugins.NewRegistry()
-	r.Register(&testExportPlugin{editorType: editorType, exporter: exporter})
+	r.Register(&testExportPlugin{editorType: pluginapi.EditorType("test"), exporter: exporter})
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	recorder := metrics.NewNoop()
 	return internal.NewExportService(
@@ -84,7 +100,7 @@ func TestExportService_Diff_Unified(t *testing.T) {
 	before := "line1\n"
 	after := "line1\nline2\n"
 	exp := &testExporter{writeContent: after}
-	service := newTestExportService(t, exp, pluginapi.EditorType("test"))
+	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
 	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
@@ -104,7 +120,7 @@ func TestExportService_Diff_JSONASCII_FromStructuredConfigs(t *testing.T) {
 	baseCfg := map[string]any{"k": "v1"}
 	afterCfg := map[string]any{"k": "v2"}
 	exp := &testExporter{baseEditorConfig: baseCfg, exportEditorConfig: afterCfg}
-	service := newTestExportService(t, exp, pluginapi.EditorType("test"))
+	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
 	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
@@ -120,7 +136,7 @@ func TestExportService_Diff_JSONASCII_FromStructuredConfigs(t *testing.T) {
 func TestExportService_Diff_FallbackFromPlugin(t *testing.T) {
 	fallback := "fallback-diff"
 	exp := &testExporter{reportDiff: &fallback}
-	service := newTestExportService(t, exp, pluginapi.EditorType("test"))
+	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
 	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{

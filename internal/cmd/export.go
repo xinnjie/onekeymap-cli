@@ -117,6 +117,15 @@ func exportRun(
 			return err
 		}
 
+		// Show skipped actions in interactive mode for visibility
+		if f.interactive && report != nil && len(report.SkipActions) > 0 {
+			vm := views.NewSkipReportViewModel(report.SkipActions)
+			p := tea.NewProgram(vm)
+			if _, err := p.Run(); err != nil {
+				logger.Error("could not start program", "error", err)
+			}
+		}
+
 		// Show diff preview
 		cmd.Println("================ Export Diff Preview ================")
 		if report != nil && strings.TrimSpace(report.Diff) != "" {

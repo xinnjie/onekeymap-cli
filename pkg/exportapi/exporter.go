@@ -37,4 +37,7 @@ type Exporter interface {
 type ExportReport struct {
 	// The diff between the base and the exported keymap.
 	Diff string
+
+	// SkipActions reports actions that were not exported and why.
+	SkipActions []pluginapi.SkipAction
 }

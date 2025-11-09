@@ -58,6 +58,68 @@ func testMappingConfig() *mappings.MappingConfig {
 	}
 }
 
+func TestExporter_SkipActions_MultipleKeybindings_Menu(t *testing.T) {
+	mappingConfig := testMappingConfig()
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	exporter := newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer())
+
+	// Same action with two bindings; Xcode supports only one
+	a := keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j")
+	a.Bindings = append(
+		a.Bindings,
+		&keymapv1.KeybindingReadable{KeyChords: keymap.MustParseKeyBinding("meta+k").KeyChords},
+	)
+	keymapSetting := &keymapv1.Keymap{Actions: []*keymapv1.Action{a}}
+
+	var out bytes.Buffer
+	report, err := exporter.Export(context.Background(), &out, keymapSetting, pluginapi.PluginExportOption{})
+	require.NoError(t, err)
+	require.NotNil(t, report)
+	require.GreaterOrEqual(t, len(report.SkipReport.SkipActions), 1)
+	assert.Equal(t, "actions.navigation.jumpToDefinition", report.SkipReport.SkipActions[0].Action)
+}
+
+func TestExporter_SkipActions_MultipleKeybindings_Text(t *testing.T) {
+	mappingConfig := testMappingConfig()
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	exporter := newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer())
+
+	// Same action with two bindings; Xcode supports only one
+	a := keymap.NewActioinBinding("actions.cursor.pageDown", "ctrl+v")
+	a.Bindings = append(
+		a.Bindings,
+		&keymapv1.KeybindingReadable{KeyChords: keymap.MustParseKeyBinding("ctrl+d").KeyChords},
+	)
+	keymapSetting := &keymapv1.Keymap{Actions: []*keymapv1.Action{a}}
+
+	var out bytes.Buffer
+	report, err := exporter.Export(context.Background(), &out, keymapSetting, pluginapi.PluginExportOption{})
+	require.NoError(t, err)
+	require.NotNil(t, report)
+	require.GreaterOrEqual(t, len(report.SkipReport.SkipActions), 1)
+	assert.Equal(t, "actions.cursor.pageDown", report.SkipReport.SkipActions[0].Action)
+}
+
+func TestExporter_SkipActions_UnsupportedAction(t *testing.T) {
+	mappingConfig := testMappingConfig()
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	exporter := newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer())
+
+	// Unknown action not present in mapping config
+	keymapSetting := &keymapv1.Keymap{
+		Actions: []*keymapv1.Action{
+			keymap.NewActioinBinding("actions.unknown.notMapped", "meta+u"),
+		},
+	}
+
+	var out bytes.Buffer
+	report, err := exporter.Export(context.Background(), &out, keymapSetting, pluginapi.PluginExportOption{})
+	require.NoError(t, err)
+	require.NotNil(t, report)
+	require.GreaterOrEqual(t, len(report.SkipReport.SkipActions), 1)
+	assert.Equal(t, "actions.unknown.notMapped", report.SkipReport.SkipActions[0].Action)
+}
+
 func TestExporter_Export_MenuKeyBindings(t *testing.T) {
 	mappingConfig := testMappingConfig()
 
