@@ -24,6 +24,7 @@ type SkipReportViewModel struct {
 	title string
 	table table.Model
 	style lipgloss.Style
+	help  string
 }
 
 func NewSkipReportViewModel(skipActions []pluginapi.SkipAction) SkipReportViewModel {
@@ -66,7 +67,12 @@ func NewSkipReportViewModel(skipActions []pluginapi.SkipAction) SkipReportViewMo
 
 	t.SetStyles(s)
 
-	return SkipReportViewModel{title: "Skipped Actions for Export", table: t, style: baseStyle}
+	return SkipReportViewModel{
+		title: "Skipped Actions for Export",
+		table: t,
+		style: baseStyle,
+		help:  "Press q or ctrl+c to quit",
+	}
 }
 
 func (m SkipReportViewModel) Init() tea.Cmd {
@@ -87,5 +93,6 @@ func (m SkipReportViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m SkipReportViewModel) View() string {
 	return lipgloss.NewStyle().Bold(true).PaddingBottom(1).Render(m.title) + "\n" +
-		m.style.Render(m.table.View()) + "\n"
+		m.style.Render(m.table.View()) + "\n" +
+		helpStyle.Render(m.help)
 }

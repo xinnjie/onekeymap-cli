@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
+	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -54,7 +55,8 @@ func (e *intellijExporter) Export(
 	}
 
 	// Generate managed actions from current setting
-	managedActions := e.generateManagedActions(setting)
+	marker := export.NewMarker(setting)
+	managedActions := e.generateManagedActions(setting, marker)
 
 	// Merge managed and unmanaged actions
 	finalActions := e.mergeActions(managedActions, unmanagedActions)
@@ -81,6 +83,7 @@ func (e *intellijExporter) Export(
 	return &pluginapi.PluginExportReport{
 		BaseEditorConfig:   existingDoc,
 		ExportEditorConfig: doc,
+		SkipReport:         marker.Report(),
 	}, nil
 }
 
@@ -109,7 +112,7 @@ func (e *intellijExporter) isManagedAction(actionID string) bool {
 }
 
 // generateManagedActions generates IntelliJ actions from KeymapSetting.
-func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap) []ActionXML {
+func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap, marker *export.Marker) []ActionXML {
 	// Group keybindings by IntelliJ action ID while preserving order of first appearance.
 	actionsMap := make(map[string]*ActionXML)
 	var actionOrder []string
@@ -121,6 +124,11 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap) []Ac
 		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil || mapping.IntelliJ.Action == "" {
 			e.logger.Info("no mapping found for action", "action", km.GetName())
+			for _, b := range km.GetBindings() {
+				if b != nil && b.GetKeyChords() != nil {
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+				}
+			}
 			continue
 		}
 		actionID := mapping.IntelliJ.Action
@@ -132,8 +140,14 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap) []Ac
 			shortcutXML, err := FormatKeybinding(keymap.NewKeyBinding(b))
 			if err != nil {
 				e.logger.Warn("failed to format keybinding", "action", km.GetName(), "error", err)
+				marker.MarkSkippedForReason(
+					km.GetName(),
+					b.GetKeyChords(),
+					&pluginapi.NotSupportedError{Note: err.Error()},
+				)
 				continue
 			}
+			marker.MarkExported(km.GetName(), b.GetKeyChords())
 
 			if _, exists := actionsMap[actionID]; !exists {
 				actionsMap[actionID] = &ActionXML{ID: actionID}

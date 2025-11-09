@@ -10,6 +10,7 @@ import (
 
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
+	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -83,21 +84,9 @@ func (e *vscodeExporter) Export(
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	// Decode existing config for non-destructive merge
-	var existingKeybindings []vscodeKeybinding
-	if opts.ExistingConfig != nil {
-		// Read all content first to apply hujson.Standardize
-		rawData, err := io.ReadAll(opts.ExistingConfig)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read existing config: %w", err)
-		}
-		// Strip comments and trailing commas using hujson
-		standardizedData, err := hujson.Standardize(rawData)
-		if err != nil {
-			return nil, fmt.Errorf("failed to standardize JSON: %w", err)
-		}
-		if err := json.Unmarshal(standardizedData, &existingKeybindings); err != nil {
-			return nil, fmt.Errorf("failed to decode existing config: %w", err)
-		}
+	existingKeybindings, err := e.parseExistingConfig(opts.ExistingConfig)
+	if err != nil {
+		return nil, err
 	}
 
 	var unmanagedKeybindings []vscodeKeybinding
@@ -105,7 +94,8 @@ func (e *vscodeExporter) Export(
 		unmanagedKeybindings = e.identifyUnmanagedKeybindings(existingKeybindings)
 	}
 
-	managedKeybindings := e.generateManagedKeybindings(setting)
+	marker := export.NewMarker(setting)
+	managedKeybindings := e.generateManagedKeybindings(setting, marker)
 
 	finalKeybindings := e.mergeKeybindings(managedKeybindings, unmanagedKeybindings)
 
@@ -124,7 +114,34 @@ func (e *vscodeExporter) Export(
 	return &pluginapi.PluginExportReport{
 		BaseEditorConfig:   existingKeybindings,
 		ExportEditorConfig: finalKeybindings,
+		SkipReport:         marker.Report(),
 	}, nil
+}
+
+func (e *vscodeExporter) parseExistingConfig(reader io.Reader) ([]vscodeKeybinding, error) {
+	var existingKeybindings []vscodeKeybinding
+	if reader == nil {
+		return existingKeybindings, nil
+	}
+
+	// Read all content first to apply hujson.Standardize
+	rawData, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read existing config: %w", err)
+	}
+
+	if len(rawData) > 0 {
+		// Strip comments and trailing commas using hujson
+		standardizedData, err := hujson.Standardize(rawData)
+		if err != nil {
+			return nil, fmt.Errorf("failed to standardize JSON: %w", err)
+		}
+		if err := json.Unmarshal(standardizedData, &existingKeybindings); err != nil {
+			return nil, fmt.Errorf("failed to decode existing config: %w", err)
+		}
+	}
+
+	return existingKeybindings, nil
 }
 
 // identifyUnmanagedKeybindings performs reverse lookup to identify keybindings
@@ -160,17 +177,30 @@ func (e *vscodeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) *map
 }
 
 // generateManagedKeybindings generates VSCode keybindings from KeymapSetting.
-func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []vscodeKeybinding {
+func (e *vscodeExporter) generateManagedKeybindings(
+	setting *keymapv1.Keymap,
+	marker *export.Marker,
+) []vscodeKeybinding {
 	var vscodeKeybindings []vscodeKeybinding
 
 	for _, km := range setting.GetActions() {
 		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil {
+			for _, b := range km.GetBindings() {
+				if b != nil && b.GetKeyChords() != nil {
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+				}
+			}
 			continue
 		}
 
 		vscodeConfigs := mapping.VSCode
 		if len(vscodeConfigs) == 0 {
+			for _, b := range km.GetBindings() {
+				if b != nil && b.GetKeyChords() != nil {
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+				}
+			}
 			continue
 		}
 
@@ -182,8 +212,14 @@ func (e *vscodeExporter) generateManagedKeybindings(setting *keymapv1.Keymap) []
 			keys, err := FormatKeybinding(binding)
 			if err != nil {
 				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
+				marker.MarkSkippedForReason(
+					km.GetName(),
+					b.GetKeyChords(),
+					&pluginapi.NotSupportedError{Note: err.Error()},
+				)
 				continue
 			}
+			marker.MarkExported(km.GetName(), b.GetKeyChords())
 			for _, vscodeConfig := range vscodeConfigs {
 				if vscodeConfig.Command == "" {
 					continue

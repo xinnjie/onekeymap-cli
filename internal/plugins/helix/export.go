@@ -9,6 +9,7 @@ import (
 
 	"github.com/pelletier/go-toml/v2"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
+	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -49,7 +50,8 @@ func (e *helixExporter) Export(
 	}
 
 	// Generate managed keybindings from current setting
-	managedKeys := e.generateManagedKeybindings(ctx, setting)
+	marker := export.NewMarker(setting)
+	managedKeys := e.generateManagedKeybindings(ctx, setting, marker)
 
 	// Merge managed and unmanaged keybindings
 	finalKeys := e.mergeKeybindings(ctx, managedKeys, unmanagedKeys)
@@ -75,6 +77,7 @@ func (e *helixExporter) Export(
 	return &pluginapi.PluginExportReport{
 		BaseEditorConfig:   existingKeys,
 		ExportEditorConfig: finalKeys,
+		SkipReport:         marker.Report(),
 	}, nil
 }
 
@@ -172,12 +175,21 @@ func (e *helixExporter) isManagedKeybinding(command string, mode Mode) bool {
 }
 
 // generateManagedKeybindings generates Helix keybindings from KeymapSetting.
-func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting *keymapv1.Keymap) helixKeys {
+func (e *helixExporter) generateManagedKeybindings(
+	ctx context.Context,
+	setting *keymapv1.Keymap,
+	marker *export.Marker,
+) helixKeys {
 	keysByMode := helixKeys{}
 
 	for _, km := range setting.GetActions() {
 		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil || len(mapping.Helix) == 0 {
+			for _, b := range km.GetBindings() {
+				if b != nil && b.GetKeyChords() != nil {
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+				}
+			}
 			continue
 		}
 
@@ -196,11 +208,18 @@ func (e *helixExporter) generateManagedKeybindings(ctx context.Context, setting 
 						"action",
 						km.GetName(),
 					)
+					marker.MarkSkippedForReason(
+						km.GetName(),
+						b.GetKeyChords(),
+						&pluginapi.NotSupportedError{Note: err.Error()},
+					)
 				} else {
 					e.logger.WarnContext(ctx, "Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), &pluginapi.NotSupportedError{Note: err.Error()})
 				}
 				continue
 			}
+			marker.MarkExported(km.GetName(), b.GetKeyChords())
 
 			for _, hconf := range mapping.Helix {
 				if hconf.Command == "" {

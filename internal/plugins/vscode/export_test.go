@@ -218,6 +218,22 @@ func TestExporter_Export(t *testing.T) {
 				}
 			]`,
 		},
+		{
+			name: "handles empty existing config file",
+			keymapSetting: &keymapv1.Keymap{
+				Actions: []*keymapv1.Action{
+					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+				},
+			},
+			existingConfig: ``, // Represents an empty file
+			expectedJSON: `[
+      {
+        "key": "cmd+c",
+        "command": "editor.action.clipboardCopyAction",
+        "when": "editorTextFocus && condition > 0"
+      }
+    ]`,
+		},
 		// Base order preservation tests
 		{
 			name: "preserves order by base config using command as key",
