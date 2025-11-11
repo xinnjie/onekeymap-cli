@@ -27,6 +27,7 @@ type EditorType int32
 const (
 	// Unspecified
 	EditorType_EDITOR_TYPE_UNSPECIFIED EditorType = 0
+	// VSCode series
 	// Visual Studio Code
 	EditorType_VSCODE EditorType = 1
 	// WindSurf
@@ -37,6 +38,7 @@ const (
 	EditorType_CURSOR EditorType = 7
 	// Zed
 	EditorType_ZED EditorType = 2
+	// IntelliJ series
 	// IntelliJ IDEA Ultimate
 	EditorType_INTELLIJ EditorType = 8
 	// IntelliJ IDEA Community
@@ -58,7 +60,8 @@ const (
 	// Helix
 	EditorType_HELIX EditorType = 3
 	// Vim
-	EditorType_VIM EditorType = 4
+	EditorType_VIM   EditorType = 4
+	EditorType_XCODE EditorType = 17
 )
 
 // Enum value maps for EditorType.
@@ -81,6 +84,7 @@ var (
 		16: "RUSTROVER",
 		3:  "HELIX",
 		4:  "VIM",
+		17: "XCODE",
 	}
 	EditorType_value = map[string]int32{
 		"EDITOR_TYPE_UNSPECIFIED": 0,
@@ -100,6 +104,7 @@ var (
 		"RUSTROVER":               16,
 		"HELIX":                   3,
 		"VIM":                     4,
+		"XCODE":                   17,
 	}
 )
 
@@ -134,7 +139,7 @@ var File_keymap_v1_editor_proto protoreflect.FileDescriptor
 
 const file_keymap_v1_editor_proto_rawDesc = "" +
 	"\n" +
-	"\x16keymap/v1/editor.proto\x12\tkeymap.v1*\x82\x02\n" +
+	"\x16keymap/v1/editor.proto\x12\tkeymap.v1*\x8d\x02\n" +
 	"\n" +
 	"EditorType\x12\x1b\n" +
 	"\x17EDITOR_TYPE_UNSPECIFIED\x10\x00\x12\n" +
@@ -157,7 +162,8 @@ const file_keymap_v1_editor_proto_rawDesc = "" +
 	"\x06GOLAND\x10\x0f\x12\r\n" +
 	"\tRUSTROVER\x10\x10\x12\t\n" +
 	"\x05HELIX\x10\x03\x12\a\n" +
-	"\x03VIM\x10\x04B\x9c\x01\n" +
+	"\x03VIM\x10\x04\x12\t\n" +
+	"\x05XCODE\x10\x11B\x9c\x01\n" +
 	"\rcom.keymap.v1B\vEditorProtoP\x01Z9github.com/xinnjie/watchbeats/protogen/keymap/v1;keymapv1\xa2\x02\x03KXX\xaa\x02\tKeymap.V1\xca\x02\tKeymap\\V1\xe2\x02\x15Keymap\\V1\\GPBMetadata\xea\x02\n" +
 	"Keymap::V1b\x06proto3"
 

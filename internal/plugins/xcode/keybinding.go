@@ -94,7 +94,7 @@ func FormatKeybinding(keybind *keymap.KeyBinding) (string, error) {
 
 	chords := keybind.GetKeyChords().GetChords()
 	if len(chords) != 1 {
-		return "", errors.New("xcode doesn't support key chords")
+		return "", fmt.Errorf("xcode doesn't support multi-key-chords keybinding: %v", keybind.KeyChordsReadable)
 	}
 
 	chord := chords[0]

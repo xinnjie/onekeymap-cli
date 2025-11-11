@@ -4,7 +4,7 @@ import (
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
-// Xcode key code constants
+// Xcode .idekeybindings config key code constants
 const (
 	// Escape key
 	xcodeEscape = 0x1B
@@ -42,28 +42,6 @@ const (
 	xcodeF24 = 0xF72B
 	xcodeF25 = 0xF72C
 	xcodeF26 = 0xF72D
-
-	// Letter keys (hex values for A-Z)
-	xcodeA = 0x41
-	xcodeC = 0x43
-	xcodeE = 0x45
-	xcodeG = 0x47
-	xcodeK = 0x4B
-	xcodeL = 0x4C
-	xcodeN = 0x4E
-	xcodeQ = 0x51
-	xcodeR = 0x52
-	xcodeS = 0x53
-	xcodeT = 0x54
-	xcodeU = 0x55
-	xcodeV = 0x56
-	xcodeW = 0x57
-	xcodeY = 0x58
-	xcodeZ = 0x59
-
-	// Special keys
-	xcodeLeftBracket = 0x5B
-	xcodeBackslash   = 0x5C
 )
 
 // getRuneFromKeyCode converts a KeyCode directly to its Xcode rune representation.
@@ -226,43 +204,66 @@ func getRuneFromKeyCode(kc keymapv1.KeyCode) (rune, bool) {
 	case keymapv1.KeyCode_PAGE_DOWN:
 		return xcodeF26, true
 
-	// Keypad (numpad) keys via HIToolbox virtual key codes
+	// FIXME(xinnjie): Do not have keyboard with numpad. So can not test it.
 	case keymapv1.KeyCode_NUMPAD_DECIMAL:
-		return xcodeA, true
+		return '.', true
 	case keymapv1.KeyCode_NUMPAD_MULTIPLY:
-		return xcodeC, true
+		return '*', true
 	case keymapv1.KeyCode_NUMPAD_PLUS:
-		return xcodeE, true
+		return '+', true
 	case keymapv1.KeyCode_NUMPAD_CLEAR:
-		return xcodeG, true
+		return 0, false
 	case keymapv1.KeyCode_NUMPAD_DIVIDE:
-		return xcodeK, true
+		return '/', true
 	case keymapv1.KeyCode_NUMPAD_ENTER:
-		return xcodeL, true
+		return '\r', true
 	case keymapv1.KeyCode_NUMPAD_MINUS:
-		return xcodeN, true
+		return '-', true
 	case keymapv1.KeyCode_NUMPAD_EQUALS:
-		return xcodeQ, true
+		return '=', true
 	case keymapv1.KeyCode_NUMPAD_0:
-		return xcodeR, true
+		return '0', true
 	case keymapv1.KeyCode_NUMPAD_1:
-		return xcodeS, true
+		return '1', true
 	case keymapv1.KeyCode_NUMPAD_2:
-		return xcodeT, true
+		return '2', true
 	case keymapv1.KeyCode_NUMPAD_3:
-		return xcodeU, true
+		return '3', true
 	case keymapv1.KeyCode_NUMPAD_4:
-		return xcodeV, true
+		return '4', true
 	case keymapv1.KeyCode_NUMPAD_5:
-		return xcodeW, true
+		return '5', true
 	case keymapv1.KeyCode_NUMPAD_6:
-		return xcodeY, true
+		return '6', true
 	case keymapv1.KeyCode_NUMPAD_7:
-		return xcodeZ, true
+		return '7', true
 	case keymapv1.KeyCode_NUMPAD_8:
-		return xcodeLeftBracket, true
+		return '8', true
 	case keymapv1.KeyCode_NUMPAD_9:
-		return xcodeBackslash, true
+		return '9', true
+
+	case keymapv1.KeyCode_BACKSLASH:
+		return '\\', true
+	case keymapv1.KeyCode_BACKTICK:
+		return '`', true
+	case keymapv1.KeyCode_COMMA:
+		return ',', true
+	case keymapv1.KeyCode_EQUAL:
+		return '=', true
+	case keymapv1.KeyCode_MINUS:
+		return '-', true
+	case keymapv1.KeyCode_PERIOD:
+		return '.', true
+	case keymapv1.KeyCode_QUOTE:
+		return '\'', true
+	case keymapv1.KeyCode_SEMICOLON:
+		return ';', true
+	case keymapv1.KeyCode_SLASH:
+		return '/', true
+	case keymapv1.KeyCode_LEFT_BRACKET:
+		return '[', true
+	case keymapv1.KeyCode_RIGHT_BRACKET:
+		return ']', true
 
 	// Unsupported KeyCodes by Xcode keybindings
 	case keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
@@ -276,18 +277,6 @@ func getRuneFromKeyCode(kc keymapv1.KeyCode) (rune, bool) {
 		keymapv1.KeyCode_RIGHT_OPTION,
 		keymapv1.KeyCode_RIGHT_CONTROL,
 		keymapv1.KeyCode_RIGHT_SHIFT,
-		keymapv1.KeyCode_BACKSLASH,
-		keymapv1.KeyCode_BACKTICK,
-		keymapv1.KeyCode_COMMA,
-		keymapv1.KeyCode_EQUAL,
-		keymapv1.KeyCode_MINUS,
-		keymapv1.KeyCode_PLUS,
-		keymapv1.KeyCode_PERIOD,
-		keymapv1.KeyCode_QUOTE,
-		keymapv1.KeyCode_SEMICOLON,
-		keymapv1.KeyCode_SLASH,
-		keymapv1.KeyCode_LEFT_BRACKET,
-		keymapv1.KeyCode_RIGHT_BRACKET,
 		keymapv1.KeyCode_MUTE,
 		keymapv1.KeyCode_VOLUME_UP,
 		keymapv1.KeyCode_VOLUME_DOWN,
@@ -385,45 +374,6 @@ func getKeyCodeFromRune(r rune) (keymapv1.KeyCode, bool) {
 		return keymapv1.KeyCode_PAGE_UP, true
 	case xcodeF26:
 		return keymapv1.KeyCode_PAGE_DOWN, true
-
-	// Keypad keys (HIToolbox virtual key codes)
-	// Note: These conflict with ASCII letters, but are distinguished by context
-	case xcodeA:
-		return keymapv1.KeyCode_NUMPAD_DECIMAL, true
-	case xcodeC:
-		return keymapv1.KeyCode_NUMPAD_MULTIPLY, true
-	case xcodeE:
-		return keymapv1.KeyCode_NUMPAD_PLUS, true
-	case xcodeG:
-		return keymapv1.KeyCode_NUMPAD_CLEAR, true
-	case xcodeK:
-		return keymapv1.KeyCode_NUMPAD_DIVIDE, true
-	case xcodeL:
-		return keymapv1.KeyCode_NUMPAD_ENTER, true
-	case xcodeN:
-		return keymapv1.KeyCode_NUMPAD_MINUS, true
-	case xcodeQ:
-		return keymapv1.KeyCode_NUMPAD_EQUALS, true
-	case xcodeR:
-		return keymapv1.KeyCode_NUMPAD_0, true
-	case xcodeS:
-		return keymapv1.KeyCode_NUMPAD_1, true
-	case xcodeT:
-		return keymapv1.KeyCode_NUMPAD_2, true
-	case xcodeU:
-		return keymapv1.KeyCode_NUMPAD_3, true
-	case xcodeV:
-		return keymapv1.KeyCode_NUMPAD_4, true
-	case xcodeW:
-		return keymapv1.KeyCode_NUMPAD_5, true
-	case xcodeY:
-		return keymapv1.KeyCode_NUMPAD_6, true
-	case xcodeZ:
-		return keymapv1.KeyCode_NUMPAD_7, true
-	case xcodeLeftBracket:
-		return keymapv1.KeyCode_NUMPAD_8, true
-	case xcodeBackslash:
-		return keymapv1.KeyCode_NUMPAD_9, true
 
 	default:
 		return keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, false
