@@ -26,7 +26,9 @@ type testExportPlugin struct {
 }
 
 func TestExportService_PropagatesSkipActions(t *testing.T) {
-	exp := &testExporter{skipActions: []pluginapi.SkipAction{{Action: "a1", Error: pluginapi.ErrActionNotSupported}}}
+	exp := &testExporter{
+		skipActions: []pluginapi.ExportSkipAction{{Action: "a1", Error: pluginapi.ErrActionNotSupported}},
+	}
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
@@ -55,7 +57,7 @@ type testExporter struct {
 	baseEditorConfig   any
 	exportEditorConfig any
 	reportDiff         *string
-	skipActions        []pluginapi.SkipAction
+	skipActions        []pluginapi.ExportSkipAction
 }
 
 func (e *testExporter) Export(
@@ -75,7 +77,7 @@ func (e *testExporter) Export(
 		Diff:               e.reportDiff,
 		BaseEditorConfig:   e.baseEditorConfig,
 		ExportEditorConfig: e.exportEditorConfig,
-		SkipReport:         pluginapi.SkipReport{SkipActions: e.skipActions},
+		SkipReport:         pluginapi.ExportSkipReport{SkipActions: e.skipActions},
 	}, nil
 }
 

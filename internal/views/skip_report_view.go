@@ -27,7 +27,7 @@ type SkipReportViewModel struct {
 	help  string
 }
 
-func NewSkipReportViewModel(skipActions []pluginapi.SkipAction) SkipReportViewModel {
+func NewSkipReportViewModel(skipActions []pluginapi.ExportSkipAction) SkipReportViewModel {
 	columns := []table.Column{
 		{Title: "Action", Width: actionColumnWidth},
 		{Title: "Keybinding", Width: keybindingColumnWidth},

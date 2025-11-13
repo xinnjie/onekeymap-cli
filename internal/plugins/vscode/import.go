@@ -39,21 +39,21 @@ func (i *vscodeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	_ pluginapi.PluginImportOption,
-) (*keymapv1.Keymap, error) {
+) (pluginapi.PluginImportResult, error) {
 	// VSCode's keybindings.json can contain comments, so we need to strip them.
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	cleanedJSON, err := hujson.Standardize(jsonData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to standardize JSON: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to standardize JSON: %w", err)
 	}
 
 	var vscodeKeybindings []vscodeKeybinding
 	if err := json.Unmarshal(cleanedJSON, &vscodeKeybindings); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal vscode keybindings: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to unmarshal vscode keybindings: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -92,5 +92,5 @@ func (i *vscodeImporter) Import(
 
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
 
-	return setting, nil
+	return pluginapi.PluginImportResult{Keymap: setting}, nil
 }

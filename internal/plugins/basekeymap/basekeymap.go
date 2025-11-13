@@ -8,7 +8,6 @@ import (
 	"github.com/xinnjie/onekeymap-cli/config/base"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type plugin struct{}
@@ -43,25 +42,25 @@ func (i *importer) Import(
 	_ context.Context,
 	source io.Reader,
 	_ pluginapi.PluginImportOption,
-) (*keymapv1.Keymap, error) {
+) (pluginapi.PluginImportResult, error) {
 	// Read the base keymap name from source
 	nameBytes, err := io.ReadAll(source)
 	if err != nil {
-		return nil, err
+		return pluginapi.PluginImportResult{}, err
 	}
 	name := string(bytes.TrimSpace(nameBytes))
 
 	// Read the embedded base keymap JSON
 	data, err := base.Read(name)
 	if err != nil {
-		return nil, err
+		return pluginapi.PluginImportResult{}, err
 	}
 
 	// Parse and return the keymap
 	km, err := keymap.Load(bytes.NewReader(data), keymap.LoadOptions{})
 	if err != nil {
-		return nil, err
+		return pluginapi.PluginImportResult{}, err
 	}
 
-	return km, nil
+	return pluginapi.PluginImportResult{Keymap: km}, nil
 }

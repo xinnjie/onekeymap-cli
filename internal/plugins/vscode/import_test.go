@@ -260,7 +260,7 @@ func TestImporter_Import(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				assert.True(t, proto.Equal(tt.expected, result), "Expected %v, got %v", tt.expected, result)
+				assert.True(t, proto.Equal(tt.expected, result.Keymap), "Expected %v, got %v", tt.expected, result.Keymap)
 			}
 		})
 	}

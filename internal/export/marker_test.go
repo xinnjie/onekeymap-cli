@@ -92,7 +92,7 @@ func TestMarker_PerKeyReasonOverridesActionLevel(t *testing.T) {
 	// Both keybindings should be reported as skipped
 	require.Len(t, rep.SkipActions, 2)
 	// Identify entries by error type and its embedded keybinding
-	var first, second *pluginapi.SkipAction
+	var first, second *pluginapi.ExportSkipAction
 	for i := range rep.SkipActions {
 		var ose *pluginapi.EditorSupportOnlyOneKeybindingPerActionError
 		if errors.As(rep.SkipActions[i].Error, &ose) {

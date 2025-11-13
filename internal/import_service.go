@@ -67,10 +67,11 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	if err != nil {
 		return nil, fmt.Errorf("failed to get importer for %s: %w", opts.EditorType, err)
 	}
-	setting, err := importer.Import(ctx, opts.InputStream, pluginapi.PluginImportOption{})
+	res, err := importer.Import(ctx, opts.InputStream, pluginapi.PluginImportOption{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to import config: %w", err)
 	}
+	setting := res.Keymap
 
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 	// Normalize: merge same-action entries and deduplicate identical bindings before downstream logic

@@ -158,7 +158,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				assert.Truef(t, proto.Equal(tc.expected, result), "Expected and actual KeymapSetting should be equal, expect %s, got %s", tc.expected.String(), result.String())
+				assert.Truef(t, proto.Equal(tc.expected, result.Keymap), "Expected and actual KeymapSetting should be equal, expect %s, got %s", tc.expected.String(), result.Keymap.String())
 			}
 		})
 	}

@@ -39,16 +39,16 @@ func (i *xcodeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	_ pluginapi.PluginImportOption,
-) (*keymapv1.Keymap, error) {
+) (pluginapi.PluginImportResult, error) {
 	// Read the plist XML data
 	xmlData, err := io.ReadAll(source)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	plistData, err := parseXcodeConfig(xmlData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal xcode keybindings: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to unmarshal xcode keybindings: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -134,7 +134,7 @@ func (i *xcodeImporter) Import(
 
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
 
-	return setting, nil
+	return pluginapi.PluginImportResult{Keymap: setting}, nil
 }
 
 // parseXcodeConfig parses the plist format and extracts keybindings using go-plist

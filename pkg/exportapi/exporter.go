@@ -39,5 +39,5 @@ type ExportReport struct {
 	Diff string
 
 	// SkipActions reports actions that were not exported and why.
-	SkipActions []pluginapi.SkipAction
+	SkipActions []pluginapi.ExportSkipAction
 }

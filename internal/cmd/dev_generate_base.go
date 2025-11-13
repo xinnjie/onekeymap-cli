@@ -146,7 +146,7 @@ func generateIntelliJBase(
 			os.Exit(1)
 		}
 
-		km, err := imp.Import(ctx, bytes.NewReader(buf.Bytes()), pluginapi.PluginImportOption{})
+		res, err := imp.Import(ctx, bytes.NewReader(buf.Bytes()), pluginapi.PluginImportOption{})
 		if err != nil {
 			logger.ErrorContext(ctx, "import intellij xml", "src", t.source, "error", err)
 			os.Exit(1)
@@ -158,7 +158,7 @@ func generateIntelliJBase(
 			logger.ErrorContext(ctx, "create output", "path", outPath, "error", err)
 			os.Exit(1)
 		}
-		if err := keymap.Save(fp, km, keymap.SaveOptions{Platform: t.platform}); err != nil {
+		if err := keymap.Save(fp, res.Keymap, keymap.SaveOptions{Platform: t.platform}); err != nil {
 			_ = fp.Close()
 			logger.ErrorContext(ctx, "write base json", "path", outPath, "error", err)
 			os.Exit(1)
@@ -194,7 +194,7 @@ func generateOnekeymapBase(
 			os.Exit(1)
 		}
 
-		km, err := imp.Import(ctx, sourceFile, pluginapi.PluginImportOption{})
+		res, err := imp.Import(ctx, sourceFile, pluginapi.PluginImportOption{})
 		_ = sourceFile.Close()
 		if err != nil {
 			logger.ErrorContext(ctx, "import json", "src", t.source, "error", err)
@@ -207,7 +207,7 @@ func generateOnekeymapBase(
 			logger.ErrorContext(ctx, "create output", "path", outPath, "error", err)
 			os.Exit(1)
 		}
-		if err := keymap.Save(fp, km, keymap.SaveOptions{Platform: t.platform}); err != nil {
+		if err := keymap.Save(fp, res.Keymap, keymap.SaveOptions{Platform: t.platform}); err != nil {
 			_ = fp.Close()
 			logger.ErrorContext(ctx, "write base json", "path", outPath, "error", err)
 			os.Exit(1)

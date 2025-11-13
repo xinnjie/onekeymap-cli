@@ -33,22 +33,22 @@ func (i *demoImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	_ pluginapi.PluginImportOption,
-) (*keymapv1.Keymap, error) {
+) (pluginapi.PluginImportResult, error) {
 	data, err := io.ReadAll(source)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	clean, err := hujson.Standardize(data)
 	if err != nil {
-		return nil, fmt.Errorf("failed to standardize JSON: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to standardize JSON: %w", err)
 	}
 	var bindings []struct {
 		Keys   string `json:"keys"`
 		Action string `json:"action"`
 	}
 	if err := json.Unmarshal(clean, &bindings); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal demo keybindings: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to unmarshal demo keybindings: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -66,5 +66,5 @@ func (i *demoImporter) Import(
 			&keymapv1.Action{Name: b.Action, Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}}},
 		)
 	}
-	return setting, nil
+	return pluginapi.PluginImportResult{Keymap: setting}, nil
 }

@@ -37,18 +37,18 @@ func (p *intellijImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	opts pluginapi.PluginImportOption,
-) (*keymapv1.Keymap, error) {
+) (pluginapi.PluginImportResult, error) {
 	_ = ctx
 	_ = opts
 
 	raw, err := io.ReadAll(source)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	var doc KeymapXML
 	if err := xml.Unmarshal(raw, &doc); err != nil {
-		return nil, fmt.Errorf("failed to parse intellij keymap xml: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse intellij keymap xml: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -80,7 +80,7 @@ func (p *intellijImporter) Import(
 	}
 
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
-	return setting, nil
+	return pluginapi.PluginImportResult{Keymap: setting}, nil
 }
 
 // ActionIDFromIntelliJ converts an IntelliJ action and optional context to a universal action ID.

@@ -72,8 +72,8 @@ func (i *testPluginImporter) Import(
 	_ context.Context,
 	_ io.Reader,
 	_ pluginapi.PluginImportOption,
-) (*keymapv1.Keymap, error) {
-	return i.importData, i.importError
+) (pluginapi.PluginImportResult, error) {
+	return pluginapi.PluginImportResult{Keymap: i.importData}, i.importError
 }
 
 // testPluginExporter implements pluginapi.PluginExporter interface for testing.

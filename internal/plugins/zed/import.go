@@ -36,20 +36,20 @@ func (p *zedImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	_ pluginapi.PluginImportOption,
-) (*keymapv1.Keymap, error) {
+) (pluginapi.PluginImportResult, error) {
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	cleanedJSON, err := hujson.Standardize(jsonData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to standardize JSON: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to standardize JSON: %w", err)
 	}
 
 	var zedKeymaps zedKeymapConfig
 	if err := json.Unmarshal(cleanedJSON, &zedKeymaps); err != nil {
-		return nil, fmt.Errorf("failed to parse zed keymap json: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse zed keymap json: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -107,5 +107,5 @@ func (p *zedImporter) Import(
 		}
 	}
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
-	return setting, nil
+	return pluginapi.PluginImportResult{Keymap: setting}, nil
 }

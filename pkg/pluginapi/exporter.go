@@ -42,14 +42,16 @@ type PluginExportReport struct {
 	// ExportEditorConfig contains the editor-specific configuration after export.
 	ExportEditorConfig any
 
-	SkipReport SkipReport
+	// SkipReport reports actions that were not exported and why.
+	SkipReport ExportSkipReport
 }
 
-type SkipReport struct {
-	SkipActions []SkipAction
+type ExportSkipReport struct {
+	SkipActions []ExportSkipAction
 }
 
-type SkipAction struct {
+type ExportSkipAction struct {
+	// Action name, e.g. "actions.clipboard.copy"
 	Action string
 	// Error description about why this action is skipped
 	Error error
