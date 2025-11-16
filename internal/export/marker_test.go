@@ -65,7 +65,7 @@ func TestMarker_ActionLevelSkipAppliesToAllUnexported(t *testing.T) {
 	// Export only first, mark action-level skip
 	note := "not available on this editor"
 	m.MarkExported(a.GetName(), keymap.MustParseKeyBinding("cmd+a").KeyChords)
-	m.MarkSkippedForReason(a.GetName(), nil, &pluginapi.NotSupportedError{Note: note})
+	m.MarkSkippedForReason(a.GetName(), nil, &pluginapi.UnsupportedExportActionError{Note: note})
 
 	rep := m.Report()
 	require.Len(t, rep.SkipActions, 1)
@@ -79,7 +79,7 @@ func TestMarker_PerKeyReasonOverridesActionLevel(t *testing.T) {
 	m := exp.NewMarker(km)
 
 	// No exported; set action-level reason and a different per-key reason for second
-	m.MarkSkippedForReason(a.GetName(), nil, &pluginapi.NotSupportedError{Note: "action"})
+	m.MarkSkippedForReason(a.GetName(), nil, &pluginapi.UnsupportedExportActionError{Note: "action"})
 	m.MarkSkippedForReason(
 		a.GetName(),
 		keymap.MustParseKeyBinding("cmd+b").KeyChords,

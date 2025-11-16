@@ -211,11 +211,11 @@ func (e *helixExporter) generateManagedKeybindings(
 					marker.MarkSkippedForReason(
 						km.GetName(),
 						b.GetKeyChords(),
-						&pluginapi.NotSupportedError{Note: err.Error()},
+						&pluginapi.UnsupportedExportActionError{Note: err.Error()},
 					)
 				} else {
 					e.logger.WarnContext(ctx, "Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), &pluginapi.NotSupportedError{Note: err.Error()})
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), &pluginapi.UnsupportedExportActionError{Note: err.Error()})
 				}
 				continue
 			}

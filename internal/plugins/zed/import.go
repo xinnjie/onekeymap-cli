@@ -10,6 +10,7 @@ import (
 
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -53,6 +54,7 @@ func (p *zedImporter) Import(
 	}
 
 	setting := &keymapv1.Keymap{}
+	marker := imports.NewMarker()
 	for _, zk := range zedKeymaps {
 		// ensure deterministic order: iterate bindings by sorted keys
 		keys := make([]string, 0, len(zk.Bindings))
@@ -65,6 +67,7 @@ func (p *zedImporter) Import(
 			kb, err := ParseZedKeybind(key)
 			if err != nil {
 				p.logger.WarnContext(ctx, "failed to parse keychord", "key", key, "error", err)
+				marker.MarkSkippedForReason(action.Action, fmt.Errorf("failed to parse keychord '%s': %w", key, err))
 				continue
 			}
 
@@ -94,6 +97,7 @@ func (p *zedImporter) Import(
 					err,
 				)
 				p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeZed, actionStr)
+				marker.MarkSkippedForReason(actionStr, err)
 				continue
 			}
 			keymapEntry := &keymapv1.Action{
@@ -104,8 +108,11 @@ func (p *zedImporter) Import(
 			}
 
 			setting.Actions = append(setting.Actions, keymapEntry)
+			marker.MarkImported(actionStr)
 		}
 	}
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
-	return pluginapi.PluginImportResult{Keymap: setting}, nil
+	result := pluginapi.PluginImportResult{Keymap: setting}
+	result.Report.SkipReport = marker.Report()
+	return result, nil
 }

@@ -3,11 +3,13 @@ package xcode
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 
 	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -52,6 +54,7 @@ func (i *xcodeImporter) Import(
 	}
 
 	setting := &keymapv1.Keymap{}
+	marker := imports.NewMarker()
 	for _, binding := range plistData.MenuKeyBindings.KeyBindings {
 		// Skip bindings without keyboard shortcuts
 		if binding.KeyboardShortcut == "" {
@@ -69,6 +72,7 @@ func (i *xcodeImporter) Import(
 				binding.CommandID,
 			)
 			i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeXcode, binding.Action)
+			marker.MarkSkippedForReason(binding.Action, errors.New("unknown action mapping"))
 			continue
 		}
 
@@ -82,6 +86,10 @@ func (i *xcodeImporter) Import(
 				"error",
 				err,
 			)
+			marker.MarkSkippedForReason(
+				binding.Action,
+				fmt.Errorf("unparsable key '%s': %w", binding.KeyboardShortcut, err),
+			)
 			continue
 		}
 
@@ -90,6 +98,7 @@ func (i *xcodeImporter) Import(
 			Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
+		marker.MarkImported(binding.Action)
 	}
 
 	// Process Text Key Bindings
@@ -109,6 +118,7 @@ func (i *xcodeImporter) Import(
 				textAction,
 			)
 			i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeXcode, textAction)
+			marker.MarkSkippedForReason(textAction, errors.New("unknown action mapping"))
 			continue
 		}
 
@@ -122,6 +132,7 @@ func (i *xcodeImporter) Import(
 				"error",
 				err,
 			)
+			marker.MarkSkippedForReason(textAction, fmt.Errorf("unparsable key '%s': %w", key, err))
 			continue
 		}
 
@@ -130,11 +141,14 @@ func (i *xcodeImporter) Import(
 			Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
+		marker.MarkImported(textAction)
 	}
 
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
 
-	return pluginapi.PluginImportResult{Keymap: setting}, nil
+	result := pluginapi.PluginImportResult{Keymap: setting}
+	result.Report.SkipReport = marker.Report()
+	return result, nil
 }
 
 // parseXcodeConfig parses the plist format and extracts keybindings using go-plist

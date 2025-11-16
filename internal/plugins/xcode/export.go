@@ -188,13 +188,17 @@ func (e *xcodeExporter) generateManagedKeybindings(
 	for _, km := range setting.GetActions() {
 		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil {
-			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.NotSupportedError{Note: "Action not supported"})
+			marker.MarkSkippedForReason(
+				km.GetName(),
+				nil,
+				&pluginapi.UnsupportedExportActionError{Note: "Action not supported"},
+			)
 			continue
 		}
 
 		// check support status for xcode
 		if ok, note := mapping.IsSupported(pluginapi.EditorTypeXcode); !ok {
-			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.NotSupportedError{Note: note})
+			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.UnsupportedExportActionError{Note: note})
 			continue
 		}
 
@@ -297,7 +301,7 @@ func (e *xcodeExporter) generateTextKeyBindings(
 
 		// check support status for xcode
 		if ok, note := mapping.IsSupported(pluginapi.EditorTypeXcode); !ok {
-			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.NotSupportedError{Note: note})
+			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.UnsupportedExportActionError{Note: note})
 			continue
 		}
 

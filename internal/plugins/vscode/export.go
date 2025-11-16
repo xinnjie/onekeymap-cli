@@ -215,7 +215,7 @@ func (e *vscodeExporter) generateManagedKeybindings(
 				marker.MarkSkippedForReason(
 					km.GetName(),
 					b.GetKeyChords(),
-					&pluginapi.NotSupportedError{Note: err.Error()},
+					&pluginapi.UnsupportedExportActionError{Note: err.Error()},
 				)
 				continue
 			}

@@ -143,7 +143,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap, mark
 				marker.MarkSkippedForReason(
 					km.GetName(),
 					b.GetKeyChords(),
-					&pluginapi.NotSupportedError{Note: err.Error()},
+					&pluginapi.UnsupportedExportActionError{Note: err.Error()},
 				)
 				continue
 			}

@@ -14,11 +14,12 @@ var (
 	ErrActionNotSupported = errors.New("action not supported")
 )
 
-type NotSupportedError struct {
+// UnsupportedExportActionError is returned when a plugin does not support a requested action when exporting
+type UnsupportedExportActionError struct {
 	Note string
 }
 
-func (e *NotSupportedError) Error() string {
+func (e *UnsupportedExportActionError) Error() string {
 	return "not supported: " + e.Note
 }
 

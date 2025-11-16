@@ -8,6 +8,7 @@ import (
 	"log/slog"
 
 	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -52,13 +53,14 @@ func (p *intellijImporter) Import(
 	}
 
 	setting := &keymapv1.Keymap{}
-
+	marker := imports.NewMarker()
 	for _, act := range doc.Actions {
 		actionID, err := p.ActionIDFromIntelliJ(act.ID)
 		if err != nil {
 			// Not found in mapping, skip quietly
 			p.logger.DebugContext(ctx, "no universal mapping for intellij action", "action", act.ID)
 			p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeIntelliJ, act.ID)
+			marker.MarkSkippedForReason(act.ID, err)
 			continue
 		}
 
@@ -69,6 +71,7 @@ func (p *intellijImporter) Import(
 			kb, err := ParseKeyBinding(ks)
 			if err != nil {
 				p.logger.WarnContext(ctx, "failed to parse key binding", "binding", ks, "error", err)
+				marker.MarkSkippedForReason(act.ID, fmt.Errorf("failed to parse key binding %v: %w", ks, err))
 				continue
 			}
 			newBinding := &keymapv1.Action{
@@ -76,11 +79,14 @@ func (p *intellijImporter) Import(
 				Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
 			}
 			setting.Actions = append(setting.Actions, newBinding)
+			marker.MarkImported(act.ID)
 		}
 	}
 
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
-	return pluginapi.PluginImportResult{Keymap: setting}, nil
+	result := pluginapi.PluginImportResult{Keymap: setting}
+	result.Report.SkipReport = marker.Report()
+	return result, nil
 }
 
 // ActionIDFromIntelliJ converts an IntelliJ action and optional context to a universal action ID.

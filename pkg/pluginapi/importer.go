@@ -22,6 +22,25 @@ type ConfigDetectOptions struct {
 	Sandbox bool
 }
 
+// PluginImportResult contains the result of an import operation.
 type PluginImportResult struct {
 	Keymap *keymapv1.Keymap
+
+	Report PluginImportReport
+}
+
+// PluginImportReport contains details about the import operation.
+type PluginImportReport struct {
+	// SkipReport contains details about actions that were skipped during the import operation.
+	SkipReport ImportSkipReport
+}
+
+type ImportSkipReport struct {
+	SkipActions []ImportSkipAction
+}
+
+type ImportSkipAction struct {
+	// EditorSpecificAction is the action name in the editor-specific format
+	EditorSpecificAction string
+	Error                error
 }

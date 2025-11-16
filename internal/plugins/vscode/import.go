@@ -3,12 +3,14 @@ package vscode
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
@@ -57,6 +59,7 @@ func (i *vscodeImporter) Import(
 	}
 
 	setting := &keymapv1.Keymap{}
+	marker := imports.NewMarker()
 	for _, binding := range vscodeKeybindings {
 		mapping := i.FindByVSCodeActionWithArgs(binding.Command, binding.When, binding.Args)
 		if mapping == nil {
@@ -74,12 +77,14 @@ func (i *vscodeImporter) Import(
 			if i.reporter != nil {
 				i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeVSCode, binding.Command)
 			}
+			marker.MarkSkippedForReason(binding.Command, errors.New("unknown action mapping"))
 			continue
 		}
 
 		kb, err := ParseKeybinding(binding.Key)
 		if err != nil {
 			i.logger.WarnContext(ctx, "Skipping keybinding with unparsable key", "key", binding.Key, "error", err)
+			marker.MarkSkippedForReason(binding.Command, fmt.Errorf("unparsable key '%s': %w", binding.Key, err))
 			continue
 		}
 
@@ -88,9 +93,13 @@ func (i *vscodeImporter) Import(
 			Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
+
+		marker.MarkImported(binding.Command)
 	}
 
 	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
 
-	return pluginapi.PluginImportResult{Keymap: setting}, nil
+	result := pluginapi.PluginImportResult{Keymap: setting}
+	result.Report.SkipReport = marker.Report()
+	return result, nil
 }

@@ -170,7 +170,7 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.Keymap, marke
 				marker.MarkSkippedForReason(
 					km.GetName(),
 					b.GetKeyChords(),
-					&pluginapi.NotSupportedError{Note: err.Error()},
+					&pluginapi.UnsupportedExportActionError{Note: err.Error()},
 				)
 				continue
 			}

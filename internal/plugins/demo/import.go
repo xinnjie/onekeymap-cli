@@ -3,11 +3,13 @@ package demo
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 
 	"github.com/tailscale/hujson"
+	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
@@ -52,19 +54,25 @@ func (i *demoImporter) Import(
 	}
 
 	setting := &keymapv1.Keymap{}
+	marker := imports.NewMarker()
 	for _, b := range bindings {
 		if b.Keys == "" || b.Action == "" {
+			marker.MarkSkippedForReason(b.Action, errors.New("missing keys or action"))
 			continue
 		}
 		kb, err := keymap.ParseKeyBinding(b.Keys, "+")
 		if err != nil {
 			i.logger.WarnContext(ctx, "Skipping unparsable keybinding", "keys", b.Keys, "error", err)
+			marker.MarkSkippedForReason(b.Action, fmt.Errorf("unparsable key '%s': %w", b.Keys, err))
 			continue
 		}
 		setting.Actions = append(
 			setting.Actions,
 			&keymapv1.Action{Name: b.Action, Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}}},
 		)
+		marker.MarkImported(b.Action)
 	}
-	return pluginapi.PluginImportResult{Keymap: setting}, nil
+	result := pluginapi.PluginImportResult{Keymap: setting}
+	result.Report.SkipReport = marker.Report()
+	return result, nil
 }
