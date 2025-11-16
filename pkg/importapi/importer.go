@@ -27,6 +27,8 @@ type ImportResult struct {
 
 	// The changes to the keymap setting.
 	Changes *KeymapChanges
+
+	SkipReport pluginapi.ImportSkipReport
 }
 
 // KeymapChanges represents the changes to a keymap setting.

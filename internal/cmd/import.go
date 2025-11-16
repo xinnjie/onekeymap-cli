@@ -145,6 +145,14 @@ func executeImportInteractive(
 		return err
 	}
 
+	if result != nil && len(result.SkipReport.SkipActions) > 0 {
+		vm := views.NewImportSkipReportViewModel(result.SkipReport)
+		p := tea.NewProgram(vm)
+		if _, err := p.Run(); err != nil {
+			logger.Error("could not start program", "error", err)
+		}
+	}
+
 	// Show validation report if there are issues
 	if result != nil && result.Report != nil &&
 		(len(result.Report.GetIssues()) > 0 || len(result.Report.GetWarnings()) > 0) {

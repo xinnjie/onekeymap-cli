@@ -83,7 +83,7 @@ func (m SkipReportViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	if keyMsg, ok := msg.(tea.KeyMsg); ok {
 		switch keyMsg.String() {
-		case "q", keyQuit:
+		case "q", tea.KeyCtrlC.String(), tea.KeyEnter.String():
 			return m, tea.Quit
 		}
 	}
@@ -94,5 +94,6 @@ func (m SkipReportViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m SkipReportViewModel) View() string {
 	return lipgloss.NewStyle().Bold(true).PaddingBottom(1).Render(m.title) + "\n" +
 		m.style.Render(m.table.View()) + "\n" +
-		helpStyle.Render(m.help)
+		helpStyle.Render(m.help) + "\n" +
+		helpStyle.Render(m.table.HelpView())
 }

@@ -2,13 +2,10 @@ package vscode
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 
-	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
@@ -42,20 +39,9 @@ func (i *vscodeImporter) Import(
 	source io.Reader,
 	_ pluginapi.PluginImportOption,
 ) (pluginapi.PluginImportResult, error) {
-	// VSCode's keybindings.json can contain comments, so we need to strip them.
-	jsonData, err := io.ReadAll(source)
+	vscodeKeybindings, err := parseExistingConfig(source)
 	if err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
-	}
-
-	cleanedJSON, err := hujson.Standardize(jsonData)
-	if err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to standardize JSON: %w", err)
-	}
-
-	var vscodeKeybindings []vscodeKeybinding
-	if err := json.Unmarshal(cleanedJSON, &vscodeKeybindings); err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to unmarshal vscode keybindings: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse existing config: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -77,7 +63,7 @@ func (i *vscodeImporter) Import(
 			if i.reporter != nil {
 				i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeVSCode, binding.Command)
 			}
-			marker.MarkSkippedForReason(binding.Command, errors.New("unknown action mapping"))
+			marker.MarkSkippedForReason(binding.Command, pluginapi.ErrActionNotSupported)
 			continue
 		}
 

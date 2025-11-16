@@ -84,7 +84,7 @@ func (e *vscodeExporter) Export(
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	// Decode existing config for non-destructive merge
-	existingKeybindings, err := e.parseExistingConfig(opts.ExistingConfig)
+	existingKeybindings, err := parseExistingConfig(opts.ExistingConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (e *vscodeExporter) Export(
 	}, nil
 }
 
-func (e *vscodeExporter) parseExistingConfig(reader io.Reader) ([]vscodeKeybinding, error) {
+func parseExistingConfig(reader io.Reader) ([]vscodeKeybinding, error) {
 	var existingKeybindings []vscodeKeybinding
 	if reader == nil {
 		return existingKeybindings, nil

@@ -99,7 +99,12 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 		if len(setting.GetActions()) > 0 {
 			changes.Add = append(changes.Add, setting.GetActions()...)
 		}
-		return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
+		return &importapi.ImportResult{
+			Setting:    setting,
+			Changes:    changes,
+			Report:     report,
+			SkipReport: res.Report.SkipReport,
+		}, nil
 	}
 
 	// If baseline provided, first union baseline chords into current setting so unchanged chords are retained.
@@ -113,7 +118,12 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 
 	// Safety: ensure dedup on output as well
 	setting.Actions = DedupKeyBindings(setting.GetActions())
-	return &importapi.ImportResult{Setting: setting, Changes: changes, Report: report}, nil
+	return &importapi.ImportResult{
+		Setting:    setting,
+		Changes:    changes,
+		Report:     report,
+		SkipReport: res.Report.SkipReport,
+	}, nil
 }
 
 func (s *importService) calculateChanges(
