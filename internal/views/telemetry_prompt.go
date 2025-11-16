@@ -17,7 +17,7 @@ type TelemetryPromptModel struct {
 // NewTelemetryPrompt creates a new telemetry prompt model
 func NewTelemetryPrompt() TelemetryPromptModel {
 	return TelemetryPromptModel{
-		choice:   0, // Default to allow telemetry
+		choice:   1, // Default to deny telemetry
 		selected: false,
 		quitting: false,
 	}
