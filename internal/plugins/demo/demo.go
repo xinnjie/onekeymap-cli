@@ -5,17 +5,17 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type demoPlugin struct {
 	mappingConfig *mappings.MappingConfig
-	importer      pluginapi.PluginImporter
-	exporter      pluginapi.PluginExporter
+	importer      pluginapi2.PluginImporter
+	exporter      pluginapi2.PluginExporter
 	logger        *slog.Logger
 }
 
-func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.Plugin {
+func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi2.Plugin {
 	return &demoPlugin{
 		mappingConfig: mappingConfig,
 		importer:      newImporter(logger),
@@ -24,8 +24,8 @@ func New(mappingConfig *mappings.MappingConfig, logger *slog.Logger) pluginapi.P
 	}
 }
 
-func (p *demoPlugin) EditorType() pluginapi.EditorType { return pluginapi.EditorType("demo") }
+func (p *demoPlugin) EditorType() pluginapi2.EditorType { return pluginapi2.EditorType("demo") }
 
-func (p *demoPlugin) Importer() (pluginapi.PluginImporter, error) { return p.importer, nil }
+func (p *demoPlugin) Importer() (pluginapi2.PluginImporter, error) { return p.importer, nil }
 
-func (p *demoPlugin) Exporter() (pluginapi.PluginExporter, error) { return p.exporter, nil }
+func (p *demoPlugin) Exporter() (pluginapi2.PluginExporter, error) { return p.exporter, nil }

@@ -1,4 +1,4 @@
-package validateapi
+package validate
 
 import (
 	"context"
@@ -6,7 +6,8 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -17,7 +18,10 @@ type PotentialShadowingRule struct {
 }
 
 // NewPotentialShadowingRule creates a new potential shadowing validation rule.
-func NewPotentialShadowingRule(targetEditor pluginapi.EditorType, platform platform.Platform) ValidationRule {
+func NewPotentialShadowingRule(
+	targetEditor pluginapi.EditorType,
+	platform platform.Platform,
+) validateapi2.ValidationRule {
 	return &PotentialShadowingRule{
 		targetEditor: targetEditor,
 		platform:     platform,
@@ -81,7 +85,7 @@ var criticalKeybindingsByPlatform = map[platform.Platform]map[string]string{
 }
 
 // Validate checks for keybindings that might shadow critical system shortcuts.
-func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *ValidationContext) error {
+func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
 	setting := validationContext.Setting
 	report := validationContext.Report
 

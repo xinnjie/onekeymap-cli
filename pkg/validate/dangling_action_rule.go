@@ -1,9 +1,10 @@
-package validateapi
+package validate
 
 import (
 	"context"
 
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -13,14 +14,14 @@ type DanglingActionRule struct {
 }
 
 // NewDanglingActionRule creates a new dangling action validation rule.
-func NewDanglingActionRule(mappingConfig *mappings.MappingConfig) ValidationRule {
+func NewDanglingActionRule(mappingConfig *mappings.MappingConfig) validateapi2.ValidationRule {
 	return &DanglingActionRule{
 		mappingConfig: mappingConfig,
 	}
 }
 
 // Validate checks for dangling actions in the keymap setting.
-func (r *DanglingActionRule) Validate(_ context.Context, validationContext *ValidationContext) error {
+func (r *DanglingActionRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
 	if validationContext.Setting == nil || len(validationContext.Setting.GetActions()) == 0 {
 		return nil
 	}

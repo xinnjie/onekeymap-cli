@@ -12,7 +12,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -26,7 +26,7 @@ func newExporter(
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	differ diff.Differ,
-) pluginapi.PluginExporter {
+) pluginapi2.PluginExporter {
 	return &helixExporter{mappingConfig: mappingConfig, logger: logger, differ: differ}
 }
 
@@ -34,8 +34,8 @@ func (e *helixExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
 	setting *keymapv1.Keymap,
-	opts pluginapi.PluginExportOption,
-) (*pluginapi.PluginExportReport, error) {
+	opts pluginapi2.PluginExportOption,
+) (*pluginapi2.PluginExportReport, error) {
 	// Read existing configuration if provided for non-destructive export
 	var existingKeys helixKeys
 	var existingFullConfig map[string]interface{}
@@ -74,7 +74,7 @@ func (e *helixExporter) Export(
 		return nil, fmt.Errorf("failed to encode helix toml: %w", err)
 	}
 
-	return &pluginapi.PluginExportReport{
+	return &pluginapi2.PluginExportReport{
 		BaseEditorConfig:   existingKeys,
 		ExportEditorConfig: finalKeys,
 		SkipReport:         marker.Report(),
@@ -187,7 +187,7 @@ func (e *helixExporter) generateManagedKeybindings(
 		if mapping == nil || len(mapping.Helix) == 0 {
 			for _, b := range km.GetBindings() {
 				if b != nil && b.GetKeyChords() != nil {
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi2.ErrActionNotSupported)
 				}
 			}
 			continue
@@ -211,11 +211,11 @@ func (e *helixExporter) generateManagedKeybindings(
 					marker.MarkSkippedForReason(
 						km.GetName(),
 						b.GetKeyChords(),
-						&pluginapi.UnsupportedExportActionError{Note: err.Error()},
+						&pluginapi2.UnsupportedExportActionError{Note: err.Error()},
 					)
 				} else {
 					e.logger.WarnContext(ctx, "Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), &pluginapi.UnsupportedExportActionError{Note: err.Error()})
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), &pluginapi2.UnsupportedExportActionError{Note: err.Error()})
 				}
 				continue
 			}

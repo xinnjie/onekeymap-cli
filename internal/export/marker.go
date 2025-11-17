@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -50,7 +50,7 @@ func (m *Marker) MarkSkippedForReason(action string, keybinding *keymapv1.Keybin
 		return
 	}
 	if reasonErr == nil {
-		reasonErr = pluginapi.ErrActionNotSupported
+		reasonErr = pluginapi2.ErrActionNotSupported
 	}
 	if keybinding == nil {
 		if _, exists := m.skippedAction[action]; !exists {
@@ -67,9 +67,9 @@ func (m *Marker) MarkSkippedForReason(action string, keybinding *keymapv1.Keybin
 	}
 }
 
-func (m *Marker) Report() pluginapi.ExportSkipReport {
+func (m *Marker) Report() pluginapi2.ExportSkipReport {
 	if m == nil || m.keymap == nil {
-		return pluginapi.ExportSkipReport{}
+		return pluginapi2.ExportSkipReport{}
 	}
 	actions := m.keymap.GetActions()
 	// ensure stable order by sorting action IDs for determinism in tests
@@ -81,7 +81,7 @@ func (m *Marker) Report() pluginapi.ExportSkipReport {
 		ids = append(ids, a.GetName())
 	}
 	slices.Sort(ids)
-	var result []pluginapi.ExportSkipAction
+	var result []pluginapi2.ExportSkipAction
 	for _, id := range ids {
 		// Find the action in the original slice to access its bindings
 		var act *keymapv1.Action
@@ -110,20 +110,20 @@ func (m *Marker) Report() pluginapi.ExportSkipReport {
 			// explicit per-key skip reason?
 			if perKey, ok := m.skippedKeys[id]; ok {
 				if err, ok2 := perKey[key]; ok2 {
-					result = append(result, pluginapi.ExportSkipAction{Action: id, Error: err})
+					result = append(result, pluginapi2.ExportSkipAction{Action: id, Error: err})
 					continue
 				}
 			}
 			// action-level skip reason?
 			if err, ok := m.skippedAction[id]; ok {
-				result = append(result, pluginapi.ExportSkipAction{Action: id, Error: err})
+				result = append(result, pluginapi2.ExportSkipAction{Action: id, Error: err})
 				continue
 			}
 			// default
-			result = append(result, pluginapi.ExportSkipAction{Action: id, Error: pluginapi.ErrActionNotSupported})
+			result = append(result, pluginapi2.ExportSkipAction{Action: id, Error: pluginapi2.ErrActionNotSupported})
 		}
 	}
-	return pluginapi.ExportSkipReport{SkipActions: result}
+	return pluginapi2.ExportSkipReport{SkipActions: result}
 }
 
 // canonicalKeybindingID builds a stable string identifier for a keybinding.

@@ -1,4 +1,4 @@
-package internal_test
+package importer_test
 
 import (
 	"bytes"
@@ -9,14 +9,14 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	vscodeplugin "github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/importer"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/protobuf/testing/protocmp"
 )
@@ -49,7 +49,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	registry := plugins.NewRegistry()
 	registry.Register(vscodeplugin.New(mappingConfig, logger, metrics.NewNoop()))
-	service := internal.NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
+	service := importer.NewImporter(registry, mappingConfig, logger, metrics.NewNoop())
 
 	// VSCode keybindings.json content (comments stripped by importer)
 	// Note that "ctrl+alt+shift+l" is different from "ctrl+shift+alt+l"
@@ -68,7 +68,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType:  pluginapi.EditorTypeVSCode,
 		InputStream: bytes.NewReader(vscodeJSON),
 		Base:        base,
@@ -78,7 +78,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, res)
 
-	expected := &importapi.ImportResult{
+	expected := &importerapi.ImportResult{
 		Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
 			{
 				Name: "actions.edit.formatSelection",
@@ -95,7 +95,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 				},
 			},
 		}},
-		Changes: &importapi.KeymapChanges{},
+		Changes: &importerapi.KeymapChanges{},
 	}
 
 	settingDiff := cmp.Diff(expected.Setting, res.Setting, protocmp.Transform())

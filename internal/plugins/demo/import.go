@@ -11,7 +11,7 @@ import (
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 

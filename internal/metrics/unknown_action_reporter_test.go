@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 func TestUnknownActionReporter_ReportUnknownCommand(t *testing.T) {

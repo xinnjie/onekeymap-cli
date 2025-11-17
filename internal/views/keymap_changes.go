@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -30,14 +30,14 @@ var (
 // TODO(xinnjie): low priority, choose which change not to apply
 type keymapChangesModel struct {
 	table   table.Model
-	changes *importapi.KeymapChanges
+	changes *importerapi.KeymapChanges
 
 	confirm    *bool
 	confirming bool
 	form       *huh.Form
 }
 
-func NewKeymapChangesModel(changes *importapi.KeymapChanges, confirm *bool) tea.Model {
+func NewKeymapChangesModel(changes *importerapi.KeymapChanges, confirm *bool) tea.Model {
 	// Compute dynamic widths for Before/After based on actual content
 	beforeW, afterW := measureBeforeAfterWidths(changes)
 	cols := []table.Column{
@@ -188,7 +188,7 @@ func formatKeyBinding(kb *keymapv1.Action) string {
 
 // measureBeforeAfterWidths calculates the suitable column widths for Before/After
 // using the display length of formatted keybindings, with sensible caps.
-func measureBeforeAfterWidths(changes *importapi.KeymapChanges) (before, after int) {
+func measureBeforeAfterWidths(changes *importerapi.KeymapChanges) (before, after int) {
 	const (
 		minW      = 12
 		maxW      = 80

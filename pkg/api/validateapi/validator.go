@@ -5,7 +5,7 @@ import (
 	"errors"
 	"math"
 
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -25,7 +25,7 @@ func NewValidator(rules ...ValidationRule) *Validator {
 func (v *Validator) Validate(
 	ctx context.Context,
 	setting *keymapv1.Keymap,
-	opts importapi.ImportOptions,
+	opts importerapi.ImportOptions,
 ) (*keymapv1.ValidationReport, error) {
 	processed := len(setting.GetActions())
 	if processed > math.MaxInt32 || processed < 0 {

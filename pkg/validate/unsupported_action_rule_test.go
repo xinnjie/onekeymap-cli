@@ -1,4 +1,4 @@
-package validateapi_test
+package validate_test
 
 import (
 	"context"
@@ -8,9 +8,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -37,7 +38,7 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 		},
 	}
 
-	validator := validateapi.NewValidator(validateapi.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
+	validator := validateapi.NewValidator(validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
 	setting := &keymapv1.Keymap{
 		Actions: []*keymapv1.Action{
@@ -46,7 +47,7 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "zed",
 	}
 
@@ -75,7 +76,7 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 		},
 	}
 
-	validator := validateapi.NewValidator(validateapi.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
+	validator := validateapi.NewValidator(validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
 	setting := &keymapv1.Keymap{
 		Actions: []*keymapv1.Action{
@@ -83,7 +84,7 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "zed",
 	}
 
@@ -107,7 +108,7 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 
 	// Test with VSCode target - should pass
 	validatorVSCode := validateapi.NewValidator(
-		validateapi.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeVSCode),
+		validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeVSCode),
 	)
 	setting := &keymapv1.Keymap{
 		Actions: []*keymapv1.Action{
@@ -115,7 +116,7 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "vscode",
 	}
 
@@ -125,7 +126,7 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 
 	// Test with Zed target - should fail
 	validatorZed := validateapi.NewValidator(
-		validateapi.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed),
+		validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed),
 	)
 	opts.EditorType = "zed"
 

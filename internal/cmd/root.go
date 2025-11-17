@@ -10,7 +10,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/cliconfig"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
@@ -23,8 +22,10 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
-	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/exporter"
+	"github.com/xinnjie/onekeymap-cli/pkg/importer"
 	"golang.org/x/term"
 )
 
@@ -41,8 +42,8 @@ var (
 var (
 	// Global shared state that needs to be accessed across commands
 	cmdPluginRegistry *plugins.Registry
-	cmdImportService  importapi.Importer
-	cmdExportService  exportapi.Exporter
+	cmdImportService  importerapi.Importer
+	cmdExportService  exporterapi.Exporter
 	cmdLogger         *slog.Logger
 	cmdRecorder       metrics.Recorder
 	cmdMappingConfig  *mappings.MappingConfig
@@ -220,8 +221,8 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 
 		cmdPluginRegistry.Register(basekeymap.New())
 
-		cmdImportService = internal.NewImportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
-		cmdExportService = internal.NewExportService(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
+		cmdImportService = importer.NewImporter(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
+		cmdExportService = exporter.NewExporter(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
 
 		// Start async update check only in interactive mode and when not in sandbox
 		if f.interactive && !f.sandbox && !f.skipUpdateCheck {

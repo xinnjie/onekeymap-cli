@@ -6,21 +6,21 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type vsCodeVariantPlugin struct {
 	*vsCodePlugin
 
-	editorType pluginapi.EditorType
+	editorType pluginapi2.EditorType
 }
 
 func newVSCodeVariantPlugin(
-	editorType pluginapi.EditorType,
+	editorType pluginapi2.EditorType,
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,
-) pluginapi.Plugin {
+) pluginapi2.Plugin {
 	return &vsCodeVariantPlugin{
 		vsCodePlugin: newVSCodePlugin(mappingConfig, logger, recorder),
 		editorType:   editorType,
@@ -28,32 +28,32 @@ func newVSCodeVariantPlugin(
 }
 
 // EditorType implements pluginapi.Plugin.
-func (p *vsCodeVariantPlugin) EditorType() pluginapi.EditorType {
+func (p *vsCodeVariantPlugin) EditorType() pluginapi2.EditorType {
 	return p.editorType
 }
 
 // Importer implements pluginapi.Plugin.
-func (p *vsCodeVariantPlugin) Importer() (pluginapi.PluginImporter, error) {
+func (p *vsCodeVariantPlugin) Importer() (pluginapi2.PluginImporter, error) {
 	return p.vsCodePlugin.Importer()
 }
 
 // Exporter implements pluginapi.Plugin.
-func (p *vsCodeVariantPlugin) Exporter() (pluginapi.PluginExporter, error) {
+func (p *vsCodeVariantPlugin) Exporter() (pluginapi2.PluginExporter, error) {
 	return p.vsCodePlugin.Exporter()
 }
 
 // ConfigDetect implements pluginapi.Plugin.
 func (p *vsCodeVariantPlugin) ConfigDetect(
-	opts pluginapi.ConfigDetectOptions,
+	opts pluginapi2.ConfigDetectOptions,
 ) (paths []string, installed bool, err error) {
 	switch p.editorType {
-	case pluginapi.EditorTypeWindsurf:
+	case pluginapi2.EditorTypeWindsurf:
 		return detectConfigForVSCodeVariant("Windsurf", "windsurf", opts)
-	case pluginapi.EditorTypeWindsurfNext:
+	case pluginapi2.EditorTypeWindsurfNext:
 		return detectConfigForVSCodeVariant("Windsurf-Next", "windsurf-next", opts)
-	case pluginapi.EditorTypeCursor:
+	case pluginapi2.EditorTypeCursor:
 		return detectConfigForVSCodeVariant("Cursor", "cursor", opts)
-	case pluginapi.EditorTypeVSCode:
+	case pluginapi2.EditorTypeVSCode:
 		return detectConfigForVSCodeVariant("Code", "code", opts)
 	default:
 		return nil, false, fmt.Errorf("unknown editor type: %s", p.editorType)
@@ -65,8 +65,8 @@ func NewWindsurf(
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,
-) pluginapi.Plugin {
-	return newVSCodeVariantPlugin(pluginapi.EditorTypeWindsurf, mappingConfig, logger, recorder)
+) pluginapi2.Plugin {
+	return newVSCodeVariantPlugin(pluginapi2.EditorTypeWindsurf, mappingConfig, logger, recorder)
 }
 
 // NewWindsurfNext creates a Windsurf-Next plugin instance.
@@ -74,11 +74,15 @@ func NewWindsurfNext(
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,
-) pluginapi.Plugin {
-	return newVSCodeVariantPlugin(pluginapi.EditorTypeWindsurfNext, mappingConfig, logger, recorder)
+) pluginapi2.Plugin {
+	return newVSCodeVariantPlugin(pluginapi2.EditorTypeWindsurfNext, mappingConfig, logger, recorder)
 }
 
 // NewCursor creates a Cursor plugin instance.
-func NewCursor(mappingConfig *mappings.MappingConfig, logger *slog.Logger, recorder metrics.Recorder) pluginapi.Plugin {
-	return newVSCodeVariantPlugin(pluginapi.EditorTypeCursor, mappingConfig, logger, recorder)
+func NewCursor(
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) pluginapi2.Plugin {
+	return newVSCodeVariantPlugin(pluginapi2.EditorTypeCursor, mappingConfig, logger, recorder)
 }

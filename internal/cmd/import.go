@@ -16,8 +16,8 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -35,7 +35,7 @@ func NewCmdImport() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "import",
 		Short: "Import an editor's keymap to the universal format",
-		RunE: importRun(&f, func() (*slog.Logger, *plugins.Registry, importapi.Importer) {
+		RunE: importRun(&f, func() (*slog.Logger, *plugins.Registry, importerapi.Importer) {
 			return cmdLogger, cmdPluginRegistry, cmdImportService
 		}),
 		Args: cobra.ExactArgs(0),
@@ -61,7 +61,7 @@ func NewCmdImport() *cobra.Command {
 
 func importRun(
 	f *importFlags,
-	dependencies func() (*slog.Logger, *plugins.Registry, importapi.Importer),
+	dependencies func() (*slog.Logger, *plugins.Registry, importerapi.Importer),
 ) func(cmd *cobra.Command, _ []string) error {
 	return func(cmd *cobra.Command, _ []string) error {
 		logger, pluginRegistry, importService := dependencies()
@@ -80,7 +80,7 @@ func importRunInteractive(
 	f *importFlags,
 	logger *slog.Logger,
 	pluginRegistry *plugins.Registry,
-	importService importapi.Importer,
+	importService importerapi.Importer,
 	onekeymapConfig string,
 ) error {
 	if err := prepareInteractiveImportFlags(cmd, f, onekeymapConfig, pluginRegistry, logger); err != nil {
@@ -95,7 +95,7 @@ func importRunNonInteractive(
 	f *importFlags,
 	logger *slog.Logger,
 	pluginRegistry *plugins.Registry,
-	importService importapi.Importer,
+	importService importerapi.Importer,
 	onekeymapConfig string,
 ) error {
 	if err := prepareNonInteractiveImportFlags(f, onekeymapConfig, pluginRegistry, logger); err != nil {
@@ -109,7 +109,7 @@ func executeImportInteractive(
 	cmd *cobra.Command,
 	f *importFlags,
 	logger *slog.Logger,
-	importService importapi.Importer,
+	importService importerapi.Importer,
 	onekeymapConfig string,
 ) error {
 	var (
@@ -133,8 +133,8 @@ func executeImportInteractive(
 
 	baseConfig := loadBaseConfig(f.output, onekeymapConfig, logger)
 
-	opts := importapi.ImportOptions{
-		EditorType:  pluginapi.EditorType(f.from),
+	opts := importerapi.ImportOptions{
+		EditorType:  pluginapi2.EditorType(f.from),
 		InputStream: file,
 		Base:        baseConfig,
 	}
@@ -181,7 +181,7 @@ func executeImportNonInteractive(
 	cmd *cobra.Command,
 	f *importFlags,
 	logger *slog.Logger,
-	importService importapi.Importer,
+	importService importerapi.Importer,
 	onekeymapConfig string,
 ) error {
 	var (
@@ -205,8 +205,8 @@ func executeImportNonInteractive(
 
 	baseConfig := loadBaseConfig(f.output, onekeymapConfig, logger)
 
-	opts := importapi.ImportOptions{
-		EditorType:  pluginapi.EditorType(f.from),
+	opts := importerapi.ImportOptions{
+		EditorType:  pluginapi2.EditorType(f.from),
 		InputStream: file,
 		Base:        baseConfig,
 	}
@@ -245,7 +245,7 @@ func loadBaseConfig(outputPath, onekeymapConfig string, logger *slog.Logger) *ke
 	return cfg
 }
 
-func saveImportResult(outputPath string, result *importapi.ImportResult, logger *slog.Logger) error {
+func saveImportResult(outputPath string, result *importerapi.ImportResult, logger *slog.Logger) error {
 	if err := os.MkdirAll(filepath.Dir(outputPath), 0o750); err != nil {
 		logger.Error("Failed to create output directory", "dir", filepath.Dir(outputPath), "error", err)
 		return err
@@ -318,7 +318,7 @@ func prepareInteractiveImportFlags(
 		return err
 	}
 
-	p, ok := pluginRegistry.Get(pluginapi.EditorType(f.from))
+	p, ok := pluginRegistry.Get(pluginapi2.EditorType(f.from))
 	if !ok {
 		logger.Error("Editor not found", "editor", f.from)
 		return fmt.Errorf("editor %s not found", f.from)
@@ -330,7 +330,7 @@ func prepareInteractiveImportFlags(
 			f.input = configPath
 			logger.Info("Using keymap path from config", "editor", f.from, "path", configPath)
 		} else {
-			v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{})
+			v, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{})
 			if err != nil {
 				logger.Error("Failed to get default config path", "error", err)
 				return err
@@ -354,7 +354,7 @@ func prepareNonInteractiveImportFlags(
 		f.output = onekeymapConfig
 	}
 
-	p, ok := pluginRegistry.Get(pluginapi.EditorType(f.from))
+	p, ok := pluginRegistry.Get(pluginapi2.EditorType(f.from))
 	if !ok {
 		logger.Error("Editor not found", "editor", f.from)
 		return fmt.Errorf("editor %s not found", f.from)
@@ -366,7 +366,7 @@ func prepareNonInteractiveImportFlags(
 			f.input = configPath
 			logger.Info("Using keymap path from config", "editor", f.from, "path", configPath)
 		} else {
-			v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{})
+			v, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{})
 			if err != nil {
 				logger.Error("Failed to get default config path", "error", err)
 				return err
@@ -377,7 +377,7 @@ func prepareNonInteractiveImportFlags(
 	return nil
 }
 
-func runImportChangesPreview(changes *importapi.KeymapChanges) (bool, error) {
+func runImportChangesPreview(changes *importerapi.KeymapChanges) (bool, error) {
 	confirmed := true
 	m := views.NewKeymapChangesModel(changes, &confirmed)
 	_, err := tea.NewProgram(m).Run()

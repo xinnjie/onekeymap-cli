@@ -9,18 +9,18 @@ import (
 	"sort"
 	"time"
 
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 // ConfigDetect returns default keymap config path for IntelliJ IDEA Ultimate.
-func (p *intellijPlugin) ConfigDetect(opts pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
+func (p *intellijPlugin) ConfigDetect(opts pluginapi2.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	return detectConfigForIDE("IntelliJ IDEA", "IntelliJIdea*", "idea", opts)
 }
 
 // detectConfigForIDE is a helper function to detect config paths for a specific JetBrains IDE.
 func detectConfigForIDE(
 	appNamePrefix, dirPattern, commandName string,
-	opts pluginapi.ConfigDetectOptions,
+	opts pluginapi2.ConfigDetectOptions,
 ) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -39,13 +39,13 @@ func detectConfigForIDE(
 	case "windows":
 		appData := os.Getenv("APPDATA")
 		if appData == "" {
-			return nil, false, fmt.Errorf("APPDATA environment variable not set, %w", pluginapi.ErrNotSupported)
+			return nil, false, fmt.Errorf("APPDATA environment variable not set, %w", pluginapi2.ErrNotSupported)
 		}
 		candidates = append(candidates, filepath.Join(appData, "JetBrains", dirPattern, "keymaps"))
 	default:
 		return nil, false, fmt.Errorf(
 			"automatic path discovery is only supported on macOS, Linux, and Windows for IntelliJ, %w",
-			pluginapi.ErrNotSupported,
+			pluginapi2.ErrNotSupported,
 		)
 	}
 

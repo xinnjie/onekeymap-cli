@@ -17,8 +17,8 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/service"
-	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -38,8 +38,9 @@ func NewCmdServe(rootFlags *rootFlags) *cobra.Command {
 		Use:   "serve",
 		Short: "Start the gRPC server",
 		Run: serveRun(
-			&f, rootFlags,
-			func() (*slog.Logger, *plugins.Registry, importapi.Importer, exportapi.Exporter, *mappings.MappingConfig) {
+			&f,
+			rootFlags,
+			func() (*slog.Logger, *plugins.Registry, importerapi.Importer, exporterapi.Exporter, *mappings.MappingConfig) {
 				return cmdLogger, cmdPluginRegistry, cmdImportService, cmdExportService, cmdMappingConfig
 			},
 		),
@@ -59,7 +60,7 @@ func NewCmdServe(rootFlags *rootFlags) *cobra.Command {
 func serveRun(
 	f *serveFlags,
 	rootFlags *rootFlags,
-	dependencies func() (*slog.Logger, *plugins.Registry, importapi.Importer, exportapi.Exporter, *mappings.MappingConfig),
+	dependencies func() (*slog.Logger, *plugins.Registry, importerapi.Importer, exporterapi.Exporter, *mappings.MappingConfig),
 ) func(cmd *cobra.Command, _ []string) {
 	return func(cmd *cobra.Command, _ []string) {
 		logger, pluginRegistry, importService, exportService, mappingConfig := dependencies()

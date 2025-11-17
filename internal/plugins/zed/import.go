@@ -9,11 +9,11 @@ import (
 	"sort"
 
 	"github.com/tailscale/hujson"
-	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/dedup"
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -36,21 +36,21 @@ func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, rec
 func (p *zedImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	_ pluginapi.PluginImportOption,
-) (pluginapi.PluginImportResult, error) {
+	_ pluginapi2.PluginImportOption,
+) (pluginapi2.PluginImportResult, error) {
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	cleanedJSON, err := hujson.Standardize(jsonData)
 	if err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to standardize JSON: %w", err)
+		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to standardize JSON: %w", err)
 	}
 
 	var zedKeymaps zedKeymapConfig
 	if err := json.Unmarshal(cleanedJSON, &zedKeymaps); err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse zed keymap json: %w", err)
+		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to parse zed keymap json: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -96,7 +96,7 @@ func (p *zedImporter) Import(
 					"error",
 					err,
 				)
-				p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeZed, actionStr)
+				p.reporter.ReportUnknownCommand(ctx, pluginapi2.EditorTypeZed, actionStr)
 				marker.MarkSkippedForReason(actionStr, err)
 				continue
 			}
@@ -111,8 +111,8 @@ func (p *zedImporter) Import(
 			marker.MarkImported(actionStr)
 		}
 	}
-	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
-	result := pluginapi.PluginImportResult{Keymap: setting}
+	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
+	result := pluginapi2.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
 	return result, nil
 }

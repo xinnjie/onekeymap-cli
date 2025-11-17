@@ -5,8 +5,8 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -17,8 +17,8 @@ type ServerOption struct {
 type Server struct {
 	keymapv1.UnimplementedOnekeymapServiceServer
 
-	importer      importapi.Importer
-	exporter      exportapi.Exporter
+	importer      importerapi.Importer
+	exporter      exporterapi.Exporter
 	registry      *plugins.Registry
 	mappingConfig *mappings.MappingConfig
 	logger        *slog.Logger
@@ -28,8 +28,8 @@ type Server struct {
 
 func NewServer(
 	registry *plugins.Registry,
-	importer importapi.Importer,
-	exporter exportapi.Exporter,
+	importer importerapi.Importer,
+	exporter exporterapi.Exporter,
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	opt ServerOption,

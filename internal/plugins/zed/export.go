@@ -13,7 +13,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -37,8 +37,8 @@ func (p *zedExporter) Export(
 	_ context.Context,
 	destination io.Writer,
 	setting *keymapv1.Keymap,
-	opts pluginapi.PluginExportOption,
-) (*pluginapi.PluginExportReport, error) {
+	opts pluginapi2.PluginExportOption,
+) (*pluginapi2.PluginExportReport, error) {
 	// Parse existing configuration if provided
 	existingConfig, err := p.parseExistingConfig(opts.ExistingConfig)
 	if err != nil {
@@ -70,7 +70,7 @@ func (p *zedExporter) Export(
 	}
 
 	// Defer diff calculation to exportService. Provide structured before/after configs.
-	return &pluginapi.PluginExportReport{
+	return &pluginapi2.PluginExportReport{
 		BaseEditorConfig:   existingConfig,
 		ExportEditorConfig: finalKeymaps,
 		SkipReport:         marker.Report(),
@@ -154,7 +154,7 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.Keymap, marke
 			p.logger.Info("no mapping found for action", "action", km.GetName())
 			for _, b := range km.GetBindings() {
 				if b != nil && b.GetKeyChords() != nil {
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi2.ErrActionNotSupported)
 				}
 			}
 			continue
@@ -170,7 +170,7 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.Keymap, marke
 				marker.MarkSkippedForReason(
 					km.GetName(),
 					b.GetKeyChords(),
-					&pluginapi.UnsupportedExportActionError{Note: err.Error()},
+					&pluginapi2.UnsupportedExportActionError{Note: err.Error()},
 				)
 				continue
 			}

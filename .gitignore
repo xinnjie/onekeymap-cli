@@ -5,3 +5,5 @@ dist
 
 # secret files
 secret
+
+.idea

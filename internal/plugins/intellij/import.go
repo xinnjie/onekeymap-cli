@@ -7,11 +7,11 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/dedup"
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -37,19 +37,19 @@ func newImporter(
 func (p *intellijImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	opts pluginapi.PluginImportOption,
-) (pluginapi.PluginImportResult, error) {
+	opts pluginapi2.PluginImportOption,
+) (pluginapi2.PluginImportResult, error) {
 	_ = ctx
 	_ = opts
 
 	raw, err := io.ReadAll(source)
 	if err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	var doc KeymapXML
 	if err := xml.Unmarshal(raw, &doc); err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse intellij keymap xml: %w", err)
+		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to parse intellij keymap xml: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -59,7 +59,7 @@ func (p *intellijImporter) Import(
 		if err != nil {
 			// Not found in mapping, skip quietly
 			p.logger.DebugContext(ctx, "no universal mapping for intellij action", "action", act.ID)
-			p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeIntelliJ, act.ID)
+			p.reporter.ReportUnknownCommand(ctx, pluginapi2.EditorTypeIntelliJ, act.ID)
 			marker.MarkSkippedForReason(act.ID, err)
 			continue
 		}
@@ -83,8 +83,8 @@ func (p *intellijImporter) Import(
 		}
 	}
 
-	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
-	result := pluginapi.PluginImportResult{Keymap: setting}
+	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
+	result := pluginapi2.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
 	return result, nil
 }

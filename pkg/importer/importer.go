@@ -1,4 +1,4 @@
-package internal
+package importer
 
 import (
 	"context"
@@ -7,20 +7,22 @@ import (
 	"log/slog"
 	"sort"
 
+	"github.com/xinnjie/onekeymap-cli/internal/dedup"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/protobuf/proto"
 )
 
-// importService is the default implementation of the Importer interface.
-type importService struct {
+// importer is the default implementation of the Importer interface.
+type importer struct {
 	registry        *plugins.Registry
 	mappingConfig   *mappings.MappingConfig
 	logger          *slog.Logger
@@ -29,20 +31,20 @@ type importService struct {
 	serviceReporter *metrics.ServiceReporter
 }
 
-// NewImportService creates a new default import service.
-func NewImportService(
+// NewImporter creates a new default import service.
+func NewImporter(
 	registry *plugins.Registry,
 	config *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,
-) importapi.Importer {
-	service := &importService{
+) importerapi.Importer {
+	service := &importer{
 		registry:      registry,
 		mappingConfig: config,
 		logger:        logger,
 		validator: validateapi.NewValidator(
-			validateapi.NewKeybindConflictRule(),
-			validateapi.NewDanglingActionRule(config),
+			validate.NewKeybindConflictRule(),
+			validate.NewDanglingActionRule(config),
 		),
 		recorder:        recorder,
 		serviceReporter: metrics.NewServiceReporter(recorder),
@@ -52,7 +54,7 @@ func NewImportService(
 }
 
 // Import is the method implementation for the default service.
-func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions) (*importapi.ImportResult, error) {
+func (s *importer) Import(ctx context.Context, opts importerapi.ImportOptions) (*importerapi.ImportResult, error) {
 	s.serviceReporter.ReportImportCall(ctx)
 
 	if opts.InputStream == nil {
@@ -76,7 +78,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 	// Normalize: merge same-action entries and deduplicate identical bindings before downstream logic
 	if setting != nil && len(setting.GetActions()) > 0 {
-		setting.Actions = DedupKeyBindings(setting.GetActions())
+		setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
 	}
 
 	// Sort by action for determinism
@@ -95,11 +97,11 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 
 	// No baseline provided: all imported keymaps are additions.
 	if len(opts.Base.GetActions()) == 0 {
-		changes := &importapi.KeymapChanges{}
+		changes := &importerapi.KeymapChanges{}
 		if len(setting.GetActions()) > 0 {
 			changes.Add = append(changes.Add, setting.GetActions()...)
 		}
-		return &importapi.ImportResult{
+		return &importerapi.ImportResult{
 			Setting:    setting,
 			Changes:    changes,
 			Report:     report,
@@ -109,7 +111,7 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 
 	// If baseline provided, first union baseline chords into current setting so unchanged chords are retained.
 	setting = unionWithBase(opts.Base, setting)
-	setting.Actions = DedupKeyBindings(setting.GetActions())
+	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
 	// Re-decorate after union so metadata (Name/Description/Category) and readable chords are present
 	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 
@@ -117,8 +119,8 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	changes := s.calculateChanges(opts.Base, setting)
 
 	// Safety: ensure dedup on output as well
-	setting.Actions = DedupKeyBindings(setting.GetActions())
-	return &importapi.ImportResult{
+	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
+	return &importerapi.ImportResult{
 		Setting:    setting,
 		Changes:    changes,
 		Report:     report,
@@ -126,10 +128,10 @@ func (s *importService) Import(ctx context.Context, opts importapi.ImportOptions
 	}, nil
 }
 
-func (s *importService) calculateChanges(
+func (s *importer) calculateChanges(
 	base *keymapv1.Keymap,
 	setting *keymapv1.Keymap,
-) *importapi.KeymapChanges {
+) *importerapi.KeymapChanges {
 	baseIndex := s.buildActionIndex(base)
 	newIndex := s.buildActionIndex(setting)
 
@@ -147,7 +149,7 @@ type actionIndex struct {
 	byPair   map[string]*keymapv1.Action
 }
 
-func (s *importService) buildActionIndex(keymap *keymapv1.Keymap) *actionIndex {
+func (s *importer) buildActionIndex(keymap *keymapv1.Keymap) *actionIndex {
 	idx := &actionIndex{
 		byAction: map[string][]*keymapv1.Action{},
 		byPair:   map[string]*keymapv1.Action{},
@@ -158,13 +160,13 @@ func (s *importService) buildActionIndex(keymap *keymapv1.Keymap) *actionIndex {
 			continue
 		}
 		idx.byAction[kb.GetName()] = append(idx.byAction[kb.GetName()], kb)
-		idx.byPair[pairKey(kb)] = kb
+		idx.byPair[dedup.PairKey(kb)] = kb
 	}
 
 	return idx
 }
 
-func (s *importService) calculateAddsAndRemoves(
+func (s *importer) calculateAddsAndRemoves(
 	basePair map[string]*keymapv1.Action,
 	newPair map[string]*keymapv1.Action,
 ) (map[string]*keymapv1.Action, map[string]*keymapv1.Action) {
@@ -186,13 +188,13 @@ func (s *importService) calculateAddsAndRemoves(
 	return adds, removes
 }
 
-func (s *importService) calculateUpdates(
+func (s *importer) calculateUpdates(
 	baseByAction map[string][]*keymapv1.Action,
 	newByAction map[string][]*keymapv1.Action,
 	adds map[string]*keymapv1.Action,
 	removes map[string]*keymapv1.Action,
-) []importapi.KeymapDiff {
-	var updates []importapi.KeymapDiff
+) []importerapi.KeymapDiff {
+	var updates []importerapi.KeymapDiff
 
 	for action, beforeList := range baseByAction {
 		afterList, ok := newByAction[action]
@@ -202,24 +204,24 @@ func (s *importService) calculateUpdates(
 
 		before := beforeList[0]
 		after := afterList[0]
-		if pairKey(before) == pairKey(after) {
+		if dedup.PairKey(before) == dedup.PairKey(after) {
 			continue
 		}
 
-		updates = append(updates, importapi.KeymapDiff{Before: before, After: after})
-		delete(adds, pairKey(after))
-		delete(removes, pairKey(before))
+		updates = append(updates, importerapi.KeymapDiff{Before: before, After: after})
+		delete(adds, dedup.PairKey(after))
+		delete(removes, dedup.PairKey(before))
 	}
 
 	return updates
 }
 
-func (s *importService) buildChangesResult(
+func (s *importer) buildChangesResult(
 	adds map[string]*keymapv1.Action,
 	removes map[string]*keymapv1.Action,
-	updates []importapi.KeymapDiff,
-) *importapi.KeymapChanges {
-	changes := &importapi.KeymapChanges{Update: updates}
+	updates []importerapi.KeymapDiff,
+) *importerapi.KeymapChanges {
+	changes := &importerapi.KeymapChanges{Update: updates}
 
 	if len(adds) > 0 {
 		changes.Add = make([]*keymapv1.Action, 0, len(adds))
@@ -244,7 +246,7 @@ func (s *importService) buildChangesResult(
 	return changes
 }
 
-func (s *importService) decorateChanges(changes *importapi.KeymapChanges) {
+func (s *importer) decorateChanges(changes *importerapi.KeymapChanges) {
 	for _, kb := range changes.Add {
 		s.decorateAction(kb)
 	}
@@ -257,7 +259,7 @@ func (s *importService) decorateChanges(changes *importapi.KeymapChanges) {
 	}
 }
 
-func (s *importService) decorateAction(kb *keymapv1.Action) {
+func (s *importer) decorateAction(kb *keymapv1.Action) {
 	if kb == nil {
 		return
 	}

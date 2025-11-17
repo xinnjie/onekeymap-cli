@@ -1,4 +1,4 @@
-package internal_test
+package importer_test
 
 import (
 	"context"
@@ -10,27 +10,27 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/importer"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
 // testPlugin implements pluginapi.Plugin interface for testing.
 type testPlugin struct {
-	editorType  pluginapi.EditorType
+	editorType  pluginapi2.EditorType
 	configPath  string
 	importData  *keymapv1.Keymap
 	importError error
 }
 
 func newTestPlugin(
-	editorType pluginapi.EditorType,
+	editorType pluginapi2.EditorType,
 	configPath string,
 	importData *keymapv1.Keymap,
 	importError error,
@@ -43,22 +43,22 @@ func newTestPlugin(
 	}
 }
 
-func (p *testPlugin) EditorType() pluginapi.EditorType {
+func (p *testPlugin) EditorType() pluginapi2.EditorType {
 	return p.editorType
 }
 
-func (p *testPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) ([]string, bool, error) {
+func (p *testPlugin) ConfigDetect(_ pluginapi2.ConfigDetectOptions) ([]string, bool, error) {
 	return []string{p.configPath}, true, nil
 }
 
-func (p *testPlugin) Importer() (pluginapi.PluginImporter, error) {
+func (p *testPlugin) Importer() (pluginapi2.PluginImporter, error) {
 	return &testPluginImporter{
 		importData:  p.importData,
 		importError: p.importError,
 	}, nil
 }
 
-func (p *testPlugin) Exporter() (pluginapi.PluginExporter, error) {
+func (p *testPlugin) Exporter() (pluginapi2.PluginExporter, error) {
 	return &testPluginExporter{}, nil
 }
 
@@ -71,9 +71,9 @@ type testPluginImporter struct {
 func (i *testPluginImporter) Import(
 	_ context.Context,
 	_ io.Reader,
-	_ pluginapi.PluginImportOption,
-) (pluginapi.PluginImportResult, error) {
-	return pluginapi.PluginImportResult{Keymap: i.importData}, i.importError
+	_ pluginapi2.PluginImportOption,
+) (pluginapi2.PluginImportResult, error) {
+	return pluginapi2.PluginImportResult{Keymap: i.importData}, i.importError
 }
 
 // testPluginExporter implements pluginapi.PluginExporter interface for testing.
@@ -83,9 +83,9 @@ func (e *testPluginExporter) Export(
 	_ context.Context,
 	_ io.Writer,
 	_ *keymapv1.Keymap,
-	_ pluginapi.PluginExportOption,
-) (*pluginapi.PluginExportReport, error) {
-	return &pluginapi.PluginExportReport{}, nil
+	_ pluginapi2.PluginExportOption,
+) (*pluginapi2.PluginExportReport, error) {
+	return &pluginapi2.PluginExportReport{}, nil
 }
 
 func TestImportService_Import(t *testing.T) {
@@ -95,7 +95,7 @@ func TestImportService_Import(t *testing.T) {
 		baseData    *keymapv1.Keymap
 		importError error
 		expectError bool
-		expect      *importapi.ImportResult
+		expect      *importerapi.ImportResult
 	}{
 		{
 			name: "sorts imported keymaps by action ID",
@@ -105,7 +105,7 @@ func TestImportService_Import(t *testing.T) {
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
-			expect: &importapi.ImportResult{
+			expect: &importerapi.ImportResult{
 				Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
 					{
 						Name: "actions.editor.copy",
@@ -130,7 +130,7 @@ func TestImportService_Import(t *testing.T) {
 						},
 					},
 				}},
-				Changes: &importapi.KeymapChanges{
+				Changes: &importerapi.KeymapChanges{
 					Add: []*keymapv1.Action{
 						{
 							Name: "actions.editor.copy",
@@ -179,7 +179,7 @@ func TestImportService_Import(t *testing.T) {
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
-			expect: &importapi.ImportResult{
+			expect: &importerapi.ImportResult{
 				Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
 					{
 						Name: "actions.editor.paste",
@@ -193,7 +193,7 @@ func TestImportService_Import(t *testing.T) {
 						},
 					},
 				}},
-				Changes: &importapi.KeymapChanges{
+				Changes: &importerapi.KeymapChanges{
 					Add: []*keymapv1.Action{
 						{
 							Name: "actions.editor.paste",
@@ -217,9 +217,9 @@ func TestImportService_Import(t *testing.T) {
 		{
 			name:       "handles empty keymap list",
 			importData: &keymapv1.Keymap{Actions: []*keymapv1.Action{}},
-			expect: &importapi.ImportResult{
+			expect: &importerapi.ImportResult{
 				Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{}},
-				Changes: &importapi.KeymapChanges{},
+				Changes: &importerapi.KeymapChanges{},
 			},
 		},
 		{
@@ -240,7 +240,7 @@ func TestImportService_Import(t *testing.T) {
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
-			expect: &importapi.ImportResult{
+			expect: &importerapi.ImportResult{
 				Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
 					{
 						Name: "actions.editor.paste",
@@ -254,7 +254,7 @@ func TestImportService_Import(t *testing.T) {
 						},
 					},
 				}},
-				Changes: &importapi.KeymapChanges{},
+				Changes: &importerapi.KeymapChanges{},
 			},
 		},
 		{
@@ -269,7 +269,7 @@ func TestImportService_Import(t *testing.T) {
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v", "ctrl+v"),
 				},
 			},
-			expect: &importapi.ImportResult{
+			expect: &importerapi.ImportResult{
 				Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
 					{
 						Name: "actions.editor.paste",
@@ -283,7 +283,7 @@ func TestImportService_Import(t *testing.T) {
 						},
 					},
 				}},
-				Changes: &importapi.KeymapChanges{},
+				Changes: &importerapi.KeymapChanges{},
 			},
 		},
 		{
@@ -296,7 +296,7 @@ func TestImportService_Import(t *testing.T) {
 					keymap.NewActioinBinding("actions.editor.paste", "ctrl+v"),
 				},
 			},
-			expect: &importapi.ImportResult{
+			expect: &importerapi.ImportResult{
 				Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
 					{
 						Name: "actions.editor.paste",
@@ -310,7 +310,7 @@ func TestImportService_Import(t *testing.T) {
 						},
 					},
 				}},
-				Changes: &importapi.KeymapChanges{
+				Changes: &importerapi.KeymapChanges{
 					Add: []*keymapv1.Action{
 						{
 							Name: "actions.editor.paste",
@@ -343,7 +343,7 @@ func TestImportService_Import(t *testing.T) {
 					keymap.NewActioinBinding("actions.editor.copy", "ctrl+c"),
 				},
 			},
-			expect: &importapi.ImportResult{
+			expect: &importerapi.ImportResult{
 				Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
 					{
 						Name: "actions.editor.copy",
@@ -357,7 +357,7 @@ func TestImportService_Import(t *testing.T) {
 						},
 					},
 				}},
-				Changes: &importapi.KeymapChanges{},
+				Changes: &importerapi.KeymapChanges{},
 			},
 		},
 		{
@@ -372,7 +372,7 @@ func TestImportService_Import(t *testing.T) {
 					keymap.NewActioinBinding("actions.editor.copy", "cmd+c", "alt+c"),
 				},
 			},
-			expect: &importapi.ImportResult{
+			expect: &importerapi.ImportResult{
 				Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
 					{
 						Name: "actions.editor.copy",
@@ -388,8 +388,8 @@ func TestImportService_Import(t *testing.T) {
 						},
 					},
 				}},
-				Changes: &importapi.KeymapChanges{
-					Update: []importapi.KeymapDiff{{
+				Changes: &importerapi.KeymapChanges{
+					Update: []importerapi.KeymapDiff{{
 						Before: &keymapv1.Action{
 							Name: "actions.editor.copy",
 							ActionConfig: &keymapv1.ActionConfig{
@@ -435,7 +435,7 @@ func TestImportService_Import(t *testing.T) {
 			_, err = testFile.WriteString(`{}`)
 			require.NoError(t, err)
 
-			testPlug := newTestPlugin(pluginapi.EditorTypeVSCode, testFile.Name(), tc.importData, tc.importError)
+			testPlug := newTestPlugin(pluginapi2.EditorTypeVSCode, testFile.Name(), tc.importData, tc.importError)
 			registry := plugins.NewRegistry()
 			registry.Register(testPlug)
 
@@ -469,10 +469,10 @@ func TestImportService_Import(t *testing.T) {
 			}
 
 			logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-			service := internal.NewImportService(registry, mappingConfig, logger, metrics.NewNoop())
+			service := importer.NewImporter(registry, mappingConfig, logger, metrics.NewNoop())
 
-			opts := importapi.ImportOptions{
-				EditorType:  pluginapi.EditorTypeVSCode,
+			opts := importerapi.ImportOptions{
+				EditorType:  pluginapi2.EditorTypeVSCode,
 				InputStream: testFile,
 				Base:        tc.baseData,
 			}

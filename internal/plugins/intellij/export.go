@@ -12,7 +12,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -31,8 +31,8 @@ func (e *intellijExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
 	setting *keymapv1.Keymap,
-	opts pluginapi.PluginExportOption,
-) (*pluginapi.PluginExportReport, error) {
+	opts pluginapi2.PluginExportOption,
+) (*pluginapi2.PluginExportReport, error) {
 	_ = ctx
 
 	// Read existing configuration if provided for non-destructive export
@@ -80,7 +80,7 @@ func (e *intellijExporter) Export(
 		return nil, fmt.Errorf("failed to write xml body: %w", err)
 	}
 
-	return &pluginapi.PluginExportReport{
+	return &pluginapi2.PluginExportReport{
 		BaseEditorConfig:   existingDoc,
 		ExportEditorConfig: doc,
 		SkipReport:         marker.Report(),
@@ -126,7 +126,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap, mark
 			e.logger.Info("no mapping found for action", "action", km.GetName())
 			for _, b := range km.GetBindings() {
 				if b != nil && b.GetKeyChords() != nil {
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi2.ErrActionNotSupported)
 				}
 			}
 			continue
@@ -143,7 +143,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap, mark
 				marker.MarkSkippedForReason(
 					km.GetName(),
 					b.GetKeyChords(),
-					&pluginapi.UnsupportedExportActionError{Note: err.Error()},
+					&pluginapi2.UnsupportedExportActionError{Note: err.Error()},
 				)
 				continue
 			}

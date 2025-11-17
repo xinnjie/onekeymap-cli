@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	actionmappings "github.com/xinnjie/onekeymap-cli/config/action_mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"gopkg.in/yaml.v3"
 )
 

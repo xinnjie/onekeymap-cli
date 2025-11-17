@@ -1,17 +1,17 @@
-package importapi
+package importerapi
 
 import (
 	"context"
 	"io"
 
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // ImportOptions provides configuration for an import operation.
 type ImportOptions struct {
 	// Required, editor type
-	EditorType pluginapi.EditorType
+	EditorType pluginapi2.EditorType
 	// Required, input stream, contains the keymap config for different editors
 	InputStream io.Reader
 	// Optional, existing onekeymap base setting
@@ -28,7 +28,7 @@ type ImportResult struct {
 	// The changes to the keymap setting.
 	Changes *KeymapChanges
 
-	SkipReport pluginapi.ImportSkipReport
+	SkipReport pluginapi2.ImportSkipReport
 }
 
 // KeymapChanges represents the changes to a keymap setting.

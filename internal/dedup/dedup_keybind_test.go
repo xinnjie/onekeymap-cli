@@ -1,11 +1,11 @@
-package internal_test
+package dedup_test
 
 import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
-	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/dedup"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/protobuf/testing/protocmp"
@@ -77,7 +77,7 @@ func TestDedupKeyBindings_Table(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			actual := internal.DedupKeyBindings(tc.input)
+			actual := dedup.DedupKeyBindings(tc.input)
 			diff := cmp.Diff(tc.expected, actual, protocmp.Transform())
 			assert.Empty(t, diff)
 		})

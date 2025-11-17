@@ -3,7 +3,7 @@ package validateapi
 import (
 	"context"
 
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -15,5 +15,5 @@ type ValidationRule interface {
 type ValidationContext struct {
 	Setting *keymapv1.Keymap
 	Report  *keymapv1.ValidationReport
-	Options importapi.ImportOptions
+	Options importerapi.ImportOptions
 }

@@ -1,4 +1,4 @@
-package validateapi
+package validate
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -14,12 +15,12 @@ import (
 type KeybindConflictRule struct{}
 
 // NewKeybindConflictRule creates a new keybinding conflict validation rule.
-func NewKeybindConflictRule() ValidationRule {
+func NewKeybindConflictRule() validateapi2.ValidationRule {
 	return &KeybindConflictRule{}
 }
 
 // Validate checks for keybinding conflicts in the keymap setting.
-func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *ValidationContext) error {
+func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
 	if validationContext.Setting == nil || len(validationContext.Setting.GetActions()) == 0 {
 		return nil
 	}

@@ -6,11 +6,11 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/xinnjie/onekeymap-cli/internal"
+	"github.com/xinnjie/onekeymap-cli/internal/dedup"
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -37,11 +37,11 @@ func newImporter(
 func (i *vscodeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	_ pluginapi.PluginImportOption,
-) (pluginapi.PluginImportResult, error) {
+	_ pluginapi2.PluginImportOption,
+) (pluginapi2.PluginImportResult, error) {
 	vscodeKeybindings, err := parseExistingConfig(source)
 	if err != nil {
-		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse existing config: %w", err)
+		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to parse existing config: %w", err)
 	}
 
 	setting := &keymapv1.Keymap{}
@@ -61,9 +61,9 @@ func (i *vscodeImporter) Import(
 			)
 			// Report unknown command metric
 			if i.reporter != nil {
-				i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeVSCode, binding.Command)
+				i.reporter.ReportUnknownCommand(ctx, pluginapi2.EditorTypeVSCode, binding.Command)
 			}
-			marker.MarkSkippedForReason(binding.Command, pluginapi.ErrActionNotSupported)
+			marker.MarkSkippedForReason(binding.Command, pluginapi2.ErrActionNotSupported)
 			continue
 		}
 
@@ -83,9 +83,9 @@ func (i *vscodeImporter) Import(
 		marker.MarkImported(binding.Command)
 	}
 
-	setting.Actions = internal.DedupKeyBindings(setting.GetActions())
+	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
 
-	result := pluginapi.PluginImportResult{Keymap: setting}
+	result := pluginapi2.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
 	return result, nil
 }

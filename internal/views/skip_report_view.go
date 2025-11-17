@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -27,7 +27,7 @@ type SkipReportViewModel struct {
 	help  string
 }
 
-func NewSkipReportViewModel(skipActions []pluginapi.ExportSkipAction) SkipReportViewModel {
+func NewSkipReportViewModel(skipActions []pluginapi2.ExportSkipAction) SkipReportViewModel {
 	columns := []table.Column{
 		{Title: "Action", Width: actionColumnWidth},
 		{Title: "Keybinding", Width: keybindingColumnWidth},
@@ -37,7 +37,7 @@ func NewSkipReportViewModel(skipActions []pluginapi.ExportSkipAction) SkipReport
 	rows := make([]table.Row, len(skipActions))
 	for i, sk := range skipActions {
 		var keybindingStr string
-		var e *pluginapi.EditorSupportOnlyOneKeybindingPerActionError
+		var e *pluginapi2.EditorSupportOnlyOneKeybindingPerActionError
 		if errors.As(sk.Error, &e) && e.SkipKeybinding != nil {
 			binding := keymap.NewKeyBinding(&keymapv1.KeybindingReadable{KeyChords: e.SkipKeybinding})
 			keybindingStr, _ = binding.Format(platform.PlatformMacOS, "+")

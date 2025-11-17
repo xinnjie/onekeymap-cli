@@ -4,7 +4,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 var (
@@ -41,7 +41,7 @@ func (m *MigrateFormModel) buildForm() {
 	editorNames := m.pluginRegistry.GetNames()
 	var editorOptions []string
 	for _, name := range editorNames {
-		editorOptions = append(editorOptions, string(pluginapi.EditorType(name)))
+		editorOptions = append(editorOptions, string(pluginapi2.EditorType(name)))
 	}
 
 	m.form = huh.NewForm(
@@ -57,8 +57,8 @@ func (m *MigrateFormModel) buildForm() {
 				Title("Source config path").
 				Description("The path to the source editor's keymap config file.").
 				PlaceholderFunc(func() string {
-					if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.EditorFrom)); ok {
-						if paths, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil &&
+					if p, ok := m.pluginRegistry.Get(pluginapi2.EditorType(*m.EditorFrom)); ok {
+						if paths, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{}); err == nil &&
 							len(paths) > 0 {
 							m.fromPlaceholder = paths[0]
 							return paths[0]
@@ -80,8 +80,8 @@ func (m *MigrateFormModel) buildForm() {
 				Title("Target config path").
 				Description("The path to the target editor's keymap config file.").
 				PlaceholderFunc(func() string {
-					if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.EditorTo)); ok {
-						if paths, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil &&
+					if p, ok := m.pluginRegistry.Get(pluginapi2.EditorType(*m.EditorTo)); ok {
+						if paths, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{}); err == nil &&
 							len(paths) > 0 {
 							m.toPlaceholder = paths[0]
 							return paths[0]

@@ -1,4 +1,4 @@
-package internal
+package exporter
 
 import (
 	"bytes"
@@ -11,13 +11,13 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
-// exportService is the default implementation of the Exporter interface.
-type exportService struct {
+// exporter is the default implementation of the Exporter interface.
+type exporter struct {
 	registry        *plugins.Registry
 	mappingConfig   *mappings.MappingConfig
 	logger          *slog.Logger
@@ -25,14 +25,14 @@ type exportService struct {
 	serviceReporter *metrics.ServiceReporter
 }
 
-// NewExportService creates a new default export service.
-func NewExportService(
+// NewExporter creates a new default export service.
+func NewExporter(
 	registry *plugins.Registry,
 	config *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,
-) exportapi.Exporter {
-	return &exportService{
+) exporterapi.Exporter {
+	return &exporter{
 		registry:        registry,
 		mappingConfig:   config,
 		logger:          logger,
@@ -42,12 +42,12 @@ func NewExportService(
 }
 
 // Export is the method implementation for the default service.
-func (s *exportService) Export(
+func (s *exporter) Export(
 	ctx context.Context,
 	destination io.Writer,
 	setting *keymapv1.Keymap,
-	opts exportapi.ExportOptions,
-) (*exportapi.ExportReport, error) {
+	opts exporterapi.ExportOptions,
+) (*exporterapi.ExportReport, error) {
 	s.serviceReporter.ReportExportCall(ctx)
 
 	plugin, ok := s.registry.Get(opts.EditorType)
@@ -105,12 +105,12 @@ func (s *exportService) Export(
 	if err != nil {
 		return nil, err
 	}
-	return &exportapi.ExportReport{Diff: diffStr, SkipActions: report.SkipReport.SkipActions}, nil
+	return &exporterapi.ExportReport{Diff: diffStr, SkipActions: report.SkipReport.SkipActions}, nil
 }
 
 // computeDiff centralizes diff generation for export results based on requested options.
-func (s *exportService) computeDiff(
-	opts exportapi.ExportOptions,
+func (s *exporter) computeDiff(
+	opts exporterapi.ExportOptions,
 	originalConfig io.Reader,
 	updatedConfig io.Reader,
 	report *pluginapi.PluginExportReport,

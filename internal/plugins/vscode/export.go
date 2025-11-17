@@ -13,12 +13,12 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 var (
-	_ pluginapi.PluginExporter = (*vscodeExporter)(nil)
+	_ pluginapi2.PluginExporter = (*vscodeExporter)(nil)
 )
 
 type vscodeExporter struct {
@@ -69,7 +69,7 @@ func newExporter(
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	differ diff.Differ,
-) pluginapi.PluginExporter {
+) pluginapi2.PluginExporter {
 	return &vscodeExporter{
 		mappingConfig: mappingConfig,
 		logger:        logger,
@@ -81,8 +81,8 @@ func (e *vscodeExporter) Export(
 	_ context.Context,
 	destination io.Writer,
 	setting *keymapv1.Keymap,
-	opts pluginapi.PluginExportOption,
-) (*pluginapi.PluginExportReport, error) {
+	opts pluginapi2.PluginExportOption,
+) (*pluginapi2.PluginExportReport, error) {
 	// Decode existing config for non-destructive merge
 	existingKeybindings, err := parseExistingConfig(opts.ExistingConfig)
 	if err != nil {
@@ -111,7 +111,7 @@ func (e *vscodeExporter) Export(
 	}
 
 	// Defer diff calculation to exportService
-	return &pluginapi.PluginExportReport{
+	return &pluginapi2.PluginExportReport{
 		BaseEditorConfig:   existingKeybindings,
 		ExportEditorConfig: finalKeybindings,
 		SkipReport:         marker.Report(),
@@ -188,7 +188,7 @@ func (e *vscodeExporter) generateManagedKeybindings(
 		if mapping == nil {
 			for _, b := range km.GetBindings() {
 				if b != nil && b.GetKeyChords() != nil {
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi2.ErrActionNotSupported)
 				}
 			}
 			continue
@@ -198,7 +198,7 @@ func (e *vscodeExporter) generateManagedKeybindings(
 		if len(vscodeConfigs) == 0 {
 			for _, b := range km.GetBindings() {
 				if b != nil && b.GetKeyChords() != nil {
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi.ErrActionNotSupported)
+					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi2.ErrActionNotSupported)
 				}
 			}
 			continue
@@ -215,7 +215,7 @@ func (e *vscodeExporter) generateManagedKeybindings(
 				marker.MarkSkippedForReason(
 					km.GetName(),
 					b.GetKeyChords(),
-					&pluginapi.UnsupportedExportActionError{Note: err.Error()},
+					&pluginapi2.UnsupportedExportActionError{Note: err.Error()},
 				)
 				continue
 			}

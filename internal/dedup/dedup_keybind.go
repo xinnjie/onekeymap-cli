@@ -1,4 +1,4 @@
-package internal
+package dedup
 
 import (
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
@@ -7,10 +7,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// pairKey builds a stable identifier for a keymap by action and normalized key bindings.
+// PairKey builds a stable identifier for a keymap by action and normalized key bindings.
 // For multi-binding actions, it sorts the formatted bindings and joins them to create a
 // deterministic signature per action.
-func pairKey(km *keymapv1.Action) string {
+func PairKey(km *keymapv1.Action) string {
 	if km == nil || len(km.GetBindings()) == 0 {
 		return km.GetName() + "\x00"
 	}
@@ -75,6 +75,7 @@ func mergeIntoExistingAction(existing, kb *keymapv1.Action) {
 	}
 }
 
+// nolint: revive // Prefer name DedupKeyBindings over KeyBindings
 // DedupKeyBindings removes duplicate keybindings based on (Action, KeyChords)
 // using a deterministic signature. The first occurrence is kept and order is preserved.
 func DedupKeyBindings(keybindings []*keymapv1.Action) []*keymapv1.Action {

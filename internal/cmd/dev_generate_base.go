@@ -18,7 +18,7 @@ import (
 	ij "github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type devGenerateBaseFlags struct {

@@ -8,8 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -20,7 +21,7 @@ func TestValidator_Validate_EmptyKeymaps(t *testing.T) {
 		Actions: []*keymapv1.Action{},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "vscode",
 	}
 
@@ -41,8 +42,8 @@ func TestValidator_Validate_ChainOfRules(t *testing.T) {
 	}
 
 	validator := validateapi.NewValidator(
-		validateapi.NewKeybindConflictRule(),
-		validateapi.NewDanglingActionRule(mappingConfig),
+		validate.NewKeybindConflictRule(),
+		validate.NewDanglingActionRule(mappingConfig),
 	)
 
 	// Create keymaps with both conflicts and dangling actions
@@ -53,7 +54,7 @@ func TestValidator_Validate_ChainOfRules(t *testing.T) {
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "vscode",
 	}
 

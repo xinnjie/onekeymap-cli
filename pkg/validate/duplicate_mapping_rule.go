@@ -1,10 +1,11 @@
-package validateapi
+package validate
 
 import (
 	"context"
 
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -12,12 +13,12 @@ import (
 type DuplicateMappingRule struct{}
 
 // NewDuplicateMappingRule creates a new duplicate mapping validation rule.
-func NewDuplicateMappingRule() ValidationRule {
+func NewDuplicateMappingRule() validateapi2.ValidationRule {
 	return &DuplicateMappingRule{}
 }
 
 // Validate checks for duplicate mappings and adds warnings to the report.
-func (r *DuplicateMappingRule) Validate(_ context.Context, validationContext *ValidationContext) error {
+func (r *DuplicateMappingRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
 	setting := validationContext.Setting
 	report := validationContext.Report
 

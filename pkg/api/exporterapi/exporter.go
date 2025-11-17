@@ -1,17 +1,17 @@
-package exportapi
+package exporterapi
 
 import (
 	"context"
 	"io"
 
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // ExportOptions provides configuration for an export operation.
 type ExportOptions struct {
 	// Editor type
-	EditorType pluginapi.EditorType
+	EditorType pluginapi2.EditorType
 	// Optional, existing base keymap for specific editor
 	Base io.Reader
 	// TODO(xinnjie): export api level enum is not a good idea
@@ -39,5 +39,5 @@ type ExportReport struct {
 	Diff string
 
 	// SkipActions reports actions that were not exported and why.
-	SkipActions []pluginapi.ExportSkipAction
+	SkipActions []pluginapi2.ExportSkipAction
 }

@@ -1,4 +1,4 @@
-package internal_test
+package exporter_test
 
 import (
 	"bytes"
@@ -10,30 +10,30 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/exporter"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // testExportPlugin is a minimal plugin implementation for export tests.
 type testExportPlugin struct {
-	editorType pluginapi.EditorType
-	exporter   pluginapi.PluginExporter
+	editorType pluginapi2.EditorType
+	exporter   pluginapi2.PluginExporter
 }
 
 func TestExportService_PropagatesSkipActions(t *testing.T) {
 	exp := &testExporter{
-		skipActions: []pluginapi.ExportSkipAction{{Action: "a1", Error: pluginapi.ErrActionNotSupported}},
+		skipActions: []pluginapi2.ExportSkipAction{{Action: "a1", Error: pluginapi2.ErrActionNotSupported}},
 	}
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
-		EditorType: pluginapi.EditorType("test"),
+	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exporterapi.ExportOptions{
+		EditorType: pluginapi2.EditorType("test"),
 		DiffType:   keymapv1.ExportKeymapRequest_DIFF_TYPE_UNSPECIFIED,
 	})
 	require.NoError(t, err)
@@ -42,14 +42,14 @@ func TestExportService_PropagatesSkipActions(t *testing.T) {
 	assert.Equal(t, "a1", report.SkipActions[0].Action)
 }
 
-func (p *testExportPlugin) EditorType() pluginapi.EditorType { return p.editorType }
-func (p *testExportPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) ([]string, bool, error) {
-	return nil, false, pluginapi.ErrNotSupported
+func (p *testExportPlugin) EditorType() pluginapi2.EditorType { return p.editorType }
+func (p *testExportPlugin) ConfigDetect(_ pluginapi2.ConfigDetectOptions) ([]string, bool, error) {
+	return nil, false, pluginapi2.ErrNotSupported
 }
-func (p *testExportPlugin) Importer() (pluginapi.PluginImporter, error) {
-	return nil, pluginapi.ErrNotSupported
+func (p *testExportPlugin) Importer() (pluginapi2.PluginImporter, error) {
+	return nil, pluginapi2.ErrNotSupported
 }
-func (p *testExportPlugin) Exporter() (pluginapi.PluginExporter, error) { return p.exporter, nil }
+func (p *testExportPlugin) Exporter() (pluginapi2.PluginExporter, error) { return p.exporter, nil }
 
 // testExporter returns a configurable PluginExportReport and optionally writes to destination.
 type testExporter struct {
@@ -57,15 +57,15 @@ type testExporter struct {
 	baseEditorConfig   any
 	exportEditorConfig any
 	reportDiff         *string
-	skipActions        []pluginapi.ExportSkipAction
+	skipActions        []pluginapi2.ExportSkipAction
 }
 
 func (e *testExporter) Export(
 	_ context.Context,
 	destination io.Writer,
 	_ *keymapv1.Keymap,
-	opts pluginapi.PluginExportOption,
-) (*pluginapi.PluginExportReport, error) {
+	opts pluginapi2.PluginExportOption,
+) (*pluginapi2.PluginExportReport, error) {
 	if e.writeContent != "" {
 		_, _ = io.Copy(destination, strings.NewReader(e.writeContent))
 	}
@@ -73,24 +73,24 @@ func (e *testExporter) Export(
 	if opts.ExistingConfig != nil {
 		_, _ = io.Copy(io.Discard, opts.ExistingConfig)
 	}
-	return &pluginapi.PluginExportReport{
+	return &pluginapi2.PluginExportReport{
 		Diff:               e.reportDiff,
 		BaseEditorConfig:   e.baseEditorConfig,
 		ExportEditorConfig: e.exportEditorConfig,
-		SkipReport:         pluginapi.ExportSkipReport{SkipActions: e.skipActions},
+		SkipReport:         pluginapi2.ExportSkipReport{SkipActions: e.skipActions},
 	}, nil
 }
 
 func newTestExportService(
 	t *testing.T,
-	exporter pluginapi.PluginExporter,
-) exportapi.Exporter {
+	e pluginapi2.PluginExporter,
+) exporterapi.Exporter {
 	t.Helper()
 	r := plugins.NewRegistry()
-	r.Register(&testExportPlugin{editorType: pluginapi.EditorType("test"), exporter: exporter})
+	r.Register(&testExportPlugin{editorType: pluginapi2.EditorType("test"), exporter: e})
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	recorder := metrics.NewNoop()
-	return internal.NewExportService(
+	return exporter.NewExporter(
 		r,
 		&mappings.MappingConfig{Mappings: map[string]mappings.ActionMappingConfig{}},
 		logger,
@@ -105,8 +105,8 @@ func TestExportService_Diff_Unified(t *testing.T) {
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
-		EditorType: pluginapi.EditorType("test"),
+	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exporterapi.ExportOptions{
+		EditorType: pluginapi2.EditorType("test"),
 		Base:       strings.NewReader(before),
 		DiffType:   keymapv1.ExportKeymapRequest_UNIFIED_DIFF,
 		FilePath:   "test.txt",
@@ -125,8 +125,8 @@ func TestExportService_Diff_JSONASCII_FromStructuredConfigs(t *testing.T) {
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
-		EditorType: pluginapi.EditorType("test"),
+	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exporterapi.ExportOptions{
+		EditorType: pluginapi2.EditorType("test"),
 		DiffType:   keymapv1.ExportKeymapRequest_ASCII_DIFF,
 	})
 	require.NoError(t, err)
@@ -141,8 +141,8 @@ func TestExportService_Diff_FallbackFromPlugin(t *testing.T) {
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exportapi.ExportOptions{
-		EditorType: pluginapi.EditorType("test"),
+	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exporterapi.ExportOptions{
+		EditorType: pluginapi2.EditorType("test"),
 		DiffType:   keymapv1.ExportKeymapRequest_DIFF_TYPE_UNSPECIFIED,
 	})
 	require.NoError(t, err)

@@ -9,7 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 var (
@@ -104,7 +104,7 @@ func (m *ImportFormModel) build() error {
 func (m *ImportFormModel) getImporterOptions() []editorSelectorOption {
 	var options []editorSelectorOption
 	for _, name := range m.pluginRegistry.GetNames() {
-		editorType := pluginapi.EditorType(name)
+		editorType := pluginapi2.EditorType(name)
 		plugin, ok := m.pluginRegistry.Get(editorType)
 		if !ok {
 			continue
@@ -114,7 +114,7 @@ func (m *ImportFormModel) getImporterOptions() []editorSelectorOption {
 			continue
 		}
 
-		_, installed, _ := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
+		_, installed, _ := plugin.ConfigDetect(pluginapi2.ConfigDetectOptions{})
 		options = append(options, editorSelectorOption{
 			displayName: editorType.AppName(),
 			editorType:  name,
@@ -244,8 +244,8 @@ func (m *ImportFormModel) createInputGroup() []*huh.Group {
 }
 
 func (m *ImportFormModel) configPaths() []string {
-	if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
-		if paths, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
+	if p, ok := m.pluginRegistry.Get(pluginapi2.EditorType(*m.Editor)); ok {
+		if paths, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{}); err == nil {
 			return paths
 		}
 	}

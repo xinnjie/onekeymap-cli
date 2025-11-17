@@ -11,7 +11,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"howett.net/plist"
 )
@@ -21,7 +21,7 @@ const (
 )
 
 var (
-	_ pluginapi.PluginExporter = (*xcodeExporter)(nil)
+	_ pluginapi2.PluginExporter = (*xcodeExporter)(nil)
 )
 
 type xcodeExporter struct {
@@ -72,7 +72,7 @@ func newExporter(
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	differ diff.Differ,
-) pluginapi.PluginExporter {
+) pluginapi2.PluginExporter {
 	return &xcodeExporter{
 		mappingConfig: mappingConfig,
 		logger:        logger,
@@ -84,8 +84,8 @@ func (e *xcodeExporter) Export(
 	_ context.Context,
 	destination io.Writer,
 	setting *keymapv1.Keymap,
-	opts pluginapi.PluginExportOption,
-) (*pluginapi.PluginExportReport, error) {
+	opts pluginapi2.PluginExportOption,
+) (*pluginapi2.PluginExportReport, error) {
 	// Decode existing config for non-destructive merge
 	var existingKeybindings []xcodeKeybinding
 	var existingTextKeybindings xcodeTextKeybinding
@@ -139,7 +139,7 @@ func (e *xcodeExporter) Export(
 	}
 
 	// Defer diff calculation to exportService
-	return &pluginapi.PluginExportReport{
+	return &pluginapi2.PluginExportReport{
 		BaseEditorConfig:   existingKeybindings,
 		ExportEditorConfig: finalKeybindings,
 		SkipReport:         marker.Report(),
@@ -191,14 +191,14 @@ func (e *xcodeExporter) generateManagedKeybindings(
 			marker.MarkSkippedForReason(
 				km.GetName(),
 				nil,
-				&pluginapi.UnsupportedExportActionError{Note: "Action not supported"},
+				&pluginapi2.UnsupportedExportActionError{Note: "Action not supported"},
 			)
 			continue
 		}
 
 		// check support status for xcode
-		if ok, note := mapping.IsSupported(pluginapi.EditorTypeXcode); !ok {
-			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.UnsupportedExportActionError{Note: note})
+		if ok, note := mapping.IsSupported(pluginapi2.EditorTypeXcode); !ok {
+			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi2.UnsupportedExportActionError{Note: note})
 			continue
 		}
 
@@ -223,7 +223,7 @@ func (e *xcodeExporter) generateManagedKeybindings(
 				marker.MarkSkippedForReason(
 					km.GetName(),
 					b.GetKeyChords(),
-					&pluginapi.EditorSupportOnlyOneKeybindingPerActionError{SkipKeybinding: b.GetKeyChords()},
+					&pluginapi2.EditorSupportOnlyOneKeybindingPerActionError{SkipKeybinding: b.GetKeyChords()},
 				)
 				continue
 			}
@@ -295,13 +295,13 @@ func (e *xcodeExporter) generateTextKeyBindings(
 	for _, km := range setting.GetActions() {
 		mapping := e.mappingConfig.Get(km.GetName())
 		if mapping == nil {
-			marker.MarkSkippedForReason(km.GetName(), nil, pluginapi.ErrActionNotSupported)
+			marker.MarkSkippedForReason(km.GetName(), nil, pluginapi2.ErrActionNotSupported)
 			continue
 		}
 
 		// check support status for xcode
-		if ok, note := mapping.IsSupported(pluginapi.EditorTypeXcode); !ok {
-			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi.UnsupportedExportActionError{Note: note})
+		if ok, note := mapping.IsSupported(pluginapi2.EditorTypeXcode); !ok {
+			marker.MarkSkippedForReason(km.GetName(), nil, &pluginapi2.UnsupportedExportActionError{Note: note})
 			continue
 		}
 
@@ -332,7 +332,7 @@ func (e *xcodeExporter) generateTextKeyBindings(
 					marker.MarkSkippedForReason(
 						km.GetName(),
 						b.GetKeyChords(),
-						&pluginapi.EditorSupportOnlyOneKeybindingPerActionError{SkipKeybinding: b.GetKeyChords()},
+						&pluginapi2.EditorSupportOnlyOneKeybindingPerActionError{SkipKeybinding: b.GetKeyChords()},
 					)
 					continue
 				}

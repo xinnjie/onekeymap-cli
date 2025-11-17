@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 // ConfigDetect returns the default path for Helix's config.toml file.
 // On macOS, this is typically ~/.config/helix/config.toml.
-func (p *helixPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
+func (p *helixPlugin) ConfigDetect(_ pluginapi2.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, false, err
@@ -25,13 +25,13 @@ func (p *helixPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) (paths []str
 	case "windows":
 		appData := os.Getenv("APPDATA")
 		if appData == "" {
-			return nil, false, fmt.Errorf("APPDATA environment variable not set, %w", pluginapi.ErrNotSupported)
+			return nil, false, fmt.Errorf("APPDATA environment variable not set, %w", pluginapi2.ErrNotSupported)
 		}
 		configPath = filepath.Join(appData, "helix", "config.toml")
 	default:
 		return nil, false, fmt.Errorf(
 			"automatic path discovery is only supported on macOS, Linux, and Windows, %w",
-			pluginapi.ErrNotSupported,
+			pluginapi2.ErrNotSupported,
 		)
 	}
 

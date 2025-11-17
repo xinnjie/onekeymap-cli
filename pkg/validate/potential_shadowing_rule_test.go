@@ -1,4 +1,4 @@
-package validateapi_test
+package validate_test
 
 import (
 	"context"
@@ -8,15 +8,16 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
-	"github.com/xinnjie/onekeymap-cli/pkg/importapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestPotentialShadowingRule_Validate_WithCriticalKeybinding(t *testing.T) {
 	validator := validateapi.NewValidator(
-		validateapi.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS),
+		validate.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS),
 	)
 
 	// Create keymaps with critical system shortcuts
@@ -27,7 +28,7 @@ func TestPotentialShadowingRule_Validate_WithCriticalKeybinding(t *testing.T) {
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "vscode",
 	}
 
@@ -50,7 +51,7 @@ func TestPotentialShadowingRule_Validate_WithCriticalKeybinding(t *testing.T) {
 
 func TestPotentialShadowingRule_Validate_NoCriticalKeybindings(t *testing.T) {
 	validator := validateapi.NewValidator(
-		validateapi.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS),
+		validate.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS),
 	)
 
 	setting := &keymapv1.Keymap{
@@ -60,7 +61,7 @@ func TestPotentialShadowingRule_Validate_NoCriticalKeybindings(t *testing.T) {
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "vscode",
 	}
 
@@ -71,7 +72,7 @@ func TestPotentialShadowingRule_Validate_NoCriticalKeybindings(t *testing.T) {
 
 func TestPotentialShadowingRule_Validate_WindowsCriticalShortcuts(t *testing.T) {
 	validator := validateapi.NewValidator(
-		validateapi.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformWindows),
+		validate.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformWindows),
 	)
 
 	setting := &keymapv1.Keymap{
@@ -81,7 +82,7 @@ func TestPotentialShadowingRule_Validate_WindowsCriticalShortcuts(t *testing.T) 
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "vscode",
 	}
 
@@ -99,7 +100,7 @@ func TestPotentialShadowingRule_Validate_WindowsCriticalShortcuts(t *testing.T) 
 
 func TestPotentialShadowingRule_Validate_CaseInsensitive(t *testing.T) {
 	validator := validateapi.NewValidator(
-		validateapi.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS),
+		validate.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS),
 	)
 
 	// Test that case variations are still detected
@@ -109,7 +110,7 @@ func TestPotentialShadowingRule_Validate_CaseInsensitive(t *testing.T) {
 		},
 	}
 
-	opts := importapi.ImportOptions{
+	opts := importerapi.ImportOptions{
 		EditorType: "vscode",
 	}
 

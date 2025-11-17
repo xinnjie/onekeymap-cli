@@ -1,4 +1,4 @@
-package validateapi
+package validate
 
 import (
 	"context"
@@ -6,7 +6,8 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -17,7 +18,10 @@ type UnsupportedActionRule struct {
 }
 
 // NewUnsupportedActionRule creates a new unsupported action validation rule.
-func NewUnsupportedActionRule(mappingConfig *mappings.MappingConfig, targetEditor pluginapi.EditorType) ValidationRule {
+func NewUnsupportedActionRule(
+	mappingConfig *mappings.MappingConfig,
+	targetEditor pluginapi.EditorType,
+) validateapi2.ValidationRule {
 	return &UnsupportedActionRule{
 		mappingConfig: mappingConfig,
 		targetEditor:  targetEditor,
@@ -25,7 +29,7 @@ func NewUnsupportedActionRule(mappingConfig *mappings.MappingConfig, targetEdito
 }
 
 // Validate checks for actions that cannot be exported to the target editor.
-func (r *UnsupportedActionRule) Validate(_ context.Context, validationContext *ValidationContext) error {
+func (r *UnsupportedActionRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
 	setting := validationContext.Setting
 	report := validationContext.Report
 

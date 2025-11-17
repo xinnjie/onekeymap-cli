@@ -16,8 +16,8 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
-	"github.com/xinnjie/onekeymap-cli/pkg/exportapi"
-	"github.com/xinnjie/onekeymap-cli/pkg/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -35,7 +35,7 @@ func NewCmdExport() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export a universal keymap to an editor's format",
-		RunE: exportRun(&f, func() (*slog.Logger, *plugins.Registry, exportapi.Exporter) {
+		RunE: exportRun(&f, func() (*slog.Logger, *plugins.Registry, exporterapi.Exporter) {
 			return cmdLogger, cmdPluginRegistry, cmdExportService
 		}),
 		Args: cobra.ExactArgs(0),
@@ -60,7 +60,7 @@ func NewCmdExport() *cobra.Command {
 
 func exportRun(
 	f *exportFlags,
-	dependencies func() (*slog.Logger, *plugins.Registry, exportapi.Exporter),
+	dependencies func() (*slog.Logger, *plugins.Registry, exporterapi.Exporter),
 ) func(cmd *cobra.Command, _ []string) error {
 	return func(cmd *cobra.Command, _ []string) error {
 		logger, pluginRegistry, exportService := dependencies()
@@ -88,7 +88,7 @@ func exportRun(
 			return err
 		}
 
-		opts := exportapi.ExportOptions{EditorType: pluginapi.EditorType(f.to)}
+		opts := exporterapi.ExportOptions{EditorType: pluginapi2.EditorType(f.to)}
 
 		// Ensure parent directory exists
 		if err := os.MkdirAll(filepath.Dir(f.output), 0o750); err != nil {
@@ -225,7 +225,7 @@ func prepareExportInputFlags(
 	}
 
 	// Validate selected editor plugin exists
-	p, ok := pluginRegistry.Get(pluginapi.EditorType(f.to))
+	p, ok := pluginRegistry.Get(pluginapi2.EditorType(f.to))
 	if !ok {
 		logger.Error("Editor not found", "editor", f.to)
 		return fmt.Errorf("editor %s not found", f.to)
@@ -243,7 +243,7 @@ func prepareExportInputFlags(
 			f.output = configPath
 			logger.Info("Using keymap path from config", "editor", f.to, "path", configPath)
 		} else {
-			if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
+			if v, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{}); err == nil {
 				f.output = v[0]
 			}
 		}
