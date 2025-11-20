@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 )
 
 type PluginExporter interface {
@@ -13,7 +13,7 @@ type PluginExporter interface {
 	Export(
 		ctx context.Context,
 		destination io.Writer,
-		setting *keymapv1.Keymap,
+		setting keymap.Keymap,
 		opts PluginExportOption,
 	) (*PluginExportReport, error)
 }

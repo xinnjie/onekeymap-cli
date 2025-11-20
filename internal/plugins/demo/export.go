@@ -8,10 +8,9 @@ import (
 	"log/slog"
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type demoExporter struct {
@@ -31,22 +30,17 @@ func newExporter(logger *slog.Logger, differ diff.Differ) pluginapi.PluginExport
 func (e *demoExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.Keymap,
+	setting keymap.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	var out []demoBinding
-	for _, km := range setting.GetActions() {
-		for _, b := range km.GetBindings() {
-			if b == nil {
+	for _, km := range setting.Actions {
+		for _, b := range km.Bindings {
+			if len(b.KeyChords) == 0 {
 				continue
 			}
-			binding := keymap.NewKeyBinding(b)
-			keys, err := binding.Format(platform.PlatformMacOS, "+")
-			if err != nil {
-				e.logger.WarnContext(ctx, "Skipping un-formattable keybinding", "action", km.GetName(), "error", err)
-				continue
-			}
-			out = append(out, demoBinding{Keys: keys, Action: km.GetName()})
+			keys := b.String(keybinding.FormatOption{Separator: "+"})
+			out = append(out, demoBinding{Keys: keys, Action: km.Name})
 		}
 	}
 

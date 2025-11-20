@@ -5,28 +5,29 @@ import (
 	"io"
 	"strings"
 
-	"github.com/xinnjie/onekeymap-cli/internal/keybindinglookup"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 // vscodeKeybindingLookup implements KeybindingLookup interface for VSCode
 type vscodeKeybindingLookup struct{}
 
 // NewVSCodeKeybindingLookup creates a new KeybindingLookup instance
-func NewVSCodeKeybindingLookup() keybindinglookup.KeybindingLookup {
+// TODO(xinnjie): Return keybindinglookup.KeybindingLookup after interface is migrated
+func NewVSCodeKeybindingLookup() *vscodeKeybindingLookup {
 	return &vscodeKeybindingLookup{}
 }
 
 // Compile-time interface check
-var _ keybindinglookup.KeybindingLookup = (*vscodeKeybindingLookup)(nil)
+// TODO(xinnjie): Re-enable after keybindinglookup interface is migrated to new keymap API
+// var _ keybindinglookup.KeybindingLookup = (*vscodeKeybindingLookup)(nil)
 
 // Lookup implements KeybindingLookup interface
 // editorSpecificConfig contains VSCodeKeybindingConfig JSON
 // returns keybindingConfig as JSON strings of matching vscodeKeybinding entries
 func (h *vscodeKeybindingLookup) Lookup(
 	editorSpecificConfig io.Reader,
-	keybinding *keymap.KeyBinding,
+	kb keybinding.Keybinding,
 ) (keybindingConfig []string, err error) {
 	// Read and parse the editor-specific config
 	configData, err := io.ReadAll(editorSpecificConfig)
@@ -51,10 +52,10 @@ func (h *vscodeKeybindingLookup) Lookup(
 	}
 
 	// Format the target keybinding to VSCode format for comparison
-	targetKey, err := keybinding.Format(platform.PlatformMacOS, "+")
-	if err != nil {
-		return nil, err
-	}
+	targetKey := kb.String(keybinding.FormatOption{
+		Platform:  platform.PlatformMacOS,
+		Separator: "+",
+	})
 
 	// Find matching keybindings
 	var matchingKeybindings []string

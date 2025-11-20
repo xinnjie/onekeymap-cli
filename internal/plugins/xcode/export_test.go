@@ -11,11 +11,27 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
+
+// newTestAction creates a test Action with given keybindings
+func newTestAction(actionName string, keybindings ...string) keymap.Action {
+	var bindings []keybinding.Keybinding
+	for _, kb := range keybindings {
+		b, err := keybinding.NewKeybinding(kb, keybinding.ParseOption{Separator: "+"})
+		if err != nil {
+			panic(err)
+		}
+		bindings = append(bindings, b)
+	}
+	return keymap.Action{
+		Name:     actionName,
+		Bindings: bindings,
+	}
+}
 
 func testMappingConfig() *mappings.MappingConfig {
 	return &mappings.MappingConfig{
@@ -64,12 +80,12 @@ func TestExporter_SkipActions_MultipleKeybindings_Menu(t *testing.T) {
 	exporter := newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer())
 
 	// Same action with two bindings; Xcode supports only one
-	a := keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j")
+	a := newTestAction("actions.navigation.jumpToDefinition", "meta+j")
 	a.Bindings = append(
 		a.Bindings,
-		&keymapv1.KeybindingReadable{KeyChords: keymap.MustParseKeyBinding("meta+k").KeyChords},
+		newTestAction("tmpact", "meta+k").Bindings[0],
 	)
-	keymapSetting := &keymapv1.Keymap{Actions: []*keymapv1.Action{a}}
+	keymapSetting := keymap.Keymap{Actions: []keymap.Action{a}}
 
 	var out bytes.Buffer
 	report, err := exporter.Export(context.Background(), &out, keymapSetting, pluginapi.PluginExportOption{})
@@ -85,12 +101,12 @@ func TestExporter_SkipActions_MultipleKeybindings_Text(t *testing.T) {
 	exporter := newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer())
 
 	// Same action with two bindings; Xcode supports only one
-	a := keymap.NewActioinBinding("actions.cursor.pageDown", "ctrl+v")
+	a := newTestAction("actions.cursor.pageDown", "ctrl+v")
 	a.Bindings = append(
 		a.Bindings,
-		&keymapv1.KeybindingReadable{KeyChords: keymap.MustParseKeyBinding("ctrl+d").KeyChords},
+		newTestAction("tmpact", "ctrl+d").Bindings[0],
 	)
-	keymapSetting := &keymapv1.Keymap{Actions: []*keymapv1.Action{a}}
+	keymapSetting := keymap.Keymap{Actions: []keymap.Action{a}}
 
 	var out bytes.Buffer
 	report, err := exporter.Export(context.Background(), &out, keymapSetting, pluginapi.PluginExportOption{})
@@ -106,9 +122,9 @@ func TestExporter_SkipActions_UnsupportedAction(t *testing.T) {
 	exporter := newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer())
 
 	// Unknown action not present in mapping config
-	keymapSetting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.unknown.notMapped", "meta+u"),
+	keymapSetting := keymap.Keymap{
+		Actions: []keymap.Action{
+			newTestAction("actions.unknown.notMapped", "meta+u"),
 		},
 	}
 
@@ -128,15 +144,15 @@ func TestExporter_Export_MenuKeyBindings(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		keymapSetting  *keymapv1.Keymap
+		keymapSetting  keymap.Keymap
 		existingConfig string
 		expectedConfig string
 	}{
 		{
 			name: "exports basic menu key binding",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "meta+j"),
 				},
 			},
 			expectedConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -188,9 +204,9 @@ func TestExporter_Export_MenuKeyBindings(t *testing.T) {
 		},
 		{
 			name: "non-destructive merge preserves unmanaged keybindings",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "meta+j"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -284,9 +300,9 @@ func TestExporter_Export_MenuKeyBindings(t *testing.T) {
 		},
 		{
 			name: "managed keybinding takes priority over conflicting keybinding",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "meta+j"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -387,15 +403,15 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		keymapSetting  *keymapv1.Keymap
+		keymapSetting  keymap.Keymap
 		existingConfig string
 		expectedConfig string
 	}{
 		{
 			name: "exports text key binding",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.cursor.pageDown", "ctrl+v"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.cursor.pageDown", "ctrl+v"),
 				},
 			},
 			expectedConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -425,9 +441,9 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 		},
 		{
 			name: "text bindings merge with existing preserving unmanaged",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.cursor.pageDown", "ctrl+v"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.cursor.pageDown", "ctrl+v"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -478,9 +494,9 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 		},
 		{
 			name: "managed text binding overrides conflicting existing",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.cursor.pageDown", "ctrl+v"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.cursor.pageDown", "ctrl+v"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -529,9 +545,9 @@ func TestExporter_Export_TextKeyBindings(t *testing.T) {
 		},
 		{
 			name: "exports array text actions",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.insertLineAfter", "meta+d"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.edit.insertLineAfter", "meta+d"),
 				},
 			},
 			expectedConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -594,15 +610,15 @@ func TestExporter_OrderByBaseCommand(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		keymapSetting  *keymapv1.Keymap
+		keymapSetting  keymap.Keymap
 		existingConfig string
 		expectedConfig string
 	}{
 		{
 			name: "reorders according to base config",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "meta+j"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -726,15 +742,15 @@ func TestExporter_MergeKeybindings(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		keymapSetting  *keymapv1.Keymap
+		keymapSetting  keymap.Keymap
 		existingConfig string
 		expectedConfig string
 	}{
 		{
 			name: "merges managed and unmanaged without conflicts",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "meta+j"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -828,9 +844,9 @@ func TestExporter_MergeKeybindings(t *testing.T) {
 		},
 		{
 			name: "managed takes priority on keyboard shortcut conflict",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "meta+j"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -930,15 +946,15 @@ func TestExporter_IdentifyUnmanagedKeybindings(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		keymapSetting  *keymapv1.Keymap
+		keymapSetting  keymap.Keymap
 		existingConfig string
 		expectedConfig string
 	}{
 		{
 			name: "identifies and preserves only unmanaged keybindings",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "meta+j"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "meta+j"),
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>

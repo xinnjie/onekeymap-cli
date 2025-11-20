@@ -11,29 +11,41 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestExportIntelliJKeymap(t *testing.T) {
 	mappingConfig, err := mappings.NewTestMappingConfig()
 	require.NoError(t, err)
 
+	parseKB := func(s string) keybinding.Keybinding {
+		kb, err := keybinding.NewKeybinding(s, keybinding.ParseOption{Platform: platform.PlatformLinux, Separator: "+"})
+		if err != nil {
+			panic(err)
+		}
+		return kb
+	}
+
 	tests := []struct {
 		name           string
-		setting        *keymapv1.Keymap
+		setting        keymap.Keymap
 		existingConfig string
 		validateFunc   func(t *testing.T, out KeymapXML)
 	}{
 		// Basic destructive export tests
 		{
 			name: "basic single-chord export ($Copy)",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -60,12 +72,18 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		},
 		{
 			name: "multi entries and multi-chord export (command1)",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
 					// single chord ctrl+alt+s
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+alt+s")},
+					},
 					// two-chord ctrl+k ctrl+c
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+k ctrl+c"),
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+k ctrl+c")},
+					},
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -88,9 +106,12 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		},
 		{
 			name: "unmapped actions skipped",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.unknown", "meta+x"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.unknown",
+						Bindings: []keybinding.Keybinding{parseKB("meta+x")},
+					},
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -100,10 +121,16 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		},
 		{
 			name: "dedup identical shortcuts for an action",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+alt+s")},
+					},
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+alt+s")},
+					},
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -124,11 +151,20 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		},
 		{
 			name: "special keys are formatted correctly",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "f5"),
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+numpad3"),
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+shift+["),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("f5")},
+					},
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+numpad3")},
+					},
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+shift+[")},
+					},
 				},
 			},
 			validateFunc: func(t *testing.T, out KeymapXML) {
@@ -151,9 +187,12 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		// Non-destructive export tests
 		{
 			name: "non-destructive export preserves user actions",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -192,9 +231,12 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		},
 		{
 			name: "managed action takes priority over conflicting user action",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>
@@ -237,9 +279,12 @@ func TestExportIntelliJKeymap(t *testing.T) {
 		},
 		{
 			name: "empty existing config behaves as destructive export",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			existingConfig: `<?xml version="1.0" encoding="UTF-8"?>

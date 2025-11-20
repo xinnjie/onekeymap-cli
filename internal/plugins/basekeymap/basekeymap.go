@@ -1,26 +1,24 @@
 package basekeymap
 
 import (
-	"bytes"
 	"context"
 	"io"
 
 	"github.com/xinnjie/onekeymap-cli/config/base"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type plugin struct{}
 
-func New() pluginapi2.Plugin {
+func New() pluginapi.Plugin {
 	return &plugin{}
 }
 
-func (p *plugin) EditorType() pluginapi2.EditorType {
-	return pluginapi2.EditorTypeBasekeymap
+func (p *plugin) EditorType() pluginapi.EditorType {
+	return pluginapi.EditorTypeBasekeymap
 }
 
-func (p *plugin) ConfigDetect(_ pluginapi2.ConfigDetectOptions) ([]string, bool, error) {
+func (p *plugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) ([]string, bool, error) {
 	bases, err := base.List()
 	if err != nil {
 		return nil, false, err
@@ -28,12 +26,12 @@ func (p *plugin) ConfigDetect(_ pluginapi2.ConfigDetectOptions) ([]string, bool,
 	return bases, true, nil
 }
 
-func (p *plugin) Importer() (pluginapi2.PluginImporter, error) {
+func (p *plugin) Importer() (pluginapi.PluginImporter, error) {
 	return &importer{}, nil
 }
 
-func (p *plugin) Exporter() (pluginapi2.PluginExporter, error) {
-	return nil, pluginapi2.ErrNotSupported
+func (p *plugin) Exporter() (pluginapi.PluginExporter, error) {
+	return nil, pluginapi.ErrNotSupported
 }
 
 type importer struct{}
@@ -41,26 +39,29 @@ type importer struct{}
 func (i *importer) Import(
 	_ context.Context,
 	source io.Reader,
-	_ pluginapi2.PluginImportOption,
-) (pluginapi2.PluginImportResult, error) {
-	// Read the base keymap name from source
-	nameBytes, err := io.ReadAll(source)
-	if err != nil {
-		return pluginapi2.PluginImportResult{}, err
-	}
-	name := string(bytes.TrimSpace(nameBytes))
+	_ pluginapi.PluginImportOption,
+) (pluginapi.PluginImportResult, error) {
+	// // Read the base keymap name from source
+	// nameBytes, err := io.ReadAll(source)
+	// if err != nil {
+	// 	return pluginapi.PluginImportResult{}, err
+	// }
+	// name := string(bytes.TrimSpace(nameBytes))
 
-	// Read the embedded base keymap JSON
-	data, err := base.Read(name)
-	if err != nil {
-		return pluginapi2.PluginImportResult{}, err
-	}
+	// // Read the embedded base keymap JSON
+	// data, err := base.Read(name)
+	// if err != nil {
+	// 	return pluginapi.PluginImportResult{}, err
+	// }
 
-	// Parse and return the keymap
-	km, err := keymap.Load(bytes.NewReader(data), keymap.LoadOptions{})
-	if err != nil {
-		return pluginapi2.PluginImportResult{}, err
-	}
+	// FIXME(xinnjie): migrate basekeymap after migrating keymap.Load
+	return pluginapi.PluginImportResult{}, nil
 
-	return pluginapi2.PluginImportResult{Keymap: km}, nil
+	// // Parse and return the keymap
+	// km, err := keymap.Load(bytes.NewReader(data), keymap.LoadOptions{})
+	// if err != nil {
+	// 	return pluginapi.PluginImportResult{}, err
+	// }
+	//
+	// return pluginapi.PluginImportResult{Keymap: km}, nil
 }

@@ -1,7 +1,7 @@
 package xcode
 
 import (
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keycode"
 )
 
 // Xcode .idekeybindings config key code constants
@@ -48,239 +48,237 @@ const (
 // Reference: NSEvent.h in AppKit framework, see http://xahlee.info/kbd/i/NSEvent.h
 //
 //nolint:gocyclo,cyclop
-func getRuneFromKeyCode(kc keymapv1.KeyCode) (rune, bool) {
+func getRuneFromKeyCode(kc keycode.KeyCode) (rune, bool) {
 	switch kc {
 	// Letters A-Z - convert to lowercase
-	case keymapv1.KeyCode_A:
+	case keycode.KeyCodeA:
 		return 'a', true
-	case keymapv1.KeyCode_B:
+	case keycode.KeyCodeB:
 		return 'b', true
-	case keymapv1.KeyCode_C:
+	case keycode.KeyCodeC:
 		return 'c', true
-	case keymapv1.KeyCode_D:
+	case keycode.KeyCodeD:
 		return 'd', true
-	case keymapv1.KeyCode_E:
+	case keycode.KeyCodeE:
 		return 'e', true
-	case keymapv1.KeyCode_F:
+	case keycode.KeyCodeF:
 		return 'f', true
-	case keymapv1.KeyCode_G:
+	case keycode.KeyCodeG:
 		return 'g', true
-	case keymapv1.KeyCode_H:
+	case keycode.KeyCodeH:
 		return 'h', true
-	case keymapv1.KeyCode_I:
+	case keycode.KeyCodeI:
 		return 'i', true
-	case keymapv1.KeyCode_J:
+	case keycode.KeyCodeJ:
 		return 'j', true
-	case keymapv1.KeyCode_K:
+	case keycode.KeyCodeK:
 		return 'k', true
-	case keymapv1.KeyCode_L:
+	case keycode.KeyCodeL:
 		return 'l', true
-	case keymapv1.KeyCode_M:
+	case keycode.KeyCodeM:
 		return 'm', true
-	case keymapv1.KeyCode_N:
+	case keycode.KeyCodeN:
 		return 'n', true
-	case keymapv1.KeyCode_O:
+	case keycode.KeyCodeO:
 		return 'o', true
-	case keymapv1.KeyCode_P:
+	case keycode.KeyCodeP:
 		return 'p', true
-	case keymapv1.KeyCode_Q:
+	case keycode.KeyCodeQ:
 		return 'q', true
-	case keymapv1.KeyCode_R:
+	case keycode.KeyCodeR:
 		return 'r', true
-	case keymapv1.KeyCode_S:
+	case keycode.KeyCodeS:
 		return 's', true
-	case keymapv1.KeyCode_T:
+	case keycode.KeyCodeT:
 		return 't', true
-	case keymapv1.KeyCode_U:
+	case keycode.KeyCodeU:
 		return 'u', true
-	case keymapv1.KeyCode_V:
+	case keycode.KeyCodeV:
 		return 'v', true
-	case keymapv1.KeyCode_W:
+	case keycode.KeyCodeW:
 		return 'w', true
-	case keymapv1.KeyCode_X:
+	case keycode.KeyCodeX:
 		return 'x', true
-	case keymapv1.KeyCode_Y:
+	case keycode.KeyCodeY:
 		return 'y', true
-	case keymapv1.KeyCode_Z:
+	case keycode.KeyCodeZ:
 		return 'z', true
 
 	// Numbers 0-9
-	case keymapv1.KeyCode_DIGIT_0:
+	case keycode.KeyCodeDigit0:
 		return '0', true
-	case keymapv1.KeyCode_DIGIT_1:
+	case keycode.KeyCodeDigit1:
 		return '1', true
-	case keymapv1.KeyCode_DIGIT_2:
+	case keycode.KeyCodeDigit2:
 		return '2', true
-	case keymapv1.KeyCode_DIGIT_3:
+	case keycode.KeyCodeDigit3:
 		return '3', true
-	case keymapv1.KeyCode_DIGIT_4:
+	case keycode.KeyCodeDigit4:
 		return '4', true
-	case keymapv1.KeyCode_DIGIT_5:
+	case keycode.KeyCodeDigit5:
 		return '5', true
-	case keymapv1.KeyCode_DIGIT_6:
+	case keycode.KeyCodeDigit6:
 		return '6', true
-	case keymapv1.KeyCode_DIGIT_7:
+	case keycode.KeyCodeDigit7:
 		return '7', true
-	case keymapv1.KeyCode_DIGIT_8:
+	case keycode.KeyCodeDigit8:
 		return '8', true
-	case keymapv1.KeyCode_DIGIT_9:
+	case keycode.KeyCodeDigit9:
 		return '9', true
 
 	// Common ASCII control/whitespace keys
-	case keymapv1.KeyCode_TAB:
+	case keycode.KeyCodeTab:
 		return '\t', true
-	case keymapv1.KeyCode_RETURN:
+	case keycode.KeyCodeEnter:
 		return '\r', true
-	case keymapv1.KeyCode_DELETE: // Backspace
+	case keycode.KeyCodeBackspace:
 		return '\b', true
-	case keymapv1.KeyCode_ESCAPE:
+	case keycode.KeyCodeEscape:
 		return xcodeEscape, true
-	case keymapv1.KeyCode_SPACE:
+	case keycode.KeyCodeSpace:
 		return ' ', true
 
 	// Arrow Keys (Unicode private use area)
-	case keymapv1.KeyCode_UP_ARROW:
+	case keycode.KeyCodeUp:
 		return xcodeUpArrow, true
-	case keymapv1.KeyCode_DOWN_ARROW:
+	case keycode.KeyCodeDown:
 		return xcodeDownArrow, true
-	case keymapv1.KeyCode_LEFT_ARROW:
+	case keycode.KeyCodeLeft:
 		return xcodeLeftArrow, true
-	case keymapv1.KeyCode_RIGHT_ARROW:
+	case keycode.KeyCodeRight:
 		return xcodeRightArrow, true
 
 	// Function Keys (F1-F20)
-	case keymapv1.KeyCode_F1:
+	case keycode.KeyCodeF1:
 		return xcodeF1, true
-	case keymapv1.KeyCode_F2:
+	case keycode.KeyCodeF2:
 		return xcodeF2, true
-	case keymapv1.KeyCode_F3:
+	case keycode.KeyCodeF3:
 		return xcodeF3, true
-	case keymapv1.KeyCode_F4:
+	case keycode.KeyCodeF4:
 		return xcodeF4, true
-	case keymapv1.KeyCode_F5:
+	case keycode.KeyCodeF5:
 		return xcodeF5, true
-	case keymapv1.KeyCode_F6:
+	case keycode.KeyCodeF6:
 		return xcodeF6, true
-	case keymapv1.KeyCode_F7:
+	case keycode.KeyCodeF7:
 		return xcodeF7, true
-	case keymapv1.KeyCode_F8:
+	case keycode.KeyCodeF8:
 		return xcodeF8, true
-	case keymapv1.KeyCode_F9:
+	case keycode.KeyCodeF9:
 		return xcodeF9, true
-	case keymapv1.KeyCode_F10:
+	case keycode.KeyCodeF10:
 		return xcodeF10, true
-	case keymapv1.KeyCode_F11:
+	case keycode.KeyCodeF11:
 		return xcodeF11, true
-	case keymapv1.KeyCode_F12:
+	case keycode.KeyCodeF12:
 		return xcodeF12, true
-	case keymapv1.KeyCode_F13:
+	case keycode.KeyCodeF13:
 		return xcodeF13, true
-	case keymapv1.KeyCode_F14:
+	case keycode.KeyCodeF14:
 		return xcodeF14, true
-	case keymapv1.KeyCode_F15:
+	case keycode.KeyCodeF15:
 		return xcodeF15, true
-	case keymapv1.KeyCode_F16:
+	case keycode.KeyCodeF16:
 		return xcodeF16, true
-	case keymapv1.KeyCode_F17:
+	case keycode.KeyCodeF17:
 		return xcodeF17, true
-	case keymapv1.KeyCode_F18:
+	case keycode.KeyCodeF18:
 		return xcodeF18, true
-	case keymapv1.KeyCode_F19:
+	case keycode.KeyCodeF19:
 		return xcodeF19, true
-	case keymapv1.KeyCode_F20:
+	case keycode.KeyCodeF20:
 		return xcodeF20, true
 
 	// Navigation Keys
-	case keymapv1.KeyCode_INSERT_OR_HELP:
+	case keycode.KeyCodeInsert:
 		return xcodeF21, true
-	case keymapv1.KeyCode_FORWARD_DELETE:
+	case keycode.KeyCodeDelete:
 		return xcodeF22, true
-	case keymapv1.KeyCode_HOME:
+	case keycode.KeyCodeHome:
 		return xcodeF23, true
-	case keymapv1.KeyCode_END:
+	case keycode.KeyCodeEnd:
 		return xcodeF24, true
-	case keymapv1.KeyCode_PAGE_UP:
+	case keycode.KeyCodePageUp:
 		return xcodeF25, true
-	case keymapv1.KeyCode_PAGE_DOWN:
+	case keycode.KeyCodePageDown:
 		return xcodeF26, true
 
 	// FIXME(xinnjie): Do not have keyboard with numpad. So can not test it.
-	case keymapv1.KeyCode_NUMPAD_DECIMAL:
+	case keycode.KeyCodeNumpadDecimal:
 		return '.', true
-	case keymapv1.KeyCode_NUMPAD_MULTIPLY:
+	case keycode.KeyCodeNumpadMultiply:
 		return '*', true
-	case keymapv1.KeyCode_NUMPAD_PLUS:
+	case keycode.KeyCodeNumpadAdd:
 		return '+', true
-	case keymapv1.KeyCode_NUMPAD_CLEAR:
+	case keycode.KeyCodeNumpadClear:
 		return 0, false
-	case keymapv1.KeyCode_NUMPAD_DIVIDE:
+	case keycode.KeyCodeNumpadDivide:
 		return '/', true
-	case keymapv1.KeyCode_NUMPAD_ENTER:
+	case keycode.KeyCodeNumpadEnter:
 		return '\r', true
-	case keymapv1.KeyCode_NUMPAD_MINUS:
+	case keycode.KeyCodeNumpadSubtract:
 		return '-', true
-	case keymapv1.KeyCode_NUMPAD_EQUALS:
+	case keycode.KeyCodeNumpadEquals:
 		return '=', true
-	case keymapv1.KeyCode_NUMPAD_0:
+	case keycode.KeyCodeNumpad0:
 		return '0', true
-	case keymapv1.KeyCode_NUMPAD_1:
+	case keycode.KeyCodeNumpad1:
 		return '1', true
-	case keymapv1.KeyCode_NUMPAD_2:
+	case keycode.KeyCodeNumpad2:
 		return '2', true
-	case keymapv1.KeyCode_NUMPAD_3:
+	case keycode.KeyCodeNumpad3:
 		return '3', true
-	case keymapv1.KeyCode_NUMPAD_4:
+	case keycode.KeyCodeNumpad4:
 		return '4', true
-	case keymapv1.KeyCode_NUMPAD_5:
+	case keycode.KeyCodeNumpad5:
 		return '5', true
-	case keymapv1.KeyCode_NUMPAD_6:
+	case keycode.KeyCodeNumpad6:
 		return '6', true
-	case keymapv1.KeyCode_NUMPAD_7:
+	case keycode.KeyCodeNumpad7:
 		return '7', true
-	case keymapv1.KeyCode_NUMPAD_8:
+	case keycode.KeyCodeNumpad8:
 		return '8', true
-	case keymapv1.KeyCode_NUMPAD_9:
+	case keycode.KeyCodeNumpad9:
 		return '9', true
 
-	case keymapv1.KeyCode_BACKSLASH:
+	case keycode.KeyCodeBackslash:
 		return '\\', true
-	case keymapv1.KeyCode_BACKTICK:
+	case keycode.KeyCodeBacktick:
 		return '`', true
-	case keymapv1.KeyCode_COMMA:
+	case keycode.KeyCodeComma:
 		return ',', true
-	case keymapv1.KeyCode_EQUAL:
+	case keycode.KeyCodeEqual:
 		return '=', true
-	case keymapv1.KeyCode_MINUS:
+	case keycode.KeyCodeMinus:
 		return '-', true
-	case keymapv1.KeyCode_PERIOD:
+	case keycode.KeyCodePeriod:
 		return '.', true
-	case keymapv1.KeyCode_QUOTE:
+	case keycode.KeyCodeQuote:
 		return '\'', true
-	case keymapv1.KeyCode_SEMICOLON:
+	case keycode.KeyCodeSemicolon:
 		return ';', true
-	case keymapv1.KeyCode_SLASH:
+	case keycode.KeyCodeSlash:
 		return '/', true
-	case keymapv1.KeyCode_LEFT_BRACKET:
+	case keycode.KeyCodeLeftBracket:
 		return '[', true
-	case keymapv1.KeyCode_RIGHT_BRACKET:
+	case keycode.KeyCodeRightBracket:
 		return ']', true
 
 	// Unsupported KeyCodes by Xcode keybindings
-	case keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
-		keymapv1.KeyCode_CAPS_LOCK,
-		keymapv1.KeyCode_SHIFT,
-		keymapv1.KeyCode_FUNCTION,
-		keymapv1.KeyCode_CONTROL,
-		keymapv1.KeyCode_OPTION,
-		keymapv1.KeyCode_COMMAND,
-		keymapv1.KeyCode_RIGHT_COMMAND,
-		keymapv1.KeyCode_RIGHT_OPTION,
-		keymapv1.KeyCode_RIGHT_CONTROL,
-		keymapv1.KeyCode_RIGHT_SHIFT,
-		keymapv1.KeyCode_MUTE,
-		keymapv1.KeyCode_VOLUME_UP,
-		keymapv1.KeyCode_VOLUME_DOWN,
-		keymapv1.KeyCode_NUMPAD_INSERT:
+	case keycode.KeyCodeCapsLock,
+		keycode.KeyCodeShift,
+		keycode.KeyCodeFn,
+		keycode.KeyCodeCtrl,
+		keycode.KeyCodeAlt,
+		keycode.KeyCodeCmd,
+		keycode.KeyCodeRightCmd,
+		keycode.KeyCodeRightAlt,
+		keycode.KeyCodeRightCtrl,
+		keycode.KeyCodeRightShift,
+		keycode.KeyCodeMute,
+		keycode.KeyCodeVolumeUp,
+		keycode.KeyCodeVolumeDown:
 		return 0, false
 
 	default:
@@ -295,87 +293,87 @@ func getRuneFromKeyCode(kc keymapv1.KeyCode) (rune, bool) {
 // are handled directly in ParseKeybinding to avoid conflicts with numpad keys.
 //
 //nolint:gocyclo,cyclop
-func getKeyCodeFromRune(r rune) (keymapv1.KeyCode, bool) {
+func getKeyCodeFromRune(r rune) (keycode.KeyCode, bool) {
 	switch r {
 	// Common ASCII control/whitespace keys
 	case '\t':
-		return keymapv1.KeyCode_TAB, true
+		return keycode.KeyCodeTab, true
 	case '\r':
-		return keymapv1.KeyCode_RETURN, true
+		return keycode.KeyCodeEnter, true
 	case '\b':
-		return keymapv1.KeyCode_DELETE, true
+		return keycode.KeyCodeDelete, true
 	case xcodeEscape:
-		return keymapv1.KeyCode_ESCAPE, true
+		return keycode.KeyCodeEscape, true
 	case ' ':
-		return keymapv1.KeyCode_SPACE, true
+		return keycode.KeyCodeSpace, true
 
 	// Arrow Keys (Unicode private use area)
 	case xcodeUpArrow:
-		return keymapv1.KeyCode_UP_ARROW, true
+		return keycode.KeyCodeUp, true
 	case xcodeDownArrow:
-		return keymapv1.KeyCode_DOWN_ARROW, true
+		return keycode.KeyCodeDown, true
 	case xcodeLeftArrow:
-		return keymapv1.KeyCode_LEFT_ARROW, true
+		return keycode.KeyCodeLeft, true
 	case xcodeRightArrow:
-		return keymapv1.KeyCode_RIGHT_ARROW, true
+		return keycode.KeyCodeRight, true
 
 	// Function Keys (Unicode private use area)
 	case xcodeF1:
-		return keymapv1.KeyCode_F1, true
+		return keycode.KeyCodeF1, true
 	case xcodeF2:
-		return keymapv1.KeyCode_F2, true
+		return keycode.KeyCodeF2, true
 	case xcodeF3:
-		return keymapv1.KeyCode_F3, true
+		return keycode.KeyCodeF3, true
 	case xcodeF4:
-		return keymapv1.KeyCode_F4, true
+		return keycode.KeyCodeF4, true
 	case xcodeF5:
-		return keymapv1.KeyCode_F5, true
+		return keycode.KeyCodeF5, true
 	case xcodeF6:
-		return keymapv1.KeyCode_F6, true
+		return keycode.KeyCodeF6, true
 	case xcodeF7:
-		return keymapv1.KeyCode_F7, true
+		return keycode.KeyCodeF7, true
 	case xcodeF8:
-		return keymapv1.KeyCode_F8, true
+		return keycode.KeyCodeF8, true
 	case xcodeF9:
-		return keymapv1.KeyCode_F9, true
+		return keycode.KeyCodeF9, true
 	case xcodeF10:
-		return keymapv1.KeyCode_F10, true
+		return keycode.KeyCodeF10, true
 	case xcodeF11:
-		return keymapv1.KeyCode_F11, true
+		return keycode.KeyCodeF11, true
 	case xcodeF12:
-		return keymapv1.KeyCode_F12, true
+		return keycode.KeyCodeF12, true
 	case xcodeF13:
-		return keymapv1.KeyCode_F13, true
+		return keycode.KeyCodeF13, true
 	case xcodeF14:
-		return keymapv1.KeyCode_F14, true
+		return keycode.KeyCodeF14, true
 	case xcodeF15:
-		return keymapv1.KeyCode_F15, true
+		return keycode.KeyCodeF15, true
 	case xcodeF16:
-		return keymapv1.KeyCode_F16, true
+		return keycode.KeyCodeF16, true
 	case xcodeF17:
-		return keymapv1.KeyCode_F17, true
+		return keycode.KeyCodeF17, true
 	case xcodeF18:
-		return keymapv1.KeyCode_F18, true
+		return keycode.KeyCodeF18, true
 	case xcodeF19:
-		return keymapv1.KeyCode_F19, true
+		return keycode.KeyCodeF19, true
 	case xcodeF20:
-		return keymapv1.KeyCode_F20, true
+		return keycode.KeyCodeF20, true
 
 	// Navigation Keys (Unicode private use area)
 	case xcodeF21:
-		return keymapv1.KeyCode_INSERT_OR_HELP, true
+		return keycode.KeyCodeInsert, true
 	case xcodeF22:
-		return keymapv1.KeyCode_FORWARD_DELETE, true
+		return keycode.KeyCodeDelete, true
 	case xcodeF23:
-		return keymapv1.KeyCode_HOME, true
+		return keycode.KeyCodeHome, true
 	case xcodeF24:
-		return keymapv1.KeyCode_END, true
+		return keycode.KeyCodeEnd, true
 	case xcodeF25:
-		return keymapv1.KeyCode_PAGE_UP, true
+		return keycode.KeyCodePageUp, true
 	case xcodeF26:
-		return keymapv1.KeyCode_PAGE_DOWN, true
+		return keycode.KeyCodePageDown, true
 
 	default:
-		return keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, false
+		return "", false
 	}
 }

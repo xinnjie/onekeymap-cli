@@ -1,28 +1,28 @@
 package plugins
 
 import (
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 // Registry holds a collection of all available editor plugins.
 type Registry struct {
-	plugins map[pluginapi2.EditorType]pluginapi2.Plugin
+	plugins map[pluginapi.EditorType]pluginapi.Plugin
 }
 
 // NewRegistry creates a new plugin registry.
 func NewRegistry() *Registry {
 	return &Registry{
-		plugins: make(map[pluginapi2.EditorType]pluginapi2.Plugin),
+		plugins: make(map[pluginapi.EditorType]pluginapi.Plugin),
 	}
 }
 
 // Register adds a new plugin to the registry.
-func (r *Registry) Register(plugin pluginapi2.Plugin) {
+func (r *Registry) Register(plugin pluginapi.Plugin) {
 	r.plugins[plugin.EditorType()] = plugin
 }
 
 // Get retrieves a plugin by its name.
-func (r *Registry) Get(editorType pluginapi2.EditorType) (pluginapi2.Plugin, bool) {
+func (r *Registry) Get(editorType pluginapi.EditorType) (pluginapi.Plugin, bool) {
 	plugin, ok := r.plugins[editorType]
 	return plugin, ok
 }

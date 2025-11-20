@@ -11,10 +11,9 @@ import (
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/export"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type zedExporter struct {
@@ -36,9 +35,9 @@ func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, dif
 func (p *zedExporter) Export(
 	_ context.Context,
 	destination io.Writer,
-	setting *keymapv1.Keymap,
-	opts pluginapi2.PluginExportOption,
-) (*pluginapi2.PluginExportReport, error) {
+	setting keymap.Keymap,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	// Parse existing configuration if provided
 	existingConfig, err := p.parseExistingConfig(opts.ExistingConfig)
 	if err != nil {
@@ -46,8 +45,8 @@ func (p *zedExporter) Export(
 	}
 
 	// Generate managed keybindings from current setting
-	marker := export.NewMarker(setting)
-	managedKeymaps := p.generateManagedKeybindings(setting, marker)
+	marker := export.NewMarker(&setting)
+	managedKeymaps := p.generateManagedKeybindings(&setting, marker)
 
 	// Merge managed and existing keybindings
 	finalKeymaps := p.mergeKeybindings(managedKeymaps, existingConfig)
@@ -70,7 +69,7 @@ func (p *zedExporter) Export(
 	}
 
 	// Defer diff calculation to exportService. Provide structured before/after configs.
-	return &pluginapi2.PluginExportReport{
+	return &pluginapi.PluginExportReport{
 		BaseEditorConfig:   existingConfig,
 		ExportEditorConfig: finalKeymaps,
 		SkipReport:         marker.Report(),
@@ -145,36 +144,36 @@ func orderByBaseContext(final zedKeymapConfig, base zedKeymapConfig) zedKeymapCo
 }
 
 // generateManagedKeybindings creates keybindings from the current setting.
-func (p *zedExporter) generateManagedKeybindings(setting *keymapv1.Keymap, marker *export.Marker) zedKeymapConfig {
+func (p *zedExporter) generateManagedKeybindings(setting *keymap.Keymap, marker *export.Marker) zedKeymapConfig {
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
-	for _, km := range setting.GetActions() {
-		actionConfig, err := p.actionIDToZed(km.GetName())
+	for _, km := range setting.Actions {
+		actionConfig, err := p.actionIDToZed(km.Name)
 		if err != nil {
-			p.logger.Info("no mapping found for action", "action", km.GetName())
-			for _, b := range km.GetBindings() {
-				if b != nil && b.GetKeyChords() != nil {
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi2.ErrActionNotSupported)
+			p.logger.Info("no mapping found for action", "action", km.Name)
+			for _, b := range km.Bindings {
+				if len(b.KeyChords) > 0 {
+					marker.MarkSkippedForReason(km.Name, &b, pluginapi.ErrActionNotSupported)
 				}
 			}
 			continue
 		}
 
-		for _, b := range km.GetBindings() {
-			if b == nil {
+		for _, b := range km.Bindings {
+			if len(b.KeyChords) == 0 {
 				continue
 			}
-			keys, err := FormatZedKeybind(keymap.NewKeyBinding(b))
+			keys, err := FormatZedKeybind(b)
 			if err != nil {
 				p.logger.Warn("failed to format key binding", "error", err)
 				marker.MarkSkippedForReason(
-					km.GetName(),
-					b.GetKeyChords(),
-					&pluginapi2.UnsupportedExportActionError{Note: err.Error()},
+					km.Name,
+					&b,
+					&pluginapi.UnsupportedExportActionError{Note: err.Error()},
 				)
 				continue
 			}
-			marker.MarkExported(km.GetName(), b.GetKeyChords())
+			marker.MarkExported(km.Name, b)
 
 			// For each Zed mapping config, create a binding under its context
 			for _, zconf := range *actionConfig {

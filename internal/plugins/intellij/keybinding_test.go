@@ -5,10 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 func TestParseKeyBinding_Table(t *testing.T) {
@@ -37,13 +36,13 @@ func TestParseKeyBinding_Table(t *testing.T) {
 			kb, err := intellij.ParseKeyBinding(tc.in)
 			if tc.wantErr {
 				require.Error(t, err)
-				assert.Nil(t, kb)
 				return
 			}
 			require.NoError(t, err)
-			require.NotNil(t, kb)
-			out, err := kb.Format(platform.PlatformLinux, "+")
-			require.NoError(t, err)
+			out := kb.String(keybinding.FormatOption{
+				Platform:  platform.PlatformLinux,
+				Separator: "+",
+			})
 			assert.Equal(t, tc.want, out)
 		})
 	}
@@ -53,30 +52,22 @@ func TestFormatKeybinding_Table(t *testing.T) {
 	tests := []struct {
 		name       string
 		in         string
-		build      func() *keymap.KeyBinding
 		wantFirst  string
 		wantSecond string
 		wantErr    bool
-		wantNil    bool
 	}{
 		{name: "SingleChord", in: "ctrl+alt+s", wantFirst: "control alt S", wantSecond: ""},
 		{name: "TwoChords", in: "ctrl+e ctrl+s", wantFirst: "control E", wantSecond: "control S"},
-		{name: "TooManyChords", in: "ctrl+a ctrl+b ctrl+c", wantErr: true, wantNil: true},
-		{name: "InvalidChordProto", build: func() *keymap.KeyBinding {
-			return keymap.NewKeyBinding(
-				&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{Chords: []*keymapv1.KeyChord{{}}}},
-			)
-		}, wantErr: true, wantNil: true},
+		{name: "TooManyChords", in: "ctrl+a ctrl+b ctrl+c", wantErr: true},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			var kb *keymap.KeyBinding
-			if tc.build != nil {
-				kb = tc.build()
-			} else {
-				kb = keymap.MustParseKeyBinding(tc.in)
-			}
+			kb, err := keybinding.NewKeybinding(tc.in, keybinding.ParseOption{
+				Platform:  platform.PlatformLinux,
+				Separator: "+",
+			})
+			require.NoError(t, err)
 			ks, err := intellij.FormatKeybinding(kb)
 			if tc.wantErr {
 				require.Error(t, err)

@@ -12,8 +12,9 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"howett.net/plist"
 )
 
@@ -40,20 +41,20 @@ func newImporter(
 func (i *xcodeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	_ pluginapi2.PluginImportOption,
-) (pluginapi2.PluginImportResult, error) {
+	_ pluginapi.PluginImportOption,
+) (pluginapi.PluginImportResult, error) {
 	// Read the plist XML data
 	xmlData, err := io.ReadAll(source)
 	if err != nil {
-		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	plistData, err := parseXcodeConfig(xmlData)
 	if err != nil {
-		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to unmarshal xcode keybindings: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to unmarshal xcode keybindings: %w", err)
 	}
 
-	setting := &keymapv1.Keymap{}
+	setting := keymap.Keymap{}
 	marker := imports.NewMarker()
 	for _, binding := range plistData.MenuKeyBindings.KeyBindings {
 		// Skip bindings without keyboard shortcuts
@@ -71,7 +72,7 @@ func (i *xcodeImporter) Import(
 				"commandID",
 				binding.CommandID,
 			)
-			i.reporter.ReportUnknownCommand(ctx, pluginapi2.EditorTypeXcode, binding.Action)
+			i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeXcode, binding.Action)
 			marker.MarkSkippedForReason(binding.Action, errors.New("unknown action mapping"))
 			continue
 		}
@@ -93,9 +94,11 @@ func (i *xcodeImporter) Import(
 			continue
 		}
 
-		newKeymap := &keymapv1.Action{
-			Name:     mapping.ID,
-			Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
+		newKeymap := keymap.Action{
+			Name: mapping.ID,
+			Bindings: []keybinding.Keybinding{
+				kb,
+			},
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
 		marker.MarkImported(binding.Action)
@@ -117,7 +120,7 @@ func (i *xcodeImporter) Import(
 				"textAction",
 				textAction,
 			)
-			i.reporter.ReportUnknownCommand(ctx, pluginapi2.EditorTypeXcode, textAction)
+			i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeXcode, textAction)
 			marker.MarkSkippedForReason(textAction, errors.New("unknown action mapping"))
 			continue
 		}
@@ -136,17 +139,19 @@ func (i *xcodeImporter) Import(
 			continue
 		}
 
-		newKeymap := &keymapv1.Action{
-			Name:     mapping.ID,
-			Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
+		newKeymap := keymap.Action{
+			Name: mapping.ID,
+			Bindings: []keybinding.Keybinding{
+				kb,
+			},
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
 		marker.MarkImported(textAction)
 	}
 
-	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
+	setting.Actions = dedup.DedupActions(setting.Actions)
 
-	result := pluginapi2.PluginImportResult{Keymap: setting}
+	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
 	return result, nil
 }

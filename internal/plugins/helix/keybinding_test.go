@@ -5,8 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 func TestFormatKeybinding(t *testing.T) {
@@ -26,41 +25,14 @@ func TestFormatKeybinding(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kb := keymap.MustParseKeyBinding(tc.in)
+			kb, err := keybinding.NewKeybinding(tc.in, keybinding.ParseOption{Separator: "+"})
+			require.NoError(t, err)
 			out, err := formatKeybinding(kb)
 			if tc.wantErr {
 				require.Error(t, err)
 				return
 			}
 			assert.Equal(t, tc.want, out)
-		})
-	}
-}
-
-func TestParseKeybinding(t *testing.T) {
-	tests := []struct {
-		name     string
-		in       string
-		wantNorm string
-		wantErr  bool
-	}{
-		{name: "Simple", in: "C-k", wantNorm: "ctrl+k"},
-		{name: "Special Enter", in: "C-ret", wantNorm: "ctrl+enter"},
-		{name: "ManyModifiersFunction", in: "M-C-S-A-F5", wantNorm: "meta+ctrl+shift+alt+f5"},
-		{name: "MultiChord", in: "C-k C-s", wantNorm: "ctrl+k ctrl+s"},
-		{name: "Empty", in: "", wantErr: true},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			kb, err := parseKeybinding(tc.in)
-			if tc.wantErr {
-				require.Error(t, err)
-				return
-			}
-			norm, err := kb.Format(platform.PlatformLinux, "+")
-			require.NoError(t, err)
-			assert.Equal(t, tc.wantNorm, norm)
 		})
 	}
 }

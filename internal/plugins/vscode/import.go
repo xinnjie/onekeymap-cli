@@ -10,8 +10,9 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 // vscodeImporter handles importing keybindings from VSCode.
@@ -37,14 +38,14 @@ func newImporter(
 func (i *vscodeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	_ pluginapi2.PluginImportOption,
-) (pluginapi2.PluginImportResult, error) {
+	_ pluginapi.PluginImportOption,
+) (pluginapi.PluginImportResult, error) {
 	vscodeKeybindings, err := parseExistingConfig(source)
 	if err != nil {
-		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to parse existing config: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse existing config: %w", err)
 	}
 
-	setting := &keymapv1.Keymap{}
+	setting := keymap.Keymap{}
 	marker := imports.NewMarker()
 	for _, binding := range vscodeKeybindings {
 		mapping := i.FindByVSCodeActionWithArgs(binding.Command, binding.When, binding.Args)
@@ -61,9 +62,9 @@ func (i *vscodeImporter) Import(
 			)
 			// Report unknown command metric
 			if i.reporter != nil {
-				i.reporter.ReportUnknownCommand(ctx, pluginapi2.EditorTypeVSCode, binding.Command)
+				i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeVSCode, binding.Command)
 			}
-			marker.MarkSkippedForReason(binding.Command, pluginapi2.ErrActionNotSupported)
+			marker.MarkSkippedForReason(binding.Command, pluginapi.ErrActionNotSupported)
 			continue
 		}
 
@@ -74,18 +75,20 @@ func (i *vscodeImporter) Import(
 			continue
 		}
 
-		newKeymap := &keymapv1.Action{
-			Name:     mapping.ID,
-			Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
+		newKeymap := keymap.Action{
+			Name: mapping.ID,
+			Bindings: []keybinding.Keybinding{
+				*kb,
+			},
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
 
 		marker.MarkImported(binding.Command)
 	}
 
-	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
+	setting.Actions = dedup.DedupActions(setting.Actions)
 
-	result := pluginapi2.PluginImportResult{Keymap: setting}
+	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
 	return result, nil
 }

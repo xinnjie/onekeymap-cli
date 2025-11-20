@@ -15,7 +15,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importer"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/protobuf/testing/protocmp"
@@ -23,14 +23,14 @@ import (
 
 // testPlugin implements pluginapi.Plugin interface for testing.
 type testPlugin struct {
-	editorType  pluginapi2.EditorType
+	editorType  pluginapi.EditorType
 	configPath  string
 	importData  *keymapv1.Keymap
 	importError error
 }
 
 func newTestPlugin(
-	editorType pluginapi2.EditorType,
+	editorType pluginapi.EditorType,
 	configPath string,
 	importData *keymapv1.Keymap,
 	importError error,
@@ -43,22 +43,22 @@ func newTestPlugin(
 	}
 }
 
-func (p *testPlugin) EditorType() pluginapi2.EditorType {
+func (p *testPlugin) EditorType() pluginapi.EditorType {
 	return p.editorType
 }
 
-func (p *testPlugin) ConfigDetect(_ pluginapi2.ConfigDetectOptions) ([]string, bool, error) {
+func (p *testPlugin) ConfigDetect(_ pluginapi.ConfigDetectOptions) ([]string, bool, error) {
 	return []string{p.configPath}, true, nil
 }
 
-func (p *testPlugin) Importer() (pluginapi2.PluginImporter, error) {
+func (p *testPlugin) Importer() (pluginapi.PluginImporter, error) {
 	return &testPluginImporter{
 		importData:  p.importData,
 		importError: p.importError,
 	}, nil
 }
 
-func (p *testPlugin) Exporter() (pluginapi2.PluginExporter, error) {
+func (p *testPlugin) Exporter() (pluginapi.PluginExporter, error) {
 	return &testPluginExporter{}, nil
 }
 
@@ -71,9 +71,9 @@ type testPluginImporter struct {
 func (i *testPluginImporter) Import(
 	_ context.Context,
 	_ io.Reader,
-	_ pluginapi2.PluginImportOption,
-) (pluginapi2.PluginImportResult, error) {
-	return pluginapi2.PluginImportResult{Keymap: i.importData}, i.importError
+	_ pluginapi.PluginImportOption,
+) (pluginapi.PluginImportResult, error) {
+	return pluginapi.PluginImportResult{Keymap: i.importData}, i.importError
 }
 
 // testPluginExporter implements pluginapi.PluginExporter interface for testing.
@@ -83,9 +83,9 @@ func (e *testPluginExporter) Export(
 	_ context.Context,
 	_ io.Writer,
 	_ *keymapv1.Keymap,
-	_ pluginapi2.PluginExportOption,
-) (*pluginapi2.PluginExportReport, error) {
-	return &pluginapi2.PluginExportReport{}, nil
+	_ pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
+	return &pluginapi.PluginExportReport{}, nil
 }
 
 func TestImportService_Import(t *testing.T) {
@@ -435,7 +435,7 @@ func TestImportService_Import(t *testing.T) {
 			_, err = testFile.WriteString(`{}`)
 			require.NoError(t, err)
 
-			testPlug := newTestPlugin(pluginapi2.EditorTypeVSCode, testFile.Name(), tc.importData, tc.importError)
+			testPlug := newTestPlugin(pluginapi.EditorTypeVSCode, testFile.Name(), tc.importData, tc.importError)
 			registry := plugins.NewRegistry()
 			registry.Register(testPlug)
 
@@ -472,7 +472,7 @@ func TestImportService_Import(t *testing.T) {
 			service := importer.NewImporter(registry, mappingConfig, logger, metrics.NewNoop())
 
 			opts := importerapi.ImportOptions{
-				EditorType:  pluginapi2.EditorTypeVSCode,
+				EditorType:  pluginapi.EditorTypeVSCode,
 				InputStream: testFile,
 				Base:        tc.baseData,
 			}

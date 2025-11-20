@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 func TestZed_FormatKeybinding(t *testing.T) {
@@ -25,7 +25,8 @@ func TestZed_FormatKeybinding(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kb := keymap.MustParseKeyBinding(tc.in)
+			kb, err := keybinding.NewKeybinding(tc.in, keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"})
+			require.NoError(t, err)
 			out, err := zed.FormatZedKeybind(kb)
 			require.NoError(t, err)
 			assert.Equal(t, tc.want, out)
@@ -56,14 +57,13 @@ func TestZed_ParseKeybinding(t *testing.T) {
 			kb, err := zed.ParseZedKeybind(tc.in)
 			if tc.wantErr {
 				require.Error(t, err)
-				assert.Nil(t, kb)
+				assert.Empty(t, kb.KeyChords)
 				return
 			}
 			require.NoError(t, err)
-			require.NotNil(t, kb)
+			require.NotEmpty(t, kb.KeyChords)
 			// Normalize using Linux and '-' to canonical form for zed
-			out, err := kb.Format(platform.PlatformLinux, "-")
-			require.NoError(t, err)
+			out := kb.String(keybinding.FormatOption{Platform: platform.PlatformLinux, Separator: "-"})
 			assert.Equal(t, tc.want, out)
 		})
 	}

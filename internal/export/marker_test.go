@@ -7,94 +7,101 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	exp "github.com/xinnjie/onekeymap-cli/internal/export"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
-func newKeymapWithTwoBindings(action string, k1, k2 string) (*keymapv1.Keymap, *keymapv1.Action) {
-	a := keymap.NewActioinBinding(action, k1)
-	a.Bindings = append(a.Bindings, &keymapv1.KeybindingReadable{KeyChords: keymap.MustParseKeyBinding(k2).KeyChords})
-	return &keymapv1.Keymap{Actions: []*keymapv1.Action{a}}, a
+func newKeymapWithTwoBindings(action string, k1, k2 string) (keymap.Keymap, keymap.Action) {
+	kb1, err := keybinding.NewKeybinding(k1, keybinding.ParseOption{Separator: "+"})
+	if err != nil {
+		panic(err)
+	}
+	kb2, err := keybinding.NewKeybinding(k2, keybinding.ParseOption{Separator: "+"})
+	if err != nil {
+		panic(err)
+	}
+	a := keymap.Action{Name: action, Bindings: []keybinding.Keybinding{kb1, kb2}}
+	return keymap.Keymap{Actions: []keymap.Action{a}}, a
 }
 
 func TestMarker_ImplicitSkipForUnexportedBindings(t *testing.T) {
 	km, a := newKeymapWithTwoBindings("actions.test.dual", "cmd+a", "cmd+c")
-	m := exp.NewMarker(km)
+	m := exp.NewMarker(&km)
 
 	// Export only first binding
-	m.MarkExported(a.GetName(), a.GetBindings()[0].GetKeyChords())
+	m.MarkExported(a.Name, a.Bindings[0])
 
 	rep := m.Report()
 	require.Len(t, rep.SkipActions, 1)
 	// The skipped one should be the second binding with default not supported
 	sk := rep.SkipActions[0]
-	assert.Equal(t, a.GetName(), sk.Action)
-	assert.ErrorIs(t, sk.Error, pluginapi2.ErrActionNotSupported)
+	assert.Equal(t, a.Name, sk.Action)
+	assert.ErrorIs(t, sk.Error, pluginapi.ErrActionNotSupported)
 }
 
 func TestMarker_ExplicitKeySkip(t *testing.T) {
 	km, a := newKeymapWithTwoBindings("actions.test.dual", "cmd+a", "cmd+b")
-	m := exp.NewMarker(km)
+	m := exp.NewMarker(&km)
 
 	// Export first, explicitly skip second
-	m.MarkExported(a.GetName(), a.GetBindings()[0].GetKeyChords())
+	m.MarkExported(a.Name, a.Bindings[0])
+	kb, err := keybinding.NewKeybinding("cmd+b", keybinding.ParseOption{Separator: "+"})
+	require.NoError(t, err)
 	m.MarkSkippedForReason(
-		a.GetName(),
-		keymap.MustParseKeyBinding("cmd+b").KeyChords,
-		&pluginapi2.EditorSupportOnlyOneKeybindingPerActionError{
-			SkipKeybinding: keymap.MustParseKeyBinding("cmd+b").KeyChords,
-		},
+		a.Name,
+		&kb,
+		&pluginapi.EditorSupportOnlyOneKeybindingPerActionError{},
 	)
 
 	rep := m.Report()
 	require.Len(t, rep.SkipActions, 1)
 	sk := rep.SkipActions[0]
-	assert.Equal(t, a.GetName(), sk.Action)
-	var ose *pluginapi2.EditorSupportOnlyOneKeybindingPerActionError
+	assert.Equal(t, a.Name, sk.Action)
+	var ose *pluginapi.EditorSupportOnlyOneKeybindingPerActionError
 	require.ErrorAs(t, sk.Error, &ose)
 	require.NotNil(t, ose)
-	require.NotNil(t, ose.SkipKeybinding)
-	assert.Equal(t, ose.SkipKeybinding, keymap.MustParseKeyBinding("cmd+b").KeyChords)
 }
 
 func TestMarker_ActionLevelSkipAppliesToAllUnexported(t *testing.T) {
 	km, a := newKeymapWithTwoBindings("actions.test.multi", "cmd+a", "cmd+b")
-	m := exp.NewMarker(km)
+	m := exp.NewMarker(&km)
 
 	// Export only first, mark action-level skip
 	note := "not available on this editor"
-	m.MarkExported(a.GetName(), keymap.MustParseKeyBinding("cmd+a").KeyChords)
-	m.MarkSkippedForReason(a.GetName(), nil, &pluginapi2.UnsupportedExportActionError{Note: note})
+	kb, err := keybinding.NewKeybinding("cmd+a", keybinding.ParseOption{Separator: "+"})
+	require.NoError(t, err)
+	m.MarkExported(a.Name, kb)
+	m.MarkSkippedForReason(a.Name, nil, &pluginapi.UnsupportedExportActionError{Note: note})
 
 	rep := m.Report()
 	require.Len(t, rep.SkipActions, 1)
 	sk := rep.SkipActions[0]
-	assert.Equal(t, a.GetName(), sk.Action)
+	assert.Equal(t, a.Name, sk.Action)
 	require.ErrorContains(t, sk.Error, note)
 }
 
 func TestMarker_PerKeyReasonOverridesActionLevel(t *testing.T) {
 	km, a := newKeymapWithTwoBindings("actions.test.override", "cmd+x", "cmd+b")
-	m := exp.NewMarker(km)
+	m := exp.NewMarker(&km)
 
 	// No exported; set action-level reason and a different per-key reason for second
-	m.MarkSkippedForReason(a.GetName(), nil, &pluginapi2.UnsupportedExportActionError{Note: "action"})
+	m.MarkSkippedForReason(a.Name, nil, &pluginapi.UnsupportedExportActionError{Note: "action"})
+	kb, err := keybinding.NewKeybinding("cmd+b", keybinding.ParseOption{Separator: "+"})
+	require.NoError(t, err)
 	m.MarkSkippedForReason(
-		a.GetName(),
-		keymap.MustParseKeyBinding("cmd+b").KeyChords,
-		&pluginapi2.EditorSupportOnlyOneKeybindingPerActionError{
-			SkipKeybinding: keymap.MustParseKeyBinding("cmd+b").KeyChords,
-		},
+		a.Name,
+		&kb,
+		&pluginapi.EditorSupportOnlyOneKeybindingPerActionError{},
 	)
 
 	rep := m.Report()
 	// Both keybindings should be reported as skipped
 	require.Len(t, rep.SkipActions, 2)
 	// Identify entries by error type and its embedded keybinding
-	var first, second *pluginapi2.ExportSkipAction
+	var first, second *pluginapi.ExportSkipAction
 	for i := range rep.SkipActions {
-		var ose *pluginapi2.EditorSupportOnlyOneKeybindingPerActionError
+		var ose *pluginapi.EditorSupportOnlyOneKeybindingPerActionError
 		if errors.As(rep.SkipActions[i].Error, &ose) {
 			second = &rep.SkipActions[i]
 		} else {
@@ -106,7 +113,7 @@ func TestMarker_PerKeyReasonOverridesActionLevel(t *testing.T) {
 	// First uses action-level reason
 	require.ErrorContains(t, first.Error, "action")
 	// Second uses per-key reason
-	var ose2 *pluginapi2.EditorSupportOnlyOneKeybindingPerActionError
+	var ose2 *pluginapi.EditorSupportOnlyOneKeybindingPerActionError
 	require.ErrorAs(t, second.Error, &ose2)
-	assert.Equal(t, ose2.SkipKeybinding, keymap.MustParseKeyBinding("cmd+b").KeyChords)
+	assert.NotNil(t, ose2)
 }

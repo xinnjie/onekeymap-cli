@@ -10,10 +10,9 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/export"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type intellijExporter struct {
@@ -30,9 +29,9 @@ func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, dif
 func (e *intellijExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.Keymap,
-	opts pluginapi2.PluginExportOption,
-) (*pluginapi2.PluginExportReport, error) {
+	setting keymap.Keymap,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	_ = ctx
 
 	// Read existing configuration if provided for non-destructive export
@@ -55,8 +54,8 @@ func (e *intellijExporter) Export(
 	}
 
 	// Generate managed actions from current setting
-	marker := export.NewMarker(setting)
-	managedActions := e.generateManagedActions(setting, marker)
+	marker := export.NewMarker(&setting)
+	managedActions := e.generateManagedActions(&setting, marker)
 
 	// Merge managed and unmanaged actions
 	finalActions := e.mergeActions(managedActions, unmanagedActions)
@@ -80,7 +79,7 @@ func (e *intellijExporter) Export(
 		return nil, fmt.Errorf("failed to write xml body: %w", err)
 	}
 
-	return &pluginapi2.PluginExportReport{
+	return &pluginapi.PluginExportReport{
 		BaseEditorConfig:   existingDoc,
 		ExportEditorConfig: doc,
 		SkipReport:         marker.Report(),
@@ -112,42 +111,42 @@ func (e *intellijExporter) isManagedAction(actionID string) bool {
 }
 
 // generateManagedActions generates IntelliJ actions from KeymapSetting.
-func (e *intellijExporter) generateManagedActions(setting *keymapv1.Keymap, marker *export.Marker) []ActionXML {
+func (e *intellijExporter) generateManagedActions(setting *keymap.Keymap, marker *export.Marker) []ActionXML {
 	// Group keybindings by IntelliJ action ID while preserving order of first appearance.
 	actionsMap := make(map[string]*ActionXML)
 	var actionOrder []string
 
-	for _, km := range setting.GetActions() {
-		if km == nil || len(km.GetBindings()) == 0 {
+	for _, km := range setting.Actions {
+		if len(km.Bindings) == 0 {
 			continue
 		}
-		mapping := e.mappingConfig.Get(km.GetName())
+		mapping := e.mappingConfig.Get(km.Name)
 		if mapping == nil || mapping.IntelliJ.Action == "" {
-			e.logger.Info("no mapping found for action", "action", km.GetName())
-			for _, b := range km.GetBindings() {
-				if b != nil && b.GetKeyChords() != nil {
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi2.ErrActionNotSupported)
+			e.logger.Info("no mapping found for action", "action", km.Name)
+			for _, b := range km.Bindings {
+				if len(b.KeyChords) > 0 {
+					marker.MarkSkippedForReason(km.Name, &b, pluginapi.ErrActionNotSupported)
 				}
 			}
 			continue
 		}
 		actionID := mapping.IntelliJ.Action
 
-		for _, b := range km.GetBindings() {
-			if b == nil {
+		for _, b := range km.Bindings {
+			if len(b.KeyChords) == 0 {
 				continue
 			}
-			shortcutXML, err := FormatKeybinding(keymap.NewKeyBinding(b))
+			shortcutXML, err := FormatKeybinding(b)
 			if err != nil {
-				e.logger.Warn("failed to format keybinding", "action", km.GetName(), "error", err)
+				e.logger.Warn("failed to format keybinding", "action", km.Name, "error", err)
 				marker.MarkSkippedForReason(
-					km.GetName(),
-					b.GetKeyChords(),
-					&pluginapi2.UnsupportedExportActionError{Note: err.Error()},
+					km.Name,
+					&b,
+					&pluginapi.UnsupportedExportActionError{Note: err.Error()},
 				)
 				continue
 			}
-			marker.MarkExported(km.GetName(), b.GetKeyChords())
+			marker.MarkExported(km.Name, b)
 
 			if _, exists := actionsMap[actionID]; !exists {
 				actionsMap[actionID] = &ActionXML{ID: actionID}

@@ -4,16 +4,15 @@ import (
 	"context"
 	"io"
 	"log/slog"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
-	"google.golang.org/protobuf/proto"
 )
 
 func TestImporter_Import(t *testing.T) {
@@ -25,7 +24,7 @@ func TestImporter_Import(t *testing.T) {
 	tests := []struct {
 		name     string
 		xmlData  string
-		expected *keymapv1.Keymap
+		expected keymap.Keymap
 		wantErr  bool
 	}{
 		{
@@ -50,9 +49,9 @@ func TestImporter_Import(t *testing.T) {
 	</dict>
 </dict>
 </plist>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "cmd+j"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "cmd+j"),
 				},
 			},
 			wantErr: false,
@@ -87,10 +86,10 @@ func TestImporter_Import(t *testing.T) {
 	</dict>
 </dict>
 </plist>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "cmd+j"),
-					keymap.NewActioinBinding("actions.cursor.pageDown", "ctrl+v"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "cmd+j"),
+					newTestAction("actions.cursor.pageDown", "ctrl+v"),
 				},
 			},
 			wantErr: false,
@@ -108,7 +107,7 @@ func TestImporter_Import(t *testing.T) {
 	</dict>
 </dict>
 </plist>`,
-			expected: &keymapv1.Keymap{},
+			expected: keymap.Keymap{},
 			wantErr:  false,
 		},
 		{
@@ -132,7 +131,7 @@ func TestImporter_Import(t *testing.T) {
 	</dict>
 </dict>
 </plist>`,
-			expected: &keymapv1.Keymap{},
+			expected: keymap.Keymap{},
 			wantErr:  false,
 		},
 		{
@@ -156,9 +155,9 @@ func TestImporter_Import(t *testing.T) {
 	</dict>
 </dict>
 </plist>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.cursor.pageDown", "ctrl+v"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.cursor.pageDown", "ctrl+v"),
 				},
 			},
 			wantErr: false,
@@ -187,7 +186,7 @@ func TestImporter_Import(t *testing.T) {
 	</dict>
 </dict>
 </plist>`,
-			expected: &keymapv1.Keymap{},
+			expected: keymap.Keymap{},
 			wantErr:  false,
 		},
 		{
@@ -220,10 +219,10 @@ func TestImporter_Import(t *testing.T) {
 	</dict>
 </dict>
 </plist>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.navigation.jumpToDefinition", "shift+cmd+up"),
-					keymap.NewActioinBinding("actions.cursor.pageDown", "alt+pagedown"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.navigation.jumpToDefinition", "shift+cmd+up"),
+					newTestAction("actions.cursor.pageDown", "alt+pagedown"),
 				},
 			},
 			wantErr: false,
@@ -232,7 +231,7 @@ func TestImporter_Import(t *testing.T) {
 			name: "Invalid XML",
 			xmlData: `<?xml version="1.0" encoding="UTF-8"?>
 <invalid>xml</invalid>`,
-			expected: nil,
+			expected: keymap.Keymap{},
 			wantErr:  true,
 		},
 	}
@@ -248,7 +247,7 @@ func TestImporter_Import(t *testing.T) {
 			}
 
 			require.NoError(t, err)
-			assert.True(t, proto.Equal(tt.expected, result.Keymap), "Expected %v, got %v", tt.expected, result.Keymap)
+			assert.True(t, reflect.DeepEqual(tt.expected, result.Keymap), "Expected %v, got %v", tt.expected, result.Keymap)
 		})
 	}
 }

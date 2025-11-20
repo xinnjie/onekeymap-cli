@@ -5,49 +5,49 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap/keychord"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keychord"
 )
 
 const maxIntellijChords = 2
 
-func ParseKeyBinding(ks KeyboardShortcutXML) (*keymap.KeyBinding, error) {
+func ParseKeyBinding(ks KeyboardShortcutXML) (keybinding.Keybinding, error) {
 	parts1, err := parseKeyStroke(ks.First)
 	if err != nil {
-		return nil, err
+		return keybinding.Keybinding{}, err
 	}
 	first := strings.Join(parts1, "+")
-	kb, err := keymap.ParseKeyBinding(first, "+")
-	if err != nil {
-		return nil, err
-	}
+	var keybindStr string
 	if ks.Second == "" {
-		return kb, nil
+		keybindStr = first
+	} else {
+		parts2, err := parseKeyStroke(ks.Second)
+		if err != nil {
+			return keybinding.Keybinding{}, err
+		}
+		second := strings.Join(parts2, "+")
+		keybindStr = first + " " + second
 	}
-	parts2, err := parseKeyStroke(ks.Second)
-	if err != nil {
-		return nil, err
-	}
-	second := strings.Join(parts2, "+")
-	return keymap.ParseKeyBinding(first+" "+second, "+")
+	return keybinding.NewKeybinding(keybindStr, keybinding.ParseOption{
+		Platform:  platform.PlatformLinux,
+		Separator: "+",
+	})
 }
 
-func FormatKeybinding(keybind *keymap.KeyBinding) (*KeyboardShortcutXML, error) {
+func FormatKeybinding(keybind keybinding.Keybinding) (*KeyboardShortcutXML, error) {
 	// Only support up to two chords for IntelliJ (first and optional second keystroke).
-	chords := keybind.GetKeyChords().GetChords()
-	if len(chords) > maxIntellijChords {
+	if len(keybind.KeyChords) > maxIntellijChords {
 		return nil, errors.New("too many chords for intellij, only first two are supported")
 	}
 
-	first, err := keyChordToIJKeyStroke(chords[0])
+	first, err := keyChordToIJKeyStroke(keybind.KeyChords[0])
 	if err != nil {
 		return nil, fmt.Errorf("failed to format first keystroke: %w", err)
 	}
 	var second string
-	if len(chords) == maxIntellijChords {
-		s, err := keyChordToIJKeyStroke(chords[1])
+	if len(keybind.KeyChords) == maxIntellijChords {
+		s, err := keyChordToIJKeyStroke(keybind.KeyChords[1])
 		if err != nil {
 			return nil, fmt.Errorf("failed to format second keystroke: %w", err)
 		}
@@ -57,16 +57,16 @@ func FormatKeybinding(keybind *keymap.KeyBinding) (*KeyboardShortcutXML, error) 
 	return &KeyboardShortcutXML{First: first, Second: second}, nil
 }
 
-func keyChordToIJKeyStroke(kc *keymapv1.KeyChord) (string, error) {
-	if kc == nil {
-		return "", errors.New("invalid key chord: nil")
+func keyChordToIJKeyStroke(kc keychord.KeyChord) (string, error) {
+	if len(kc.Modifiers) == 0 && kc.KeyCode == "" {
+		return "", errors.New("invalid key chord: empty")
 	}
-	// Use platform.PlatformLinus beacuse intellij convert `meta` key to `cmd` on macos internally
-	parts, err := keychord.NewKeyChord(kc).Format(platform.PlatformLinux)
-	if err != nil {
-		return "", err
-	}
-	s := formatKeyChord(parts)
+	// Use platform.PlatformLinux because intellij convert `meta` key to `cmd` on macos internally
+	parts := kc.String(keychord.FormatOption{
+		Platform:  platform.PlatformLinux,
+		Separator: "+",
+	})
+	s := formatKeyChord(strings.Split(parts, "+"))
 	if s == "" {
 		return "", errors.New("invalid key chord: empty key code")
 	}

@@ -10,9 +10,9 @@ import (
 
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type demoImporter struct {
@@ -53,14 +53,14 @@ func (i *demoImporter) Import(
 		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to unmarshal demo keybindings: %w", err)
 	}
 
-	setting := &keymapv1.Keymap{}
+	setting := keymap.Keymap{}
 	marker := imports.NewMarker()
 	for _, b := range bindings {
 		if b.Keys == "" || b.Action == "" {
 			marker.MarkSkippedForReason(b.Action, errors.New("missing keys or action"))
 			continue
 		}
-		kb, err := keymap.ParseKeyBinding(b.Keys, "+")
+		kb, err := keybinding.NewKeybinding(b.Keys, keybinding.ParseOption{Separator: "+"})
 		if err != nil {
 			i.logger.WarnContext(ctx, "Skipping unparsable keybinding", "keys", b.Keys, "error", err)
 			marker.MarkSkippedForReason(b.Action, fmt.Errorf("unparsable key '%s': %w", b.Keys, err))
@@ -68,7 +68,7 @@ func (i *demoImporter) Import(
 		}
 		setting.Actions = append(
 			setting.Actions,
-			&keymapv1.Action{Name: b.Action, Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}}},
+			keymap.Action{Name: b.Action, Bindings: []keybinding.Keybinding{kb}},
 		)
 		marker.MarkImported(b.Action)
 	}

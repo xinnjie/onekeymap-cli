@@ -9,7 +9,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,7 +23,7 @@ func (s *Server) ExportKeymap(
 	if req.GetEditorType() == keymapv1.EditorType_EDITOR_TYPE_UNSPECIFIED {
 		return nil, status.Errorf(codes.InvalidArgument, "editor_type is required")
 	}
-	et := pluginapi2.NewEditorTypeFromAPI(req.GetEditorType())
+	et := pluginapi.NewEditorTypeFromAPI(req.GetEditorType())
 	if _, ok := s.registry.Get(et); !ok {
 		return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
 	}
@@ -58,7 +58,7 @@ func (s *Server) ImportKeymap(
 	if req.GetEditorType() == keymapv1.EditorType_EDITOR_TYPE_UNSPECIFIED {
 		return nil, status.Errorf(codes.InvalidArgument, "editor_type is required")
 	}
-	et := pluginapi2.NewEditorTypeFromAPI(req.GetEditorType())
+	et := pluginapi.NewEditorTypeFromAPI(req.GetEditorType())
 	if _, ok := s.registry.Get(et); !ok {
 		return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
 	}
@@ -110,12 +110,12 @@ func (s *Server) ConfigDetect(
 		return nil, status.Errorf(codes.InvalidArgument, "editor_type is required")
 	}
 
-	et := pluginapi2.NewEditorTypeFromAPI(req.GetEditorType())
+	et := pluginapi.NewEditorTypeFromAPI(req.GetEditorType())
 	plugin, ok := s.registry.Get(et)
 	if !ok {
 		return nil, status.Errorf(codes.NotFound, "editor not supported: %s", et)
 	}
-	v, _, err := plugin.ConfigDetect(pluginapi2.ConfigDetectOptions{Sandbox: s.opt.Sandbox})
+	v, _, err := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{Sandbox: s.opt.Sandbox})
 	if err != nil || len(v) == 0 {
 		return nil, status.Errorf(codes.NotFound, "no default config paths found for editor: %s", et)
 	}

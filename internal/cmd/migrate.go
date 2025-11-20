@@ -14,7 +14,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type migrateFlags struct {
@@ -74,19 +74,19 @@ func migrateRun(
 
 		logger.Info("Migrating keymaps", "from", f.from, "to", f.to)
 
-		inputPlugin, ok := pluginRegistry.Get(pluginapi2.EditorType(f.from))
+		inputPlugin, ok := pluginRegistry.Get(pluginapi.EditorType(f.from))
 		if !ok {
 			logger.Error("failed to get input plugin", "from", f.from)
 			return errors.New("failed to get input plugin")
 		}
-		outputPlugin, ok := pluginRegistry.Get(pluginapi2.EditorType(f.to))
+		outputPlugin, ok := pluginRegistry.Get(pluginapi.EditorType(f.to))
 		if !ok {
 			logger.Error("failed to get output plugin", "to", f.to)
 			return errors.New("failed to get output plugin")
 		}
 
 		if f.input == "" {
-			v, _, err := inputPlugin.ConfigDetect(pluginapi2.ConfigDetectOptions{})
+			v, _, err := inputPlugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
 			if err != nil {
 				logger.Error("failed to get default config path", "error", err)
 				return err
@@ -95,7 +95,7 @@ func migrateRun(
 		}
 
 		if f.output == "" {
-			v, _, err := outputPlugin.ConfigDetect(pluginapi2.ConfigDetectOptions{})
+			v, _, err := outputPlugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
 			if err != nil {
 				logger.Error("failed to get default config path", "error", err)
 				return err
@@ -111,7 +111,7 @@ func migrateRun(
 		defer func() { _ = inputStream.Close() }()
 
 		importOpts := importerapi.ImportOptions{
-			EditorType:  pluginapi2.EditorType(f.from),
+			EditorType:  pluginapi.EditorType(f.from),
 			InputStream: inputStream,
 		}
 		importResult, err := importService.Import(ctx, importOpts)
@@ -141,7 +141,7 @@ func migrateRun(
 
 		// Export to memory buffer first for preview, optional confirmation, and then write
 		var mem bytes.Buffer
-		exportOpts := exporterapi.ExportOptions{EditorType: pluginapi2.EditorType(f.to), Base: base}
+		exportOpts := exporterapi.ExportOptions{EditorType: pluginapi.EditorType(f.to), Base: base}
 		exportReport, err := exportService.Export(ctx, &mem, importResult.Setting, exportOpts)
 		if err != nil {
 			logger.Error("migrate failed during export step", "error", err)

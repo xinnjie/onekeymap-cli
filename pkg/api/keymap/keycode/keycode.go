@@ -118,3 +118,16 @@ const (
 	KeyCodeNumpadMultiply KeyCode = "numpad_multiply"
 	KeyCodeNumpadAdd      KeyCode = "numpad_add"
 )
+
+// IsNumpad returns true if the given KeyCode represents a numpad key
+func (kc KeyCode) IsNumpad() bool {
+	switch kc {
+	case KeyCodeNumpad0, KeyCodeNumpad1, KeyCodeNumpad2, KeyCodeNumpad3, KeyCodeNumpad4,
+		KeyCodeNumpad5, KeyCodeNumpad6, KeyCodeNumpad7, KeyCodeNumpad8, KeyCodeNumpad9,
+		KeyCodeNumpadDecimal, KeyCodeNumpadDivide, KeyCodeNumpadEnter, KeyCodeNumpadEquals,
+		KeyCodeNumpadSubtract, KeyCodeNumpadMultiply, KeyCodeNumpadAdd:
+		return true
+	default:
+		return false
+	}
+}

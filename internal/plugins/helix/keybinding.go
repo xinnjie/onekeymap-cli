@@ -1,106 +1,104 @@
 package helix
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
 
 	"github.com/xinnjie/onekeymap-cli/internal/bimap"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap/keycode"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keycode"
 )
 
 //nolint:gochecknoglobals // static lookup tables shared across parse/format functions; initialized once and read-only
 var (
-	helixModifierMapping = bimap.NewBiMapFromMap(map[string]keymapv1.KeyModifier{
-		"C": keymapv1.KeyModifier_KEY_MODIFIER_CTRL,
-		"A": keymapv1.KeyModifier_KEY_MODIFIER_ALT,
-		"S": keymapv1.KeyModifier_KEY_MODIFIER_SHIFT,
-		"M": keymapv1.KeyModifier_KEY_MODIFIER_META,
+	helixModifierMapping = bimap.NewBiMapFromMap(map[string]keycode.KeyModifier{
+		"C": keycode.KeyModifierCtrl,
+		"A": keycode.KeyModifierAlt,
+		"S": keycode.KeyModifierShift,
+		"M": keycode.KeyModifierMeta,
 	})
 
 	// see https://github.com/helix-editor/helix/blob/22a3b10dd8ab907367ae1fe57d9703e22b30d391/book/src/remapping.md?plain=1#L92
-	helixKeyMapping = bimap.NewBiMapFromMap(map[string]keymapv1.KeyCode{
+	helixKeyMapping = bimap.NewBiMapFromMap(map[string]keycode.KeyCode{
 		// Special keys from Helix docs
-		"backspace": keymapv1.KeyCode_DELETE, // Note: Helix 'backspace' is our 'delete' (backwards delete)
-		"space":     keymapv1.KeyCode_SPACE,
-		"ret":       keymapv1.KeyCode_RETURN,
-		"esc":       keymapv1.KeyCode_ESCAPE,
-		"del":       keymapv1.KeyCode_FORWARD_DELETE, // Note: Helix 'del' is our 'forward_delete'
-		"ins":       keymapv1.KeyCode_INSERT_OR_HELP,
-		"left":      keymapv1.KeyCode_LEFT_ARROW,
-		"right":     keymapv1.KeyCode_RIGHT_ARROW,
-		"up":        keymapv1.KeyCode_UP_ARROW,
-		"down":      keymapv1.KeyCode_DOWN_ARROW,
-		"home":      keymapv1.KeyCode_HOME,
-		"end":       keymapv1.KeyCode_END,
-		"pageup":    keymapv1.KeyCode_PAGE_UP,
-		"pagedown":  keymapv1.KeyCode_PAGE_DOWN,
-		"tab":       keymapv1.KeyCode_TAB,
-		// TODO(xinnjie) shift+, -> <
-		"lt":    keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
-		"gt":    keymapv1.KeyCode_KEY_CODE_UNSPECIFIED,
-		"minus": keymapv1.KeyCode_MINUS,
+		"backspace": keycode.KeyCodeBackspace, // Note: Helix 'backspace' is our 'delete' (backwards delete)
+		"space":     keycode.KeyCodeSpace,
+		"ret":       keycode.KeyCodeEnter,
+		"esc":       keycode.KeyCodeEscape,
+		"del":       keycode.KeyCodeDelete, // Note: Helix 'del' is our 'forward_delete'
+		"ins":       keycode.KeyCodeInsert,
+		"left":      keycode.KeyCodeLeft,
+		"right":     keycode.KeyCodeRight,
+		"up":        keycode.KeyCodeUp,
+		"down":      keycode.KeyCodeDown,
+		"home":      keycode.KeyCodeHome,
+		"end":       keycode.KeyCodeEnd,
+		"pageup":    keycode.KeyCodePageUp,
+		"pagedown":  keycode.KeyCodePageDown,
+		"tab":       keycode.KeyCodeTab,
+		// TODO(xinnjie) shift+, -> < and shift+. -> > are not supported yet
+		// "lt":    keycode.???,
+		// "gt":    keycode.???,
+		"minus": keycode.KeyCodeMinus,
 
 		// Function keys
-		"F1":  keymapv1.KeyCode_F1,
-		"F2":  keymapv1.KeyCode_F2,
-		"F3":  keymapv1.KeyCode_F3,
-		"F4":  keymapv1.KeyCode_F4,
-		"F5":  keymapv1.KeyCode_F5,
-		"F6":  keymapv1.KeyCode_F6,
-		"F7":  keymapv1.KeyCode_F7,
-		"F8":  keymapv1.KeyCode_F8,
-		"F9":  keymapv1.KeyCode_F9,
-		"F10": keymapv1.KeyCode_F10,
-		"F11": keymapv1.KeyCode_F11,
-		"F12": keymapv1.KeyCode_F12,
+		"F1":  keycode.KeyCodeF1,
+		"F2":  keycode.KeyCodeF2,
+		"F3":  keycode.KeyCodeF3,
+		"F4":  keycode.KeyCodeF4,
+		"F5":  keycode.KeyCodeF5,
+		"F6":  keycode.KeyCodeF6,
+		"F7":  keycode.KeyCodeF7,
+		"F8":  keycode.KeyCodeF8,
+		"F9":  keycode.KeyCodeF9,
+		"F10": keycode.KeyCodeF10,
+		"F11": keycode.KeyCodeF11,
+		"F12": keycode.KeyCodeF12,
 	})
 )
 
-func formatKeybinding(kb *keymap.KeyBinding) (string, error) {
+func formatKeybinding(kb keybinding.Keybinding) (string, error) {
 	var outChords []string
 
-	for _, chord := range kb.GetKeyChords().GetChords() {
-		if keycode.IsNumpad(chord.GetKeyCode()) {
+	for _, chord := range kb.KeyChords {
+		if chord.KeyCode.IsNumpad() {
 			return "", ErrNotSupportKeyChords
 		}
 
 		// Special case for C--
-		if chord.GetKeyCode() == keymapv1.KeyCode_MINUS &&
-			len(chord.GetModifiers()) == 1 &&
-			chord.GetModifiers()[0] == keymapv1.KeyModifier_KEY_MODIFIER_CTRL {
+		if chord.KeyCode == keycode.KeyCodeMinus &&
+			len(chord.Modifiers) == 1 &&
+			chord.Modifiers[0] == keycode.KeyModifierCtrl {
 			outChords = append(outChords, "C--")
 			continue
 		}
 
 		var parts []string
 		// Modifiers first, in M-C-S-A order for consistency
-		if slices.Contains(chord.GetModifiers(), keymapv1.KeyModifier_KEY_MODIFIER_META) {
-			if mod, ok := helixModifierMapping.GetInverse(keymapv1.KeyModifier_KEY_MODIFIER_META); ok {
+		if slices.Contains(chord.Modifiers, keycode.KeyModifierMeta) {
+			if mod, ok := helixModifierMapping.GetInverse(keycode.KeyModifierMeta); ok {
 				parts = append(parts, mod)
 			}
 		}
-		if slices.Contains(chord.GetModifiers(), keymapv1.KeyModifier_KEY_MODIFIER_CTRL) {
-			if mod, ok := helixModifierMapping.GetInverse(keymapv1.KeyModifier_KEY_MODIFIER_CTRL); ok {
+		if slices.Contains(chord.Modifiers, keycode.KeyModifierCtrl) {
+			if mod, ok := helixModifierMapping.GetInverse(keycode.KeyModifierCtrl); ok {
 				parts = append(parts, mod)
 			}
 		}
-		if slices.Contains(chord.GetModifiers(), keymapv1.KeyModifier_KEY_MODIFIER_SHIFT) {
-			if mod, ok := helixModifierMapping.GetInverse(keymapv1.KeyModifier_KEY_MODIFIER_SHIFT); ok {
+		if slices.Contains(chord.Modifiers, keycode.KeyModifierShift) {
+			if mod, ok := helixModifierMapping.GetInverse(keycode.KeyModifierShift); ok {
 				parts = append(parts, mod)
 			}
 		}
-		if slices.Contains(chord.GetModifiers(), keymapv1.KeyModifier_KEY_MODIFIER_ALT) {
-			if mod, ok := helixModifierMapping.GetInverse(keymapv1.KeyModifier_KEY_MODIFIER_ALT); ok {
+		if slices.Contains(chord.Modifiers, keycode.KeyModifierAlt) {
+			if mod, ok := helixModifierMapping.GetInverse(keycode.KeyModifierAlt); ok {
 				parts = append(parts, mod)
 			}
 		}
 
 		// Then the key
-		keyStr, err := toHelixKey(chord.GetKeyCode())
+		keyStr, err := toHelixKey(chord.KeyCode)
 		if err != nil {
 			return "", err
 		}
@@ -112,14 +110,15 @@ func formatKeybinding(kb *keymap.KeyBinding) (string, error) {
 	return strings.Join(outChords, " "), nil
 }
 
-func toHelixKey(kc keymapv1.KeyCode) (string, error) {
+func toHelixKey(kc keycode.KeyCode) (string, error) {
 	// Check named mappings first
 	if helixKey, ok := helixKeyMapping.GetInverse(kc); ok {
 		return helixKey, nil
 	}
 
 	// Fallback to single characters
-	keyStr, ok := keycode.ToString(kc)
+	keyStr := string(kc)
+	ok := keyStr != ""
 	if !ok {
 		return "", fmt.Errorf("unsupported keycode: %v", kc)
 	}
@@ -129,73 +128,4 @@ func toHelixKey(kc keymapv1.KeyCode) (string, error) {
 	}
 
 	return "", fmt.Errorf("cannot format key for helix: %s", keyStr)
-}
-
-func parseKeybinding(s string) (*keymap.KeyBinding, error) {
-	s = strings.TrimSpace(s)
-	if s == "" {
-		return nil, errors.New("empty keybinding")
-	}
-
-	var chords []*keymapv1.KeyChord
-	for _, chordStr := range strings.Fields(s) {
-		parts := strings.Split(chordStr, "-")
-		var modifiers []keymapv1.KeyModifier
-		var keyStr string
-
-		// The last part is the key, unless it's an empty string from a trailing '-'
-		if len(parts) > 0 {
-			keyStr = parts[len(parts)-1]
-			// Special case: C-- means Ctrl+Minus
-			if keyStr == "" && len(parts) > 1 && parts[len(parts)-2] != "" {
-				keyStr = "minus"
-			} else if keyStr == "" {
-				return nil, fmt.Errorf("invalid key chord format: %s", chordStr)
-			}
-		}
-
-		// All other parts are modifiers
-		modParts := parts[:len(parts)-1]
-		for _, modStr := range modParts {
-			if mod, ok := helixModifierMapping.Get(modStr); ok {
-				modifiers = append(modifiers, mod)
-			} else if modStr != "" {
-				// Also handle long-form modifiers from older configs
-				switch modStr {
-				case "cmd", "win", "meta":
-					modifiers = append(modifiers, keymapv1.KeyModifier_KEY_MODIFIER_META)
-				default:
-					return nil, fmt.Errorf("unknown modifier: %s", modStr)
-				}
-			}
-		}
-
-		kc, err := fromHelixKey(keyStr)
-		if err != nil {
-			return nil, err
-		}
-
-		chords = append(chords, &keymapv1.KeyChord{
-			Modifiers: modifiers,
-			KeyCode:   kc,
-		})
-	}
-
-	return keymap.NewKeyBinding(&keymapv1.KeybindingReadable{KeyChords: &keymapv1.Keybinding{Chords: chords}}), nil
-}
-
-func fromHelixKey(s string) (keymapv1.KeyCode, error) {
-	// Check named mappings first
-	if kc, ok := helixKeyMapping.Get(s); ok {
-		return kc, nil
-	}
-
-	// Fallback to single characters
-	if len(s) == 1 {
-		if kc, ok := keycode.FromString(s); ok {
-			return kc, nil
-		}
-	}
-
-	return keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, fmt.Errorf("unknown helix key: %s", s)
 }

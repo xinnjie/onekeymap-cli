@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 )
 
 type PluginImportOption struct {
@@ -24,7 +24,7 @@ type ConfigDetectOptions struct {
 
 // PluginImportResult contains the result of an import operation.
 type PluginImportResult struct {
-	Keymap *keymapv1.Keymap
+	Keymap keymap.Keymap
 
 	Report PluginImportReport
 }

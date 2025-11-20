@@ -10,10 +10,9 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/export"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type helixExporter struct {
@@ -26,16 +25,16 @@ func newExporter(
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	differ diff.Differ,
-) pluginapi2.PluginExporter {
+) pluginapi.PluginExporter {
 	return &helixExporter{mappingConfig: mappingConfig, logger: logger, differ: differ}
 }
 
 func (e *helixExporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.Keymap,
-	opts pluginapi2.PluginExportOption,
-) (*pluginapi2.PluginExportReport, error) {
+	setting keymap.Keymap,
+	opts pluginapi.PluginExportOption,
+) (*pluginapi.PluginExportReport, error) {
 	// Read existing configuration if provided for non-destructive export
 	var existingKeys helixKeys
 	var existingFullConfig map[string]interface{}
@@ -50,8 +49,8 @@ func (e *helixExporter) Export(
 	}
 
 	// Generate managed keybindings from current setting
-	marker := export.NewMarker(setting)
-	managedKeys := e.generateManagedKeybindings(ctx, setting, marker)
+	marker := export.NewMarker(&setting)
+	managedKeys := e.generateManagedKeybindings(ctx, &setting, marker)
 
 	// Merge managed and unmanaged keybindings
 	finalKeys := e.mergeKeybindings(ctx, managedKeys, unmanagedKeys)
@@ -74,7 +73,7 @@ func (e *helixExporter) Export(
 		return nil, fmt.Errorf("failed to encode helix toml: %w", err)
 	}
 
-	return &pluginapi2.PluginExportReport{
+	return &pluginapi.PluginExportReport{
 		BaseEditorConfig:   existingKeys,
 		ExportEditorConfig: finalKeys,
 		SkipReport:         marker.Report(),
@@ -177,28 +176,27 @@ func (e *helixExporter) isManagedKeybinding(command string, mode Mode) bool {
 // generateManagedKeybindings generates Helix keybindings from KeymapSetting.
 func (e *helixExporter) generateManagedKeybindings(
 	ctx context.Context,
-	setting *keymapv1.Keymap,
+	setting *keymap.Keymap,
 	marker *export.Marker,
 ) helixKeys {
 	keysByMode := helixKeys{}
 
-	for _, km := range setting.GetActions() {
-		mapping := e.mappingConfig.Get(km.GetName())
+	for _, km := range setting.Actions {
+		mapping := e.mappingConfig.Get(km.Name)
 		if mapping == nil || len(mapping.Helix) == 0 {
-			for _, b := range km.GetBindings() {
-				if b != nil && b.GetKeyChords() != nil {
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), pluginapi2.ErrActionNotSupported)
+			for _, b := range km.Bindings {
+				if len(b.KeyChords) > 0 {
+					marker.MarkSkippedForReason(km.Name, &b, pluginapi.ErrActionNotSupported)
 				}
 			}
 			continue
 		}
 
-		for _, b := range km.GetBindings() {
-			if b == nil {
+		for _, b := range km.Bindings {
+			if len(b.KeyChords) == 0 {
 				continue
 			}
-			kb := keymap.NewKeyBinding(b)
-			keyStr, err := formatKeybinding(kb)
+			keyStr, err := formatKeybinding(b)
 			if err != nil {
 				// TODO(xinnjie): Add doc about this behavior: because helix do not recognize numpad keys(numpad1 is recognized as "1"), to avoid conflict with other keybindings, we skip these keybindings
 				if errors.Is(err, ErrNotSupportKeyChords) {
@@ -206,20 +204,20 @@ func (e *helixExporter) generateManagedKeybindings(
 						ctx,
 						"Skipping keybinding with unsupported key chords",
 						"action",
-						km.GetName(),
+						km.Name,
 					)
 					marker.MarkSkippedForReason(
-						km.GetName(),
-						b.GetKeyChords(),
-						&pluginapi2.UnsupportedExportActionError{Note: err.Error()},
+						km.Name,
+						&b,
+						&pluginapi.UnsupportedExportActionError{Note: err.Error()},
 					)
 				} else {
-					e.logger.WarnContext(ctx, "Skipping keybinding with un-formattable key", "action", km.GetName(), "error", err)
-					marker.MarkSkippedForReason(km.GetName(), b.GetKeyChords(), &pluginapi2.UnsupportedExportActionError{Note: err.Error()})
+					e.logger.WarnContext(ctx, "Skipping keybinding with un-formattable key", "action", km.Name, "error", err)
+					marker.MarkSkippedForReason(km.Name, &b, &pluginapi.UnsupportedExportActionError{Note: err.Error()})
 				}
 				continue
 			}
-			marker.MarkExported(km.GetName(), b.GetKeyChords())
+			marker.MarkExported(km.Name, b)
 
 			for _, hconf := range mapping.Helix {
 				if hconf.Command == "" {
@@ -256,7 +254,7 @@ func (e *helixExporter) generateManagedKeybindings(
 						"mode",
 						string(m),
 						"action",
-						km.GetName(),
+						km.Name,
 					)
 					continue
 				}

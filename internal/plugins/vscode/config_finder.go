@@ -8,20 +8,20 @@ import (
 	"path/filepath"
 	"runtime"
 
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 var ErrConfigNotFound = errors.New("configuration file not found")
 
 // ConfigDetect returns the default path for VSCode's keybindings.json file.
-func (p *vsCodePlugin) ConfigDetect(opt pluginapi2.ConfigDetectOptions) (paths []string, installed bool, err error) {
+func (p *vsCodePlugin) ConfigDetect(opt pluginapi.ConfigDetectOptions) (paths []string, installed bool, err error) {
 	return detectConfigForVSCodeVariant("Code", "code", opt)
 }
 
 // detectConfigForVSCodeVariant is a helper function to detect config paths for VSCode-based editors.
 func detectConfigForVSCodeVariant(
 	appDir, commandName string,
-	opt pluginapi2.ConfigDetectOptions,
+	opt pluginapi.ConfigDetectOptions,
 ) (paths []string, installed bool, err error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -39,7 +39,7 @@ func detectConfigForVSCodeVariant(
 	default:
 		return nil, false, fmt.Errorf(
 			"automatic path discovery is only supported on macOS, Linux, and Windows, %w",
-			pluginapi2.ErrNotSupported,
+			pluginapi.ErrNotSupported,
 		)
 	}
 

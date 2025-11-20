@@ -11,11 +11,27 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
+
+// newTestAction creates a test Action with given keybindings
+func newTestAction(actionName string, keybindings ...string) keymap.Action {
+	var bindings []keybinding.Keybinding
+	for _, kb := range keybindings {
+		b, err := keybinding.NewKeybinding(kb, keybinding.ParseOption{Separator: "+"})
+		if err != nil {
+			panic(err)
+		}
+		bindings = append(bindings, b)
+	}
+	return keymap.Action{
+		Name:     actionName,
+		Bindings: bindings,
+	}
+}
 
 func decodeHelixTOMLMap(t *testing.T, s string) map[string]any {
 	var got map[string]any
@@ -29,16 +45,16 @@ func TestExportHelixKeymap(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		setting        *keymapv1.Keymap
+		setting        keymap.Keymap
 		wantTOML       string
 		existingConfig string
 	}{
 		// Basic destructive export tests
 		{
 			name: "export copy keymap",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.edit.copy", "meta+c"),
 				},
 			},
 			wantTOML: `
@@ -49,9 +65,9 @@ func TestExportHelixKeymap(t *testing.T) {
 		// Non-destructive export tests
 		{
 			name: "non-destructive export preserves user keybindings",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -72,9 +88,9 @@ func TestExportHelixKeymap(t *testing.T) {
 		},
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -90,9 +106,9 @@ func TestExportHelixKeymap(t *testing.T) {
 		},
 		{
 			name: "multiple modes with mixed conflicts",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -122,9 +138,9 @@ func TestExportHelixKeymap(t *testing.T) {
 		},
 		{
 			name: "empty existing config behaves as destructive export",
-			setting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newTestAction("actions.edit.copy", "ctrl+c"),
 				},
 			},
 			existingConfig: `[keys.normal]`,
@@ -177,9 +193,9 @@ normal = "block"
 "C-x" = "extend_line_below"`
 
 	// Managed keymap setting to apply
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
+	setting := keymap.Keymap{
+		Actions: []keymap.Action{
+			newTestAction("actions.edit.copy", "ctrl+c"),
 		},
 	}
 

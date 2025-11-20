@@ -13,8 +13,9 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type zedImporter struct {
@@ -36,24 +37,24 @@ func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, rec
 func (p *zedImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	_ pluginapi2.PluginImportOption,
-) (pluginapi2.PluginImportResult, error) {
+	_ pluginapi.PluginImportOption,
+) (pluginapi.PluginImportResult, error) {
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
-		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	cleanedJSON, err := hujson.Standardize(jsonData)
 	if err != nil {
-		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to standardize JSON: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to standardize JSON: %w", err)
 	}
 
 	var zedKeymaps zedKeymapConfig
 	if err := json.Unmarshal(cleanedJSON, &zedKeymaps); err != nil {
-		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to parse zed keymap json: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse zed keymap json: %w", err)
 	}
 
-	setting := &keymapv1.Keymap{}
+	setting := keymap.Keymap{}
 	marker := imports.NewMarker()
 	for _, zk := range zedKeymaps {
 		// ensure deterministic order: iterate bindings by sorted keys
@@ -96,14 +97,14 @@ func (p *zedImporter) Import(
 					"error",
 					err,
 				)
-				p.reporter.ReportUnknownCommand(ctx, pluginapi2.EditorTypeZed, actionStr)
+				p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeZed, actionStr)
 				marker.MarkSkippedForReason(actionStr, err)
 				continue
 			}
-			keymapEntry := &keymapv1.Action{
+			keymapEntry := keymap.Action{
 				Name: actionID,
-				Bindings: []*keymapv1.KeybindingReadable{
-					{KeyChords: kb.KeyChords},
+				Bindings: []keybinding.Keybinding{
+					kb,
 				},
 			}
 
@@ -111,8 +112,8 @@ func (p *zedImporter) Import(
 			marker.MarkImported(actionStr)
 		}
 	}
-	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
-	result := pluginapi2.PluginImportResult{Keymap: setting}
+	setting.Actions = dedup.DedupActions(setting.Actions)
+	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
 	return result, nil
 }

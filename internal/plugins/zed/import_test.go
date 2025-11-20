@@ -9,12 +9,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
-	"google.golang.org/protobuf/proto"
 )
 
 func TestImportZedKeymap(t *testing.T) {
@@ -24,10 +24,18 @@ func TestImportZedKeymap(t *testing.T) {
 	}
 	plugin := New(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)), metrics.NewNoop())
 
+	parseKB := func(s string) keybinding.Keybinding {
+		kb, err := keybinding.NewKeybinding(s, keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"})
+		if err != nil {
+			panic(err)
+		}
+		return kb
+	}
+
 	testCases := []struct {
 		name      string
 		input     string
-		expected  *keymapv1.Keymap
+		expected  keymap.Keymap
 		expectErr bool
 	}{
 		{
@@ -40,9 +48,14 @@ func TestImportZedKeymap(t *testing.T) {
 					}
 				}
 			]`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name: "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{
+							parseKB("meta+c"),
+						},
+					},
 				},
 			},
 			expectErr: false,
@@ -58,9 +71,15 @@ func TestImportZedKeymap(t *testing.T) {
                     }
                 }
             ]`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c", "ctrl+c"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name: "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{
+							parseKB("meta+c"),
+							parseKB("ctrl+c"),
+						},
+					},
 				},
 			},
 			expectErr: false,
@@ -73,7 +92,7 @@ func TestImportZedKeymap(t *testing.T) {
 						"cmd-s": "workspace::Save"
 					}
 				}`,
-			expected:  nil,
+			expected:  keymap.Keymap{},
 			expectErr: true,
 		},
 		{
@@ -87,9 +106,14 @@ func TestImportZedKeymap(t *testing.T) {
 					}
 				}
 			]`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name: "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{
+							parseKB("meta+c"),
+						},
+					},
 				},
 			},
 			expectErr: false,
@@ -110,9 +134,14 @@ func TestImportZedKeymap(t *testing.T) {
 					}
 				}
 			]`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name: "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{
+							parseKB("alt+3"),
+						},
+					},
 				},
 			},
 		},
@@ -133,16 +162,22 @@ func TestImportZedKeymap(t *testing.T) {
 					}
 			}
 	]`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+1", "alt+3"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name: "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{
+							parseKB("alt+1"),
+							parseKB("alt+3"),
+						},
+					},
 				},
 			},
 		},
 		{
 			name:      "Invalid keychord",
 			input:     `[{"context": "Editor", "bindings": {"invalid-key": "editor::Save"}}]`,
-			expected:  &keymapv1.Keymap{},
+			expected:  keymap.Keymap{},
 			expectErr: false,
 		},
 		{
@@ -155,9 +190,14 @@ func TestImportZedKeymap(t *testing.T) {
 					}
 				}
 			]`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.withArgs", "meta+shift+t"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name: "actions.test.withArgs",
+						Bindings: []keybinding.Keybinding{
+							parseKB("meta+shift+t"),
+						},
+					},
 				},
 			},
 			expectErr: false,
@@ -172,7 +212,7 @@ func TestImportZedKeymap(t *testing.T) {
 					}
 				}
 			]`,
-			expected:  &keymapv1.Keymap{},
+			expected:  keymap.Keymap{},
 			expectErr: false,
 		},
 		{
@@ -185,13 +225,13 @@ func TestImportZedKeymap(t *testing.T) {
 					}
 				}
 			]`,
-			expected:  &keymapv1.Keymap{},
+			expected:  keymap.Keymap{},
 			expectErr: false,
 		},
 		{
 			name:      "Malformed JSON",
 			input:     `[{"context": "Editor", "bindings": {"cmd-s": "editor::Save"}`,
-			expected:  nil,
+			expected:  keymap.Keymap{},
 			expectErr: true,
 		},
 	}
@@ -207,7 +247,7 @@ func TestImportZedKeymap(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				assert.Truef(t, proto.Equal(tc.expected, result.Keymap), "Expected and actual KeymapSetting should be equal, expect %s, got %s", tc.expected.String(), result.Keymap.String())
+				assert.Equal(t, tc.expected, result.Keymap)
 			}
 		})
 	}

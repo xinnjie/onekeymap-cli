@@ -4,17 +4,18 @@ import (
 	"context"
 	"log/slog"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
-	"google.golang.org/protobuf/proto"
 )
 
 func TestImportIntelliJKeymap(t *testing.T) {
@@ -24,10 +25,18 @@ func TestImportIntelliJKeymap(t *testing.T) {
 	}
 	plugin := New(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)), metrics.NewNoop())
 
+	parseKB := func(s string) keybinding.Keybinding {
+		kb, err := keybinding.NewKeybinding(s, keybinding.ParseOption{Platform: platform.PlatformLinux, Separator: "+"})
+		if err != nil {
+			panic(err)
+		}
+		return kb
+	}
+
 	testCases := []struct {
 		name      string
 		input     string
-		expected  *keymapv1.Keymap
+		expected  keymap.Keymap
 		expectErr bool
 	}{
 		{
@@ -37,9 +46,12 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="meta C"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			expectErr: false,
@@ -58,10 +70,16 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="shift HOME"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s", "ctrl+k ctrl+c"),
-					keymap.NewActioinBinding("actions.test.withArgs", "shift+home"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+alt+s"), parseKB("ctrl+k ctrl+c")},
+					},
+					{
+						Name:     "actions.test.withArgs",
+						Bindings: []keybinding.Keybinding{parseKB("shift+home")},
+					},
 				},
 			},
 			expectErr: false,
@@ -74,9 +92,12 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="control alt S"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+alt+s")},
+					},
 				},
 			},
 			expectErr: false,
@@ -88,7 +109,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="alt UNKNOWN"/>
   </action>
 </keymap>`,
-			expected:  &keymapv1.Keymap{},
+			expected:  keymap.Keymap{},
 			expectErr: false,
 		},
 		{
@@ -98,9 +119,12 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="control K" second-keystroke=""/>
   </action>
 </keymap>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+k"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+k")},
+					},
 				},
 			},
 			expectErr: false,
@@ -112,7 +136,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="control K" second-keystroke="  "/>
   </action>
 </keymap>`,
-			expected:  &keymapv1.Keymap{},
+			expected:  keymap.Keymap{},
 			expectErr: false,
 		},
 		{
@@ -124,9 +148,12 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="control shift OPEN_BRACKET"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "f5", "ctrl+numpad3", "ctrl+shift+["),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("f5"), parseKB("ctrl+numpad3"), parseKB("ctrl+shift+[")},
+					},
 				},
 			},
 			expectErr: false,
@@ -138,9 +165,12 @@ func TestImportIntelliJKeymap(t *testing.T) {
     <keyboard-shortcut first-keystroke="CTRL ALt s"/>
   </action>
 </keymap>`,
-			expected: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "ctrl+alt+s"),
+			expected: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("ctrl+alt+s")},
+					},
 				},
 			},
 			expectErr: false,
@@ -158,7 +188,7 @@ func TestImportIntelliJKeymap(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				assert.Truef(t, proto.Equal(tc.expected, result.Keymap), "Expected and actual KeymapSetting should be equal, expect %s, got %s", tc.expected.String(), result.Keymap.String())
+				assert.Truef(t, reflect.DeepEqual(tc.expected, result.Keymap), "Expected and actual KeymapSetting should be equal, expect %v, got %v", tc.expected, result.Keymap)
 			}
 		})
 	}

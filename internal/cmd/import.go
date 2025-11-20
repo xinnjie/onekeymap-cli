@@ -17,7 +17,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -134,7 +134,7 @@ func executeImportInteractive(
 	baseConfig := loadBaseConfig(f.output, onekeymapConfig, logger)
 
 	opts := importerapi.ImportOptions{
-		EditorType:  pluginapi2.EditorType(f.from),
+		EditorType:  pluginapi.EditorType(f.from),
 		InputStream: file,
 		Base:        baseConfig,
 	}
@@ -206,7 +206,7 @@ func executeImportNonInteractive(
 	baseConfig := loadBaseConfig(f.output, onekeymapConfig, logger)
 
 	opts := importerapi.ImportOptions{
-		EditorType:  pluginapi2.EditorType(f.from),
+		EditorType:  pluginapi.EditorType(f.from),
 		InputStream: file,
 		Base:        baseConfig,
 	}
@@ -318,7 +318,7 @@ func prepareInteractiveImportFlags(
 		return err
 	}
 
-	p, ok := pluginRegistry.Get(pluginapi2.EditorType(f.from))
+	p, ok := pluginRegistry.Get(pluginapi.EditorType(f.from))
 	if !ok {
 		logger.Error("Editor not found", "editor", f.from)
 		return fmt.Errorf("editor %s not found", f.from)
@@ -330,7 +330,7 @@ func prepareInteractiveImportFlags(
 			f.input = configPath
 			logger.Info("Using keymap path from config", "editor", f.from, "path", configPath)
 		} else {
-			v, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{})
+			v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{})
 			if err != nil {
 				logger.Error("Failed to get default config path", "error", err)
 				return err
@@ -354,7 +354,7 @@ func prepareNonInteractiveImportFlags(
 		f.output = onekeymapConfig
 	}
 
-	p, ok := pluginRegistry.Get(pluginapi2.EditorType(f.from))
+	p, ok := pluginRegistry.Get(pluginapi.EditorType(f.from))
 	if !ok {
 		logger.Error("Editor not found", "editor", f.from)
 		return fmt.Errorf("editor %s not found", f.from)
@@ -366,7 +366,7 @@ func prepareNonInteractiveImportFlags(
 			f.input = configPath
 			logger.Info("Using keymap path from config", "editor", f.from, "path", configPath)
 		} else {
-			v, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{})
+			v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{})
 			if err != nil {
 				logger.Error("Failed to get default config path", "error", err)
 				return err

@@ -1,17 +1,16 @@
 package export
 
 import (
-	"fmt"
 	"slices"
-	"sort"
-	"strings"
 
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type Marker struct {
-	keymap *keymapv1.Keymap
+	keymap *keymap.Keymap
 	// per-action exported key set (canonical keybinding string -> true)
 	exported map[string]map[string]bool
 	// per-action per-keybinding skip reason
@@ -20,7 +19,7 @@ type Marker struct {
 	skippedAction map[string]error
 }
 
-func NewMarker(keymap *keymapv1.Keymap) *Marker {
+func NewMarker(keymap *keymap.Keymap) *Marker {
 	return &Marker{
 		keymap:        keymap,
 		exported:      make(map[string]map[string]bool),
@@ -31,28 +30,28 @@ func NewMarker(keymap *keymapv1.Keymap) *Marker {
 
 // MarkExported marks a specific keybinding of an action as exported.
 // Exporter should always call this method for each exported keybinding.
-func (m *Marker) MarkExported(action string, keybinding *keymapv1.Keybinding) {
-	if m == nil || keybinding == nil {
+func (m *Marker) MarkExported(action string, kb keybinding.Keybinding) {
+	if m == nil {
 		return
 	}
 	if _, ok := m.exported[action]; !ok {
 		m.exported[action] = make(map[string]bool)
 	}
-	m.exported[action][canonicalKeybindingID(keybinding)] = true
+	m.exported[action][kb.String(keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: " "})] = true
 }
 
 // MarkSkippedForReason marks an action or a specific keybinding as skipped for a reason.
 // If keybinding is nil, the reason is applied at action level for all unexported keybindings.
 // If not called, any keybinding not marked as exported will be filled with
 // pluginapi.ErrActionNotSupported in SkipReport.
-func (m *Marker) MarkSkippedForReason(action string, keybinding *keymapv1.Keybinding, reasonErr error) {
+func (m *Marker) MarkSkippedForReason(action string, kb *keybinding.Keybinding, reasonErr error) {
 	if m == nil {
 		return
 	}
 	if reasonErr == nil {
-		reasonErr = pluginapi2.ErrActionNotSupported
+		reasonErr = pluginapi.ErrActionNotSupported
 	}
-	if keybinding == nil {
+	if kb == nil {
 		if _, exists := m.skippedAction[action]; !exists {
 			m.skippedAction[action] = reasonErr
 		}
@@ -61,33 +60,27 @@ func (m *Marker) MarkSkippedForReason(action string, keybinding *keymapv1.Keybin
 	if _, ok := m.skippedKeys[action]; !ok {
 		m.skippedKeys[action] = make(map[string]error)
 	}
-	k := canonicalKeybindingID(keybinding)
+	k := kb.String(keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: " "})
 	if _, exists := m.skippedKeys[action][k]; !exists {
 		m.skippedKeys[action][k] = reasonErr
 	}
 }
 
-func (m *Marker) Report() pluginapi2.ExportSkipReport {
-	if m == nil || m.keymap == nil {
-		return pluginapi2.ExportSkipReport{}
-	}
-	actions := m.keymap.GetActions()
+func (m *Marker) Report() pluginapi.ExportSkipReport {
+	actions := m.keymap.Actions
 	// ensure stable order by sorting action IDs for determinism in tests
 	ids := make([]string, 0, len(actions))
 	for _, a := range actions {
-		if a == nil {
-			continue
-		}
-		ids = append(ids, a.GetName())
+		ids = append(ids, a.Name)
 	}
 	slices.Sort(ids)
-	var result []pluginapi2.ExportSkipAction
+	var result []pluginapi.ExportSkipAction
 	for _, id := range ids {
 		// Find the action in the original slice to access its bindings
-		var act *keymapv1.Action
-		for _, a := range actions {
-			if a != nil && a.GetName() == id {
-				act = a
+		var act *keymap.Action
+		for i := range actions {
+			if actions[i].Name == id {
+				act = &actions[i]
 				break
 			}
 		}
@@ -95,12 +88,11 @@ func (m *Marker) Report() pluginapi2.ExportSkipReport {
 			continue
 		}
 		// iterate each binding
-		for _, br := range act.GetBindings() {
-			if br == nil || br.GetKeyChords() == nil {
+		for _, kb := range act.Bindings {
+			if len(kb.KeyChords) == 0 {
 				continue
 			}
-			kb := br.GetKeyChords()
-			key := canonicalKeybindingID(kb)
+			key := kb.String(keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: " "})
 			// exported? skip
 			if expForAct, ok := m.exported[id]; ok {
 				if expForAct[key] {
@@ -110,36 +102,18 @@ func (m *Marker) Report() pluginapi2.ExportSkipReport {
 			// explicit per-key skip reason?
 			if perKey, ok := m.skippedKeys[id]; ok {
 				if err, ok2 := perKey[key]; ok2 {
-					result = append(result, pluginapi2.ExportSkipAction{Action: id, Error: err})
+					result = append(result, pluginapi.ExportSkipAction{Action: id, Error: err})
 					continue
 				}
 			}
 			// action-level skip reason?
 			if err, ok := m.skippedAction[id]; ok {
-				result = append(result, pluginapi2.ExportSkipAction{Action: id, Error: err})
+				result = append(result, pluginapi.ExportSkipAction{Action: id, Error: err})
 				continue
 			}
 			// default
-			result = append(result, pluginapi2.ExportSkipAction{Action: id, Error: pluginapi2.ErrActionNotSupported})
+			result = append(result, pluginapi.ExportSkipAction{Action: id, Error: pluginapi.ErrActionNotSupported})
 		}
 	}
-	return pluginapi2.ExportSkipReport{SkipActions: result}
-}
-
-// canonicalKeybindingID builds a stable string identifier for a keybinding.
-// It sorts modifiers in each chord to ensure consistent identity.
-func canonicalKeybindingID(kb *keymapv1.Keybinding) string {
-	if kb == nil {
-		return ""
-	}
-	parts := make([]string, 0, len(kb.GetChords()))
-	for _, ch := range kb.GetChords() {
-		if ch == nil {
-			continue
-		}
-		mods := append([]keymapv1.KeyModifier(nil), ch.GetModifiers()...)
-		sort.Slice(mods, func(i, j int) bool { return mods[i] < mods[j] })
-		parts = append(parts, fmt.Sprintf("%d:%v", ch.GetKeyCode(), mods))
-	}
-	return strings.Join(parts, " ")
+	return pluginapi.ExportSkipReport{SkipActions: result}
 }

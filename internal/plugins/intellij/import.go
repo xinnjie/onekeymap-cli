@@ -11,8 +11,9 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/imports"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type intellijImporter struct {
@@ -37,29 +38,29 @@ func newImporter(
 func (p *intellijImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	opts pluginapi2.PluginImportOption,
-) (pluginapi2.PluginImportResult, error) {
+	opts pluginapi.PluginImportOption,
+) (pluginapi.PluginImportResult, error) {
 	_ = ctx
 	_ = opts
 
 	raw, err := io.ReadAll(source)
 	if err != nil {
-		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to read from reader: %w", err)
 	}
 
 	var doc KeymapXML
 	if err := xml.Unmarshal(raw, &doc); err != nil {
-		return pluginapi2.PluginImportResult{}, fmt.Errorf("failed to parse intellij keymap xml: %w", err)
+		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse intellij keymap xml: %w", err)
 	}
 
-	setting := &keymapv1.Keymap{}
+	setting := keymap.Keymap{}
 	marker := imports.NewMarker()
 	for _, act := range doc.Actions {
 		actionID, err := p.ActionIDFromIntelliJ(act.ID)
 		if err != nil {
 			// Not found in mapping, skip quietly
 			p.logger.DebugContext(ctx, "no universal mapping for intellij action", "action", act.ID)
-			p.reporter.ReportUnknownCommand(ctx, pluginapi2.EditorTypeIntelliJ, act.ID)
+			p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeIntelliJ, act.ID)
 			marker.MarkSkippedForReason(act.ID, err)
 			continue
 		}
@@ -74,17 +75,19 @@ func (p *intellijImporter) Import(
 				marker.MarkSkippedForReason(act.ID, fmt.Errorf("failed to parse key binding %v: %w", ks, err))
 				continue
 			}
-			newBinding := &keymapv1.Action{
-				Name:     actionID,
-				Bindings: []*keymapv1.KeybindingReadable{{KeyChords: kb.KeyChords}},
+			newBinding := keymap.Action{
+				Name: actionID,
+				Bindings: []keybinding.Keybinding{
+					kb,
+				},
 			}
 			setting.Actions = append(setting.Actions, newBinding)
 			marker.MarkImported(act.ID)
 		}
 	}
 
-	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
-	result := pluginapi2.PluginImportResult{Keymap: setting}
+	setting.Actions = dedup.DedupActions(setting.Actions)
+	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
 	return result, nil
 }

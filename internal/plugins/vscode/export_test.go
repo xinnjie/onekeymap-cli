@@ -10,29 +10,41 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestExporter_Export(t *testing.T) {
 	mappingConfig, err := mappings.NewTestMappingConfig()
 	require.NoError(t, err)
 
+	parseKB := func(s string) keybinding.Keybinding {
+		kb, err := keybinding.NewKeybinding(s, keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"})
+		if err != nil {
+			panic(err)
+		}
+		return kb
+	}
+
 	tests := []struct {
 		name           string
-		keymapSetting  *keymapv1.Keymap
+		keymapSetting  keymap.Keymap
 		expectedJSON   string
 		existingConfig string
 	}{
 		// Basic destructive export tests
 		{
 			name: "correctly exports a standard action",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			expectedJSON: `[
@@ -45,9 +57,12 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "correctly exports multiple actions",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("alt+3")},
+					},
 				},
 			},
 			expectedJSON: `[
@@ -66,9 +81,12 @@ func TestExporter_Export(t *testing.T) {
 		// Non-destructive export tests
 		{
 			name: "non-destructive export preserves user keybindings",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			existingConfig: `[
@@ -93,9 +111,12 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "managed keybinding takes priority over conflicting user keybinding",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			existingConfig: `[
@@ -115,10 +136,16 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "multiple user keybindings with mixed conflicts",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
-					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("alt+3")},
+					},
 				},
 			},
 			existingConfig: `[
@@ -165,9 +192,12 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "empty existing config behaves as destructive export",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			existingConfig: `[]`,
@@ -181,9 +211,12 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "existing config with trailing commas and comments",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			existingConfig: `[
@@ -220,9 +253,12 @@ func TestExporter_Export(t *testing.T) {
 		},
 		{
 			name: "handles empty existing config file",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
 				},
 			},
 			existingConfig: ``, // Represents an empty file
@@ -237,10 +273,16 @@ func TestExporter_Export(t *testing.T) {
 		// Base order preservation tests
 		{
 			name: "preserves order by base config using command as key",
-			keymapSetting: &keymapv1.Keymap{
-				Actions: []*keymapv1.Action{
-					keymap.NewActioinBinding("actions.edit.copy", "meta+c"),
-					keymap.NewActioinBinding("actions.test.mutipleActions", "alt+3"),
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("alt+3")},
+					},
 				},
 			},
 			// Base config defines the desired order by command: command2, copy, command1, custom.undo

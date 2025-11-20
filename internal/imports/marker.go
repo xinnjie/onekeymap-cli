@@ -1,7 +1,7 @@
 package imports
 
 import (
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 type Marker struct {
@@ -30,7 +30,7 @@ func (m *Marker) MarkSkippedForReason(editorSpecificAction string, reasonErr err
 		return
 	}
 	if reasonErr == nil {
-		reasonErr = pluginapi2.ErrNotSupported
+		reasonErr = pluginapi.ErrNotSupported
 	}
 	if m.imported[editorSpecificAction] {
 		return
@@ -41,18 +41,18 @@ func (m *Marker) MarkSkippedForReason(editorSpecificAction string, reasonErr err
 	}
 }
 
-func (m *Marker) Report() pluginapi2.ImportSkipReport {
-	result := make([]pluginapi2.ImportSkipAction, 0, len(m.skipped))
+func (m *Marker) Report() pluginapi.ImportSkipReport {
+	result := make([]pluginapi.ImportSkipAction, 0, len(m.skipped))
 	for _, action := range m.order {
 		if m.imported[action] {
 			continue
 		}
 		if err, ok := m.skipped[action]; ok {
-			result = append(result, pluginapi2.ImportSkipAction{
+			result = append(result, pluginapi.ImportSkipAction{
 				EditorSpecificAction: action,
 				Error:                err,
 			})
 		}
 	}
-	return pluginapi2.ImportSkipReport{SkipActions: result}
+	return pluginapi.ImportSkipReport{SkipActions: result}
 }

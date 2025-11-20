@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keycode"
 )
 
 // Xcode uses specific symbols for modifier keys:
@@ -16,21 +17,21 @@ import (
 // $ = Shift
 // No separator between modifier keys and main key
 
-// ParseKeybinding converts Xcode format (@k, ^g, ~@l) directly to keymap.KeyBinding
-func ParseKeybinding(keybind string) (*keymap.KeyBinding, error) {
+// ParseKeybinding converts Xcode format (@k, ^g, ~@l) directly to keybinding.Keybinding
+func ParseKeybinding(keybind string) (keybinding.Keybinding, error) {
 	if keybind == "" {
-		return nil, errors.New("empty keybind")
+		return keybinding.Keybinding{}, errors.New("empty keybind")
 	}
 
 	runes := []rune(keybind)
-	var modifiers []keymapv1.KeyModifier
+	var modifiers []keycode.KeyModifier
 
 	// Find the main key (last character that's not a modifier symbol)
 	var mainKeyRune rune
 	i := len(runes) - 1
 
 	if i < 0 {
-		return nil, errors.New("empty keybind")
+		return keybinding.Keybinding{}, errors.New("empty keybind")
 	}
 
 	mainKeyRune = runes[i]
@@ -40,78 +41,88 @@ func ParseKeybinding(keybind string) (*keymap.KeyBinding, error) {
 	for j := 0; j <= i; j++ {
 		switch runes[j] {
 		case '@':
-			modifiers = append(modifiers, keymapv1.KeyModifier_KEY_MODIFIER_META)
+			modifiers = append(modifiers, keycode.KeyModifierMeta)
 		case '^':
-			modifiers = append(modifiers, keymapv1.KeyModifier_KEY_MODIFIER_CTRL)
+			modifiers = append(modifiers, keycode.KeyModifierCtrl)
 		case '~':
-			modifiers = append(modifiers, keymapv1.KeyModifier_KEY_MODIFIER_ALT)
+			modifiers = append(modifiers, keycode.KeyModifierAlt)
 		case '$':
-			modifiers = append(modifiers, keymapv1.KeyModifier_KEY_MODIFIER_SHIFT)
+			modifiers = append(modifiers, keycode.KeyModifierShift)
 		default:
-			return nil, fmt.Errorf("unknown modifier symbol: %c", runes[j])
+			return keybinding.Keybinding{}, fmt.Errorf("unknown modifier symbol: %c", runes[j])
 		}
 	}
 
 	// Determine the key code from the main key rune
-	var keyCode keymapv1.KeyCode
+	var kc keycode.KeyCode
 
 	// First try to look up special keys
-	if kc, ok := getKeyCodeFromRune(mainKeyRune); ok {
-		keyCode = kc
+	if keyCode, ok := getKeyCodeFromRune(mainKeyRune); ok {
+		kc = keyCode
 	} else {
 		switch {
 		case mainKeyRune >= 'a' && mainKeyRune <= 'z':
 			// Lowercase letter
-			keyCode = keymapv1.KeyCode_A + keymapv1.KeyCode(mainKeyRune-'a')
+			kc = keycode.KeyCode(string(mainKeyRune))
 		case mainKeyRune >= 'A' && mainKeyRune <= 'Z':
 			// Uppercase letter (treat as lowercase)
-			keyCode = keymapv1.KeyCode_A + keymapv1.KeyCode(mainKeyRune-'A')
+			kc = keycode.KeyCode(strings.ToLower(string(mainKeyRune)))
 		case mainKeyRune >= '0' && mainKeyRune <= '9':
 			// Digit
-			keyCode = keymapv1.KeyCode_DIGIT_0 + keymapv1.KeyCode(mainKeyRune-'0')
+			kc = keycode.KeyCode(string(mainKeyRune))
 		default:
-			return nil, fmt.Errorf("unsupported key rune: %q", mainKeyRune)
+			return keybinding.Keybinding{}, fmt.Errorf("unsupported key rune: %q", mainKeyRune)
 		}
 	}
 
-	chord := &keymapv1.KeyChord{
-		KeyCode:   keyCode,
-		Modifiers: modifiers,
+	// Convert to string format for NewKeybinding
+	var parts []string
+	for _, mod := range modifiers {
+		switch mod {
+		case keycode.KeyModifierMeta:
+			parts = append(parts, "cmd")
+		case keycode.KeyModifierCtrl:
+			parts = append(parts, "ctrl")
+		case keycode.KeyModifierShift:
+			parts = append(parts, "shift")
+		case keycode.KeyModifierAlt:
+			parts = append(parts, "alt")
+		}
 	}
+	parts = append(parts, string(kc))
+	keybindStr := strings.Join(parts, "+")
 
-	return keymap.NewKeyBinding(&keymapv1.KeybindingReadable{
-		KeyChords: &keymapv1.Keybinding{
-			Chords: []*keymapv1.KeyChord{chord},
-		},
-	}), nil
+	return keybinding.NewKeybinding(keybindStr, keybinding.ParseOption{
+		Platform:  platform.PlatformMacOS,
+		Separator: "+",
+	})
 }
 
 // FormatKeybinding converts internal format back to Xcode format
-func FormatKeybinding(keybind *keymap.KeyBinding) (string, error) {
-	if keybind == nil || keybind.GetKeyChords() == nil || len(keybind.GetKeyChords().GetChords()) == 0 {
+func FormatKeybinding(keybind keybinding.Keybinding) (string, error) {
+	if len(keybind.KeyChords) == 0 {
 		return "", errors.New("invalid key binding: empty key chords")
 	}
 
-	chords := keybind.GetKeyChords().GetChords()
-	if len(chords) != 1 {
-		return "", fmt.Errorf("xcode doesn't support multi-key-chords keybinding: %v", keybind.KeyChordsReadable)
+	if len(keybind.KeyChords) != 1 {
+		return "", fmt.Errorf("xcode doesn't support multi-key-chords keybinding: %v", keybind.String(keybinding.FormatOption{Separator: "+"}))
 	}
 
-	chord := chords[0]
+	chord := keybind.KeyChords[0]
 
 	// Handle modifier-only chord (exactly one modifier, no keycode)
-	if chord.GetKeyCode() == keymapv1.KeyCode_KEY_CODE_UNSPECIFIED {
-		if len(chord.GetModifiers()) != 1 {
+	if chord.KeyCode == "" {
+		if len(chord.Modifiers) != 1 {
 			return "", errors.New("invalid key chord: empty key code")
 		}
-		switch chord.GetModifiers()[0] {
-		case keymapv1.KeyModifier_KEY_MODIFIER_META:
+		switch chord.Modifiers[0] {
+		case keycode.KeyModifierMeta:
 			return "cmd", nil
-		case keymapv1.KeyModifier_KEY_MODIFIER_CTRL:
+		case keycode.KeyModifierCtrl:
 			return "ctrl", nil
-		case keymapv1.KeyModifier_KEY_MODIFIER_SHIFT:
+		case keycode.KeyModifierShift:
 			return "shift", nil
-		case keymapv1.KeyModifier_KEY_MODIFIER_ALT:
+		case keycode.KeyModifierAlt:
 			return "alt", nil
 		default:
 			return "", errors.New("invalid key chord: unknown modifier")
@@ -120,8 +131,8 @@ func FormatKeybinding(keybind *keymap.KeyBinding) (string, error) {
 
 	var b strings.Builder
 
-	has := func(mod keymapv1.KeyModifier) bool {
-		for _, m := range chord.GetModifiers() {
+	has := func(mod keycode.KeyModifier) bool {
+		for _, m := range chord.Modifiers {
 			if m == mod {
 				return true
 			}
@@ -129,23 +140,23 @@ func FormatKeybinding(keybind *keymap.KeyBinding) (string, error) {
 		return false
 	}
 
-	if has(keymapv1.KeyModifier_KEY_MODIFIER_META) {
+	if has(keycode.KeyModifierMeta) {
 		b.WriteRune('@')
 	}
-	if has(keymapv1.KeyModifier_KEY_MODIFIER_CTRL) {
+	if has(keycode.KeyModifierCtrl) {
 		b.WriteRune('^')
 	}
-	if has(keymapv1.KeyModifier_KEY_MODIFIER_SHIFT) {
+	if has(keycode.KeyModifierShift) {
 		b.WriteRune('$')
 	}
-	if has(keymapv1.KeyModifier_KEY_MODIFIER_ALT) {
+	if has(keycode.KeyModifierAlt) {
 		b.WriteRune('~')
 	}
 
 	// Convert KeyCode directly to Xcode rune
-	r, ok := getRuneFromKeyCode(chord.GetKeyCode())
+	r, ok := getRuneFromKeyCode(chord.KeyCode)
 	if !ok {
-		return "", fmt.Errorf("unsupported key code for Xcode: %v", chord.GetKeyCode())
+		return "", fmt.Errorf("unsupported key code for Xcode: %v", chord.KeyCode)
 	}
 	b.WriteRune(r)
 

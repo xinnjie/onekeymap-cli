@@ -9,7 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	pluginapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
 var (
@@ -113,8 +113,8 @@ func (m *ExportFormModel) build() error {
 						return "Output config path for " + *m.Editor
 					}, &m.Editor).
 					PlaceholderFunc(func() string {
-						if p, ok := m.pluginRegistry.Get(pluginapi2.EditorType(*m.Editor)); ok {
-							if v, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{}); err == nil {
+						if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
+							if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
 								placeholderOutput = v[0]
 							}
 						}
@@ -132,7 +132,7 @@ func (m *ExportFormModel) build() error {
 func (m *ExportFormModel) getExporterOptions() []editorSelectorOption {
 	var options []editorSelectorOption
 	for _, name := range m.pluginRegistry.GetNames() {
-		editorType := pluginapi2.EditorType(name)
+		editorType := pluginapi.EditorType(name)
 		plugin, ok := m.pluginRegistry.Get(editorType)
 		if !ok {
 			continue
@@ -143,7 +143,7 @@ func (m *ExportFormModel) getExporterOptions() []editorSelectorOption {
 			continue
 		}
 
-		_, installed, _ := plugin.ConfigDetect(pluginapi2.ConfigDetectOptions{})
+		_, installed, _ := plugin.ConfigDetect(pluginapi.ConfigDetectOptions{})
 		options = append(options, editorSelectorOption{
 			displayName: editorType.AppName(),
 			editorType:  name,
@@ -192,8 +192,8 @@ func (m *ExportFormModel) applyPlaceholders() {
 		*m.OnekeymapConfigInput = m.OnekeymapConfigPlaceHolder
 	}
 	if m.needOutput && *m.EditorKeymapConfigOutput == "" {
-		if p, ok := m.pluginRegistry.Get(pluginapi2.EditorType(*m.Editor)); ok {
-			if v, _, err := p.ConfigDetect(pluginapi2.ConfigDetectOptions{}); err == nil {
+		if p, ok := m.pluginRegistry.Get(pluginapi.EditorType(*m.Editor)); ok {
+			if v, _, err := p.ConfigDetect(pluginapi.ConfigDetectOptions{}); err == nil {
 				*m.EditorKeymapConfigOutput = v[0]
 			}
 		}
