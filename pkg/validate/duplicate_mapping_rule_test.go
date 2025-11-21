@@ -6,22 +6,21 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestDuplicateMappingRule_Validate_WithDuplicates(t *testing.T) {
 	validator := validateapi.NewValidator(validate.NewDuplicateMappingRule())
 
 	// Create keymaps with duplicate mappings
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
-			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"), // Duplicate
-			keymap.NewActioinBinding("actions.edit.paste", "ctrl+v"),
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.edit.copy", "ctrl+c"),
+			newAction("actions.edit.copy", "ctrl+c"), // Duplicate
+			newAction("actions.edit.paste", "ctrl+v"),
 		},
 	}
 
@@ -42,11 +41,11 @@ func TestDuplicateMappingRule_Validate_WithDuplicates(t *testing.T) {
 func TestDuplicateMappingRule_Validate_NoDuplicates(t *testing.T) {
 	validator := validateapi.NewValidator(validate.NewDuplicateMappingRule())
 
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
-			keymap.NewActioinBinding("actions.edit.paste", "ctrl+v"),
-			keymap.NewActioinBinding("actions.edit.cut", "ctrl+x"),
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.edit.copy", "ctrl+c"),
+			newAction("actions.edit.paste", "ctrl+v"),
+			newAction("actions.edit.cut", "ctrl+x"),
 		},
 	}
 
@@ -63,10 +62,10 @@ func TestDuplicateMappingRule_Validate_SameActionDifferentKeys(t *testing.T) {
 	validator := validateapi.NewValidator(validate.NewDuplicateMappingRule())
 
 	// Same action with different keys should not be flagged as duplicate
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.edit.copy", "ctrl+c"),
-			keymap.NewActioinBinding("actions.edit.copy", "cmd+c"), // Different keys
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.edit.copy", "ctrl+c"),
+			newAction("actions.edit.copy", "cmd+c"), // Different keys
 		},
 	}
 

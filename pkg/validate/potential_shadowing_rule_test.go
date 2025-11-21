@@ -6,13 +6,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestPotentialShadowingRule_Validate_WithCriticalKeybinding(t *testing.T) {
@@ -21,10 +20,10 @@ func TestPotentialShadowingRule_Validate_WithCriticalKeybinding(t *testing.T) {
 	)
 
 	// Create keymaps with critical system shortcuts
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.format.document", "cmd+q"), // Critical: quit on macOS
-			keymap.NewActioinBinding("actions.edit.copy", "cmd+c"),       // Critical: copy on macOS
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.format.document", "cmd+q"), // Critical: quit on macOS
+			newAction("actions.edit.copy", "cmd+c"),       // Critical: copy on macOS
 		},
 	}
 
@@ -54,10 +53,10 @@ func TestPotentialShadowingRule_Validate_NoCriticalKeybindings(t *testing.T) {
 		validate.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformMacOS),
 	)
 
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.custom.action", "ctrl+shift+f12"),
-			keymap.NewActioinBinding("actions.another.action", "alt+shift+g"),
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.custom.action", "ctrl+shift+f12"),
+			newAction("actions.another.action", "alt+shift+g"),
 		},
 	}
 
@@ -75,10 +74,10 @@ func TestPotentialShadowingRule_Validate_WindowsCriticalShortcuts(t *testing.T) 
 		validate.NewPotentialShadowingRule(pluginapi.EditorTypeVSCode, platform.PlatformWindows),
 	)
 
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.close.app", "alt+f4"),   // Critical: close app on Windows
-			keymap.NewActioinBinding("actions.switch.app", "alt+tab"), // Critical: app switching
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.close.app", "alt+f4"),   // Critical: close app on Windows
+			newAction("actions.switch.app", "alt+tab"), // Critical: app switching
 		},
 	}
 
@@ -104,9 +103,9 @@ func TestPotentialShadowingRule_Validate_CaseInsensitive(t *testing.T) {
 	)
 
 	// Test that case variations are still detected
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.test", "CMD+Q"), // Uppercase should still match
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.test", "CMD+Q"), // Uppercase should still match
 		},
 	}
 

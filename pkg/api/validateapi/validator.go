@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -24,10 +25,10 @@ func NewValidator(rules ...ValidationRule) *Validator {
 // Validate executes all validation rules in the chain.
 func (v *Validator) Validate(
 	ctx context.Context,
-	setting *keymapv1.Keymap,
+	setting keymap.Keymap,
 	opts importerapi.ImportOptions,
 ) (*keymapv1.ValidationReport, error) {
-	processed := len(setting.GetActions())
+	processed := len(setting.Actions)
 	if processed > math.MaxInt32 || processed < 0 {
 		return nil, errors.New("keybindings count out of range")
 	}

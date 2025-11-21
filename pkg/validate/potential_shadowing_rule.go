@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	validateapi "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -21,7 +21,7 @@ type PotentialShadowingRule struct {
 func NewPotentialShadowingRule(
 	targetEditor pluginapi.EditorType,
 	platform platform.Platform,
-) validateapi2.ValidationRule {
+) validateapi.ValidationRule {
 	return &PotentialShadowingRule{
 		targetEditor: targetEditor,
 		platform:     platform,
@@ -85,7 +85,7 @@ var criticalKeybindingsByPlatform = map[platform.Platform]map[string]string{
 }
 
 // Validate checks for keybindings that might shadow critical system shortcuts.
-func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
+func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *validateapi.ValidationContext) error {
 	setting := validationContext.Setting
 	report := validationContext.Report
 
@@ -96,20 +96,13 @@ func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *
 		return nil
 	}
 
-	for _, ab := range setting.GetActions() {
-		if ab == nil {
-			continue
-		}
-		for _, b := range ab.GetBindings() {
-			if b == nil {
-				continue
-			}
+	for _, action := range setting.Actions {
+		for _, b := range action.Bindings {
 			// Format the key binding to get a consistent string representation
-			kb := keymap.NewKeyBinding(b)
-			formattedKeys, err := kb.Format(r.platform, "+")
-			if err != nil {
-				continue
-			}
+			formattedKeys := b.String(keybinding.FormatOption{
+				Platform:  r.platform,
+				Separator: "+",
+			})
 			// Normalize the key combination for comparison
 			normalizedKeys := strings.ToLower(formattedKeys)
 			// Check if this keybinding shadows a critical shortcut
@@ -119,7 +112,7 @@ func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *
 					Issue: &keymapv1.ValidationIssue_PotentialShadowing{
 						PotentialShadowing: &keymapv1.PotentialShadowing{
 							Keybinding:   formattedKeys,
-							Action:       ab.GetName(),
+							Action:       action.Name,
 							TargetEditor: string(r.targetEditor),
 							Message:      "This key chord is the default for " + description + ".",
 						},

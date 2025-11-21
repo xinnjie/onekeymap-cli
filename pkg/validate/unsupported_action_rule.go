@@ -3,11 +3,11 @@ package validate
 import (
 	"context"
 
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -21,7 +21,7 @@ type UnsupportedActionRule struct {
 func NewUnsupportedActionRule(
 	mappingConfig *mappings.MappingConfig,
 	targetEditor pluginapi.EditorType,
-) validateapi2.ValidationRule {
+) validateapi.ValidationRule {
 	return &UnsupportedActionRule{
 		mappingConfig: mappingConfig,
 		targetEditor:  targetEditor,
@@ -29,17 +29,13 @@ func NewUnsupportedActionRule(
 }
 
 // Validate checks for actions that cannot be exported to the target editor.
-func (r *UnsupportedActionRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
+func (r *UnsupportedActionRule) Validate(_ context.Context, validationContext *validateapi.ValidationContext) error {
 	setting := validationContext.Setting
 	report := validationContext.Report
 
-	for _, ab := range setting.GetActions() {
-		if ab == nil {
-			continue
-		}
-
+	for _, action := range setting.Actions {
 		// Check if this action has a mapping for the target editor
-		actionMapping, exists := r.mappingConfig.Mappings[ab.GetName()]
+		actionMapping, exists := r.mappingConfig.Mappings[action.Name]
 		if !exists {
 			// This would be caught by DanglingActionRule, skip here
 			continue
@@ -62,21 +58,17 @@ func (r *UnsupportedActionRule) Validate(_ context.Context, validationContext *v
 		}
 
 		if !hasTargetMapping {
-			for _, b := range ab.GetBindings() {
-				if b == nil {
-					continue
-				}
+			for _, b := range action.Bindings {
 				// Format the key binding for the error message
-				kb := keymap.NewKeyBinding(b)
-				formattedKeys, err := kb.Format(platform.PlatformMacOS, " ")
-				if err != nil {
-					formattedKeys = "unknown"
-				}
+				formattedKeys := b.String(keybinding.FormatOption{
+					Platform:  platform.PlatformMacOS,
+					Separator: " ",
+				})
 				// Add error for unsupported action
 				issue := &keymapv1.ValidationIssue{
 					Issue: &keymapv1.ValidationIssue_UnsupportedAction{
 						UnsupportedAction: &keymapv1.UnsupportedAction{
-							Action:       ab.GetName(),
+							Action:       action.Name,
 							Keybinding:   formattedKeys,
 							TargetEditor: string(r.targetEditor),
 						},

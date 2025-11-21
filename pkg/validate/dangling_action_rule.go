@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -14,29 +14,25 @@ type DanglingActionRule struct {
 }
 
 // NewDanglingActionRule creates a new dangling action validation rule.
-func NewDanglingActionRule(mappingConfig *mappings.MappingConfig) validateapi2.ValidationRule {
+func NewDanglingActionRule(mappingConfig *mappings.MappingConfig) validateapi.ValidationRule {
 	return &DanglingActionRule{
 		mappingConfig: mappingConfig,
 	}
 }
 
 // Validate checks for dangling actions in the keymap setting.
-func (r *DanglingActionRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
-	if validationContext.Setting == nil || len(validationContext.Setting.GetActions()) == 0 {
+func (r *DanglingActionRule) Validate(_ context.Context, validationContext *validateapi.ValidationContext) error {
+	if len(validationContext.Setting.Actions) == 0 {
 		return nil
 	}
 
-	for _, kb := range validationContext.Setting.GetActions() {
-		if kb == nil {
-			continue
-		}
-
+	for _, action := range validationContext.Setting.Actions {
 		// Check if the action exists in the mapping configuration
-		if _, exists := r.mappingConfig.Mappings[kb.GetName()]; !exists {
+		if _, exists := r.mappingConfig.Mappings[action.Name]; !exists {
 			// Create a dangling action issue
 			danglingAction := &keymapv1.DanglingAction{
-				Action:     kb.GetName(),
-				Keybinding: kb.GetName(), // Use action as placeholder for keybinding
+				Action:     action.Name,
+				Keybinding: action.Name, // Use action as placeholder for keybinding
 				Suggestion: "Check if the action ID is correct or if it needs to be added to action mappings",
 			}
 

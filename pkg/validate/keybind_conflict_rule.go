@@ -3,10 +3,11 @@ package validate
 import (
 	"context"
 
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
-	validateapi2 "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	validateapi "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
@@ -15,13 +16,13 @@ import (
 type KeybindConflictRule struct{}
 
 // NewKeybindConflictRule creates a new keybinding conflict validation rule.
-func NewKeybindConflictRule() validateapi2.ValidationRule {
+func NewKeybindConflictRule() validateapi.ValidationRule {
 	return &KeybindConflictRule{}
 }
 
 // Validate checks for keybinding conflicts in the keymap setting.
-func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *validateapi2.ValidationContext) error {
-	if validationContext.Setting == nil || len(validationContext.Setting.GetActions()) == 0 {
+func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *validateapi.ValidationContext) error {
+	if len(validationContext.Setting.Actions) == 0 {
 		return nil
 	}
 
@@ -34,53 +35,46 @@ func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *val
 
 	// Group keybindings by their formatted key combination
 	keybindingMap := make(
-		map[string][]*keymapv1.Action,
-	) // key: formatted keybinding, value: list of action bindings having it
+		map[string][]keymap.Action,
+	) // key: formatted keybinding, value: list of actions having it
 
-	for _, ab := range validationContext.Setting.GetActions() {
-		if ab == nil {
-			continue
-		}
-		for _, b := range ab.GetBindings() {
-			if b == nil {
-				continue
-			}
+	for _, action := range validationContext.Setting.Actions {
+		for _, b := range action.Bindings {
 			// Format the key combination for comparison
-			formatted, err := keymap.NewKeyBinding(b).Format(platform.PlatformMacOS, "+")
-			if err != nil {
-				// Skip invalid keybindings but don't fail validation
-				continue
-			}
-			keybindingMap[formatted] = append(keybindingMap[formatted], ab)
+			formatted := b.String(keybinding.FormatOption{
+				Platform:  platform.PlatformMacOS,
+				Separator: "+",
+			})
+			keybindingMap[formatted] = append(keybindingMap[formatted], action)
 		}
 	}
 
 	// Check for conflicts (multiple actions for same keybinding)
-	for keybinding, keybindings := range keybindingMap {
-		if len(keybindings) > 1 {
+	for keybindingStr, actions := range keybindingMap {
+		if len(actions) > 1 {
 			// Create action objects with editor commands
-			var actions []*keymapv1.KeybindConflict_Action
-			for _, kb := range keybindings {
-				action := &keymapv1.KeybindConflict_Action{
-					Action: kb.GetName(),
+			var conflictActions []*keymapv1.KeybindConflict_Action
+			for _, act := range actions {
+				conflictAction := &keymapv1.KeybindConflict_Action{
+					Action: act.Name,
 				}
 
 				// Try to get editor command from mapping config
 				if mappingConfig != nil {
-					if mapping := mappingConfig.Get(kb.GetName()); mapping != nil {
+					if mapping := mappingConfig.Get(act.Name); mapping != nil {
 						// Get editor command based on source editor from report
 						editorCommand := getEditorCommand(mapping, validationContext.Report.GetSourceEditor())
-						action.EditorCommand = editorCommand
+						conflictAction.EditorCommand = editorCommand
 					}
 				}
 
-				actions = append(actions, action)
+				conflictActions = append(conflictActions, conflictAction)
 			}
 
 			// Create a keybinding conflict issue
 			conflict := &keymapv1.KeybindConflict{
-				Keybinding: keybinding,
-				Actions:    actions,
+				Keybinding: keybindingStr,
+				Actions:    conflictActions,
 			}
 
 			issue := &keymapv1.ValidationIssue{

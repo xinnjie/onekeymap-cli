@@ -6,13 +6,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
@@ -40,10 +39,10 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 
 	validator := validateapi.NewValidator(validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.supported", "ctrl+s"),
-			keymap.NewActioinBinding("actions.vscode.only", "ctrl+v"), // Unsupported in Zed
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.supported", "ctrl+s"),
+			newAction("actions.vscode.only", "ctrl+v"), // Unsupported in Zed
 		},
 	}
 
@@ -78,9 +77,9 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 
 	validator := validateapi.NewValidator(validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.universal", "ctrl+u"),
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.universal", "ctrl+u"),
 		},
 	}
 
@@ -110,9 +109,9 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 	validatorVSCode := validateapi.NewValidator(
 		validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeVSCode),
 	)
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.test", "ctrl+t"),
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("actions.test", "ctrl+t"),
 		},
 	}
 

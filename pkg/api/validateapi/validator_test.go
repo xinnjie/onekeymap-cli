@@ -6,19 +6,28 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
+
+func newAction(name string, bindings ...string) pkgkeymap.Action {
+	action := pkgkeymap.Action{Name: name}
+	for _, b := range bindings {
+		kb, _ := keybinding.NewKeybinding(b, keybinding.ParseOption{Separator: "+"})
+		action.Bindings = append(action.Bindings, kb)
+	}
+	return action
+}
 
 func TestValidator_Validate_EmptyKeymaps(t *testing.T) {
 	validator := validateapi.NewValidator()
 
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{},
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{},
 	}
 
 	opts := importerapi.ImportOptions{
@@ -47,10 +56,10 @@ func TestValidator_Validate_ChainOfRules(t *testing.T) {
 	)
 
 	// Create keymaps with both conflicts and dangling actions
-	setting := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("valid.action", "ctrl+c"),
-			keymap.NewActioinBinding("invalid.action", "ctrl+c"), // This will cause dangling action
+	setting := pkgkeymap.Keymap{
+		Actions: []pkgkeymap.Action{
+			newAction("valid.action", "ctrl+c"),
+			newAction("invalid.action", "ctrl+c"), // This will cause dangling action
 		},
 	}
 
