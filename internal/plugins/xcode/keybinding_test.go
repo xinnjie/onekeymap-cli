@@ -133,7 +133,10 @@ func TestFormatKeybinding(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			kb, err := keybinding.NewKeybinding(tt.input, keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"})
+			kb, err := keybinding.NewKeybinding(
+				tt.input,
+				keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"},
+			)
 			require.NoError(t, err)
 			formatted, err := xcode.FormatKeybinding(kb)
 			require.NoError(t, err)

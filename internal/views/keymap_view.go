@@ -10,9 +10,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 const (
@@ -42,7 +42,7 @@ type FileErrorMsg struct {
 
 // KeymapViewModel is a read-only TUI model to present current OneKeymapSetting.
 type KeymapViewModel struct {
-	setting  *keymapv1.Keymap
+	setting  keymap.Keymap
 	mc       *mappings.MappingConfig
 	filePath string // Path to the onekeymap.json file being watched
 
@@ -56,7 +56,7 @@ type KeymapViewModel struct {
 	errorMsg      string // Error message to display
 }
 
-func NewKeymapViewModel(setting *keymapv1.Keymap, mc *mappings.MappingConfig, filePath string) tea.Model {
+func NewKeymapViewModel(setting keymap.Keymap, mc *mappings.MappingConfig, filePath string) tea.Model {
 	m := &KeymapViewModel{
 		setting:  setting,
 		mc:       mc,
@@ -125,15 +125,18 @@ func (m *KeymapViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		// nolint:goconst // key strings for TUI input are clearer inline here
-		case "ctrl+c", "esc", "q":
+		switch msg.Type {
+		case tea.KeyRunes:
+			if msg.String() == "q" {
+				return m, tea.Quit
+			}
+		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
-		case "tab":
+		case tea.KeyTab:
 			// Move to next category
 			m.moveToNextCategory(1)
 			m.actionTable.SetRows(m.keybindingRows())
-		case "shift+tab":
+		case tea.KeyShiftTab:
 			// Move to previous category
 			m.moveToNextCategory(-1)
 			m.actionTable.SetRows(m.keybindingRows())
@@ -216,8 +219,8 @@ func (m *KeymapViewModel) selectedActionID() string {
 
 func (m *KeymapViewModel) initCategories() {
 	catSet := map[string]struct{}{}
-	for _, kb := range m.setting.GetActions() {
-		if mapping := m.mc.Get(kb.GetName()); mapping != nil {
+	for _, kb := range m.setting.Actions {
+		if mapping := m.mc.Get(kb.Name); mapping != nil {
 			if mapping.Category != "" {
 				catSet[mapping.Category] = struct{}{}
 			}
@@ -268,16 +271,16 @@ func (m *KeymapViewModel) includeAction(actionID string) bool {
 func (m *KeymapViewModel) keybindingRows() []table.Row {
 	// Aggregate keybindings by action id
 	agg := map[string][]string{}
-	for _, ab := range m.setting.GetActions() {
-		if !m.includeAction(ab.GetName()) {
+	for _, ab := range m.setting.Actions {
+		if !m.includeAction(ab.Name) {
 			continue
 		}
-		for _, b := range ab.GetBindings() {
-			k := b.GetKeyChordsReadable()
+		for _, b := range ab.Bindings {
+			k := b.String(keybinding.FormatOption{})
 			if k == "" {
 				continue
 			}
-			agg[ab.GetName()] = append(agg[ab.GetName()], k)
+			agg[ab.Name] = append(agg[ab.Name], k)
 		}
 	}
 
@@ -328,11 +331,11 @@ func (m *KeymapViewModel) reloadKeymap() error {
 	}
 	defer file.Close()
 
-	setting, err := keymap.Load(file, keymap.LoadOptions{MappingConfig: m.mc})
+	keymap, err := keymap.Load(file, keymap.LoadOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to parse keymap: %w", err)
 	}
 
-	m.setting = setting
+	m.setting = keymap
 	return nil
 }

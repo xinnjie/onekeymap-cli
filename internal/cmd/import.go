@@ -12,11 +12,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -220,26 +220,26 @@ func executeImportNonInteractive(
 	return saveImportResult(f.output, result, logger)
 }
 
-func loadBaseConfig(outputPath, onekeymapConfig string, logger *slog.Logger) *keymapv1.Keymap {
+func loadBaseConfig(outputPath, onekeymapConfig string, logger *slog.Logger) pkgkeymap.Keymap {
 	basePath := outputPath
 	if basePath == "" {
 		basePath = onekeymapConfig
 	}
 	if basePath == "" {
-		return nil
+		return pkgkeymap.Keymap{}
 	}
 
 	baseConfigFile, err := os.Open(basePath)
 	if err != nil {
 		logger.Debug("Base config file not found, skip loading base config", "path", basePath)
-		return nil
+		return pkgkeymap.Keymap{}
 	}
 	defer func() { _ = baseConfigFile.Close() }()
 
-	cfg, lerr := keymap.Load(baseConfigFile, keymap.LoadOptions{})
+	cfg, lerr := pkgkeymap.Load(baseConfigFile, pkgkeymap.LoadOptions{})
 	if lerr != nil {
 		logger.Warn("Failed to load base keymap, treat as no base config", "error", lerr)
-		return nil
+		return pkgkeymap.Keymap{}
 	}
 
 	return cfg
@@ -259,13 +259,14 @@ func saveImportResult(outputPath string, result *importerapi.ImportResult, logge
 		_ = outputFile.Close()
 	}()
 
-	if result == nil || result.Setting == nil {
+	if result == nil || len(result.Setting.Actions) == 0 {
 		logger.Warn("No keymaps imported; nothing to save")
 		return nil
 	}
 
-	saveOpt := keymap.SaveOptions{Platform: platform.PlatformMacOS}
-	if err := keymap.Save(outputFile, result.Setting, saveOpt); err != nil {
+	// Use new API Save
+	saveOpt := pkgkeymap.SaveOptions{Platform: platform.PlatformMacOS}
+	if err := pkgkeymap.Save(outputFile, result.Setting, saveOpt); err != nil {
 		logger.Error("Failed to save config file", "error", err)
 		return err
 	}

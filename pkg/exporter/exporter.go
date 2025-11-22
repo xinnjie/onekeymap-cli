@@ -12,8 +12,8 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // exporter is the default implementation of the Exporter interface.
@@ -45,7 +45,7 @@ func NewExporter(
 func (s *exporter) Export(
 	ctx context.Context,
 	destination io.Writer,
-	setting *keymapv1.Keymap,
+	setting keymap.Keymap,
 	opts exporterapi.ExportOptions,
 ) (*exporterapi.ExportReport, error) {
 	s.serviceReporter.ReportExportCall(ctx)
@@ -116,7 +116,7 @@ func (s *exporter) computeDiff(
 	report *pluginapi.PluginExportReport,
 ) (string, error) {
 	switch {
-	case opts.DiffType == keymapv1.ExportKeymapRequest_UNIFIED_DIFF:
+	case opts.DiffType == exporterapi.DiffTypeUnified:
 		// Unified diff over raw editor configs
 		ud := diff.NewUnifiedDiffFormatDiffer()
 		if originalConfig == nil {
@@ -130,7 +130,7 @@ func (s *exporter) computeDiff(
 			return "", fmt.Errorf("failed to compute unified diff: %w", err)
 		}
 		return d, nil
-	case opts.DiffType == keymapv1.ExportKeymapRequest_ASCII_DIFF:
+	case opts.DiffType == exporterapi.DiffTypeASCII:
 		// JSON ASCII diff over structured editor configs supplied by plugin
 		jd := diff.NewJSONASCIIDiffer()
 		d, err := jd.Diff(report.BaseEditorConfig, report.ExportEditorConfig)

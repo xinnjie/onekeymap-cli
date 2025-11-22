@@ -86,7 +86,7 @@ func (p *intellijImporter) Import(
 		}
 	}
 
-	setting.Actions = dedup.DedupActions(setting.Actions)
+	setting.Actions = dedup.Actions(setting.Actions)
 	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
 	return result, nil

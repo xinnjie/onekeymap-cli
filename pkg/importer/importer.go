@@ -8,17 +8,16 @@ import (
 	"sort"
 
 	"github.com/xinnjie/onekeymap-cli/internal/dedup"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi" // Only for ValidationReport
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
-	"google.golang.org/protobuf/proto"
 )
 
 // importer is the default implementation of the Importer interface.
@@ -75,18 +74,18 @@ func (s *importer) Import(ctx context.Context, opts importerapi.ImportOptions) (
 	}
 	setting := res.Keymap
 
-	setting = keymap.DecorateSetting(setting, s.mappingConfig)
 	// Normalize: merge same-action entries and deduplicate identical bindings before downstream logic
-	if setting != nil && len(setting.GetActions()) > 0 {
-		setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
-	}
-
+	setting.Actions = dedup.Actions(setting.Actions)
 	// Sort by action for determinism
-	sort.Slice(setting.GetActions(), func(i, j int) bool {
-		return setting.GetActions()[i].GetName() < setting.GetActions()[j].GetName()
+	sort.Slice(setting.Actions, func(i, j int) bool {
+		return setting.Actions[i].Name < setting.Actions[j].Name
 	})
 
-	if setting == nil {
+	s.logger.DebugContext(ctx, "imported from plugin", "actions", len(setting.Actions))
+
+	// Check if Actions slice is nil (uninitialized), which indicates import failure
+	// An empty slice (len=0) is valid for clearing all bindings
+	if setting.Actions == nil {
 		return nil, errors.New("failed to import config: no keybindings found")
 	}
 
@@ -96,10 +95,10 @@ func (s *importer) Import(ctx context.Context, opts importerapi.ImportOptions) (
 	}
 
 	// No baseline provided: all imported keymaps are additions.
-	if len(opts.Base.GetActions()) == 0 {
+	if len(opts.Base.Actions) == 0 {
 		changes := &importerapi.KeymapChanges{}
-		if len(setting.GetActions()) > 0 {
-			changes.Add = append(changes.Add, setting.GetActions()...)
+		if len(setting.Actions) > 0 {
+			changes.Add = append(changes.Add, setting.Actions...)
 		}
 		return &importerapi.ImportResult{
 			Setting:    setting,
@@ -111,15 +110,13 @@ func (s *importer) Import(ctx context.Context, opts importerapi.ImportOptions) (
 
 	// If baseline provided, first union baseline chords into current setting so unchanged chords are retained.
 	setting = unionWithBase(opts.Base, setting)
-	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
-	// Re-decorate after union so metadata (Name/Description/Category) and readable chords are present
-	setting = keymap.DecorateSetting(setting, s.mappingConfig)
+	setting.Actions = dedup.Actions(setting.Actions)
 
 	// With baseline: compute changes via helper.
 	changes := s.calculateChanges(opts.Base, setting)
 
 	// Safety: ensure dedup on output as well
-	setting.Actions = dedup.DedupKeyBindings(setting.GetActions())
+	setting.Actions = dedup.Actions(setting.Actions)
 	return &importerapi.ImportResult{
 		Setting:    setting,
 		Changes:    changes,
@@ -129,8 +126,8 @@ func (s *importer) Import(ctx context.Context, opts importerapi.ImportOptions) (
 }
 
 func (s *importer) calculateChanges(
-	base *keymapv1.Keymap,
-	setting *keymapv1.Keymap,
+	base keymap.Keymap,
+	setting keymap.Keymap,
 ) *importerapi.KeymapChanges {
 	baseIndex := s.buildActionIndex(base)
 	newIndex := s.buildActionIndex(setting)
@@ -139,39 +136,38 @@ func (s *importer) calculateChanges(
 	updates := s.calculateUpdates(baseIndex.byAction, newIndex.byAction, adds, removes)
 
 	changes := s.buildChangesResult(adds, removes, updates)
-	s.decorateChanges(changes)
 
 	return changes
 }
 
 type actionIndex struct {
-	byAction map[string][]*keymapv1.Action
-	byPair   map[string]*keymapv1.Action
+	byAction map[string][]keymap.Action
+	byPair   map[string]keymap.Action
 }
 
-func (s *importer) buildActionIndex(keymap *keymapv1.Keymap) *actionIndex {
+func (s *importer) buildActionIndex(km keymap.Keymap) *actionIndex {
 	idx := &actionIndex{
-		byAction: map[string][]*keymapv1.Action{},
-		byPair:   map[string]*keymapv1.Action{},
+		byAction: map[string][]keymap.Action{},
+		byPair:   map[string]keymap.Action{},
 	}
 
-	for _, kb := range keymap.GetActions() {
+	for _, kb := range km.Actions {
 		if !hasValidChord(kb) {
 			continue
 		}
-		idx.byAction[kb.GetName()] = append(idx.byAction[kb.GetName()], kb)
-		idx.byPair[dedup.PairKey(kb)] = kb
+		idx.byAction[kb.Name] = append(idx.byAction[kb.Name], kb)
+		idx.byPair[pairKey(kb)] = kb
 	}
 
 	return idx
 }
 
 func (s *importer) calculateAddsAndRemoves(
-	basePair map[string]*keymapv1.Action,
-	newPair map[string]*keymapv1.Action,
-) (map[string]*keymapv1.Action, map[string]*keymapv1.Action) {
-	adds := map[string]*keymapv1.Action{}
-	removes := map[string]*keymapv1.Action{}
+	basePair map[string]keymap.Action,
+	newPair map[string]keymap.Action,
+) (map[string]keymap.Action, map[string]keymap.Action) {
+	adds := map[string]keymap.Action{}
+	removes := map[string]keymap.Action{}
 
 	for k, v := range newPair {
 		adds[k] = v
@@ -189,10 +185,10 @@ func (s *importer) calculateAddsAndRemoves(
 }
 
 func (s *importer) calculateUpdates(
-	baseByAction map[string][]*keymapv1.Action,
-	newByAction map[string][]*keymapv1.Action,
-	adds map[string]*keymapv1.Action,
-	removes map[string]*keymapv1.Action,
+	baseByAction map[string][]keymap.Action,
+	newByAction map[string][]keymap.Action,
+	adds map[string]keymap.Action,
+	removes map[string]keymap.Action,
 ) []importerapi.KeymapDiff {
 	var updates []importerapi.KeymapDiff
 
@@ -204,90 +200,80 @@ func (s *importer) calculateUpdates(
 
 		before := beforeList[0]
 		after := afterList[0]
-		if dedup.PairKey(before) == dedup.PairKey(after) {
+		if pairKey(before) == pairKey(after) {
 			continue
 		}
 
 		updates = append(updates, importerapi.KeymapDiff{Before: before, After: after})
-		delete(adds, dedup.PairKey(after))
-		delete(removes, dedup.PairKey(before))
+		delete(adds, pairKey(after))
+		delete(removes, pairKey(before))
 	}
 
 	return updates
 }
 
 func (s *importer) buildChangesResult(
-	adds map[string]*keymapv1.Action,
-	removes map[string]*keymapv1.Action,
+	adds map[string]keymap.Action,
+	removes map[string]keymap.Action,
 	updates []importerapi.KeymapDiff,
 ) *importerapi.KeymapChanges {
 	changes := &importerapi.KeymapChanges{Update: updates}
 
 	if len(adds) > 0 {
-		changes.Add = make([]*keymapv1.Action, 0, len(adds))
+		changes.Add = make([]keymap.Action, 0, len(adds))
 		for _, v := range adds {
 			changes.Add = append(changes.Add, v)
 		}
 		sort.Slice(changes.Add, func(i, j int) bool {
-			return changes.Add[i].GetName() < changes.Add[j].GetName()
+			return changes.Add[i].Name < changes.Add[j].Name
 		})
 	}
 
 	if len(removes) > 0 {
-		changes.Remove = make([]*keymapv1.Action, 0, len(removes))
+		changes.Remove = make([]keymap.Action, 0, len(removes))
 		for _, v := range removes {
 			changes.Remove = append(changes.Remove, v)
 		}
 		sort.Slice(changes.Remove, func(i, j int) bool {
-			return changes.Remove[i].GetName() < changes.Remove[j].GetName()
+			return changes.Remove[i].Name < changes.Remove[j].Name
 		})
 	}
 
 	return changes
 }
 
-func (s *importer) decorateChanges(changes *importerapi.KeymapChanges) {
-	for _, kb := range changes.Add {
-		s.decorateAction(kb)
+// pairKey builds a stable identifier for an action by name and normalized key bindings
+func pairKey(action keymap.Action) string {
+	if len(action.Bindings) == 0 {
+		return action.Name + "\x00"
 	}
-	for _, kb := range changes.Remove {
-		s.decorateAction(kb)
-	}
-	for i := range changes.Update {
-		s.decorateAction(changes.Update[i].Before)
-		s.decorateAction(changes.Update[i].After)
-	}
-}
-
-func (s *importer) decorateAction(kb *keymapv1.Action) {
-	if kb == nil {
-		return
-	}
-
-	if cfg := s.mappingConfig.Get(kb.GetName()); cfg != nil {
-		if kb.GetActionConfig() == nil {
-			kb.ActionConfig = &keymapv1.ActionConfig{}
+	// Format each binding
+	parts := make([]string, 0, len(action.Bindings))
+	for _, b := range action.Bindings {
+		if len(b.KeyChords) == 0 {
+			continue
 		}
-		kb.ActionConfig.Description = cfg.Description
-		kb.ActionConfig.DisplayName = cfg.Name
-		kb.ActionConfig.Category = cfg.Category
+		parts = append(parts, b.String(keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: "+"}))
 	}
-
-	for _, b := range kb.GetBindings() {
-		if b != nil && b.GetKeyChords() != nil && len(b.GetKeyChords().GetChords()) > 0 {
-			if formatted, err := keymap.NewKeyBinding(b).Format(platform.PlatformMacOS, "+"); err == nil {
-				b.KeyChordsReadable = formatted
-			}
+	// Simple insertion sort
+	for i := 1; i < len(parts); i++ {
+		j := i
+		for j > 0 && parts[j] < parts[j-1] {
+			parts[j], parts[j-1] = parts[j-1], parts[j]
+			j--
 		}
 	}
+	// Join with NUL to avoid ambiguity
+	sig := action.Name + "\x00"
+	for _, p := range parts {
+		sig += p + "\x00"
+	}
+	return sig
 }
 
-func hasValidChord(kb *keymapv1.Action) bool {
-	if kb == nil {
-		return false
-	}
-	for _, b := range kb.GetBindings() {
-		if b != nil && b.GetKeyChords() != nil && len(b.GetKeyChords().GetChords()) > 0 {
+func hasValidChord(action keymap.Action) bool {
+	for _, b := range action.Bindings {
+		if len(b.KeyChords) > 0 {
 			return true
 		}
 	}
@@ -295,78 +281,51 @@ func hasValidChord(kb *keymapv1.Action) bool {
 }
 
 // unionWithBase merges baseline and imported settings per action id,
-// preserving baseline bindings and adding new imported bindings. Metadata from Decorate is preserved.
-func unionWithBase(base *keymapv1.Keymap, imported *keymapv1.Keymap) *keymapv1.Keymap {
-	if imported == nil {
+// preserving baseline bindings and adding new imported bindings.
+func unionWithBase(base keymap.Keymap, imported keymap.Keymap) keymap.Keymap {
+	if len(imported.Actions) == 0 {
 		return base
 	}
-	if base == nil || len(base.GetActions()) == 0 {
+	if len(base.Actions) == 0 {
 		return imported
 	}
 	// index existing results by action id
-	out := &keymapv1.Keymap{Actions: []*keymapv1.Action{}}
-	byID := make(map[string]*keymapv1.Action)
+	out := keymap.Keymap{Actions: []keymap.Action{}}
+	byID := make(map[string]*keymap.Action)
 
 	// start with baseline (so Before reflects baseline order/first occurrence)
-	for _, kb := range base.GetActions() {
-		if kb == nil {
-			continue
+	for _, kb := range base.Actions {
+		// copy action
+		ab := keymap.Action{
+			Name:     kb.Name,
+			Bindings: append([]keybinding.Keybinding{}, kb.Bindings...),
 		}
-		// shallow copy action binding shell; reuse bindings slice ref (safe; will be appended below possibly)
-		ab := &keymapv1.Action{
-			Name: kb.GetName(),
-		}
-		// Only clone ActionConfig if it exists
-		if kb.GetActionConfig() != nil {
-			cloned := proto.Clone(kb.GetActionConfig())
-			if ac, ok := cloned.(*keymapv1.ActionConfig); ok {
-				ab.ActionConfig = ac
-			}
-		}
-		// copy bindings
-		for _, b := range kb.GetBindings() {
-			if b != nil {
-				ab.Bindings = append(ab.Bindings, b)
-			}
-		}
-		byID[ab.GetName()] = ab
 		out.Actions = append(out.Actions, ab)
+		byID[ab.Name] = &out.Actions[len(out.Actions)-1]
 	}
 	// merge imported bindings into corresponding actions (or create new action entries)
-	for _, kb := range imported.GetActions() {
-		if kb == nil {
-			continue
-		}
-		existing, ok := byID[kb.GetName()]
+	for _, kb := range imported.Actions {
+		existing, ok := byID[kb.Name]
 		if !ok {
 			// add as new action
-			ab := &keymapv1.Action{
-				Name: kb.GetName(),
+			ab := keymap.Action{
+				Name:     kb.Name,
+				Bindings: append([]keybinding.Keybinding{}, kb.Bindings...),
 			}
-			// Only clone ActionConfig if it exists
-			if kb.GetActionConfig() != nil {
-				cloned := proto.Clone(kb.GetActionConfig())
-				if ac, ok := cloned.(*keymapv1.ActionConfig); ok {
-					ab.ActionConfig = ac
-				}
-			}
-			for _, b := range kb.GetBindings() {
-				if b != nil {
-					ab.Bindings = append(ab.Bindings, b)
-				}
-			}
-			byID[ab.GetName()] = ab
 			out.Actions = append(out.Actions, ab)
+			byID[ab.Name] = &out.Actions[len(out.Actions)-1]
 			continue
 		}
 		// union bindings
-		for _, nb := range kb.GetBindings() {
-			if nb == nil {
+		for _, nb := range kb.Bindings {
+			if len(nb.KeyChords) == 0 {
 				continue
 			}
 			dup := false
-			for _, eb := range existing.GetBindings() {
-				if proto.Equal(eb.GetKeyChords(), nb.GetKeyChords()) {
+			nbStr := nb.String(keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: "+"})
+			for _, eb := range existing.Bindings {
+				ebStr := eb.String(keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: "+"})
+				if ebStr == nbStr {
 					dup = true
 					break
 				}

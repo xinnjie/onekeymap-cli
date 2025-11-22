@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/xinnjie/onekeymap-cli/internal/keybindinglookup"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
@@ -13,14 +14,12 @@ import (
 type vscodeKeybindingLookup struct{}
 
 // NewVSCodeKeybindingLookup creates a new KeybindingLookup instance
-// TODO(xinnjie): Return keybindinglookup.KeybindingLookup after interface is migrated
-func NewVSCodeKeybindingLookup() *vscodeKeybindingLookup {
+func NewVSCodeKeybindingLookup() keybindinglookup.KeybindingLookup {
 	return &vscodeKeybindingLookup{}
 }
 
 // Compile-time interface check
-// TODO(xinnjie): Re-enable after keybindinglookup interface is migrated to new keymap API
-// var _ keybindinglookup.KeybindingLookup = (*vscodeKeybindingLookup)(nil)
+var _ keybindinglookup.KeybindingLookup = (*vscodeKeybindingLookup)(nil)
 
 // Lookup implements KeybindingLookup interface
 // editorSpecificConfig contains VSCodeKeybindingConfig JSON
@@ -61,7 +60,6 @@ func (h *vscodeKeybindingLookup) Lookup(
 	var matchingKeybindings []string
 	for _, binding := range vscodeConfig {
 		if binding.Key == targetKey {
-			// Marshal the matching keybinding to JSON string
 			bindingJSON, err := json.Marshal(binding)
 			if err != nil {
 				return nil, err

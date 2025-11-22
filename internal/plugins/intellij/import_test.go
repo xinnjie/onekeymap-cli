@@ -151,8 +151,12 @@ func TestImportIntelliJKeymap(t *testing.T) {
 			expected: keymap.Keymap{
 				Actions: []keymap.Action{
 					{
-						Name:     "actions.test.mutipleActions",
-						Bindings: []keybinding.Keybinding{parseKB("f5"), parseKB("ctrl+numpad3"), parseKB("ctrl+shift+[")},
+						Name: "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{
+							parseKB("f5"),
+							parseKB("ctrl+numpad3"),
+							parseKB("ctrl+shift+["),
+						},
 					},
 				},
 			},

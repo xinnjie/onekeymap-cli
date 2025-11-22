@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
@@ -15,13 +16,13 @@ type ImportOptions struct {
 	// Required, input stream, contains the keymap config for different editors
 	InputStream io.Reader
 	// Optional, existing onekeymap base setting
-	Base *keymapv1.Keymap
+	Base keymap.Keymap
 }
 
 // ImportResult represents the result of an import operation.
 type ImportResult struct {
 	// The converted keymap setting.
-	Setting *keymapv1.Keymap
+	Setting keymap.Keymap
 	// Any issues that arose during the import process.
 	Report *keymapv1.ValidationReport
 
@@ -34,16 +35,16 @@ type ImportResult struct {
 // KeymapChanges represents the changes to a keymap setting.
 type KeymapChanges struct {
 	// The keymaps that are added.
-	Add []*keymapv1.Action
+	Add []keymap.Action
 	// The keymaps that are removed.
-	Remove []*keymapv1.Action
+	Remove []keymap.Action
 	// The keymaps that are updated.
 	Update []KeymapDiff
 }
 
 type KeymapDiff struct {
-	Before *keymapv1.Action
-	After  *keymapv1.Action
+	Before keymap.Action
+	After  keymap.Action
 }
 
 // Importer defines the interface for the import service, which handles the

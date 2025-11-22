@@ -11,10 +11,9 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 )
 
 type viewFlags struct {
@@ -70,7 +69,7 @@ func viewRun(
 		}
 		defer func() { _ = file.Close() }()
 
-		setting, err := keymap.Load(file, keymap.LoadOptions{MappingConfig: mappingConfig})
+		setting, err := keymap.Load(file, keymap.LoadOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to parse onekeymap config: %w", err)
 		}
@@ -151,7 +150,7 @@ func ensureConfigFile(path string) error {
 		return fmt.Errorf("failed to initialize onekeymap config: %w", err)
 	}
 
-	if err := keymap.Save(file, &keymapv1.Keymap{}, keymap.SaveOptions{}); err != nil {
+	if err := keymap.Save(file, keymap.Keymap{}, keymap.SaveOptions{}); err != nil {
 		_ = file.Close()
 		return fmt.Errorf("failed to initialize onekeymap config: %w", err)
 	}

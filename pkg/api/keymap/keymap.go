@@ -35,7 +35,7 @@ type LoadOptions struct {
 }
 
 // Load reads from reader and builds a keymap.
-func Load(reader io.Reader, opt LoadOptions) (Keymap, error) {
+func Load(reader io.Reader, _ LoadOptions) (Keymap, error) {
 	data, err := io.ReadAll(reader)
 	if err != nil {
 		return Keymap{}, err
@@ -107,15 +107,15 @@ func Save(writer io.Writer, km Keymap, opt SaveOptions) error {
 
 // oneKeymapSetting is the root struct for the user config file.
 type oneKeymapSetting struct {
-	Version string             `json:"version"`
+	Version string            `json:"version"`
 	Keymaps []oneKeymapConfig `json:"keymaps"`
 }
 
 // oneKeymapConfig is a struct that matches the user config file format.
 type oneKeymapConfig struct {
-	ID         string           `json:"id,omitempty"`
+	ID         string            `json:"id,omitempty"`
 	Keybinding keybindingStrings `json:"keybinding,omitempty"`
-	Comment    string           `json:"comment,omitempty"`
+	Comment    string            `json:"comment,omitempty"`
 }
 
 // keybindingStrings is a custom type to handle single or multiple keybindings.
@@ -197,7 +197,12 @@ func buildKeymapFromFriendly(friendlyData oneKeymapSetting) (Keymap, error) {
 				Separator: "+",
 			})
 			if err != nil {
-				return Keymap{}, fmt.Errorf("failed to parse keybinding '%s' for id '%s': %w", keybindingStr, fk.ID, err)
+				return Keymap{}, fmt.Errorf(
+					"failed to parse keybinding '%s' for id '%s': %w",
+					keybindingStr,
+					fk.ID,
+					err,
+				)
 			}
 			action.Bindings = append(action.Bindings, kb)
 		}

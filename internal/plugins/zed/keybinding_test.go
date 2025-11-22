@@ -25,7 +25,10 @@ func TestZed_FormatKeybinding(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kb, err := keybinding.NewKeybinding(tc.in, keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"})
+			kb, err := keybinding.NewKeybinding(
+				tc.in,
+				keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"},
+			)
 			require.NoError(t, err)
 			out, err := zed.FormatZedKeybind(kb)
 			require.NoError(t, err)

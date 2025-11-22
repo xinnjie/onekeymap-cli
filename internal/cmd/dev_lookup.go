@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/xinnjie/onekeymap-cli/internal/keybindinglookup"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/xcode"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 type devLookupFlags struct {
@@ -61,7 +61,7 @@ Examples:
 func devLookupRun(f *devLookupFlags, factory *keybindinglookup.LookupFactory) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, _ []string) {
 		// Parse the keybinding
-		keybinding, err := keymap.ParseKeyBinding(f.keybind, "+")
+		keybinding, err := keybinding.NewKeybinding(f.keybind, keybinding.ParseOption{Separator: "+"})
 		if err != nil {
 			cmd.PrintErrf("Error parsing keybinding '%s': %v\n", f.keybind, err)
 			os.Exit(1)

@@ -276,16 +276,16 @@ func TestLoad(t *testing.T) {
 				}
 			} else {
 				require.NoError(t, err)
-				
+
 				// Custom comparison for Keymap
-				require.Equal(t, len(tc.expected.Actions), len(loadedSetting.Actions), "Number of actions should match")
-				
+				require.Len(t, loadedSetting.Actions, len(tc.expected.Actions), "Number of actions should match")
+
 				for i, expectedAction := range tc.expected.Actions {
 					actualAction := loadedSetting.Actions[i]
 					assert.Equal(t, expectedAction.Name, actualAction.Name, "Action name should match")
-					
-					require.Equal(t, len(expectedAction.Bindings), len(actualAction.Bindings), "Number of bindings should match for action %s", expectedAction.Name)
-					
+
+					require.Len(t, actualAction.Bindings, len(expectedAction.Bindings), "Number of bindings should match for action %s", expectedAction.Name)
+
 					for j, expectedBinding := range expectedAction.Bindings {
 						actualBinding := actualAction.Bindings[j]
 						expectedStr := expectedBinding.String(keybinding.FormatOption{
@@ -334,10 +334,10 @@ func TestLoadAndSaveRoundTrip(t *testing.T) {
 	require.NoError(t, err)
 
 	// Compare
-	require.Equal(t, len(km.Actions), len(km2.Actions))
+	require.Len(t, km2.Actions, len(km.Actions))
 	for i := range km.Actions {
 		assert.Equal(t, km.Actions[i].Name, km2.Actions[i].Name)
-		assert.Equal(t, len(km.Actions[i].Bindings), len(km2.Actions[i].Bindings))
+		assert.Len(t, km2.Actions[i].Bindings, len(km.Actions[i].Bindings))
 	}
 }
 
@@ -354,5 +354,5 @@ func TestSaveEmptyKeymap(t *testing.T) {
 
 	assert.Equal(t, "1.0", result["version"])
 	keymaps := result["keymaps"].([]interface{})
-	assert.Len(t, keymaps, 0)
+	assert.Empty(t, keymaps)
 }

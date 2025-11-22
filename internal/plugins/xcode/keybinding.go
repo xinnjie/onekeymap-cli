@@ -105,7 +105,10 @@ func FormatKeybinding(keybind keybinding.Keybinding) (string, error) {
 	}
 
 	if len(keybind.KeyChords) != 1 {
-		return "", fmt.Errorf("xcode doesn't support multi-key-chords keybinding: %v", keybind.String(keybinding.FormatOption{Separator: "+"}))
+		return "", fmt.Errorf(
+			"xcode doesn't support multi-key-chords keybinding: %v",
+			keybind.String(keybinding.FormatOption{Separator: "+"}),
+		)
 	}
 
 	chord := keybind.KeyChords[0]

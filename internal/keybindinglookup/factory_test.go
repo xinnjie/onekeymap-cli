@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/keybindinglookup"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 // Mock KeybindingLookup implementation for testing
@@ -15,7 +15,7 @@ type mockKeybindingLookup struct {
 	name string
 }
 
-func (m *mockKeybindingLookup) Lookup(_ io.Reader, _ *keymap.KeyBinding) ([]string, error) {
+func (m *mockKeybindingLookup) Lookup(_ io.Reader, _ keybinding.Keybinding) ([]string, error) {
 	return []string{"mock-result-" + m.name}, nil
 }
 
@@ -84,7 +84,7 @@ func TestLookupFactory_Integration(t *testing.T) {
 	require.NoError(t, err)
 
 	// Mock a keybinding (we don't need a real one for this test)
-	keybinding, err := keymap.ParseKeyBinding("cmd+k", "+")
+	keybinding, err := keybinding.NewKeybinding("cmd+k", keybinding.ParseOption{Separator: "+"})
 	require.NoError(t, err)
 
 	// Test the lookup functionality (using nil reader since mock doesn't use it)

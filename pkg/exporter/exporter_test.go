@@ -14,9 +14,9 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/exporter"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // testExportPlugin is a minimal plugin implementation for export tests.
@@ -32,9 +32,9 @@ func TestExportService_PropagatesSkipActions(t *testing.T) {
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exporterapi.ExportOptions{
+	report, err := service.Export(context.Background(), &out, keymap.Keymap{}, exporterapi.ExportOptions{
 		EditorType: pluginapi.EditorType("test"),
-		DiffType:   keymapv1.ExportKeymapRequest_DIFF_TYPE_UNSPECIFIED,
+		DiffType:   exporterapi.DiffTypeUnspecified,
 	})
 	require.NoError(t, err)
 	require.NotNil(t, report)
@@ -63,7 +63,7 @@ type testExporter struct {
 func (e *testExporter) Export(
 	_ context.Context,
 	destination io.Writer,
-	_ *keymapv1.Keymap,
+	_ keymap.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
 	if e.writeContent != "" {
@@ -105,10 +105,10 @@ func TestExportService_Diff_Unified(t *testing.T) {
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exporterapi.ExportOptions{
+	report, err := service.Export(context.Background(), &out, keymap.Keymap{}, exporterapi.ExportOptions{
 		EditorType: pluginapi.EditorType("test"),
 		Base:       strings.NewReader(before),
-		DiffType:   keymapv1.ExportKeymapRequest_UNIFIED_DIFF,
+		DiffType:   exporterapi.DiffTypeUnified,
 		FilePath:   "test.txt",
 	})
 	require.NoError(t, err)
@@ -125,9 +125,9 @@ func TestExportService_Diff_JSONASCII_FromStructuredConfigs(t *testing.T) {
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exporterapi.ExportOptions{
+	report, err := service.Export(context.Background(), &out, keymap.Keymap{}, exporterapi.ExportOptions{
 		EditorType: pluginapi.EditorType("test"),
-		DiffType:   keymapv1.ExportKeymapRequest_ASCII_DIFF,
+		DiffType:   exporterapi.DiffTypeASCII,
 	})
 	require.NoError(t, err)
 	require.NotNil(t, report)
@@ -141,9 +141,9 @@ func TestExportService_Diff_FallbackFromPlugin(t *testing.T) {
 	service := newTestExportService(t, exp)
 
 	var out bytes.Buffer
-	report, err := service.Export(context.Background(), &out, &keymapv1.Keymap{}, exporterapi.ExportOptions{
+	report, err := service.Export(context.Background(), &out, keymap.Keymap{}, exporterapi.ExportOptions{
 		EditorType: pluginapi.EditorType("test"),
-		DiffType:   keymapv1.ExportKeymapRequest_DIFF_TYPE_UNSPECIFIED,
+		DiffType:   exporterapi.DiffTypeUnspecified,
 	})
 	require.NoError(t, err)
 	require.NotNil(t, report)

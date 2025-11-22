@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 )
@@ -16,8 +16,8 @@ func TestValidator_Validate_WithKeybindConflict(t *testing.T) {
 	validator := validateapi.NewValidator(validate.NewKeybindConflictRule())
 
 	// Create keymaps with conflicting keybindings
-	setting := pkgkeymap.Keymap{
-		Actions: []pkgkeymap.Action{
+	setting := keymap.Keymap{
+		Actions: []keymap.Action{
 			newAction("action1", "ctrl+c"),
 			newAction("action2", "ctrl+c"),
 		},

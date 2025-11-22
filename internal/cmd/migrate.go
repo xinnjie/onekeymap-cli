@@ -125,7 +125,7 @@ func migrateRun(
 			logger.Debug("Import Report", "report", importResult.Report)
 		}
 
-		if importResult == nil || importResult.Setting == nil {
+		if len(importResult.Setting.Actions) == 0 {
 			logger.Warn("No imported keymaps to export; aborting migrate")
 			return nil
 		}

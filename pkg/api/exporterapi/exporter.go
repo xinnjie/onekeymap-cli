@@ -4,9 +4,35 @@ import (
 	"context"
 	"io"
 
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
+
+// DiffType represents the type of diff output format.
+type DiffType int
+
+const (
+	// DiffTypeUnspecified represents an unspecified diff type.
+	DiffTypeUnspecified DiffType = iota
+	// DiffTypeASCII represents ASCII diff format.
+	DiffTypeASCII
+	// DiffTypeUnified represents unified diff format.
+	DiffTypeUnified
+)
+
+// String returns the string representation of the DiffType.
+func (d DiffType) String() string {
+	switch d {
+	case DiffTypeUnspecified:
+		return "UNSPECIFIED"
+	case DiffTypeASCII:
+		return "ASCII"
+	case DiffTypeUnified:
+		return "UNIFIED"
+	default:
+		return "UNKNOWN"
+	}
+}
 
 // ExportOptions provides configuration for an export operation.
 type ExportOptions struct {
@@ -15,7 +41,7 @@ type ExportOptions struct {
 	// Optional, existing base keymap for specific editor
 	Base io.Reader
 	// TODO(xinnjie): export api level enum is not a good idea
-	DiffType keymapv1.ExportKeymapRequest_DiffType
+	DiffType DiffType
 	// file path for the keymap config
 	FilePath string
 }
@@ -28,7 +54,7 @@ type Exporter interface {
 	Export(
 		ctx context.Context,
 		destination io.Writer,
-		setting *keymapv1.Keymap,
+		setting keymap.Keymap,
 		opts ExportOptions,
 	) (*ExportReport, error)
 }

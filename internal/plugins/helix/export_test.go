@@ -17,8 +17,8 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
-// newTestAction creates a test Action with given keybindings
-func newTestAction(actionName string, keybindings ...string) keymap.Action {
+// nolint:unparam // newAction creates a test Action with given keybindings
+func newAction(actionName string, keybindings ...string) keymap.Action {
 	var bindings []keybinding.Keybinding
 	for _, kb := range keybindings {
 		b, err := keybinding.NewKeybinding(kb, keybinding.ParseOption{Separator: "+"})
@@ -54,7 +54,7 @@ func TestExportHelixKeymap(t *testing.T) {
 			name: "export copy keymap",
 			setting: keymap.Keymap{
 				Actions: []keymap.Action{
-					newTestAction("actions.edit.copy", "meta+c"),
+					newAction("actions.edit.copy", "meta+c"),
 				},
 			},
 			wantTOML: `
@@ -67,7 +67,7 @@ func TestExportHelixKeymap(t *testing.T) {
 			name: "non-destructive export preserves user keybindings",
 			setting: keymap.Keymap{
 				Actions: []keymap.Action{
-					newTestAction("actions.edit.copy", "meta+c"),
+					newAction("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -90,7 +90,7 @@ func TestExportHelixKeymap(t *testing.T) {
 			name: "managed keybinding takes priority over conflicting user keybinding",
 			setting: keymap.Keymap{
 				Actions: []keymap.Action{
-					newTestAction("actions.edit.copy", "meta+c"),
+					newAction("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -108,7 +108,7 @@ func TestExportHelixKeymap(t *testing.T) {
 			name: "multiple modes with mixed conflicts",
 			setting: keymap.Keymap{
 				Actions: []keymap.Action{
-					newTestAction("actions.edit.copy", "meta+c"),
+					newAction("actions.edit.copy", "meta+c"),
 				},
 			},
 			existingConfig: `
@@ -140,7 +140,7 @@ func TestExportHelixKeymap(t *testing.T) {
 			name: "empty existing config behaves as destructive export",
 			setting: keymap.Keymap{
 				Actions: []keymap.Action{
-					newTestAction("actions.edit.copy", "ctrl+c"),
+					newAction("actions.edit.copy", "ctrl+c"),
 				},
 			},
 			existingConfig: `[keys.normal]`,
@@ -195,7 +195,7 @@ normal = "block"
 	// Managed keymap setting to apply
 	setting := keymap.Keymap{
 		Actions: []keymap.Action{
-			newTestAction("actions.edit.copy", "ctrl+c"),
+			newAction("actions.edit.copy", "ctrl+c"),
 		},
 	}
 

@@ -13,12 +13,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 type exportFlags struct {
@@ -106,7 +105,7 @@ func exportRun(
 			logger.Warn("Failed to open existing output as base", "error", err)
 		}
 		opts.Base = base
-		opts.DiffType = keymapv1.ExportKeymapRequest_ASCII_DIFF
+		opts.DiffType = exporterapi.DiffTypeASCII
 		opts.FilePath = f.output
 
 		// Export to memory buffer first for preview, optional confirmation, and then write

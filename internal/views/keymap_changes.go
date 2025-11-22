@@ -8,10 +8,10 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	keybindingpkg "github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 const (
@@ -49,25 +49,25 @@ func NewKeymapChangesModel(changes *importerapi.KeymapChanges, confirm *bool) te
 	var rows []table.Row
 	if changes != nil {
 		for _, kb := range changes.Remove {
-			rows = append(rows, table.Row{"Remove", redMinus(kb.GetName()), redMinus(formatKeyBinding(kb)), ""})
+			rows = append(rows, table.Row{"Remove", redMinus(kb.Name), redMinus(formatKeyBinding(&kb)), ""})
 		}
 		for _, kb := range changes.Add {
-			rows = append(rows, table.Row{"Add", greenPlus(kb.GetName()), "", greenPlus(formatKeyBinding(kb))})
+			rows = append(rows, table.Row{"Add", greenPlus(kb.Name), "", greenPlus(formatKeyBinding(&kb))})
 		}
 		for _, diff := range changes.Update {
 			action := ""
-			if diff.Before != nil {
-				action = diff.Before.GetName()
-			} else if diff.After != nil {
-				action = diff.After.GetName()
+			if diff.Before.Name != "" {
+				action = diff.Before.Name
+			} else if diff.After.Name != "" {
+				action = diff.After.Name
 			}
 			rows = append(
 				rows,
 				table.Row{
 					"Update",
 					action,
-					redMinus(formatKeyBinding(diff.Before)),
-					greenPlus(formatKeyBinding(diff.After)),
+					redMinus(formatKeyBinding(&diff.Before)),
+					greenPlus(formatKeyBinding(&diff.After)),
 				},
 			)
 		}
@@ -91,11 +91,14 @@ func (m keymapChangesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		// nolint:goconst // key strings for TUI input are clearer inline here
-		case "ctrl+c", "esc", "q":
+		switch msg.Type {
+		case tea.KeyRunes:
+			if msg.String() == "q" {
+				return m, tea.Quit
+			}
+		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
-		case "enter":
+		case tea.KeyEnter:
 			// Show confirm dialog
 			m.confirming = true
 			c := huh.NewConfirm().
@@ -126,9 +129,15 @@ func (m keymapChangesModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m keymapChangesModel) handleConfirmingState(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// When confirming, delegate to the form
 	if km, ok := msg.(tea.KeyMsg); ok {
-		switch km.String() {
-		// nolint:goconst // key strings for TUI input are clearer inline here
-		case "ctrl+c", "esc", "q":
+		switch km.Type {
+		case tea.KeyRunes:
+			if km.String() == "q" {
+				if m.confirm != nil {
+					*m.confirm = false
+				}
+				return m, tea.Quit
+			}
+		case tea.KeyCtrlC, tea.KeyEsc:
 			if m.confirm != nil {
 				*m.confirm = false
 			}
@@ -168,17 +177,17 @@ func redMinus(s string) string {
 	return fmt.Sprintf("\x1b[31m-\x1b[0m %s", s)
 }
 
-func formatKeyBinding(kb *keymapv1.Action) string {
-	if kb == nil {
+func formatKeyBinding(action *keymap.Action) string {
+	if action == nil {
 		return ""
 	}
 	var parts []string
-	for _, b := range kb.GetBindings() {
-		if b == nil {
-			continue
-		}
-		f, err := keymap.NewKeyBinding(b).Format(platform.PlatformMacOS, "+")
-		if err != nil || f == "" {
+	for _, b := range action.Bindings {
+		f := b.String(keybindingpkg.FormatOption{
+			Platform:  platform.PlatformMacOS,
+			Separator: "+",
+		})
+		if f == "" {
 			continue
 		}
 		parts = append(parts, f)
@@ -200,26 +209,26 @@ func measureBeforeAfterWidths(changes *importerapi.KeymapChanges) (before, after
 	maxBefore := 0
 	maxAfter := 0
 	for _, kb := range changes.Remove {
-		l := utf8.RuneCountInString(formatKeyBinding(kb)) + prefixLen
+		l := utf8.RuneCountInString(formatKeyBinding(&kb)) + prefixLen
 		if l > maxBefore {
 			maxBefore = l
 		}
 	}
 	for _, kb := range changes.Add {
-		l := utf8.RuneCountInString(formatKeyBinding(kb)) + prefixLen
+		l := utf8.RuneCountInString(formatKeyBinding(&kb)) + prefixLen
 		if l > maxAfter {
 			maxAfter = l
 		}
 	}
 	for _, diff := range changes.Update {
-		if diff.Before != nil {
-			l := utf8.RuneCountInString(formatKeyBinding(diff.Before)) + prefixLen
+		if diff.Before.Name != "" {
+			l := utf8.RuneCountInString(formatKeyBinding(&diff.Before)) + prefixLen
 			if l > maxBefore {
 				maxBefore = l
 			}
 		}
-		if diff.After != nil {
-			l := utf8.RuneCountInString(formatKeyBinding(diff.After)) + prefixLen
+		if diff.After.Name != "" {
+			l := utf8.RuneCountInString(formatKeyBinding(&diff.After)) + prefixLen
 			if l > maxAfter {
 				maxAfter = l
 			}

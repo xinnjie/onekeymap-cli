@@ -233,7 +233,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 }
 
 func Execute() {
-	rootCmd, rootFlags := newCmdRoot()
+	rootCmd, _ := newCmdRoot()
 
 	devCmd := NewCmdDev()
 	rootCmd.AddCommand(devCmd)
@@ -244,7 +244,7 @@ func Execute() {
 	devCmd.AddCommand(NewCmdDevLookup())
 	devCmd.AddCommand(NewCmdDevMapping())
 	rootCmd.AddCommand(NewCmdView())
-	rootCmd.AddCommand(NewCmdServe(rootFlags))
+	// rootCmd.AddCommand(NewCmdServe(rootFlags))  // TODO: Migrate serve command
 	rootCmd.AddCommand(NewCmdMigrate())
 	rootCmd.AddCommand(NewCmdImport())
 	rootCmd.AddCommand(NewCmdExport())

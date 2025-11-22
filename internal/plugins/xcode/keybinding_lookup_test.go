@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 func TestXcodeKeybindingLookup(t *testing.T) {
@@ -72,11 +72,9 @@ func TestXcodeKeybindingLookup(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			lookup := NewXcodeKeybindingLookup()
 
-			// Parse the keybinding
-			keybinding, err := keymap.ParseKeyBinding(tt.keybind, "+")
+			keybinding, err := keybinding.NewKeybinding(tt.keybind, keybinding.ParseOption{Separator: "+"})
 			require.NoError(t, err)
 
-			// Perform lookup
 			results, err := lookup.Lookup(strings.NewReader(tt.plistXML), keybinding)
 
 			if tt.wantErr {

@@ -9,16 +9,15 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	vscodeplugin "github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importer"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
-	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
@@ -62,9 +61,10 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 ]`)
 
 	// Base config has the same binding (order of modifiers irrelevant; parser normalizes)
-	base := &keymapv1.Keymap{
-		Actions: []*keymapv1.Action{
-			keymap.NewActioinBinding("actions.edit.formatSelection", "ctrl+shift+alt+l"),
+	baseBinding, _ := keybinding.NewKeybinding("ctrl+shift+alt+l", keybinding.ParseOption{Separator: "+"})
+	base := keymap.Keymap{
+		Actions: []keymap.Action{
+			{Name: "actions.edit.formatSelection", Bindings: []keybinding.Keybinding{baseBinding}},
 		},
 	}
 
@@ -78,28 +78,16 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, res)
 
+	expectedBinding, _ := keybinding.NewKeybinding("ctrl+shift+alt+l", keybinding.ParseOption{Separator: "+"})
 	expected := &importerapi.ImportResult{
-		Setting: &keymapv1.Keymap{Actions: []*keymapv1.Action{
-			{
-				Name: "actions.edit.formatSelection",
-				ActionConfig: &keymapv1.ActionConfig{
-					DisplayName: "Format selection",
-					Description: "Format Selection",
-					Category:    "Editor",
-				},
-				Bindings: []*keymapv1.KeybindingReadable{
-					{
-						KeyChords:         keymap.MustParseKeyBinding("ctrl+shift+alt+l").KeyChords,
-						KeyChordsReadable: "ctrl+shift+alt+l",
-					},
-				},
-			},
+		Setting: keymap.Keymap{Actions: []keymap.Action{
+			{Name: "actions.edit.formatSelection", Bindings: []keybinding.Keybinding{expectedBinding}},
 		}},
 		Changes: &importerapi.KeymapChanges{},
 	}
 
-	settingDiff := cmp.Diff(expected.Setting, res.Setting, protocmp.Transform())
-	assert.Empty(t, settingDiff)
-	changesDiff := cmp.Diff(expected.Changes, res.Changes, protocmp.Transform())
-	assert.Empty(t, changesDiff)
+	settingDiff := cmp.Diff(expected.Setting, res.Setting)
+	assert.Empty(t, settingDiff, "Setting mismatch: %s", settingDiff)
+	changesDiff := cmp.Diff(expected.Changes, res.Changes)
+	assert.Empty(t, changesDiff, "Changes mismatch: %s", changesDiff)
 }

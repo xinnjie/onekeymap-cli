@@ -82,8 +82,12 @@ func (m SkipReportViewModel) Init() tea.Cmd {
 func (m SkipReportViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	if keyMsg, ok := msg.(tea.KeyMsg); ok {
-		switch keyMsg.String() {
-		case "q", tea.KeyCtrlC.String(), tea.KeyEnter.String():
+		switch keyMsg.Type {
+		case tea.KeyRunes:
+			if keyMsg.String() == "q" {
+				return m, tea.Quit
+			}
+		case tea.KeyCtrlC, tea.KeyEnter:
 			return m, tea.Quit
 		}
 	}

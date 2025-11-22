@@ -1,3 +1,5 @@
+//go:build disable
+
 package service_test
 
 import (

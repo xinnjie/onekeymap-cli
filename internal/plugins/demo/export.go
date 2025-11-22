@@ -28,7 +28,7 @@ func newExporter(logger *slog.Logger, differ diff.Differ) pluginapi.PluginExport
 }
 
 func (e *demoExporter) Export(
-	ctx context.Context,
+	_ context.Context,
 	destination io.Writer,
 	setting keymap.Keymap,
 	opts pluginapi.PluginExportOption,

@@ -8,15 +8,15 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 )
 
 // newAction creates a test action with bindings
-func newAction(name string, bindings ...string) pkgkeymap.Action {
-	action := pkgkeymap.Action{Name: name}
+func newAction(name string, bindings ...string) keymap.Action {
+	action := keymap.Action{Name: name}
 	for _, b := range bindings {
 		kb, _ := keybinding.NewKeybinding(b, keybinding.ParseOption{Separator: "+"})
 		action.Bindings = append(action.Bindings, kb)
@@ -36,8 +36,8 @@ func TestValidator_Validate_WithDanglingAction(t *testing.T) {
 
 	validator := validateapi.NewValidator(validate.NewDanglingActionRule(mappingConfig))
 
-	setting := pkgkeymap.Keymap{
-		Actions: []pkgkeymap.Action{
+	setting := keymap.Keymap{
+		Actions: []keymap.Action{
 			newAction("valid.action", "a"),
 			newAction("invalid.action", "b"),
 		},

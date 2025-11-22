@@ -247,7 +247,13 @@ func TestImporter_Import(t *testing.T) {
 			}
 
 			require.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(tt.expected, result.Keymap), "Expected %v, got %v", tt.expected, result.Keymap)
+			assert.True(
+				t,
+				reflect.DeepEqual(tt.expected, result.Keymap),
+				"Expected %v, got %v",
+				tt.expected,
+				result.Keymap,
+			)
 		})
 	}
 }

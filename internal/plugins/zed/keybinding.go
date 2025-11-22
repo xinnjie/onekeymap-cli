@@ -14,7 +14,7 @@ func ParseZedKeybind(keybind string) (keybinding.Keybinding, error) {
 	})
 }
 
-// FIXME(xinnjie): Format need platform param
+// FormatZedKeybind formats a keybinding for Zed editor. FIXME(xinnjie): Format need platform param
 func FormatZedKeybind(kb keybinding.Keybinding) (string, error) {
 	return kb.String(keybinding.FormatOption{
 		Platform:  platform.PlatformMacOS,

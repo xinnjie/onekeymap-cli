@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
@@ -39,8 +39,8 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 
 	validator := validateapi.NewValidator(validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
-	setting := pkgkeymap.Keymap{
-		Actions: []pkgkeymap.Action{
+	setting := keymap.Keymap{
+		Actions: []keymap.Action{
 			newAction("actions.supported", "ctrl+s"),
 			newAction("actions.vscode.only", "ctrl+v"), // Unsupported in Zed
 		},
@@ -77,8 +77,8 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 
 	validator := validateapi.NewValidator(validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeZed))
 
-	setting := pkgkeymap.Keymap{
-		Actions: []pkgkeymap.Action{
+	setting := keymap.Keymap{
+		Actions: []keymap.Action{
 			newAction("actions.universal", "ctrl+u"),
 		},
 	}
@@ -109,8 +109,8 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 	validatorVSCode := validateapi.NewValidator(
 		validate.NewUnsupportedActionRule(mappingConfig, pluginapi.EditorTypeVSCode),
 	)
-	setting := pkgkeymap.Keymap{
-		Actions: []pkgkeymap.Action{
+	setting := keymap.Keymap{
+		Actions: []keymap.Action{
 			newAction("actions.test", "ctrl+t"),
 		},
 	}

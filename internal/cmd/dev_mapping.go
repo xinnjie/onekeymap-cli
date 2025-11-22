@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/xinnjie/onekeymap-cli/internal/keybindinglookup"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/xcode"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 type devMappingFlags struct {
@@ -164,7 +164,7 @@ func findMappingsUsingLookup(
 
 	for _, keyStr := range allKeys {
 		// Parse the key string
-		kb, err := keymap.ParseKeyBinding(keyStr, "+")
+		kb, err := keybinding.NewKeybinding(keyStr, keybinding.ParseOption{Separator: "+"})
 		if err != nil {
 			continue // Skip invalid keybindings
 		}
