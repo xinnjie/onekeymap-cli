@@ -3,8 +3,8 @@ package keybinding
 import (
 	"strings"
 
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keychord"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 type Keybinding struct {

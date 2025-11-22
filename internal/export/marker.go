@@ -3,9 +3,9 @@ package export
 import (
 	"slices"
 
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 

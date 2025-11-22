@@ -8,10 +8,10 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	keybindingpkg "github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 const (

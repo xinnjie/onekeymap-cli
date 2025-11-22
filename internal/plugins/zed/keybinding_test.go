@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 func TestZed_FormatKeybinding(t *testing.T) {

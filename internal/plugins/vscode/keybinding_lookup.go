@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/xinnjie/onekeymap-cli/internal/keybindinglookup"
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 // vscodeKeybindingLookup implements KeybindingLookup interface for VSCode

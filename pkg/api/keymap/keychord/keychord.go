@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keycode"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 //nolint:gochecknoglobals // modifier lookup table is initialized once and used read-only at runtime

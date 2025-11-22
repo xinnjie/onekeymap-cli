@@ -6,9 +6,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keychord"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keycode"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 func TestNewKeyChord(t *testing.T) {

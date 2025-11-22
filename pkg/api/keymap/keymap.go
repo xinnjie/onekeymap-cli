@@ -8,8 +8,8 @@ import (
 	"io"
 	"sort"
 
-	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 type Keymap struct {
