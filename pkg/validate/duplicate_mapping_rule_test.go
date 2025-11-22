@@ -28,14 +28,14 @@ func TestDuplicateMappingRule_Validate_WithDuplicates(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Len(t, report.GetWarnings(), 1)
-	assert.NotNil(t, report.GetWarnings()[0].GetDuplicateMapping())
+	assert.Len(t, report.Warnings, 1)
+	assert.Equal(t, validateapi.IssueTypeDuplicateMapping, report.Warnings[0].Type)
 
-	duplicate := report.GetWarnings()[0].GetDuplicateMapping()
-	assert.Equal(t, "actions.edit.copy", duplicate.GetAction())
-	assert.Contains(t, duplicate.GetMessage(), "multiple times")
+	duplicate, ok := report.Warnings[0].Details.(validateapi.DuplicateMapping)
+	require.True(t, ok)
+	assert.Equal(t, "actions.edit.copy", duplicate.Action)
 }
 
 func TestDuplicateMappingRule_Validate_NoDuplicates(t *testing.T) {
@@ -53,9 +53,9 @@ func TestDuplicateMappingRule_Validate_NoDuplicates(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Empty(t, report.GetWarnings())
+	assert.Empty(t, report.Warnings)
 }
 
 func TestDuplicateMappingRule_Validate_SameActionDifferentKeys(t *testing.T) {
@@ -73,7 +73,7 @@ func TestDuplicateMappingRule_Validate_SameActionDifferentKeys(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Empty(t, report.GetWarnings())
+	assert.Empty(t, report.Warnings)
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 )
 
 // ImportOptions provides configuration for an import operation.
@@ -24,7 +24,7 @@ type ImportResult struct {
 	// The converted keymap setting.
 	Setting keymap.Keymap
 	// Any issues that arose during the import process.
-	Report *keymapv1.ValidationReport
+	Report *validateapi.ValidationReport
 
 	// The changes to the keymap setting.
 	Changes *KeymapChanges

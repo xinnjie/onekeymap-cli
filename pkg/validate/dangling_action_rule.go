@@ -5,7 +5,6 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // DanglingActionRule checks for actions that don't exist in the action mappings.
@@ -30,15 +29,12 @@ func (r *DanglingActionRule) Validate(_ context.Context, validationContext *vali
 		// Check if the action exists in the mapping configuration
 		if _, exists := r.mappingConfig.Mappings[action.Name]; !exists {
 			// Create a dangling action issue
-			danglingAction := &keymapv1.DanglingAction{
-				Action:     action.Name,
-				Keybinding: action.Name, // Use action as placeholder for keybinding
-				Suggestion: "Check if the action ID is correct or if it needs to be added to action mappings",
-			}
-
-			issue := &keymapv1.ValidationIssue{
-				Issue: &keymapv1.ValidationIssue_DanglingAction{
-					DanglingAction: danglingAction,
+			issue := validateapi.ValidationIssue{
+				Type: validateapi.IssueTypeDanglingAction,
+				Details: validateapi.DanglingAction{
+					Action:       action.Name,
+					TargetEditor: validationContext.Report.SourceEditor,
+					Suggestion:   "Check if the action ID is correct or if it needs to be added to action mappings",
 				},
 			}
 

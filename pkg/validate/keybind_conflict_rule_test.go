@@ -27,11 +27,12 @@ func TestValidator_Validate_WithKeybindConflict(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Len(t, report.GetIssues(), 1)
-	assert.NotNil(t, report.GetIssues()[0].GetKeybindConflict())
+	assert.Len(t, report.Issues, 1)
+	assert.Equal(t, validateapi.IssueTypeKeybindConflict, report.Issues[0].Type)
 
-	conflict := report.GetIssues()[0].GetKeybindConflict()
-	assert.Len(t, conflict.GetActions(), 2)
+	conflict, ok := report.Issues[0].Details.(validateapi.KeybindConflict)
+	require.True(t, ok)
+	assert.Len(t, conflict.Actions, 2)
 }

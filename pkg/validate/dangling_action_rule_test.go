@@ -47,11 +47,12 @@ func TestValidator_Validate_WithDanglingAction(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Len(t, report.GetIssues(), 1)
-	assert.NotNil(t, report.GetIssues()[0].GetDanglingAction())
+	assert.Len(t, report.Issues, 1)
+	assert.Equal(t, validateapi.IssueTypeDanglingAction, report.Issues[0].Type)
 
-	danglingAction := report.GetIssues()[0].GetDanglingAction()
-	assert.Equal(t, "invalid.action", danglingAction.GetAction())
+	danglingAction, ok := report.Issues[0].Details.(validateapi.DanglingAction)
+	require.True(t, ok)
+	assert.Equal(t, "invalid.action", danglingAction.Action)
 }

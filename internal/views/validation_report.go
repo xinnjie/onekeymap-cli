@@ -7,16 +7,16 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 )
 
 type ValidationReportModel struct {
-	report   *keymapv1.ValidationReport
+	report   *validateapi.ValidationReport
 	viewport viewport.Model
 	ready    bool
 }
 
-func NewValidationReportModel(report *keymapv1.ValidationReport) ValidationReportModel {
+func NewValidationReportModel(report *validateapi.ValidationReport) ValidationReportModel {
 	return ValidationReportModel{
 		report: report,
 	}
@@ -82,23 +82,23 @@ func (m ValidationReportModel) footerView() string {
 func (m ValidationReportModel) renderReport() string {
 	var b strings.Builder
 
-	s := m.report.GetSummary()
+	s := m.report.Summary
 	b.WriteString(summaryStyle.Render(
 		fmt.Sprintf("Source: %s | Mappings Processed: %d | Succeeded: %d",
-			m.report.GetSourceEditor(), s.GetMappingsProcessed(), s.GetMappingsSucceeded()),
+			m.report.SourceEditor, s.MappingsProcessed, s.MappingsSucceeded),
 	))
 	b.WriteString("\n")
 
-	if len(m.report.GetIssues()) > 0 {
-		b.WriteString(errorHeaderStyle.Render(fmt.Sprintf("Issues (%d)", len(m.report.GetIssues()))))
-		for _, issue := range m.report.GetIssues() {
+	if len(m.report.Issues) > 0 {
+		b.WriteString(errorHeaderStyle.Render(fmt.Sprintf("Issues (%d)", len(m.report.Issues))))
+		for _, issue := range m.report.Issues {
 			b.WriteString(renderIssue(issue))
 		}
 	}
 
-	if len(m.report.GetWarnings()) > 0 {
-		b.WriteString(warningHeaderStyle.Render(fmt.Sprintf("Warnings (%d)", len(m.report.GetWarnings()))))
-		for _, warning := range m.report.GetWarnings() {
+	if len(m.report.Warnings) > 0 {
+		b.WriteString(warningHeaderStyle.Render(fmt.Sprintf("Warnings (%d)", len(m.report.Warnings))))
+		for _, warning := range m.report.Warnings {
 			b.WriteString(renderIssue(warning))
 		}
 	}
@@ -106,42 +106,47 @@ func (m ValidationReportModel) renderReport() string {
 	return b.String()
 }
 
-func renderIssue(issue *keymapv1.ValidationIssue) string {
+func renderIssue(issue validateapi.ValidationIssue) string {
 	var content string
-	switch v := issue.GetIssue().(type) {
-	case *keymapv1.ValidationIssue_KeybindConflict:
-		c := v.KeybindConflict
-		var actionLines []string
-		for _, action := range c.GetActions() {
-			if action.GetEditorCommand() != "" {
-				actionLines = append(actionLines, fmt.Sprintf("%s (%s)", action.GetEditorCommand(), action.GetAction()))
-			} else {
-				actionLines = append(actionLines, action.GetAction())
+	switch issue.Type {
+	case validateapi.IssueTypeKeybindConflict:
+		if c, ok := issue.Details.(validateapi.KeybindConflict); ok {
+			var actionLines []string
+			for _, action := range c.Actions {
+				if action.Context != "" {
+					actionLines = append(actionLines, fmt.Sprintf("%s (%s)", action.Context, action.ActionID))
+				} else {
+					actionLines = append(actionLines, action.ActionID)
+				}
 			}
+			content = fmt.Sprintf("Keybind Conflict: %s is mapped to multiple actions:\n  - %s",
+				keyStyle.Render(c.Keybinding),
+				actionStyle.Render(strings.Join(actionLines, "\n  - ")))
 		}
-		content = fmt.Sprintf("Keybind Conflict: %s is mapped to multiple actions:\n  - %s",
-			keyStyle.Render(c.GetKeybinding()),
-			actionStyle.Render(strings.Join(actionLines, "\n  - ")))
-	case *keymapv1.ValidationIssue_DanglingAction:
-		d := v.DanglingAction
-		suggestion := ""
-		if d.GetSuggestion() != "" {
-			suggestion = fmt.Sprintf(" (Did you mean %s?)", actionStyle.Render(d.GetSuggestion()))
+	case validateapi.IssueTypeDanglingAction:
+		if d, ok := issue.Details.(validateapi.DanglingAction); ok {
+			suggestion := ""
+			if d.Suggestion != "" {
+				suggestion = fmt.Sprintf(" (%s)", actionStyle.Render(d.Suggestion))
+			}
+			content = fmt.Sprintf("Dangling Action: %s does not exist in target %s.%s",
+				actionStyle.Render(d.Action), keyStyle.Render(d.TargetEditor), suggestion)
 		}
-		content = fmt.Sprintf("Dangling Action: %s for key %s does not exist.%s",
-			actionStyle.Render(d.GetAction()), keyStyle.Render(d.GetKeybinding()), suggestion)
-	case *keymapv1.ValidationIssue_UnsupportedAction:
-		u := v.UnsupportedAction
-		content = fmt.Sprintf("Unsupported Action: %s (on key %s) is not supported for target %s.",
-			actionStyle.Render(u.GetAction()), keyStyle.Render(u.GetKeybinding()), keyStyle.Render(u.GetTargetEditor()))
-	case *keymapv1.ValidationIssue_DuplicateMapping:
-		d := v.DuplicateMapping
-		content = fmt.Sprintf("Duplicate Mapping: Action %s with key %s is defined multiple times.",
-			actionStyle.Render(d.GetAction()), keyStyle.Render(d.GetKeybinding()))
-	case *keymapv1.ValidationIssue_PotentialShadowing:
-		p := v.PotentialShadowing
-		content = fmt.Sprintf("Potential Shadowing: Key %s (for action %s) might override a system or editor default on %s.",
-			keyStyle.Render(p.GetKeybinding()), actionStyle.Render(p.GetAction()), keyStyle.Render(p.GetTargetEditor()))
+	case validateapi.IssueTypeUnsupportedAction:
+		if u, ok := issue.Details.(validateapi.UnsupportedAction); ok {
+			content = fmt.Sprintf("Unsupported Action: %s (on key %s) is not supported for target %s.",
+				actionStyle.Render(u.Action), keyStyle.Render(u.Keybinding), keyStyle.Render(u.TargetEditor))
+		}
+	case validateapi.IssueTypeDuplicateMapping:
+		if d, ok := issue.Details.(validateapi.DuplicateMapping); ok {
+			content = fmt.Sprintf("Duplicate Mapping: Action %s with key %s is defined multiple times.",
+				actionStyle.Render(d.Action), keyStyle.Render(d.Keybinding))
+		}
+	case validateapi.IssueTypePotentialShadowing:
+		if p, ok := issue.Details.(validateapi.PotentialShadowing); ok {
+			content = fmt.Sprintf("Potential Shadowing: Key %s (for action %s). %s",
+				keyStyle.Render(p.Keybinding), actionStyle.Render(p.Action), p.CriticalShortcutDescription)
+		}
 	default:
 		content = "Unknown issue type."
 	}

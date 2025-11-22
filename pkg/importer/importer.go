@@ -89,7 +89,7 @@ func (s *importer) Import(ctx context.Context, opts importerapi.ImportOptions) (
 		return nil, errors.New("failed to import config: no keybindings found")
 	}
 
-	report, err := s.validator.Validate(ctx, setting, opts)
+	report, err := s.validator.Validate(ctx, setting, opts.EditorType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to validate config: %w", err)
 	}

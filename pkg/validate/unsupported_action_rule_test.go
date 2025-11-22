@@ -50,14 +50,15 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 		EditorType: "zed",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Len(t, report.GetIssues(), 1)
-	assert.NotNil(t, report.GetIssues()[0].GetUnsupportedAction())
+	assert.Len(t, report.Issues, 1)
+	assert.Equal(t, validateapi.IssueTypeUnsupportedAction, report.Issues[0].Type)
 
-	unsupported := report.GetIssues()[0].GetUnsupportedAction()
-	assert.Equal(t, "actions.vscode.only", unsupported.GetAction())
-	assert.Equal(t, "zed", unsupported.GetTargetEditor())
+	unsupported, ok := report.Issues[0].Details.(validateapi.UnsupportedAction)
+	require.True(t, ok)
+	assert.Equal(t, "actions.vscode.only", unsupported.Action)
+	assert.Equal(t, "zed", unsupported.TargetEditor)
 }
 
 func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
@@ -87,9 +88,9 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 		EditorType: "zed",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Empty(t, report.GetIssues())
+	assert.Empty(t, report.Issues)
 }
 
 func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
@@ -119,9 +120,9 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validatorVSCode.Validate(context.Background(), setting, opts)
+	report, err := validatorVSCode.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Empty(t, report.GetIssues())
+	assert.Empty(t, report.Issues)
 
 	// Test with Zed target - should fail
 	validatorZed := validateapi.NewValidator(
@@ -129,7 +130,7 @@ func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
 	)
 	opts.EditorType = "zed"
 
-	report, err = validatorZed.Validate(context.Background(), setting, opts)
+	report, err = validatorZed.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Len(t, report.GetIssues(), 1)
+	assert.Len(t, report.Issues, 1)
 }

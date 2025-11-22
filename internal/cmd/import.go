@@ -16,9 +16,9 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
-	pkgkeymap "github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 )
 
 type importFlags struct {
@@ -155,7 +155,7 @@ func executeImportInteractive(
 
 	// Show validation report if there are issues
 	if result != nil && result.Report != nil &&
-		(len(result.Report.GetIssues()) > 0 || len(result.Report.GetWarnings()) > 0) {
+		(len(result.Report.Issues) > 0 || len(result.Report.Warnings) > 0) {
 		logger.Info("Validation found issues. Displaying report...")
 		if err := runValidationReportPreview(result.Report); err != nil {
 			logger.Warn("Failed to display validation report", "error", err)
@@ -220,26 +220,26 @@ func executeImportNonInteractive(
 	return saveImportResult(f.output, result, logger)
 }
 
-func loadBaseConfig(outputPath, onekeymapConfig string, logger *slog.Logger) pkgkeymap.Keymap {
+func loadBaseConfig(outputPath, onekeymapConfig string, logger *slog.Logger) keymap.Keymap {
 	basePath := outputPath
 	if basePath == "" {
 		basePath = onekeymapConfig
 	}
 	if basePath == "" {
-		return pkgkeymap.Keymap{}
+		return keymap.Keymap{}
 	}
 
 	baseConfigFile, err := os.Open(basePath)
 	if err != nil {
 		logger.Debug("Base config file not found, skip loading base config", "path", basePath)
-		return pkgkeymap.Keymap{}
+		return keymap.Keymap{}
 	}
 	defer func() { _ = baseConfigFile.Close() }()
 
-	cfg, lerr := pkgkeymap.Load(baseConfigFile, pkgkeymap.LoadOptions{})
+	cfg, lerr := keymap.Load(baseConfigFile, keymap.LoadOptions{})
 	if lerr != nil {
 		logger.Warn("Failed to load base keymap, treat as no base config", "error", lerr)
-		return pkgkeymap.Keymap{}
+		return keymap.Keymap{}
 	}
 
 	return cfg
@@ -265,8 +265,8 @@ func saveImportResult(outputPath string, result *importerapi.ImportResult, logge
 	}
 
 	// Use new API Save
-	saveOpt := pkgkeymap.SaveOptions{Platform: platform.PlatformMacOS}
-	if err := pkgkeymap.Save(outputFile, result.Setting, saveOpt); err != nil {
+	saveOpt := keymap.SaveOptions{Platform: platform.PlatformMacOS}
+	if err := keymap.Save(outputFile, result.Setting, saveOpt); err != nil {
 		logger.Error("Failed to save config file", "error", err)
 		return err
 	}
@@ -417,7 +417,7 @@ func runImportForm(
 }
 
 // run the validation report TUI ---.
-func runValidationReportPreview(report *keymapv1.ValidationReport) error {
+func runValidationReportPreview(report *validateapi.ValidationReport) error {
 	m := views.NewValidationReportModel(report)
 	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {

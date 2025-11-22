@@ -8,7 +8,6 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	validateapi "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // PotentialShadowingRule detects keybindings that might shadow critical system or editor shortcuts.
@@ -108,14 +107,12 @@ func (r *PotentialShadowingRule) Validate(_ context.Context, validationContext *
 			// Check if this keybinding shadows a critical shortcut
 			if description, isCritical := criticalKeybindings[normalizedKeys]; isCritical {
 				// Add warning for potential shadowing
-				warning := &keymapv1.ValidationIssue{
-					Issue: &keymapv1.ValidationIssue_PotentialShadowing{
-						PotentialShadowing: &keymapv1.PotentialShadowing{
-							Keybinding:   formattedKeys,
-							Action:       action.Name,
-							TargetEditor: string(r.targetEditor),
-							Message:      "This key chord is the default for " + description + ".",
-						},
+				warning := validateapi.ValidationIssue{
+					Type: validateapi.IssueTypePotentialShadowing,
+					Details: validateapi.PotentialShadowing{
+						Keybinding:                  formattedKeys,
+						Action:                      action.Name,
+						CriticalShortcutDescription: "This key chord is the default for " + description + ".",
 					},
 				}
 				report.Warnings = append(report.Warnings, warning)

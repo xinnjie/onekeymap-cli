@@ -8,7 +8,6 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	validateapi "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // KeybindConflictRule checks for keybinding conflicts where multiple actions
@@ -53,18 +52,18 @@ func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *val
 	for keybindingStr, actions := range keybindingMap {
 		if len(actions) > 1 {
 			// Create action objects with editor commands
-			var conflictActions []*keymapv1.KeybindConflict_Action
+			var conflictActions []validateapi.ConflictAction
 			for _, act := range actions {
-				conflictAction := &keymapv1.KeybindConflict_Action{
-					Action: act.Name,
+				conflictAction := validateapi.ConflictAction{
+					ActionID: act.Name,
 				}
 
 				// Try to get editor command from mapping config
 				if mappingConfig != nil {
 					if mapping := mappingConfig.Get(act.Name); mapping != nil {
 						// Get editor command based on source editor from report
-						editorCommand := getEditorCommand(mapping, validationContext.Report.GetSourceEditor())
-						conflictAction.EditorCommand = editorCommand
+						editorCommand := getEditorCommand(mapping, validationContext.Report.SourceEditor)
+						conflictAction.Context = editorCommand
 					}
 				}
 
@@ -72,14 +71,11 @@ func (r *KeybindConflictRule) Validate(_ context.Context, validationContext *val
 			}
 
 			// Create a keybinding conflict issue
-			conflict := &keymapv1.KeybindConflict{
-				Keybinding: keybindingStr,
-				Actions:    conflictActions,
-			}
-
-			issue := &keymapv1.ValidationIssue{
-				Issue: &keymapv1.ValidationIssue_KeybindConflict{
-					KeybindConflict: conflict,
+			issue := validateapi.ValidationIssue{
+				Type: validateapi.IssueTypeKeybindConflict,
+				Details: validateapi.KeybindConflict{
+					Keybinding: keybindingStr,
+					Actions:    conflictActions,
 				},
 			}
 

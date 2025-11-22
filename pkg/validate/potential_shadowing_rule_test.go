@@ -31,21 +31,23 @@ func TestPotentialShadowingRule_Validate_WithCriticalKeybinding(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Len(t, report.GetWarnings(), 2)
+	assert.Len(t, report.Warnings, 2)
 
 	// Check first warning (cmd+q)
-	warning1 := report.GetWarnings()[0].GetPotentialShadowing()
-	assert.NotNil(t, warning1)
-	assert.Equal(t, "actions.format.document", warning1.GetAction())
-	assert.Contains(t, warning1.GetMessage(), "quitting applications on macOS")
+	assert.Equal(t, validateapi.IssueTypePotentialShadowing, report.Warnings[0].Type)
+	warning1, ok := report.Warnings[0].Details.(validateapi.PotentialShadowing)
+	require.True(t, ok)
+	assert.Equal(t, "actions.format.document", warning1.Action)
+	assert.Contains(t, warning1.CriticalShortcutDescription, "quitting applications on macOS")
 
 	// Check second warning (cmd+c)
-	warning2 := report.GetWarnings()[1].GetPotentialShadowing()
-	assert.NotNil(t, warning2)
-	assert.Equal(t, "actions.edit.copy", warning2.GetAction())
-	assert.Contains(t, warning2.GetMessage(), "copy on macOS")
+	assert.Equal(t, validateapi.IssueTypePotentialShadowing, report.Warnings[1].Type)
+	warning2, ok := report.Warnings[1].Details.(validateapi.PotentialShadowing)
+	require.True(t, ok)
+	assert.Equal(t, "actions.edit.copy", warning2.Action)
+	assert.Contains(t, warning2.CriticalShortcutDescription, "copy on macOS")
 }
 
 func TestPotentialShadowingRule_Validate_NoCriticalKeybindings(t *testing.T) {
@@ -64,9 +66,9 @@ func TestPotentialShadowingRule_Validate_NoCriticalKeybindings(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Empty(t, report.GetWarnings())
+	assert.Empty(t, report.Warnings)
 }
 
 func TestPotentialShadowingRule_Validate_WindowsCriticalShortcuts(t *testing.T) {
@@ -85,15 +87,16 @@ func TestPotentialShadowingRule_Validate_WindowsCriticalShortcuts(t *testing.T) 
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Len(t, report.GetWarnings(), 2)
+	assert.Len(t, report.Warnings, 2)
 
 	// Check warnings contain appropriate messages
-	for _, warning := range report.GetWarnings() {
-		shadowing := warning.GetPotentialShadowing()
-		assert.NotNil(t, shadowing)
-		assert.Contains(t, shadowing.GetMessage(), "Windows")
+	for _, warning := range report.Warnings {
+		assert.Equal(t, validateapi.IssueTypePotentialShadowing, warning.Type)
+		shadowing, ok := warning.Details.(validateapi.PotentialShadowing)
+		require.True(t, ok)
+		assert.Contains(t, shadowing.CriticalShortcutDescription, "Windows")
 	}
 }
 
@@ -113,11 +116,12 @@ func TestPotentialShadowingRule_Validate_CaseInsensitive(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Len(t, report.GetWarnings(), 1)
+	assert.Len(t, report.Warnings, 1)
 
-	warning := report.GetWarnings()[0].GetPotentialShadowing()
-	assert.NotNil(t, warning)
-	assert.Contains(t, warning.GetMessage(), "quitting applications on macOS")
+	assert.Equal(t, validateapi.IssueTypePotentialShadowing, report.Warnings[0].Type)
+	warning, ok := report.Warnings[0].Details.(validateapi.PotentialShadowing)
+	require.True(t, ok)
+	assert.Contains(t, warning.CriticalShortcutDescription, "quitting applications on macOS")
 }

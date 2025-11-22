@@ -6,7 +6,6 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	validateapi "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // DuplicateMappingRule detects duplicate mappings (same action and keys combination).
@@ -33,13 +32,11 @@ func (r *DuplicateMappingRule) Validate(_ context.Context, validationContext *va
 			})
 			composite := action.Name + "\x00" + key
 			if _, exists := seen[composite]; exists {
-				warning := &keymapv1.ValidationIssue{
-					Issue: &keymapv1.ValidationIssue_DuplicateMapping{
-						DuplicateMapping: &keymapv1.DuplicateMapping{
-							Action:     action.Name,
-							Keybinding: key,
-							Message:    "This keymap is defined multiple times in the source configuration.",
-						},
+				warning := validateapi.ValidationIssue{
+					Type: validateapi.IssueTypeDuplicateMapping,
+					Details: validateapi.DuplicateMapping{
+						Action:     action.Name,
+						Keybinding: key,
 					},
 				}
 				report.Warnings = append(report.Warnings, warning)

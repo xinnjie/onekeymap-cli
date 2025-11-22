@@ -34,11 +34,11 @@ func TestValidator_Validate_EmptyKeymaps(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
-	assert.Equal(t, "vscode", report.GetSourceEditor())
-	assert.Equal(t, int32(0), report.GetSummary().GetMappingsProcessed())
-	assert.Empty(t, report.GetIssues())
+	assert.Equal(t, "vscode", report.SourceEditor)
+	assert.Equal(t, 0, report.Summary.MappingsProcessed)
+	assert.Empty(t, report.Issues)
 }
 
 func TestValidator_Validate_ChainOfRules(t *testing.T) {
@@ -67,21 +67,21 @@ func TestValidator_Validate_ChainOfRules(t *testing.T) {
 		EditorType: "vscode",
 	}
 
-	report, err := validator.Validate(context.Background(), setting, opts)
+	report, err := validator.Validate(context.Background(), setting, opts.EditorType)
 	require.NoError(t, err)
 
 	// Should have both keybind conflict and dangling action issues
-	assert.Len(t, report.GetIssues(), 2)
+	assert.Len(t, report.Issues, 2)
 
 	// Check that we have both types of issues
 	hasKeybindConflict := false
 	hasDanglingAction := false
 
-	for _, issue := range report.GetIssues() {
-		if issue.GetKeybindConflict() != nil {
+	for _, issue := range report.Issues {
+		if issue.Type == validateapi.IssueTypeKeybindConflict {
 			hasKeybindConflict = true
 		}
-		if issue.GetDanglingAction() != nil {
+		if issue.Type == validateapi.IssueTypeDanglingAction {
 			hasDanglingAction = true
 		}
 	}

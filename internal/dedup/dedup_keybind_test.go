@@ -6,70 +6,89 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/xinnjie/onekeymap-cli/internal/dedup"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
-	"google.golang.org/protobuf/testing/protocmp"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keychord"
 )
 
-func TestDedupKeyBindings_Table(t *testing.T) {
+func newAction(name string, keys ...string) keymap.Action {
+	var bindings []keybinding.Keybinding
+	for _, k := range keys {
+		kb, err := keybinding.NewKeybinding(k, keybinding.ParseOption{
+			Separator: "+",
+			Platform:  platform.PlatformMacOS,
+		})
+		if err != nil {
+			panic(err)
+		}
+		bindings = append(bindings, kb)
+	}
+	return keymap.Action{
+		Name:     name,
+		Bindings: bindings,
+	}
+}
+
+func TestActions_Table(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    []*keymapv1.Action
-		expected []*keymapv1.Action
+		input    []keymap.Action
+		expected []keymap.Action
 	}{
 		{
 			name: "EmptyChords",
-			input: []*keymapv1.Action{
+			input: []keymap.Action{
 				{
 					Name: "actions.copy",
-					Bindings: []*keymapv1.KeybindingReadable{
-						{KeyChords: &keymapv1.Keybinding{Chords: []*keymapv1.KeyChord{}}},
+					Bindings: []keybinding.Keybinding{
+						{KeyChords: []keychord.KeyChord{}},
 					},
 				},
 			},
-			expected: []*keymapv1.Action{},
+			expected: []keymap.Action{},
 		},
 		{
 			name: "DuplicatesByActionAndChords",
-			input: []*keymapv1.Action{
-				keymap.NewActioinBinding("actions.copy", "k"),
-				keymap.NewActioinBinding("actions.copy", "k"),
+			input: []keymap.Action{
+				newAction("actions.copy", "k"),
+				newAction("actions.copy", "k"),
 			},
-			expected: []*keymapv1.Action{
-				keymap.NewActioinBinding("actions.copy", "k"),
+			expected: []keymap.Action{
+				newAction("actions.copy", "k"),
 			},
 		},
 		{
 			name: "KeepsOrderAndSkipsNil",
-			input: []*keymapv1.Action{
-				keymap.NewActioinBinding("actions.open", "o"),
-				keymap.NewActioinBinding("actions.open", "o"),
-				keymap.NewActioinBinding("actions.save", "o"),
+			input: []keymap.Action{
+				newAction("actions.open", "o"),
+				newAction("actions.open", "o"),
+				newAction("actions.save", "o"),
 			},
-			expected: []*keymapv1.Action{
-				keymap.NewActioinBinding("actions.open", "o"),
-				keymap.NewActioinBinding("actions.save", "o"),
+			expected: []keymap.Action{
+				newAction("actions.open", "o"),
+				newAction("actions.save", "o"),
 			},
 		},
 		{
 			name: "AggregatesByIDForDifferentChords",
-			input: []*keymapv1.Action{
-				keymap.NewActioinBinding("actions.find", "f"),
-				keymap.NewActioinBinding("actions.replace", "f", "f", "f"),
-				keymap.NewActioinBinding("actions.find", "g"),
+			input: []keymap.Action{
+				newAction("actions.find", "f"),
+				newAction("actions.replace", "f", "f", "f"),
+				newAction("actions.find", "g"),
 			},
-			expected: []*keymapv1.Action{
-				keymap.NewActioinBinding("actions.find", "f", "g"),
-				keymap.NewActioinBinding("actions.replace", "f"),
+			expected: []keymap.Action{
+				newAction("actions.find", "f", "g"),
+				newAction("actions.replace", "f"),
 			},
 		},
 		{
 			name: "NilVsEmptyChordsConsideredEqual",
-			input: []*keymapv1.Action{
+			input: []keymap.Action{
 				{Name: "actions.nochord"},
-				{Name: "actions.nochord", Bindings: []*keymapv1.KeybindingReadable{}},
+				{Name: "actions.nochord", Bindings: []keybinding.Keybinding{}},
 			},
-			expected: []*keymapv1.Action{
+			expected: []keymap.Action{
 				{Name: "actions.nochord"},
 			},
 		},
@@ -77,8 +96,8 @@ func TestDedupKeyBindings_Table(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			actual := dedup.DedupKeyBindings(tc.input)
-			diff := cmp.Diff(tc.expected, actual, protocmp.Transform())
+			actual := dedup.Actions(tc.input)
+			diff := cmp.Diff(tc.expected, actual)
 			assert.Empty(t, diff)
 		})
 	}

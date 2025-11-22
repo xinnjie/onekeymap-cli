@@ -8,7 +8,6 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 // UnsupportedActionRule detects actions that cannot be exported to a specific target editor.
@@ -65,13 +64,12 @@ func (r *UnsupportedActionRule) Validate(_ context.Context, validationContext *v
 					Separator: " ",
 				})
 				// Add error for unsupported action
-				issue := &keymapv1.ValidationIssue{
-					Issue: &keymapv1.ValidationIssue_UnsupportedAction{
-						UnsupportedAction: &keymapv1.UnsupportedAction{
-							Action:       action.Name,
-							Keybinding:   formattedKeys,
-							TargetEditor: string(r.targetEditor),
-						},
+				issue := validateapi.ValidationIssue{
+					Type: validateapi.IssueTypeUnsupportedAction,
+					Details: validateapi.UnsupportedAction{
+						Action:       action.Name,
+						Keybinding:   formattedKeys,
+						TargetEditor: string(r.targetEditor),
 					},
 				}
 				report.Issues = append(report.Issues, issue)
