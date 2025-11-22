@@ -13,11 +13,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 type exportFlags struct {
@@ -34,7 +34,7 @@ func NewCmdExport() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export a universal keymap to an editor's format",
-		RunE: exportRun(&f, func() (*slog.Logger, *plugins.Registry, exporterapi.Exporter) {
+		RunE: exportRun(&f, func() (*slog.Logger, *registry.Registry, exporterapi.Exporter) {
 			return cmdLogger, cmdPluginRegistry, cmdExportService
 		}),
 		Args: cobra.ExactArgs(0),
@@ -59,7 +59,7 @@ func NewCmdExport() *cobra.Command {
 
 func exportRun(
 	f *exportFlags,
-	dependencies func() (*slog.Logger, *plugins.Registry, exporterapi.Exporter),
+	dependencies func() (*slog.Logger, *registry.Registry, exporterapi.Exporter),
 ) func(cmd *cobra.Command, _ []string) error {
 	return func(cmd *cobra.Command, _ []string) error {
 		logger, pluginRegistry, exportService := dependencies()
@@ -178,7 +178,7 @@ func handleInteractiveExportFlags(
 	cmd *cobra.Command,
 	f *exportFlags,
 	onekeymapPlaceholder string,
-	pluginRegistry *plugins.Registry,
+	pluginRegistry *registry.Registry,
 ) error {
 	needSelectEditor := !cmd.Flags().Changed("to") || f.to == ""
 	needInput := !cmd.Flags().Changed("input") || f.input == ""
@@ -210,7 +210,7 @@ func prepareExportInputFlags(
 	cmd *cobra.Command,
 	f *exportFlags,
 	onekeymapPlaceholder string,
-	pluginRegistry *plugins.Registry,
+	pluginRegistry *registry.Registry,
 	logger *slog.Logger,
 ) error {
 	if f.interactive {
@@ -250,7 +250,7 @@ func prepareExportInputFlags(
 	return nil
 }
 
-func runExportForm(pluginRegistry *plugins.Registry, to, input, output *string, onekeymapConfigPlaceHolder string,
+func runExportForm(pluginRegistry *registry.Registry, to, input, output *string, onekeymapConfigPlaceHolder string,
 	needSelectEditor, needInput, needOutput bool) error {
 	m, err := views.NewOutputFormModel(
 		pluginRegistry,

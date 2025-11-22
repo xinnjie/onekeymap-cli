@@ -11,13 +11,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importer"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 // testPlugin implements pluginapi.Plugin interface for testing.
@@ -283,7 +283,7 @@ func TestImportService_Import(t *testing.T) {
 			require.NoError(t, err)
 
 			testPlug := newTestPlugin(pluginapi.EditorTypeVSCode, testFile.Name(), tc.importData, tc.importError)
-			registry := plugins.NewRegistry()
+			registry := registry.NewRegistry()
 			registry.Register(testPlug)
 
 			mappingConfig := &mappings.MappingConfig{

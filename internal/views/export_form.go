@@ -8,8 +8,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 type ExportFormModel struct {
 	form *huh.Form
 
-	pluginRegistry *plugins.Registry
+	pluginRegistry *registry.Registry
 
 	needSelectEditor bool
 	needInput        bool
@@ -34,7 +34,7 @@ type ExportFormModel struct {
 }
 
 func NewOutputFormModel(
-	registry *plugins.Registry,
+	registry *registry.Registry,
 	needSelectEditor, needInput, needOutput bool,
 	editor, onekeymapConfigInput, editorKeymapConfigOutput *string,
 	onekeymapConfigPlaceHolder string,

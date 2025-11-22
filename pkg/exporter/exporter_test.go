@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/exporter"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 // testExportPlugin is a minimal plugin implementation for export tests.
@@ -86,7 +86,7 @@ func newTestExportService(
 	e pluginapi.PluginExporter,
 ) exporterapi.Exporter {
 	t.Helper()
-	r := plugins.NewRegistry()
+	r := registry.NewRegistry()
 	r.Register(&testExportPlugin{editorType: pluginapi.EditorType("test"), exporter: e})
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	recorder := metrics.NewNoop()

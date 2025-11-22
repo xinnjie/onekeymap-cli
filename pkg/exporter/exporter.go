@@ -9,16 +9,16 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 // exporter is the default implementation of the Exporter interface.
 type exporter struct {
-	registry        *plugins.Registry
+	registry        *registry.Registry
 	mappingConfig   *mappings.MappingConfig
 	logger          *slog.Logger
 	recorder        metrics.Recorder
@@ -27,7 +27,7 @@ type exporter struct {
 
 // NewExporter creates a new default export service.
 func NewExporter(
-	registry *plugins.Registry,
+	registry *registry.Registry,
 	config *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,

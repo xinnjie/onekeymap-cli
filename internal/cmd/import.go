@@ -12,13 +12,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 type importFlags struct {
@@ -35,7 +35,7 @@ func NewCmdImport() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "import",
 		Short: "Import an editor's keymap to the universal format",
-		RunE: importRun(&f, func() (*slog.Logger, *plugins.Registry, importerapi.Importer) {
+		RunE: importRun(&f, func() (*slog.Logger, *registry.Registry, importerapi.Importer) {
 			return cmdLogger, cmdPluginRegistry, cmdImportService
 		}),
 		Args: cobra.ExactArgs(0),
@@ -61,7 +61,7 @@ func NewCmdImport() *cobra.Command {
 
 func importRun(
 	f *importFlags,
-	dependencies func() (*slog.Logger, *plugins.Registry, importerapi.Importer),
+	dependencies func() (*slog.Logger, *registry.Registry, importerapi.Importer),
 ) func(cmd *cobra.Command, _ []string) error {
 	return func(cmd *cobra.Command, _ []string) error {
 		logger, pluginRegistry, importService := dependencies()
@@ -79,7 +79,7 @@ func importRunInteractive(
 	cmd *cobra.Command,
 	f *importFlags,
 	logger *slog.Logger,
-	pluginRegistry *plugins.Registry,
+	pluginRegistry *registry.Registry,
 	importService importerapi.Importer,
 	onekeymapConfig string,
 ) error {
@@ -94,7 +94,7 @@ func importRunNonInteractive(
 	cmd *cobra.Command,
 	f *importFlags,
 	logger *slog.Logger,
-	pluginRegistry *plugins.Registry,
+	pluginRegistry *registry.Registry,
 	importService importerapi.Importer,
 	onekeymapConfig string,
 ) error {
@@ -282,7 +282,7 @@ func handleInteractiveImportFlags(
 	cmd *cobra.Command,
 	f *importFlags,
 	onekeymapConfig string,
-	pluginRegistry *plugins.Registry,
+	pluginRegistry *registry.Registry,
 	logger *slog.Logger,
 ) error {
 	needSelectEditor := !cmd.Flags().Changed("from") || f.from == ""
@@ -312,7 +312,7 @@ func prepareInteractiveImportFlags(
 	cmd *cobra.Command,
 	f *importFlags,
 	onekeymapConfig string,
-	pluginRegistry *plugins.Registry,
+	pluginRegistry *registry.Registry,
 	logger *slog.Logger,
 ) error {
 	if err := handleInteractiveImportFlags(cmd, f, onekeymapConfig, pluginRegistry, logger); err != nil {
@@ -345,7 +345,7 @@ func prepareInteractiveImportFlags(
 func prepareNonInteractiveImportFlags(
 	f *importFlags,
 	onekeymapConfig string,
-	pluginRegistry *plugins.Registry,
+	pluginRegistry *registry.Registry,
 	logger *slog.Logger,
 ) error {
 	if f.from == "" {
@@ -388,7 +388,7 @@ func runImportChangesPreview(changes *importerapi.KeymapChanges) (bool, error) {
 // runImportForm runs the interactive import form and returns the selected values.
 // All TUI logic is encapsulated here to keep cmd/import.go simple.
 func runImportForm(
-	pluginRegistry *plugins.Registry,
+	pluginRegistry *registry.Registry,
 	from, input, output *string,
 	onekeymapConfigPlaceHolder string,
 	needSelectEditor, needInput, needOutput bool,

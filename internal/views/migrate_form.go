@@ -3,8 +3,8 @@ package views
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 type MigrateFormModel struct {
 	form *huh.Form
 
-	pluginRegistry *plugins.Registry
+	pluginRegistry *registry.Registry
 	EditorFrom     *string
 	EditorTo       *string
 	Input          *string
@@ -25,7 +25,7 @@ type MigrateFormModel struct {
 	toPlaceholder   string
 }
 
-func NewMigrateFormModel(registry *plugins.Registry, from, to, input, output *string) *MigrateFormModel {
+func NewMigrateFormModel(registry *registry.Registry, from, to, input, output *string) *MigrateFormModel {
 	m := &MigrateFormModel{
 		pluginRegistry: registry,
 		EditorFrom:     from,

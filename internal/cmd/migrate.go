@@ -10,11 +10,11 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 type migrateFlags struct {
@@ -31,7 +31,7 @@ func NewCmdMigrate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "migrate",
 		Short: "Migrate keymaps from one editor to another",
-		RunE: migrateRun(&f, func() (*slog.Logger, importerapi.Importer, exporterapi.Exporter, *plugins.Registry) {
+		RunE: migrateRun(&f, func() (*slog.Logger, importerapi.Importer, exporterapi.Exporter, *registry.Registry) {
 			return cmdLogger, cmdImportService, cmdExportService, cmdPluginRegistry
 		}),
 		Args: cobra.ExactArgs(0),
@@ -49,7 +49,7 @@ func NewCmdMigrate() *cobra.Command {
 
 func migrateRun(
 	f *migrateFlags,
-	dependencies func() (*slog.Logger, importerapi.Importer, exporterapi.Exporter, *plugins.Registry),
+	dependencies func() (*slog.Logger, importerapi.Importer, exporterapi.Exporter, *registry.Registry),
 ) func(cmd *cobra.Command, _ []string) error {
 	return func(cmd *cobra.Command, _ []string) error {
 		ctx := cmd.Context()

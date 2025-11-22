@@ -9,7 +9,6 @@ import (
 
 	"github.com/xinnjie/onekeymap-cli/internal/dedup"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi" // Only for ValidationReport
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
@@ -17,12 +16,13 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 )
 
 // importer is the default implementation of the Importer interface.
 type importer struct {
-	registry        *plugins.Registry
+	registry        *registry.Registry
 	mappingConfig   *mappings.MappingConfig
 	logger          *slog.Logger
 	validator       *validateapi.Validator
@@ -32,7 +32,7 @@ type importer struct {
 
 // NewImporter creates a new default import service.
 func NewImporter(
-	registry *plugins.Registry,
+	registry *registry.Registry,
 	config *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,

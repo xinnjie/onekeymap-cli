@@ -17,11 +17,11 @@ import (
 	grpc_selector "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/service"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -43,7 +43,7 @@ func NewCmdServe(rootFlags *rootFlags) *cobra.Command {
 		Run: serveRun(
 			&f,
 			rootFlags,
-			func() (*slog.Logger, *plugins.Registry, importerapi.Importer, exporterapi.Exporter, *mappings.MappingConfig) {
+			func() (*slog.Logger, *registry.Registry, importerapi.Importer, exporterapi.Exporter, *mappings.MappingConfig) {
 				return cmdLogger, cmdPluginRegistry, cmdImportService, cmdExportService, cmdMappingConfig
 			},
 		),
@@ -63,7 +63,7 @@ func NewCmdServe(rootFlags *rootFlags) *cobra.Command {
 func serveRun(
 	f *serveFlags,
 	rootFlags *rootFlags,
-	dependencies func() (*slog.Logger, *plugins.Registry, importerapi.Importer, exporterapi.Exporter, *mappings.MappingConfig),
+	dependencies func() (*slog.Logger, *registry.Registry, importerapi.Importer, exporterapi.Exporter, *mappings.MappingConfig),
 ) func(cmd *cobra.Command, _ []string) {
 	return func(cmd *cobra.Command, _ []string) {
 		logger, pluginRegistry, importService, exportService, mappingConfig := dependencies()

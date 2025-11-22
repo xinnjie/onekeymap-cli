@@ -12,13 +12,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/xinnjie/onekeymap-cli/internal/cliconfig"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins/basekeymap"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins/helix"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins/xcode"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
@@ -26,6 +19,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/exporter"
 	"github.com/xinnjie/onekeymap-cli/pkg/importer"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 	"golang.org/x/term"
 )
 
@@ -41,7 +35,7 @@ var (
 //nolint:gochecknoglobals // TODO(xinnjie): Stop using these global variables. But for now I can not think of a better way.
 var (
 	// Global shared state that needs to be accessed across commands
-	cmdPluginRegistry *plugins.Registry
+	cmdPluginRegistry *registry.Registry
 	cmdImportService  importerapi.Importer
 	cmdExportService  exporterapi.Exporter
 	cmdLogger         *slog.Logger
@@ -196,30 +190,7 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 			}
 		}
 
-		cmdPluginRegistry = plugins.NewRegistry()
-
-		// VSCode family
-		cmdPluginRegistry.Register(vscode.New(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(vscode.NewWindsurf(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(vscode.NewWindsurfNext(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(vscode.NewCursor(cmdMappingConfig, cmdLogger, cmdRecorder))
-
-		// IntelliJ family
-		cmdPluginRegistry.Register(intellij.New(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(intellij.NewPycharm(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(intellij.NewIntelliJCommunity(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(intellij.NewWebStorm(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(intellij.NewClion(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(intellij.NewPhpStorm(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(intellij.NewRubyMine(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(intellij.NewGoLand(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(intellij.NewRustRover(cmdMappingConfig, cmdLogger, cmdRecorder))
-
-		cmdPluginRegistry.Register(helix.New(cmdMappingConfig, cmdLogger))
-		cmdPluginRegistry.Register(zed.New(cmdMappingConfig, cmdLogger, cmdRecorder))
-		cmdPluginRegistry.Register(xcode.New(cmdMappingConfig, cmdLogger, cmdRecorder))
-
-		cmdPluginRegistry.Register(basekeymap.New())
+		cmdPluginRegistry = registry.NewRegistryWithPlugins(cmdMappingConfig, cmdLogger, cmdRecorder)
 
 		cmdImportService = importer.NewImporter(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)
 		cmdExportService = exporter.NewExporter(cmdPluginRegistry, cmdMappingConfig, cmdLogger, cmdRecorder)

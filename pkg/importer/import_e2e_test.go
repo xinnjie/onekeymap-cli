@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
-	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	vscodeplugin "github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
@@ -18,6 +17,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importer"
 	mappings2 "github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 )
 
 func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
@@ -46,7 +46,7 @@ func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 
 	// Use real VSCode plugin importer for this scenario
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	registry := plugins.NewRegistry()
+	registry := registry.NewRegistry()
 	registry.Register(vscodeplugin.New(mappingConfig, logger, metrics.NewNoop()))
 	service := importer.NewImporter(registry, mappingConfig, logger, metrics.NewNoop())
 
