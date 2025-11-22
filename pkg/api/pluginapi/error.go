@@ -3,7 +3,8 @@ package pluginapi
 import (
 	"errors"
 
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	keybinding "github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 )
 
 var (
@@ -26,12 +27,14 @@ func (e *UnsupportedExportActionError) Error() string {
 // EditorSupportOnlyOneKeybindingPerActionError is returned when an editor does not support
 // assigning multiple keybindings to a single action.
 type EditorSupportOnlyOneKeybindingPerActionError struct {
-	SkipKeybinding *keymapv1.Keybinding
+	SkipKeybinding *keybinding.Keybinding
 }
 
 func (e *EditorSupportOnlyOneKeybindingPerActionError) Error() string {
 	if e == nil || e.SkipKeybinding == nil {
 		return "editor support only one keybinding per action"
 	}
-	return "editor support only one keybinding per action: " + e.SkipKeybinding.String()
+	return "editor support only one keybinding per action: " + e.SkipKeybinding.String(
+		keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: "+"},
+	)
 }

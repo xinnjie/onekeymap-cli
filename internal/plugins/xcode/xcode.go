@@ -4,9 +4,9 @@ import (
 	"log/slog"
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 // xcodePlugin implements the plugins.Plugin interface for the Xcode editor.

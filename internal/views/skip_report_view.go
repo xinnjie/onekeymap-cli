@@ -6,10 +6,9 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
 )
 
 const (
@@ -17,7 +16,6 @@ const (
 	keybindingColumnWidth = 20
 	reasonColumnWidth     = 50
 	tableHeight           = 15
-	keyQuit               = "ctrl+c"
 )
 
 type SkipReportViewModel struct {
@@ -39,8 +37,9 @@ func NewSkipReportViewModel(skipActions []pluginapi.ExportSkipAction) SkipReport
 		var keybindingStr string
 		var e *pluginapi.EditorSupportOnlyOneKeybindingPerActionError
 		if errors.As(sk.Error, &e) && e.SkipKeybinding != nil {
-			binding := keymap.NewKeyBinding(&keymapv1.KeybindingReadable{KeyChords: e.SkipKeybinding})
-			keybindingStr, _ = binding.Format(platform.PlatformMacOS, "+")
+			keybindingStr = e.SkipKeybinding.String(
+				keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: "+"},
+			)
 		}
 
 		rows[i] = table.Row{

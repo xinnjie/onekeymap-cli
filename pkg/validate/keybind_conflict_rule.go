@@ -3,11 +3,11 @@ package validate
 import (
 	"context"
 
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	validateapi "github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 // KeybindConflictRule checks for keybinding conflicts where multiple actions

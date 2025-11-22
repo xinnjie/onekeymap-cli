@@ -4,8 +4,8 @@ import (
 	"log/slog"
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 var _ pluginapi.Plugin = (*helixPlugin)(nil)

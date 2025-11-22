@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	mappings2 "github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 // newTestAction creates a test Action with given keybindings
@@ -33,15 +33,15 @@ func newTestAction(actionName string, keybindings ...string) keymap.Action {
 	}
 }
 
-func testMappingConfig() *mappings.MappingConfig {
-	return &mappings.MappingConfig{
-		Mappings: map[string]mappings.ActionMappingConfig{
+func testMappingConfig() *mappings2.MappingConfig {
+	return &mappings2.MappingConfig{
+		Mappings: map[string]mappings2.ActionMappingConfig{
 			"actions.navigation.jumpToDefinition": {
 				ID:          "actions.navigation.jumpToDefinition",
 				Description: "Jump to definition",
-				Xcode: []mappings.XcodeMappingConfig{
+				Xcode: []mappings2.XcodeMappingConfig{
 					{
-						MenuAction: mappings.XcodeMenuAction{
+						MenuAction: mappings2.XcodeMenuAction{
 							Action:    "editorContext_jumpToDefinition:",
 							CommandID: "Xcode.IDEKit.CmdDefinition.JumpToDefinition",
 						},
@@ -51,10 +51,10 @@ func testMappingConfig() *mappings.MappingConfig {
 			"actions.cursor.pageDown": {
 				ID:          "actions.cursor.pageDown",
 				Description: "Page down",
-				Xcode: []mappings.XcodeMappingConfig{
+				Xcode: []mappings2.XcodeMappingConfig{
 					{
-						TextAction: mappings.XcodeTextAction{
-							TextAction: mappings.StringOrSlice{Items: []string{"pageDown:"}},
+						TextAction: mappings2.XcodeTextAction{
+							TextAction: mappings2.StringOrSlice{Items: []string{"pageDown:"}},
 						},
 					},
 				},
@@ -62,10 +62,10 @@ func testMappingConfig() *mappings.MappingConfig {
 			"actions.edit.insertLineAfter": {
 				ID:          "actions.edit.insertLineAfter",
 				Description: "Insert line after",
-				Xcode: []mappings.XcodeMappingConfig{
+				Xcode: []mappings2.XcodeMappingConfig{
 					{
-						TextAction: mappings.XcodeTextAction{
-							TextAction: mappings.StringOrSlice{Items: []string{"moveToEndOfLine:", "insertNewline:"}},
+						TextAction: mappings2.XcodeTextAction{
+							TextAction: mappings2.StringOrSlice{Items: []string{"moveToEndOfLine:", "insertNewline:"}},
 						},
 					},
 				},

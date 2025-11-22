@@ -10,9 +10,9 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/export"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 type helixExporter struct {

@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/onekeymap-cli/internal/cliconfig"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/basekeymap"
@@ -26,6 +25,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/exporter"
 	"github.com/xinnjie/onekeymap-cli/pkg/importer"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 	"golang.org/x/term"
 )
 

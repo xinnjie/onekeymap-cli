@@ -1,4 +1,4 @@
-package mappings
+package mappings //nolint:testpackage
 
 import (
 	"encoding/json"

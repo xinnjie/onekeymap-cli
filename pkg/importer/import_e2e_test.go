@@ -9,7 +9,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
 	vscodeplugin "github.com/xinnjie/onekeymap-cli/internal/plugins/vscode"
@@ -18,24 +17,25 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/importer"
+	mappings2 "github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 func TestImportEndToEnd_Import_VSCode_FormatSelection_NoChange(t *testing.T) {
 	// Setup mapping config according to provided YAML
-	mappingConfig := &mappings.MappingConfig{
-		Mappings: map[string]mappings.ActionMappingConfig{
+	mappingConfig := &mappings2.MappingConfig{
+		Mappings: map[string]mappings2.ActionMappingConfig{
 			"actions.edit.formatSelection": {
 				ID:          "actions.edit.formatSelection",
 				Name:        "Format selection",
 				Description: "Format Selection",
 				Category:    "Editor",
-				VSCode: mappings.VscodeConfigs{
+				VSCode: mappings2.VscodeConfigs{
 					{
 						Command: "editor.action.formatSelection",
 						When:    "editorHasDocumentSelectionFormattingProvider && editorTextFocus && !editorReadonly",
 					},
 					{
-						EditorActionMapping: mappings.EditorActionMapping{DisableImport: true},
+						EditorActionMapping: mappings2.EditorActionMapping{DisableImport: true},
 						Command:             "notebook.formatCell",
 						When:                "editorHasDocumentFormattingProvider && editorTextFocus && inCompositeEditor && notebookEditable && !editorReadonly && activeEditor == 'workbench.editor.notebook'",
 					},

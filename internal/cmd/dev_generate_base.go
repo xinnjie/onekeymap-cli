@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	ij "github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
@@ -19,6 +18,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 type devGenerateBaseFlags struct {

@@ -3,8 +3,8 @@ package validate
 import (
 	"context"
 
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 // DanglingActionRule checks for actions that don't exist in the action mappings.

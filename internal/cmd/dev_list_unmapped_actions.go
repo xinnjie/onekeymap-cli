@@ -6,8 +6,8 @@ import (
 	"sort"
 
 	"github.com/spf13/cobra"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 type devListUnmappedActionsFlags struct {

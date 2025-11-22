@@ -8,8 +8,7 @@ import (
 	"unicode"
 
 	"github.com/xinnjie/onekeymap-cli/internal/bimap"
-	"github.com/xinnjie/onekeymap-cli/internal/keymap/keycode"
-	keymapv1 "github.com/xinnjie/onekeymap-cli/protogen/keymap/v1"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keycode"
 )
 
 // Shared well-known key name mappings between IntelliJ naming and our normalized names.
@@ -26,78 +25,78 @@ var (
 	})
 
 	//nolint:gochecknoglobals // shared key mapping table; initialized once and read-only; values reflect upstream key names
-	strokeMapping = bimap.NewBiMapFromMap(map[string]keymapv1.KeyCode{
+	strokeMapping = bimap.NewBiMapFromMap(map[string]keycode.KeyCode{
 		// Alphanumeric and punctuation
-		"BACK_QUOTE":    keymapv1.KeyCode_BACKTICK,
-		"MINUS":         keymapv1.KeyCode_MINUS,
-		"EQUALS":        keymapv1.KeyCode_EQUAL,
-		"OPEN_BRACKET":  keymapv1.KeyCode_LEFT_BRACKET,
-		"CLOSE_BRACKET": keymapv1.KeyCode_RIGHT_BRACKET,
-		"BACK_SLASH":    keymapv1.KeyCode_BACKSLASH,
-		"SEMICOLON":     keymapv1.KeyCode_SEMICOLON,
-		"QUOTE":         keymapv1.KeyCode_QUOTE,
-		"COMMA":         keymapv1.KeyCode_COMMA,
-		"PERIOD":        keymapv1.KeyCode_PERIOD,
-		"SLASH":         keymapv1.KeyCode_SLASH,
-		"PLUS":          keymapv1.KeyCode_PLUS,
+		"BACK_QUOTE":    keycode.KeyCodeBacktick,
+		"MINUS":         keycode.KeyCodeMinus,
+		"EQUALS":        keycode.KeyCodeEqual,
+		"OPEN_BRACKET":  keycode.KeyCodeLeftBracket,
+		"CLOSE_BRACKET": keycode.KeyCodeRightBracket,
+		"BACK_SLASH":    keycode.KeyCodeBackslash,
+		"SEMICOLON":     keycode.KeyCodeSemicolon,
+		"QUOTE":         keycode.KeyCodeQuote,
+		"COMMA":         keycode.KeyCodeComma,
+		"PERIOD":        keycode.KeyCodePeriod,
+		"SLASH":         keycode.KeyCodeSlash,
+		"PLUS":          keycode.KeyCodePlus,
 
 		// Navigation and control keys
-		"LEFT":       keymapv1.KeyCode_LEFT_ARROW,
-		"UP":         keymapv1.KeyCode_UP_ARROW,
-		"RIGHT":      keymapv1.KeyCode_RIGHT_ARROW,
-		"DOWN":       keymapv1.KeyCode_DOWN_ARROW,
-		"END":        keymapv1.KeyCode_END,
-		"HOME":       keymapv1.KeyCode_HOME,
-		"PAGE_UP":    keymapv1.KeyCode_PAGE_UP,
-		"PAGE_DOWN":  keymapv1.KeyCode_PAGE_DOWN,
-		"TAB":        keymapv1.KeyCode_TAB,
-		"ENTER":      keymapv1.KeyCode_RETURN,
-		"ESCAPE":     keymapv1.KeyCode_ESCAPE,
-		"BACK_SPACE": keymapv1.KeyCode_DELETE, // This is 'backspace' on most keyboards
-		"SPACE":      keymapv1.KeyCode_SPACE,
-		"DELETE":     keymapv1.KeyCode_FORWARD_DELETE,
-		"CAPS_LOCK":  keymapv1.KeyCode_CAPS_LOCK,
-		"INSERT":     keymapv1.KeyCode_INSERT_OR_HELP,
+		"LEFT":       keycode.KeyCodeLeft,
+		"UP":         keycode.KeyCodeUp,
+		"RIGHT":      keycode.KeyCodeRight,
+		"DOWN":       keycode.KeyCodeDown,
+		"END":        keycode.KeyCodeEnd,
+		"HOME":       keycode.KeyCodeHome,
+		"PAGE_UP":    keycode.KeyCodePageUp,
+		"PAGE_DOWN":  keycode.KeyCodePageDown,
+		"TAB":        keycode.KeyCodeTab,
+		"ENTER":      keycode.KeyCodeEnter,
+		"ESCAPE":     keycode.KeyCodeEscape,
+		"BACK_SPACE": keycode.KeyCodeBackspace, // This is 'backspace' on most keyboards
+		"SPACE":      keycode.KeyCodeSpace,
+		"DELETE":     keycode.KeyCodeDelete,
+		"CAPS_LOCK":  keycode.KeyCodeCapsLock,
+		"INSERT":     keycode.KeyCodeInsert,
 
 		// Function keys
-		"F1":  keymapv1.KeyCode_F1,
-		"F2":  keymapv1.KeyCode_F2,
-		"F3":  keymapv1.KeyCode_F3,
-		"F4":  keymapv1.KeyCode_F4,
-		"F5":  keymapv1.KeyCode_F5,
-		"F6":  keymapv1.KeyCode_F6,
-		"F7":  keymapv1.KeyCode_F7,
-		"F8":  keymapv1.KeyCode_F8,
-		"F9":  keymapv1.KeyCode_F9,
-		"F10": keymapv1.KeyCode_F10,
-		"F11": keymapv1.KeyCode_F11,
-		"F12": keymapv1.KeyCode_F12,
-		"F13": keymapv1.KeyCode_F13,
-		"F14": keymapv1.KeyCode_F14,
-		"F15": keymapv1.KeyCode_F15,
-		"F16": keymapv1.KeyCode_F16,
-		"F17": keymapv1.KeyCode_F17,
-		"F18": keymapv1.KeyCode_F18,
-		"F19": keymapv1.KeyCode_F19,
-		"F20": keymapv1.KeyCode_F20,
+		"F1":  keycode.KeyCodeF1,
+		"F2":  keycode.KeyCodeF2,
+		"F3":  keycode.KeyCodeF3,
+		"F4":  keycode.KeyCodeF4,
+		"F5":  keycode.KeyCodeF5,
+		"F6":  keycode.KeyCodeF6,
+		"F7":  keycode.KeyCodeF7,
+		"F8":  keycode.KeyCodeF8,
+		"F9":  keycode.KeyCodeF9,
+		"F10": keycode.KeyCodeF10,
+		"F11": keycode.KeyCodeF11,
+		"F12": keycode.KeyCodeF12,
+		"F13": keycode.KeyCodeF13,
+		"F14": keycode.KeyCodeF14,
+		"F15": keycode.KeyCodeF15,
+		"F16": keycode.KeyCodeF16,
+		"F17": keycode.KeyCodeF17,
+		"F18": keycode.KeyCodeF18,
+		"F19": keycode.KeyCodeF19,
+		"F20": keycode.KeyCodeF20,
 
 		// Numpad digits and ops
-		"NUMPAD0":      keymapv1.KeyCode_NUMPAD_0,
-		"NUMPAD1":      keymapv1.KeyCode_NUMPAD_1,
-		"NUMPAD2":      keymapv1.KeyCode_NUMPAD_2,
-		"NUMPAD3":      keymapv1.KeyCode_NUMPAD_3,
-		"NUMPAD4":      keymapv1.KeyCode_NUMPAD_4,
-		"NUMPAD5":      keymapv1.KeyCode_NUMPAD_5,
-		"NUMPAD6":      keymapv1.KeyCode_NUMPAD_6,
-		"NUMPAD7":      keymapv1.KeyCode_NUMPAD_7,
-		"NUMPAD8":      keymapv1.KeyCode_NUMPAD_8,
-		"NUMPAD9":      keymapv1.KeyCode_NUMPAD_9,
-		"DIVIDE":       keymapv1.KeyCode_NUMPAD_DIVIDE,
-		"MULTIPLY":     keymapv1.KeyCode_NUMPAD_MULTIPLY,
-		"SUBTRACT":     keymapv1.KeyCode_NUMPAD_MINUS,
-		"ADD":          keymapv1.KeyCode_NUMPAD_PLUS,
-		"DECIMAL":      keymapv1.KeyCode_NUMPAD_DECIMAL,
-		"NUMPAD_ENTER": keymapv1.KeyCode_NUMPAD_ENTER,
+		"NUMPAD0":      keycode.KeyCodeNumpad0,
+		"NUMPAD1":      keycode.KeyCodeNumpad1,
+		"NUMPAD2":      keycode.KeyCodeNumpad2,
+		"NUMPAD3":      keycode.KeyCodeNumpad3,
+		"NUMPAD4":      keycode.KeyCodeNumpad4,
+		"NUMPAD5":      keycode.KeyCodeNumpad5,
+		"NUMPAD6":      keycode.KeyCodeNumpad6,
+		"NUMPAD7":      keycode.KeyCodeNumpad7,
+		"NUMPAD8":      keycode.KeyCodeNumpad8,
+		"NUMPAD9":      keycode.KeyCodeNumpad9,
+		"DIVIDE":       keycode.KeyCodeNumpadDivide,
+		"MULTIPLY":     keycode.KeyCodeNumpadMultiply,
+		"SUBTRACT":     keycode.KeyCodeNumpadSubtract,
+		"ADD":          keycode.KeyCodeNumpadAdd,
+		"DECIMAL":      keycode.KeyCodeNumpadDecimal,
+		"NUMPAD_ENTER": keycode.KeyCodeNumpadEnter,
 	})
 )
 
@@ -134,11 +133,7 @@ func parseKeyStroke(raw string) ([]string, error) {
 		if !ok {
 			return nil, fmt.Errorf("invalid key code: '%s'", tok)
 		}
-		keyStr, ok := keycode.ToString(norm)
-		if !ok {
-			return nil, fmt.Errorf("cannot convert keycode to string: %v", norm)
-		}
-		result = append(result, keyStr)
+		result = append(result, string(norm))
 	}
 
 	return result, nil
@@ -146,10 +141,10 @@ func parseKeyStroke(raw string) ([]string, error) {
 
 // normalizeIJKey converts an IntelliJ key token (possibly uppercase word) into
 // our normalized token (lowercase, real character where applicable).
-func normalizeIJKey(tok string) (keymapv1.KeyCode, bool) {
+func normalizeIJKey(tok string) (keycode.KeyCode, bool) {
 	t := strings.TrimSpace(tok)
 	if t == "" {
-		return keymapv1.KeyCode_KEY_CODE_UNSPECIFIED, false
+		return "", false
 	}
 
 	// Accept single ASCII character keys as-is (lowercased)
@@ -157,7 +152,7 @@ func normalizeIJKey(tok string) (keymapv1.KeyCode, bool) {
 		r := rune(t[0])
 		// letter or digit or punctuation we explicitly handle below
 		if unicode.IsLetter(r) || unicode.IsDigit(r) || strings.ContainsRune("`-=[].'", r) {
-			return keycode.FromString(strings.ToLower(t))
+			return keycode.KeyCode(strings.ToLower(t)), true
 		}
 	}
 
@@ -169,7 +164,11 @@ func normalizeIJKey(tok string) (keymapv1.KeyCode, bool) {
 	}
 
 	// Accept already-normalized names present in our key set
-	return keycode.FromString(strings.ToLower(t))
+	k := keycode.KeyCode(strings.ToLower(t))
+	if k.IsValid() {
+		return k, true
+	}
+	return "", false
 }
 
 // formatKeyChord formats normalized key parts (e.g., ["ctrl","alt","s"]) into IntelliJ form
@@ -180,17 +179,14 @@ func formatKeyChord(parts []string) string {
 	}
 
 	var modifiers []string
-	var key keymapv1.KeyCode
+	var key keycode.KeyCode
 
 	for _, p := range parts {
 		lp := strings.ToLower(p)
 		if _, ok := modifierMapping.GetInverse(lp); ok {
 			modifiers = append(modifiers, lp)
 		} else {
-			kc, ok := keycode.FromString(lp)
-			if ok {
-				key = kc
-			}
+			key = keycode.KeyCode(lp)
 		}
 	}
 
@@ -201,7 +197,7 @@ func formatKeyChord(parts []string) string {
 		}
 	}
 
-	if key != keymapv1.KeyCode_KEY_CODE_UNSPECIFIED {
+	if key != "" {
 		out = append(out, toIJKey(key))
 	}
 	return strings.Join(out, " ")
@@ -216,14 +212,14 @@ func formatKeyChord(parts []string) string {
 // - numpad digit keys (e.g., "numpad3" -> "NUMPAD3")
 // - named special keys via shared mapping (e.g., "enter" -> "ENTER")
 // - fallback: return as uppercased word.
-func toIJKey(kc keymapv1.KeyCode) string {
+func toIJKey(kc keycode.KeyCode) string {
 	// Named specials via shared mapping first
 	if v, ok := strokeMapping.GetInverse(kc); ok {
 		return v
 	}
 
-	n, ok := keycode.ToString(kc)
-	if !ok {
+	n := string(kc)
+	if n == "" {
 		return ""
 	}
 

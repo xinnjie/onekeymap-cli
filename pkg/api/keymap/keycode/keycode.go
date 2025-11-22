@@ -119,6 +119,23 @@ const (
 	KeyCodeNumpadAdd      KeyCode = "numpad_add"
 )
 
+//nolint:gochecknoglobals // validKeyCodes set is initialized once and used read-only at runtime
+var validKeyCodes = map[KeyCode]struct{}{
+	KeyCodeA: {}, KeyCodeB: {}, KeyCodeC: {}, KeyCodeD: {}, KeyCodeE: {}, KeyCodeF: {}, KeyCodeG: {}, KeyCodeH: {}, KeyCodeI: {}, KeyCodeJ: {}, KeyCodeK: {}, KeyCodeL: {}, KeyCodeM: {}, KeyCodeN: {}, KeyCodeO: {}, KeyCodeP: {}, KeyCodeQ: {}, KeyCodeR: {}, KeyCodeS: {}, KeyCodeT: {}, KeyCodeU: {}, KeyCodeV: {}, KeyCodeW: {}, KeyCodeX: {}, KeyCodeY: {}, KeyCodeZ: {},
+	KeyCodeDigit0: {}, KeyCodeDigit1: {}, KeyCodeDigit2: {}, KeyCodeDigit3: {}, KeyCodeDigit4: {}, KeyCodeDigit5: {}, KeyCodeDigit6: {}, KeyCodeDigit7: {}, KeyCodeDigit8: {}, KeyCodeDigit9: {},
+	KeyCodeCapsLock: {}, KeyCodeShift: {}, KeyCodeFn: {}, KeyCodeCtrl: {}, KeyCodeAlt: {}, KeyCodeCmd: {}, KeyCodeRightCmd: {}, KeyCodeRightAlt: {}, KeyCodeRightCtrl: {}, KeyCodeRightShift: {}, KeyCodeEnter: {}, KeyCodeBackslash: {}, KeyCodeBacktick: {}, KeyCodeComma: {}, KeyCodeEqual: {}, KeyCodeMinus: {}, KeyCodePlus: {}, KeyCodePeriod: {}, KeyCodeQuote: {}, KeyCodeSemicolon: {}, KeyCodeSlash: {}, KeyCodeSpace: {}, KeyCodeTab: {}, KeyCodeLeftBracket: {}, KeyCodeRightBracket: {},
+	KeyCodePageUp: {}, KeyCodePageDown: {}, KeyCodeHome: {}, KeyCodeEnd: {}, KeyCodeUp: {}, KeyCodeRight: {}, KeyCodeDown: {}, KeyCodeLeft: {}, KeyCodeEscape: {}, KeyCodeBackspace: {}, KeyCodeDelete: {}, KeyCodeInsert: {}, KeyCodeMute: {}, KeyCodeVolumeUp: {}, KeyCodeVolumeDown: {},
+	KeyCodeF1: {}, KeyCodeF2: {}, KeyCodeF3: {}, KeyCodeF4: {}, KeyCodeF5: {}, KeyCodeF6: {}, KeyCodeF7: {}, KeyCodeF8: {}, KeyCodeF9: {}, KeyCodeF10: {}, KeyCodeF11: {}, KeyCodeF12: {}, KeyCodeF13: {}, KeyCodeF14: {}, KeyCodeF15: {}, KeyCodeF16: {}, KeyCodeF17: {}, KeyCodeF18: {}, KeyCodeF19: {}, KeyCodeF20: {},
+	KeyCodeNumpad0: {}, KeyCodeNumpad1: {}, KeyCodeNumpad2: {}, KeyCodeNumpad3: {}, KeyCodeNumpad4: {}, KeyCodeNumpad5: {}, KeyCodeNumpad6: {}, KeyCodeNumpad7: {}, KeyCodeNumpad8: {}, KeyCodeNumpad9: {},
+	KeyCodeNumpadClear: {}, KeyCodeNumpadDecimal: {}, KeyCodeNumpadDivide: {}, KeyCodeNumpadEnter: {}, KeyCodeNumpadEquals: {}, KeyCodeNumpadSubtract: {}, KeyCodeNumpadMultiply: {}, KeyCodeNumpadAdd: {},
+}
+
+// IsValid returns true if the KeyCode is a valid known key code
+func (kc KeyCode) IsValid() bool {
+	_, ok := validKeyCodes[kc]
+	return ok
+}
+
 // IsNumpad returns true if the given KeyCode represents a numpad key
 func (kc KeyCode) IsNumpad() bool {
 	switch kc {

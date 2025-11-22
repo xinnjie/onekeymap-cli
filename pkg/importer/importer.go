@@ -8,7 +8,6 @@ import (
 	"sort"
 
 	"github.com/xinnjie/onekeymap-cli/internal/dedup"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/platform"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins"
@@ -17,6 +16,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 )
 

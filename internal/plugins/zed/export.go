@@ -11,18 +11,18 @@ import (
 	"github.com/tailscale/hujson"
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/export"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	mappings2 "github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 type zedExporter struct {
-	mappingConfig *mappings.MappingConfig
+	mappingConfig *mappings2.MappingConfig
 	logger        *slog.Logger
 	differ        diff.Differ
 }
 
-func newExporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, differ diff.Differ) *zedExporter {
+func newExporter(mappingConfig *mappings2.MappingConfig, logger *slog.Logger, differ diff.Differ) *zedExporter {
 	return &zedExporter{
 		mappingConfig: mappingConfig,
 		logger:        logger,
@@ -277,7 +277,7 @@ func (p *zedExporter) mergeKeybindings(managed, existing zedKeymapConfig) zedKey
 }
 
 // actionIDToZed converts a universal action ID to Zed action and context.
-func (p *zedExporter) actionIDToZed(actionID string) (*mappings.ZedConfigs, error) {
+func (p *zedExporter) actionIDToZed(actionID string) (*mappings2.ZedConfigs, error) {
 	if mapping, exists := p.mappingConfig.Mappings[actionID]; exists {
 		return &mapping.Zed, nil
 	}

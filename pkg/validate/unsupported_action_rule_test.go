@@ -6,30 +6,30 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
+	mappings2 "github.com/xinnjie/onekeymap-cli/pkg/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/validate"
 )
 
 func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 	// Create a test mapping config with limited editor support
-	mappingConfig := &mappings.MappingConfig{
-		Mappings: map[string]mappings.ActionMappingConfig{
+	mappingConfig := &mappings2.MappingConfig{
+		Mappings: map[string]mappings2.ActionMappingConfig{
 			"actions.supported": {
 				ID: "actions.supported",
-				VSCode: mappings.VscodeConfigs{{
+				VSCode: mappings2.VscodeConfigs{{
 					Command: "supported.command",
 				}},
-				Zed: mappings.ZedConfigs{{
+				Zed: mappings2.ZedConfigs{{
 					Action: "supported::action",
 				}},
 			},
 			"actions.vscode.only": {
 				ID: "actions.vscode.only",
-				VSCode: mappings.VscodeConfigs{{
+				VSCode: mappings2.VscodeConfigs{{
 					Command: "vscode.only.command",
 				}},
 				// No Zed mapping
@@ -62,14 +62,14 @@ func TestUnsupportedActionRule_Validate_WithUnsupportedAction(t *testing.T) {
 }
 
 func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
-	mappingConfig := &mappings.MappingConfig{
-		Mappings: map[string]mappings.ActionMappingConfig{
+	mappingConfig := &mappings2.MappingConfig{
+		Mappings: map[string]mappings2.ActionMappingConfig{
 			"actions.universal": {
 				ID: "actions.universal",
-				VSCode: mappings.VscodeConfigs{{
+				VSCode: mappings2.VscodeConfigs{{
 					Command: "universal.command",
 				}},
-				Zed: mappings.ZedConfigs{{
+				Zed: mappings2.ZedConfigs{{
 					Action: "universal::action",
 				}},
 			},
@@ -94,11 +94,11 @@ func TestUnsupportedActionRule_Validate_AllSupported(t *testing.T) {
 }
 
 func TestUnsupportedActionRule_Validate_DifferentEditors(t *testing.T) {
-	mappingConfig := &mappings.MappingConfig{
-		Mappings: map[string]mappings.ActionMappingConfig{
+	mappingConfig := &mappings2.MappingConfig{
+		Mappings: map[string]mappings2.ActionMappingConfig{
 			"actions.test": {
 				ID: "actions.test",
-				VSCode: mappings.VscodeConfigs{{
+				VSCode: mappings2.VscodeConfigs{{
 					Command: "test.command",
 				}},
 				// No Zed mapping

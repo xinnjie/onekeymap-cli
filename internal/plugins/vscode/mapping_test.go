@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 func TestVscodeImporter_FindByVSCodeActionWithArgs(t *testing.T) {

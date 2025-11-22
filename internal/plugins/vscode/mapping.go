@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	mappings2 "github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 // FindByVSCodeActionWithArgs searches for a mapping by VSCode command, when clause, and args.
@@ -14,7 +14,7 @@ import (
 func (i *vscodeImporter) FindByVSCodeActionWithArgs(
 	command, when string,
 	args map[string]interface{},
-) *mappings.ActionMappingConfig {
+) *mappings2.ActionMappingConfig {
 	buckets := newCandidateBuckets()
 	for _, mapping := range i.mappingConfig.Mappings {
 		i.appendMappingCandidates(buckets, mapping, command, when, args)
@@ -45,11 +45,11 @@ func (i *vscodeImporter) FindByVSCodeActionWithArgs(
 }
 
 type candidate struct {
-	mapping          *mappings.ActionMappingConfig
+	mapping          *mappings2.ActionMappingConfig
 	enabledForImport bool
 }
 
-func newCandidate(mapping mappings.ActionMappingConfig, enabled bool) *candidate {
+func newCandidate(mapping mappings2.ActionMappingConfig, enabled bool) *candidate {
 	mCopy := mapping
 	return &candidate{mapping: &mCopy, enabledForImport: enabled}
 }
@@ -114,7 +114,7 @@ func (b *candidateBuckets) add(kind bucketKind, mappingID string, cand *candidat
 	}
 }
 
-func pickCandidate(cands []*candidate) *mappings.ActionMappingConfig {
+func pickCandidate(cands []*candidate) *mappings2.ActionMappingConfig {
 	if len(cands) == 0 {
 		return nil
 	}
@@ -142,7 +142,7 @@ func pickCandidate(cands []*candidate) *mappings.ActionMappingConfig {
 
 func (i *vscodeImporter) appendMappingCandidates(
 	buckets *candidateBuckets,
-	mapping mappings.ActionMappingConfig,
+	mapping mappings2.ActionMappingConfig,
 	command, when string,
 	args map[string]interface{},
 ) {
@@ -170,7 +170,7 @@ func (i *vscodeImporter) appendMappingCandidates(
 	}
 }
 
-func determineBucket(vc mappings.VscodeMappingConfig, when string, args map[string]interface{}) bucketKind {
+func determineBucket(vc mappings2.VscodeMappingConfig, when string, args map[string]interface{}) bucketKind {
 	if equalArgs(vc.Args, args) {
 		if vc.When == "" {
 			return bucketWildcard

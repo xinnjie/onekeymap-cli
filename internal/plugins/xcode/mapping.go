@@ -3,7 +3,7 @@ package xcode
 import (
 	"strings"
 
-	"github.com/xinnjie/onekeymap-cli/internal/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 // FindByXcodeAction searches for a mapping by Xcode action.
