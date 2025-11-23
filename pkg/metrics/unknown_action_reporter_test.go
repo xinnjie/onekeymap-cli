@@ -3,8 +3,8 @@ package metrics_test
 import (
 	"testing"
 
-	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
+	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 )
 
 func TestUnknownActionReporter_ReportUnknownCommand(t *testing.T) {

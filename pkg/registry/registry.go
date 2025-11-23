@@ -3,7 +3,6 @@ package registry
 import (
 	"log/slog"
 
-	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/basekeymap"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/helix"
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/intellij"
@@ -12,6 +11,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/plugins/zed"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 )
 
 // Registry holds a collection of all available editor plugins.

@@ -44,5 +44,4 @@
 # - ONEKEYMAP_TELEMETRY_ENDPOINT -> telemetry.endpoint
 # - ONEKEYMAP_TELEMETRY_HEADERS -> telemetry.headers
 # - ONEKEYMAP_TELEMETRY_INSECURE -> telemetry.insecure
-# - ONEKEYMAP_SERVER_LISTEN -> server.listen
 # - ONEKEYMAP_EDITORS_VSCODE_KEYMAP_PATH -> editors.vscode.keymap_path

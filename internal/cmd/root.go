@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/onekeymap-cli/internal/cliconfig"
-	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
 	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
@@ -19,6 +18,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/exporter"
 	"github.com/xinnjie/onekeymap-cli/pkg/importer"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/registry"
 	"golang.org/x/term"
 )
@@ -215,7 +215,6 @@ func Execute() {
 	devCmd.AddCommand(NewCmdDevLookup())
 	devCmd.AddCommand(NewCmdDevMapping())
 	rootCmd.AddCommand(NewCmdView())
-	// rootCmd.AddCommand(NewCmdServe(rootFlags))  // TODO: Migrate serve command
 	rootCmd.AddCommand(NewCmdMigrate())
 	rootCmd.AddCommand(NewCmdImport())
 	rootCmd.AddCommand(NewCmdExport())

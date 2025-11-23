@@ -20,10 +20,6 @@ telemetry:
   # Can also be enabled with --telemetry flag
   # enabled: false
   endpoint: "test.example.com"
-
-# Other settings
-server:
-  listen: ":8080"
 `
 
 // nolint:gochecknoglobals // TestConfig for testing - all comments case
@@ -83,9 +79,6 @@ telemetry:
   # Can also be enabled with --telemetry flag
   # enabled: false
   endpoint: "test.example.com"
-# Other settings
-server:
-  listen: ":8080"
 `,
 		},
 		{
@@ -110,9 +103,6 @@ telemetry:
   # Can also be enabled with --telemetry flag
   # enabled: false
   endpoint: "test.example.com"
-# Other settings
-server:
-  listen: ":8080"
 `,
 		},
 		{

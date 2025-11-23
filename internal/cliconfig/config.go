@@ -45,8 +45,6 @@ type Config struct {
 	OneKeyMap string `mapstructure:"onekeymap"`
 	// Telemetry holds OpenTelemetry configuration.
 	Telemetry TelemetryConfig `mapstructure:"telemetry"`
-	// ServerListen is the server listen address (e.g., "tcp://127.0.0.1:50051" or "unix:///tmp/onekeymap.sock").
-	ServerListen string `mapstructure:"server.listen"`
 	// Editors holds configuration for different editors.
 	Editors map[string]EditorConfig `mapstructure:"editors"`
 }
@@ -65,7 +63,6 @@ type Config struct {
 // - ONEKEYMAP_TELEMETRY_ENDPOINT -> telemetry.endpoint (string)
 // - ONEKEYMAP_TELEMETRY_HEADERS -> telemetry.headers (string, "key1=value1,key2=value2")
 // - ONEKEYMAP_TELEMETRY_INSECURE -> telemetry.insecure (bool)
-// - ONEKEYMAP_SERVER_LISTEN -> server.listen (string, e.g. "tcp://127.0.0.1:50051" or "unix:///tmp/onekeymap.sock")
 
 // NewConfig initializes and returns a new Config object.
 // It sets defaults, binds environment variables, reads config files, and unmarshals the result.
@@ -80,7 +77,6 @@ func NewConfig(sandbox bool) (*Config, error) {
 	// Note: We don't set default for telemetry.enabled to detect if it's explicitly configured
 	viper.SetDefault("telemetry.endpoint", telemetryEndpoint)
 	viper.SetDefault("telemetry.headers", telemetryHeaders)
-	viper.SetDefault("server.listen", "")
 
 	// Set environment variable handling
 	viper.SetEnvPrefix("ONEKEYMAP")

@@ -4,9 +4,9 @@ import (
 	"log/slog"
 
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
-	"github.com/xinnjie/onekeymap-cli/internal/metrics"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 )
 
 var (
