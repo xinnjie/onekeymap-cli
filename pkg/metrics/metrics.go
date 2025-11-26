@@ -45,8 +45,6 @@ type recorder struct {
 
 // RecorderOption holds configuration for creating a Recorder.
 type RecorderOption struct {
-	Endpoint string
-	Headers  map[string]string
 	UseDelta bool
 }
 
@@ -57,17 +55,9 @@ func New(
 	logger *slog.Logger,
 	option RecorderOption,
 ) (Recorder, error) {
-	opts := []otlpmetrichttp.Option{}
-
-	if option.Endpoint != "" {
-		opts = append(opts, otlpmetrichttp.WithEndpoint(option.Endpoint))
-	}
-
-	if len(option.Headers) > 0 {
-		opts = append(opts, otlpmetrichttp.WithHeaders(option.Headers))
-	}
-
-	exporter, err := otlpmetrichttp.New(ctx, opts...)
+	// otlpmetrichttp.New will automatically read from standard OTEL environment variables
+	// e.g. OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_HEADERS
+	exporter, err := otlpmetrichttp.New(ctx)
 	if err != nil {
 		return nil, err
 	}
