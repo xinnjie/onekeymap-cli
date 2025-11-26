@@ -35,8 +35,6 @@ builds:
     ldflags:
       - -s -w
       - -X github.com/xinnjie/onekeymap-cli/internal/cmd.version={{.Version}}
-      - -X github.com/xinnjie/onekeymap-cli/internal/cliconfig.telemetryEndpoint={{.Env.TELEMETRY_ENDPOINT}}
-      - -X github.com/xinnjie/onekeymap-cli/internal/cliconfig.telemetryHeaders={{.Env.TELEMETRY_HEADERS}}
 
 archives:
   - id: onekeymap-cli

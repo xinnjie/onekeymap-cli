@@ -1,18 +1,14 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"os"
-	"strings"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/xinnjie/onekeymap-cli/internal/cliconfig"
 	"github.com/xinnjie/onekeymap-cli/internal/updatecheck"
-	"github.com/xinnjie/onekeymap-cli/internal/views"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/exporterapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/exporter"
@@ -50,7 +46,6 @@ type rootFlags struct {
 	logJSON         bool
 	backup          bool
 	interactive     bool
-	enableTelemetry bool
 	sandbox         bool
 	skipUpdateCheck bool
 	onekeymap       string
@@ -78,8 +73,6 @@ func newCmdRoot() (*cobra.Command, *rootFlags) {
 	cmd.PersistentFlags().BoolVarP(&f.backup, "backup", "b", true, "Create a backup of the target editor's keymap")
 	cmd.PersistentFlags().BoolVarP(&f.interactive, "interactive", "i", true, "Run in interactive mode")
 	cmd.PersistentFlags().
-		BoolVar(&f.enableTelemetry, "telemetry", false, "Enable telemetry to help improve onekeymap-cli")
-	cmd.PersistentFlags().
 		BoolVar(&f.sandbox, "sandbox", false, "Enable sandbox mode for macOS, restricting file access")
 	cmd.PersistentFlags().
 		BoolVar(&f.skipUpdateCheck, "skip-update-check", false, "Skip checking for updates")
@@ -88,10 +81,6 @@ func newCmdRoot() (*cobra.Command, *rootFlags) {
 
 	if err := viper.BindPFlag("onekeymap", cmd.PersistentFlags().Lookup("onekeymap")); err != nil {
 		cmd.PrintErrf("Error binding onekeymap flag: %v\n", err)
-		os.Exit(1)
-	}
-	if err := viper.BindPFlag("telemetry.enabled", cmd.PersistentFlags().Lookup("telemetry")); err != nil {
-		cmd.PrintErrf("Error binding telemetry flag: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -106,26 +95,15 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 			os.Exit(1)
 		}
 
-		// Show telemetry prompt in interactive mode if telemetry is not explicitly configured
-		// and not explicitly enabled via flag, and running in a TTY environment
 		isTTY := term.IsTerminal(int(os.Stdin.Fd()))
 		if !isTTY {
 			f.interactive = false
-		}
-		if f.interactive && isTTY && !cliconfig.IsTelemetryExplicitlySet() && !f.enableTelemetry {
-			if err := showTelemetryPrompt(); err != nil {
-				cmd.PrintErrf("Error showing telemetry prompt: %v\n", err)
-				// Continue execution even if prompt fails
-			}
 		}
 
 		verbose := f.verbose
 		quiet := f.quiet
 		logJSON := f.logJSON
-		telemetryEnabled := viper.GetBool("telemetry.enabled")
-		telemetryEndpoint := viper.GetString("telemetry.endpoint")
-		telemetryHeaders := viper.GetString("telemetry.headers")
-		ctx := cmd.Context()
+		cmdRecorder = metrics.NewNoop()
 
 		cmdMappingConfig, err = mappings.NewMappingConfig()
 		if err != nil {
@@ -165,30 +143,6 @@ func rootPersistentPreRun(f *rootFlags) func(cmd *cobra.Command, _ []string) {
 		}
 
 		cmdLogger = slog.New(handler)
-		logger := cmdLogger
-
-		cmdRecorder = metrics.NewNoop()
-		if telemetryEnabled {
-			logger.DebugContext(ctx, "Telemetry enabled")
-			if telemetryEndpoint == "" {
-				logger.DebugContext(
-					ctx,
-					"telemetry is enabled, but telemetry.endpoint is not set. Telemetry data will not be sent.",
-				)
-			}
-
-			headers := parseHeaders(telemetryHeaders)
-
-			cmdRecorder, err = metrics.New(ctx, version, logger, metrics.RecorderOption{
-				Endpoint: telemetryEndpoint,
-				Headers:  headers,
-				UseDelta: true, // Use delta temporality for short-lived CLI application
-			})
-			if err != nil {
-				logger.WarnContext(ctx, "failed to initialize telemetry", "error", err)
-				os.Exit(1)
-			}
-		}
 
 		cmdPluginRegistry = registry.NewRegistryWithPlugins(cmdMappingConfig, cmdLogger, cmdRecorder)
 
@@ -265,57 +219,4 @@ func buildVersionString() string {
 	}
 
 	return version
-}
-
-const (
-	headerKeyValueParts = 2
-)
-
-// parseHeaders parses a comma-separated string of key=value pairs into a map.
-// Format: "key1=value1,key2=value2"
-func parseHeaders(headersStr string) map[string]string {
-	if headersStr == "" {
-		return nil
-	}
-
-	headers := make(map[string]string)
-	pairs := strings.Split(headersStr, ",")
-	for _, pair := range pairs {
-		pair = strings.TrimSpace(pair)
-		if pair == "" {
-			continue
-		}
-		parts := strings.SplitN(pair, "=", headerKeyValueParts)
-		if len(parts) == headerKeyValueParts {
-			headers[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
-		}
-	}
-	return headers
-}
-
-// showTelemetryPrompt displays the telemetry consent prompt and updates config based on user choice
-func showTelemetryPrompt() error {
-	model := views.NewTelemetryPrompt()
-	program := tea.NewProgram(model)
-
-	finalModel, err := program.Run()
-	if err != nil {
-		return fmt.Errorf("failed to run telemetry prompt: %w", err)
-	}
-
-	// Cast back to our model type
-	m, ok := finalModel.(views.TelemetryPromptModel)
-	if !ok {
-		return errors.New("unexpected model type")
-	}
-
-	// Only update config if user made a selection (didn't quit)
-	if m.WasSelected() {
-		enabled := m.GetChoice()
-		if err := cliconfig.UpdateTelemetrySettings(enabled); err != nil {
-			return fmt.Errorf("failed to update telemetry settings: %w", err)
-		}
-	}
-
-	return nil
 }

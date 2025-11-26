@@ -4,15 +4,13 @@ import "github.com/charmbracelet/lipgloss"
 
 // Color constants used across TUI components
 const (
-	blue      = lipgloss.Color("12")
-	white     = lipgloss.Color("7")
-	red       = lipgloss.Color("9")
-	yellow    = lipgloss.Color("11")
-	cyan      = lipgloss.Color("14")
-	green     = lipgloss.Color("10")
-	gray      = lipgloss.Color("8")
-	purple    = lipgloss.Color("#7C3AED")
-	lightGray = lipgloss.Color("#666666")
+	blue   = lipgloss.Color("12")
+	white  = lipgloss.Color("7")
+	red    = lipgloss.Color("9")
+	yellow = lipgloss.Color("11")
+	cyan   = lipgloss.Color("14")
+	green  = lipgloss.Color("10")
+	gray   = lipgloss.Color("8")
 
 	IssuePaddingLeft = 2
 	OptionPadding    = 2
@@ -61,32 +59,6 @@ var (
 	//nolint:gochecknoglobals // style reused across TUI
 	actionStyle = lipgloss.NewStyle().
 			Foreground(green)
-
-	// Telemetry prompt styles
-	//nolint:gochecknoglobals // style reused across TUI
-	telemetryTitleStyle = lipgloss.NewStyle().
-				Bold(true).
-				Foreground(purple).
-				Padding(1, 0)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	questionStyle = lipgloss.NewStyle().
-			Padding(1, 0)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	optionStyle = lipgloss.NewStyle().
-			Padding(0, OptionPadding)
-
-	//nolint:gochecknoglobals // style reused across TUI
-	selectedOptionStyle = lipgloss.NewStyle().
-				Padding(0, OptionPadding).
-				Background(purple).
-				Foreground(lipgloss.Color("#FFFFFF"))
-
-	//nolint:gochecknoglobals // style reused across TUI
-	telemetryHelpStyle = lipgloss.NewStyle().
-				Foreground(lightGray).
-				Padding(1, 0)
 
 	// Action detail styles
 	//nolint:gochecknoglobals // style reused across TUI

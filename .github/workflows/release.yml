@@ -47,9 +47,6 @@ jobs:
           MACOS_NOTARY_ISSUER_ID: ${{ secrets.MACOS_NOTARY_ISSUER_ID }}
           MACOS_NOTARY_KEY_ID: ${{ secrets.MACOS_NOTARY_KEY_ID }}
           MACOS_NOTARY_KEY: ${{ secrets.MACOS_NOTARY_KEY }}
-          # Telemetry configuration (injected at build time)
-          TELEMETRY_ENDPOINT: ${{ secrets.TELEMETRY_ENDPOINT }}
-          TELEMETRY_HEADERS: ${{ secrets.TELEMETRY_HEADERS }}
 
   container-images:
     name: Build and Push Container Images

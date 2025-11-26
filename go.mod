@@ -9,7 +9,6 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/google/go-cmp v0.7.0
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
 	github.com/hashicorp/go-version v1.7.0
 	github.com/microsoft/go-deviceid v1.0.0
 	github.com/mrk21/go-diff-fmt v0.2.0
@@ -27,9 +26,6 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/term v0.37.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20251002232023-7c0ddcbb5797
-	google.golang.org/grpc v1.76.0
-	google.golang.org/protobuf v1.36.10
 	gopkg.in/yaml.v3 v3.0.1
 	howett.net/plist v1.0.1
 )
@@ -79,8 +75,12 @@ require (
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.7.1 // indirect
+	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251002232023-7c0ddcbb5797 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250922171735-9219d122eba9 // indirect
+	google.golang.org/grpc v1.76.0 // indirect
+	google.golang.org/protobuf v1.36.10 // indirect
 )
