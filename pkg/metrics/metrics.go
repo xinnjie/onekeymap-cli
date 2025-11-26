@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/microsoft/go-deviceid"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	otelmetric "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
@@ -62,14 +61,11 @@ func New(
 		return nil, err
 	}
 
-	deviceID := getDeviceID(logger)
-
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			semconv.ServiceName("onekeymap-cli"),
 			semconv.ServiceVersion(version),
 			semconv.OSName(runtime.GOOS),
-			semconv.ServiceInstanceID(deviceID),
 		),
 	)
 	if err != nil {
@@ -169,16 +165,4 @@ func (r *recorder) collect(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// getDeviceID returns a stable device identifier for this machine.
-// It uses the github.com/microsoft/go-deviceid library to generate a consistent ID.
-func getDeviceID(logger *slog.Logger) string {
-	deviceID, err := deviceid.Get()
-	if err != nil {
-		logger.Warn("Failed to get device ID, using fallback", "error", err)
-		// Fallback to a generic identifier
-		return "unknown-device"
-	}
-	return deviceID
 }
