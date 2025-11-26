@@ -15,13 +15,14 @@ type UnknownActionReporter struct {
 
 // NewUnknownActionReporter creates a new metrics reporter for unknown actions.
 func NewUnknownActionReporter(recorder Recorder) *UnknownActionReporter {
-	unknownActionMetric := Metric{
-		Name:        "unknown_action_total",
-		Unit:        "1",
-		Description: "Total number of unknown actions encountered during import",
-	}
+	meter := recorder.Meter()
+	unknownActionCounter, _ := meter.Int64Counter(
+		"onekeymap.unknown_action_total",
+		otelmetric.WithDescription("Total number of unknown actions encountered during import"),
+		otelmetric.WithUnit("1"),
+	)
 	return &UnknownActionReporter{
-		unknownActionCounter: recorder.Counter(unknownActionMetric),
+		unknownActionCounter: unknownActionCounter,
 	}
 }
 

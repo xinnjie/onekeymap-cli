@@ -5,28 +5,31 @@ import (
 
 	otelmetric "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/noop"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 )
 
 // noopRecorder implements the Recorder interface but does nothing.
-type noopRecorder struct{}
-
-// Histogram returns a no-op histogram.
-func (r *noopRecorder) Histogram(_ Metric) otelmetric.Int64Histogram { //nolint:ireturn
-	return noop.Int64Histogram{}
+type noopRecorder struct {
+	meter otelmetric.Meter
 }
 
-// Counter returns a no-op counter.
-func (r *noopRecorder) Counter(_ Metric) otelmetric.Int64Counter { //nolint:ireturn
-	return noop.Int64Counter{}
+// Meter returns a no-op meter.
+func (r *noopRecorder) Meter() otelmetric.Meter {
+	return r.meter
 }
 
-// Collect is a no-op.
-func (r *noopRecorder) Collect(_ context.Context) error { return nil }
+// Provider returns a nil provider for noop recorder.
+// Note: This might need to return a real but empty provider if callers rely on it being non-nil.
+func (r *noopRecorder) Provider() *sdkmetric.MeterProvider {
+	return sdkmetric.NewMeterProvider()
+}
 
 // Shutdown is a no-op.
 func (r *noopRecorder) Shutdown(_ context.Context) error { return nil }
 
 // NewNoop returns a no-op Recorder.
 func NewNoop() Recorder {
-	return &noopRecorder{}
+	return &noopRecorder{
+		meter: noop.NewMeterProvider().Meter("noop"),
+	}
 }

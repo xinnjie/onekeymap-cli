@@ -10,30 +10,6 @@
 # Default: ~/.config/onekeymap/onekeymap.json
 # onekeymap: ~/.config/onekeymap/onekeymap.json
 
-# OpenTelemetry configuration for telemetry
-# telemetry:
-  # Can also be enabled with --telemetry flag
-  # Can be overridden with ONEKEYMAP_TELEMETRY_ENABLED
-  # enabled: false
-
-  # OTLP HTTP endpoint
-  # For local collector: localhost:4318
-  # Can be overridden with ONEKEYMAP_TELEMETRY_ENDPOINT
-  # endpoint: ""
-
-  # Custom headers for authentication (comma-separated key=value pairs)
-  # For Grafana Cloud, you need to set Authorization header with your API token:
-  # Example: "Authorization=Bearer <your-api-token>"
-  # Can be overridden with ONEKEYMAP_TELEMETRY_HEADERS
-  # headers: ""
-
-  # Disable TLS verification (default: false, which means TLS is enabled)
-  # Set to true only for local development without TLS
-  # For Grafana Cloud, keep this false (use TLS)
-  # Can be overridden with ONEKEYMAP_TELEMETRY_INSECURE
-  # insecure: false
-
-
 # Environment Variables:
 # All config keys can be set via environment variables with the ONEKEYMAP_ prefix
 # and dots replaced with underscores:

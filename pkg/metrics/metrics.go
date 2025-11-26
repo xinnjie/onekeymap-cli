@@ -8,7 +8,6 @@ import (
 
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	otelmetric "go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/noop"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -19,17 +18,11 @@ const (
 	metricExportIntervalSeconds = 1
 )
 
-// Metric represents a metric that can be collected.
-type Metric struct {
-	Name        string
-	Unit        string
-	Description string
-}
-
 // Recorder is the interface for recording metrics.
 type Recorder interface {
-	Histogram(metric Metric) otelmetric.Int64Histogram
-	Counter(metric Metric) otelmetric.Int64Counter
+	Meter() otelmetric.Meter
+
+	Provider() *sdkmetric.MeterProvider
 	Shutdown(ctx context.Context) error
 }
 
@@ -107,35 +100,14 @@ func New(
 	return recorder, nil
 }
 
-// Histogram creates a new int64 histogram metric.
-func (r *recorder) Histogram(metric Metric) otelmetric.Int64Histogram { //nolint:ireturn
-	histogram, err := r.meter.Int64Histogram(
-		"onekeymap."+metric.Name,
-		otelmetric.WithDescription(metric.Description),
-		otelmetric.WithUnit(metric.Unit),
-	)
-
-	if err != nil {
-		r.logger.Warn("failed to create histogram", "error", err)
-		return noop.Int64Histogram{}
-	}
-
-	return histogram
+// Meter returns the OpenTelemetry Meter for creating instruments.
+func (r *recorder) Meter() otelmetric.Meter {
+	return r.meter
 }
 
-// Counter creates a new int64 up down counter metric.
-func (r *recorder) Counter(metric Metric) otelmetric.Int64Counter { //nolint:ireturn
-	counter, err := r.meter.Int64Counter(
-		"onekeymap."+metric.Name,
-		otelmetric.WithDescription(metric.Description),
-		otelmetric.WithUnit(metric.Unit),
-	)
-
-	if err != nil {
-		r.logger.Warn("failed to create counter", "error", err)
-		return noop.Int64Counter{}
-	}
-	return counter
+// Provider returns the MeterProvider.
+func (r *recorder) Provider() *sdkmetric.MeterProvider {
+	return r.provider
 }
 
 // Shutdown shuts down the OpenTelemetry provider.

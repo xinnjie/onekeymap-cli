@@ -14,21 +14,23 @@ type ServiceReporter struct {
 
 // NewServiceReporter creates a new metrics reporter for service operations.
 func NewServiceReporter(recorder Recorder) *ServiceReporter {
-	importMetric := Metric{
-		Name:        "import_total",
-		Unit:        "1",
-		Description: "Total number of import operations called",
-	}
+	meter := recorder.Meter()
 
-	exportMetric := Metric{
-		Name:        "export_total",
-		Unit:        "1",
-		Description: "Total number of export operations called",
-	}
+	importCounter, _ := meter.Int64Counter(
+		"onekeymap.import_total",
+		otelmetric.WithDescription("Total number of import operations called"),
+		otelmetric.WithUnit("1"),
+	)
+
+	exportCounter, _ := meter.Int64Counter(
+		"onekeymap.export_total",
+		otelmetric.WithDescription("Total number of export operations called"),
+		otelmetric.WithUnit("1"),
+	)
 
 	return &ServiceReporter{
-		importCounter: recorder.Counter(importMetric),
-		exportCounter: recorder.Counter(exportMetric),
+		importCounter: importCounter,
+		exportCounter: exportCounter,
 	}
 }
 
