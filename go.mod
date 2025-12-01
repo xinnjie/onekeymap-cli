@@ -9,7 +9,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/google/go-cmp v0.7.0
-	github.com/hashicorp/go-version v1.7.0
+	github.com/hashicorp/go-version v1.8.0
 	github.com/mrk21/go-diff-fmt v0.2.0
 	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/sergi/go-diff v1.4.0
