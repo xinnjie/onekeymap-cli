@@ -1,5 +1,9 @@
 # Base keymap import behavior
 
+## What is Base Keymap
+
+Base Keymap refers to the default keybindings of different editors, such as the default shortcuts for VSCode, Zed, or IntelliJ.
+
 This document describes how OneKeymap handles base keymaps through the import plugin system.
 
 ## Design Philosophy

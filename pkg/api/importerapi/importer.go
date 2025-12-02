@@ -9,6 +9,14 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/validateapi"
 )
 
+// Importer defines the interface for the import service, which handles the
+// conversion of editor-specific keymaps into the universal format.
+type Importer interface {
+	// Import converts keymaps from a source stream. It returns the converted
+	// settings and a report detailing any conflicts or unmapped actions.
+	Import(ctx context.Context, opts ImportOptions) (*ImportResult, error)
+}
+
 // ImportOptions provides configuration for an import operation.
 type ImportOptions struct {
 	// Required, editor type
@@ -45,12 +53,4 @@ type KeymapChanges struct {
 type KeymapDiff struct {
 	Before keymap.Action
 	After  keymap.Action
-}
-
-// Importer defines the interface for the import service, which handles the
-// conversion of editor-specific keymaps into the universal format.
-type Importer interface {
-	// Import converts keymaps from a source stream. It returns the converted
-	// settings and a report detailing any conflicts or unmapped actions.
-	Import(ctx context.Context, opts ImportOptions) (*ImportResult, error)
 }
