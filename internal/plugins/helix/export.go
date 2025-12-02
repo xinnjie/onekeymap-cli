@@ -182,7 +182,7 @@ func (e *helixExporter) generateManagedKeybindings(
 	keysByMode := helixKeys{}
 
 	for _, km := range setting.Actions {
-		mapping := e.mappingConfig.Get(km.Name)
+		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeHelix)
 		if mapping == nil || len(mapping.Helix) == 0 {
 			for _, b := range km.Bindings {
 				if len(b.KeyChords) > 0 {
@@ -190,6 +190,13 @@ func (e *helixExporter) generateManagedKeybindings(
 				}
 			}
 			continue
+		}
+
+		if usedFallback {
+			e.logger.InfoContext(ctx, "Action not directly supported, falling back to child action",
+				"originalAction", km.Name,
+				"fallbackAction", mapping.ID,
+			)
 		}
 
 		for _, b := range km.Bindings {

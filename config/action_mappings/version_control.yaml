@@ -174,6 +174,10 @@ mappings:
     name: "Toggle blame"
     description: "Toggle Blame in left of editor"
     category: "Version Control"
+    children:
+      - "actions.git.blameHover"
+      - "actions.git.toggleBlameInline"
+      - "actions.git.toggleBlameStatusBar"
     vscode:
       command: "git.blame.toggleEditorDecoration"
       note: "toggle blame inline"
@@ -208,6 +212,7 @@ mappings:
     name: "Toggle blame inline"
     description: "Toggle blame inline, next to editor content"
     category: "Version Control"
+    featured: true
     vscode:
       command: "git.blame.toggleEditorDecoration"
     zed:

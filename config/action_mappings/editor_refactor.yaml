@@ -141,6 +141,7 @@ mappings:
     name: "Extract to variable"
     description: "Extract to variable"
     category: "Code.Refactor"
+    featured: true
     xcode:
       action: "extractExpression:"
       alternate: "NO"
@@ -156,6 +157,7 @@ mappings:
     name: "Extract to method"
     description: "Extract to method"
     category: "Code.Refactor"
+    featured: true
     xcode:
       action: "extractMethod:"
       alternate: "NO"

@@ -308,6 +308,35 @@ func TestExportIntelliJKeymap(t *testing.T) {
 				}
 			},
 		},
+		// Children fallback tests
+		{
+			name: "falls back to child action when parent not supported",
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.parentNotSupported",
+						Bindings: []keybinding.Keybinding{parseKB("meta+shift+h")},
+					},
+				},
+			},
+			validateFunc: func(t *testing.T, out KeymapXML) {
+				// Should have one action using the child's action ID
+				assert.Len(t, out.Actions, 1)
+
+				var childAction *ActionXML
+				for i := range out.Actions {
+					if out.Actions[i].ID == "ChildSupportedAction" {
+						childAction = &out.Actions[i]
+						break
+					}
+				}
+
+				if assert.NotNil(t, childAction, "expected ChildSupportedAction from child fallback") {
+					assert.Len(t, childAction.KeyboardShortcuts, 1)
+					assert.Equal(t, "meta shift H", childAction.KeyboardShortcuts[0].First)
+				}
+			},
+		},
 	}
 
 	for _, tt := range tests {

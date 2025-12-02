@@ -34,7 +34,7 @@ completion:
 	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli completion fish > completions/onekeymap-cli.fish
 
 docs:
-	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli dev docSupportActions &> ./action-support-matrix.md
+	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli dev docSupportActions &> ./docs/action-support-matrix.md
 
 generate-base:
 	@$(GO_ENV) go run -ldflags "$(GO_LDFLAGS)" ./cmd/onekeymap-cli dev generateBase

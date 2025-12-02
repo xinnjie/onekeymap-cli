@@ -82,6 +82,8 @@ mappings:
     name: "Go to definition"
     description: "Go to definition"
     category: "Code.Go"
+    children:
+      - "actions.go.definitionPeek"
     vscode:
       command: "editor.action.revealDefinition"
       when: "editorHasDefinitionProvider && editorTextFocus"
@@ -122,6 +124,8 @@ mappings:
     name: "Go to type definition"
     description: "Go to type definition"
     category: "Code.Go"
+    children:
+      - "actions.go.typeDefinitionPeek"
     vscode:
       command: "editor.action.goToTypeDefinition"
       when: "editorTextFocus"
@@ -152,6 +156,8 @@ mappings:
     name: "Go to references"
     description: "Go to references"
     category: "Code.Go"
+    children:
+      - "actions.go.referencePeek"
     vscode:
       command: "references-view.findReferences"
       when: "editorHasReferenceProvider"
@@ -188,6 +194,8 @@ mappings:
     name: "Call hierarchy"
     description: "Show call hierarchy"
     category: "Code.Go"
+    children:
+      - "actions.go.callHierarchyPeek"
     vscode:
       command: "references-view.showCallHierarchy"
       when: "editorHasCallHierarchyProvider && editorTextFocus"
@@ -292,8 +300,8 @@ mappings:
         parentTitle: "Selection"
         title: "Balance Delimiters"
   - id: "actions.go.jumpToNextCounterpart"
-    name: "Jump to next counterpart"
-    description: "Jump to next counterpart, like switching between .cpp file and .h file"
+    name: "Go to counterpart"
+    description: "Go to counterpart, like switching between .cpp file and .h file"
     category: "Code.Go"
     featured: true
     xcode:

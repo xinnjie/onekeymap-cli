@@ -10,7 +10,6 @@ The Action Mappings System is the core component that enables OneKeymap to trans
 
 ```
 action_mappings/
-├── README.md          # This documentation
 ├── editor.yaml        # Core text editing operations
 ├── navigation.yaml    # Cursor movement and navigation
 └── workspace.yaml     # Workspace-level operations
@@ -27,7 +26,7 @@ mappings:
     description: "A longer, more detailed description of what the action does"
     category: "editor.editing.selection"
     featured: false
-    featuredReason: "This action is widely supported and considered portable."
+    featuredReason: "This action is widely supported and is considered portable."
     vscode:
       command: "vscode.command.name"
       when: "contextCondition"
@@ -41,6 +40,9 @@ mappings:
     vim:
       command: "vim_command"
       mode: "normal|insert|visual"
+    # To nest actions, add a 'children' key with child action IDs.
+    children:
+      - "actions.category.actionName.child"
 ```
 
 ### Field Definitions
@@ -51,11 +53,31 @@ mappings:
 - **`category`**: The category of the action, used for grouping and organization.
 - **`featured`**: A boolean indicating if the action is not widely portable across editors. Set to `true` for editor-specific or non-standard actions.
 - **`featuredReason`**: An explanation for why an action is `featured`, or a recommendation to use a more portable alternative.
-- **Editor-specific sections** (`vscode`, `zed`, `intellij`, `vim`, `helix`, `xcode`):
+- **`children`** (optional): A list of child action IDs (string array).
+### Editor-specific sections (`vscode`, `zed`, `intellij`, `vim`, `helix`, `xcode`):
   - These sections contain the specific implementation details for each editor. For editors that support multiple configurations for a single action (like VSCode), this is a list of mappings.
   - **`disableImport`** (optional): If `true`, this mapping will only be used for exporting keymaps and will be ignored during import.
   - **`notSupported`** (optional): If `true`, this action is explicitly marked as not supported for the editor.
   - **`note`** (optional): A string explaining why the action is not supported.
+
+#### Export Fallback Mechanism (for `children`):
+
+When exporting keybindings for a specific editor, if a parent action is marked as `notSupported` or has no definition for that editor, the system will attempt to find a suitable replacement within its `children` list. It will iterate through the `children` in the defined order and select the *first* child action that *is* supported by the target editor. This ensures a graceful fallback for editor-specific limitations.
+
+**Key Characteristics of the Fallback Mechanism:**
+
+1.  **Export-Only Behavior**:
+    *   **Export**: The fallback logic is applied *only* during the export process. If a parent action (e.g., `actions.go.callHierarchy`) is bound to `Cmd+Shift+H` but is not supported in the target editor (e.g., VSCode), the system will look for the first supported child action (e.g., `actions.go.callHierarchy.peek`) in the `children` list and export `Cmd+Shift+H` bound to VSCode's `peek` command.
+    *   **Import**: When importing keybindings, this fallback logic is *not* applied. A keybinding imported for a specific child action (e.g., `actions.go.callHierarchy.peek`) will always be mapped back to that exact child action, not its parent.
+
+2.  **Order as Priority**:
+    *   The `children` list functions as an ordered **priority list**. The exporter will traverse this list from top to bottom, selecting the *first* child action that is supported by the target editor. This allows maintainers to explicitly control the fallback preference.
+
+3.  **Export Process Transparency **:
+    *   It is recommended that the export process provides clear logging or warnings when a fallback occurs. For example: "Action `actions.go.callHierarchy` is not directly supported in VSCode; falling back to `actions.go.callHierarchy.peek`." This ensures users understand why a specific keybinding might be mapped to a different, though related, action than originally intended.
+
+4.  **Conflict Resolution: Precise Match Wins**:
+    *   If a user has defined keybindings for both a parent action and one of its child actions, the system will prioritize the most specific mapping. Keybindings explicitly set for a child action will always take precedence over any keybinding inherited from its parent or determined via the fallback mechanism.
 
 ## Supported Editors
 

@@ -473,6 +473,8 @@ linters:
           - goconst
           - gosec
           - noctx
+          - gocyclo
+          - cyclop
           - wrapcheck
       # TODO(xinnjie): Can not figure out a way to avoid using global logger in cobra cli codes
       - text: "global logger should not be used"

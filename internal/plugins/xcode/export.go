@@ -185,7 +185,8 @@ func (e *xcodeExporter) generateManagedKeybindings(
 	var xcodeKeybindings []xcodeKeybinding
 
 	for _, km := range setting.Actions {
-		mapping := e.mappingConfig.Get(km.Name)
+		// Use GetExportAction to support children fallback
+		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeXcode)
 		if mapping == nil {
 			marker.MarkSkippedForReason(
 				km.Name,
@@ -195,10 +196,20 @@ func (e *xcodeExporter) generateManagedKeybindings(
 			continue
 		}
 
-		// check support status for xcode
-		if ok, note := mapping.IsSupported(pluginapi.EditorTypeXcode); !ok {
-			marker.MarkSkippedForReason(km.Name, nil, &pluginapi.UnsupportedExportActionError{Note: note})
-			continue
+		// If using fallback, check if the fallback target action is explicitly in the keymap.
+		// If so, skip this one - let the explicit action handle it (exact match priority).
+		if usedFallback {
+			if setting.HasAction(mapping.ID) {
+				e.logger.Debug("Skipping fallback: target action is explicitly defined in keymap",
+					"originalAction", km.Name,
+					"fallbackAction", mapping.ID,
+				)
+				continue
+			}
+			e.logger.Info("Action not directly supported, falling back to child action",
+				"originalAction", km.Name,
+				"fallbackAction", mapping.ID,
+			)
 		}
 
 		xcodeConfigs := mapping.Xcode
@@ -278,6 +289,7 @@ func (e *xcodeExporter) mergeKeybindings(managed, unmanaged []xcodeKeybinding) [
 
 // generateTextKeyBindings generates Xcode Text Key Bindings from KeymapSetting.
 // It merges managed text bindings with existing ones, with managed taking priority.
+// Uses GetExportAction to support fallback to children when parent is not supported.
 func (e *xcodeExporter) generateTextKeyBindings(
 	setting *keymap.Keymap,
 	existingTextBindings xcodeTextKeybinding,
@@ -291,16 +303,27 @@ func (e *xcodeExporter) generateTextKeyBindings(
 
 	// Generate managed text bindings
 	for _, km := range setting.Actions {
-		mapping := e.mappingConfig.Get(km.Name)
+		// Use GetExportAction to support children fallback
+		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeXcode)
 		if mapping == nil {
 			marker.MarkSkippedForReason(km.Name, nil, pluginapi.ErrActionNotSupported)
 			continue
 		}
 
-		// check support status for xcode
-		if ok, note := mapping.IsSupported(pluginapi.EditorTypeXcode); !ok {
-			marker.MarkSkippedForReason(km.Name, nil, &pluginapi.UnsupportedExportActionError{Note: note})
-			continue
+		// If using fallback, check if the fallback target action is explicitly in the keymap.
+		// If so, skip this one - let the explicit action handle it (exact match priority).
+		if usedFallback {
+			if setting.HasAction(mapping.ID) {
+				e.logger.Debug("Skipping fallback (text): target action is explicitly defined in keymap",
+					"originalAction", km.Name,
+					"fallbackAction", mapping.ID,
+				)
+				continue
+			}
+			e.logger.Info("Action not directly supported, falling back to child action (text)",
+				"originalAction", km.Name,
+				"fallbackAction", mapping.ID,
+			)
 		}
 
 		xcodeConfigs := mapping.Xcode

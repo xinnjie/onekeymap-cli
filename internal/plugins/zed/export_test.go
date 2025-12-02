@@ -108,6 +108,28 @@ func TestExportZedKeymap(t *testing.T) {
 			]`,
 			wantErr: false,
 		},
+		{
+			name: "falls back to child action when parent not supported",
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name: "actions.test.parentNotSupported",
+						Bindings: []keybinding.Keybinding{
+							parseKB("meta+shift+h"),
+						},
+					},
+				},
+			},
+			wantJSON: `[
+			{
+				"context": "Editor",
+				"bindings": {
+					"cmd-shift-h": "child::Action"
+				}
+			}
+			]`,
+			wantErr: false,
+		},
 	}
 
 	mappingConfig, err := mappings.NewTestMappingConfig()

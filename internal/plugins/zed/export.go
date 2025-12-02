@@ -148,8 +148,9 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymap.Keymap, marker 
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
 	for _, km := range setting.Actions {
-		actionConfig, err := p.actionIDToZed(km.Name)
-		if err != nil {
+		// Use GetExportAction to support children fallback
+		mapping, usedFallback := p.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeZed)
+		if mapping == nil {
 			p.logger.Info("no mapping found for action", "action", km.Name)
 			for _, b := range km.Bindings {
 				if len(b.KeyChords) > 0 {
@@ -157,6 +158,13 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymap.Keymap, marker 
 				}
 			}
 			continue
+		}
+
+		if usedFallback {
+			p.logger.Info("Action not directly supported, falling back to child action",
+				"originalAction", km.Name,
+				"fallbackAction", mapping.ID,
+			)
 		}
 
 		for _, b := range km.Bindings {
@@ -176,7 +184,7 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymap.Keymap, marker 
 			marker.MarkExported(km.Name, b)
 
 			// For each Zed mapping config, create a binding under its context
-			for _, zconf := range *actionConfig {
+			for _, zconf := range mapping.Zed {
 				if zconf.Action == "" {
 					continue
 				}
@@ -274,12 +282,4 @@ func (p *zedExporter) mergeKeybindings(managed, existing zedKeymapConfig) zedKey
 	}
 
 	return result
-}
-
-// actionIDToZed converts a universal action ID to Zed action and context.
-func (p *zedExporter) actionIDToZed(actionID string) (*mappings2.ZedConfigs, error) {
-	if mapping, exists := p.mappingConfig.Mappings[actionID]; exists {
-		return &mapping.Zed, nil
-	}
-	return nil, fmt.Errorf("no mapping found for action ID '%s'", actionID)
 }

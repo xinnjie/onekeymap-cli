@@ -46,3 +46,42 @@ mappings:
       context: "Editor"
     intellij:
       action: "TestAction"
+  # Test children fallback - parent not supported in vscode/intellij/zed/xcode/helix
+  - id: "actions.test.parentNotSupported"
+    description: "Parent action not supported in vscode/intellij/zed/xcode/helix"
+    category: "Testing"
+    children:
+      - "actions.test.childSupported"
+    vscode:
+      notSupported: true
+      note: "Use child action instead"
+    intellij:
+      notSupported: true
+      note: "Use child action instead"
+    zed:
+      notSupported: true
+      note: "Use child action instead"
+    xcode:
+      notSupported: true
+      note: "Use child action instead"
+    helix:
+      notSupported: true
+      note: "Use child action instead"
+  - id: "actions.test.childSupported"
+    description: "Child action supported in vscode/intellij/zed/xcode/helix"
+    category: "Testing"
+    vscode:
+      command: "child.supported.command"
+      when: "editorTextFocus"
+    intellij:
+      action: "ChildSupportedAction"
+    zed:
+      action: "child::Action"
+      context: "Editor"
+    xcode:
+      menuAction:
+        action: "Debug.Child.Supported"
+        title: "Child Supported Action"
+    helix:
+      command: "child_supported_command"
+      mode: "normal"

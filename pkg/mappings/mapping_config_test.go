@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	actionmappings "github.com/xinnjie/onekeymap-cli/config/action_mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"gopkg.in/yaml.v3"
 )
 
@@ -201,4 +202,113 @@ func TestNewMappingConfig_NoDuplicateIDs(t *testing.T) {
 func TestDuplicateInProductionActionMappingConfig(t *testing.T) {
 	_, err := NewMappingConfig()
 	require.NoError(t, err)
+}
+
+func TestGetExportAction(t *testing.T) {
+	t.Run("returns action itself when supported", func(t *testing.T) {
+		content := `
+mappings:
+  - id: "parent.action"
+    children:
+      - "child.action"
+    vscode:
+      command: "parent.cmd"
+  - id: "child.action"
+    vscode:
+      command: "child.cmd"
+`
+		reader := strings.NewReader(content)
+		mc, err := load(reader)
+		require.NoError(t, err)
+
+		action, fallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
+		require.NotNil(t, action)
+		assert.Equal(t, "parent.action", action.ID)
+		assert.False(t, fallback)
+	})
+
+	t.Run("falls back to child when parent not supported", func(t *testing.T) {
+		content := `
+mappings:
+  - id: "parent.action"
+    children:
+      - "child.action"
+    vscode:
+      notSupported: true
+  - id: "child.action"
+    vscode:
+      command: "child.cmd"
+`
+		reader := strings.NewReader(content)
+		mc, err := load(reader)
+		require.NoError(t, err)
+
+		action, fallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
+		require.NotNil(t, action)
+		assert.Equal(t, "child.action", action.ID)
+		assert.True(t, fallback)
+	})
+
+	t.Run("falls back to first supported child in order", func(t *testing.T) {
+		content := `
+mappings:
+  - id: "parent.action"
+    children:
+      - "child1.action"
+      - "child2.action"
+    vscode:
+      notSupported: true
+  - id: "child1.action"
+    vscode:
+      notSupported: true
+  - id: "child2.action"
+    vscode:
+      command: "child2.cmd"
+`
+		reader := strings.NewReader(content)
+		mc, err := load(reader)
+		require.NoError(t, err)
+
+		action, fallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
+		require.NotNil(t, action)
+		assert.Equal(t, "child2.action", action.ID)
+		assert.True(t, fallback)
+	})
+
+	t.Run("returns nil when no action supported", func(t *testing.T) {
+		content := `
+mappings:
+  - id: "parent.action"
+    children:
+      - "child.action"
+    vscode:
+      notSupported: true
+  - id: "child.action"
+    vscode:
+      notSupported: true
+`
+		reader := strings.NewReader(content)
+		mc, err := load(reader)
+		require.NoError(t, err)
+
+		action, fallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
+		assert.Nil(t, action)
+		assert.False(t, fallback)
+	})
+
+	t.Run("returns nil for non-existent action", func(t *testing.T) {
+		content := `
+mappings:
+  - id: "some.action"
+    vscode:
+      command: "cmd"
+`
+		reader := strings.NewReader(content)
+		mc, err := load(reader)
+		require.NoError(t, err)
+
+		action, fallback := mc.GetExportAction("non.existent", pluginapi.EditorTypeVSCode)
+		assert.Nil(t, action)
+		assert.False(t, fallback)
+	})
 }

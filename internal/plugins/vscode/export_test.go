@@ -78,6 +78,51 @@ func TestExporter_Export(t *testing.T) {
 			  }
 			]`,
 		},
+		{
+			name: "falls back to child action when parent not supported",
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.parentNotSupported",
+						Bindings: []keybinding.Keybinding{parseKB("meta+shift+h")},
+					},
+				},
+			},
+			expectedJSON: `[
+			  {
+			    "key": "cmd+shift+h",
+			    "command": "child.supported.command",
+			    "when": "editorTextFocus"
+			  }
+			]`,
+		},
+		{
+			name: "both parent and child have keybindings - each exports to child command",
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.parentNotSupported",
+						Bindings: []keybinding.Keybinding{parseKB("meta+shift+h")},
+					},
+					{
+						Name:     "actions.test.childSupported",
+						Bindings: []keybinding.Keybinding{parseKB("meta+shift+j")},
+					},
+				},
+			},
+			expectedJSON: `[
+			  {
+			    "key": "cmd+shift+h",
+			    "command": "child.supported.command",
+			    "when": "editorTextFocus"
+			  },
+			  {
+			    "key": "cmd+shift+j",
+			    "command": "child.supported.command",
+			    "when": "editorTextFocus"
+			  }
+			]`,
+		},
 		// Non-destructive export tests
 		{
 			name: "non-destructive export preserves user keybindings",

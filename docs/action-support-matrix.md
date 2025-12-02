@@ -39,14 +39,21 @@
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
-| Extract to method | N/A | N/A | N/A | ✅ | N/A | Extract to method | action.refactor.extractMethod |
-| Extract to variable | N/A | N/A | N/A | ✅ | N/A | Extract to variable | action.refactor.extractVariable |
 | Code action | ✅ | ✅ | ✅ | ❌ | ✅ | Code Action... | actions.refactor.codeAction |
 | Organize imports | ✅ | ✅ | ✅ | N/A | ❌ | Organize Imports | actions.refactor.organizeImports |
 | Quick fix | ✅ | ❌ (not supported yet, no issue tracked) | ✅ | ✅ | ❌ | Quick Fix... | actions.refactor.quickFix |
 | Refactor code | ✅ | ❌ (not supported yet, see [Code refactoring in Zed ](https://github.com/zed-industries/zed/discussions/8623)) | ✅ | N/A | ✅ | Refactor This... | actions.refactor.refactor |
 | Rename symbol | ✅ | ✅ | ✅ | ✅ | ✅ | Rename | actions.refactor.rename |
 | Generate codes | ✅ | ❌ (Use `Code action` instead) | ✅ | N/A | N/A | Generate code... (Getters, Setters, Constructors, hashCode/equals, toString) | actions.refactor.sourceAction |
+
+<details>
+<summary>Featured Actions</summary>
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
+| Extract to method | N/A | N/A | N/A | ✅ | N/A | Extract to method | action.refactor.extractMethod | - |
+| Extract to variable | N/A | N/A | N/A | ✅ | N/A | Extract to variable | action.refactor.extractVariable | - |
+</details>
 
 ## Code.Suggestion
 
@@ -197,7 +204,7 @@
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 | Delete line | ✅ | ✅ | ✅ | ✅ | N/A | Delete line | actions.edit.deleteLines |
-| Insert line after | ✅ | ✅ | ✅ | N/A | N/A | Insert a new line after the current line | actions.edit.insertLineAfter |
+| Insert line after | ✅ | ✅ | ✅ | ✅ | N/A | Insert a new line after the current line | actions.edit.insertLineAfter |
 | Insert line before | ✅ | ✅ | ✅ | N/A | N/A | Insert a new line before the current line | actions.edit.insertLineBefore |
 | Join lines | ✅ | ✅ | ✅ | N/A | N/A | Join lines | actions.edit.joinLines |
 | Copy line down | ✅ | ✅ | ✅ | ✅ | ✅ | Copy current line down | actions.selection.copyLineDown |
@@ -249,7 +256,7 @@
 |--------|--------|-----|----------|-------|-------|-------------|-----------|
 | Find next | ✅ | ✅ | ✅ | ✅ | ✅ | Find Next | actions.edit.nextMatchFindAction |
 | Find previous | ✅ | ✅ | ✅ | ✅ | ✅ | Find Previous | actions.edit.previousMatchFindAction |
-| Jump to Navigation Bar | ✅ | ❌ (Not support, no issue tracked) | ✅ | N/A | N/A | Jump to Navigation Bar | actions.go.breadcrumbsFocus |
+| Jump to Navigation Bar | ✅ | ❌ (Not support, no issue tracked) | ✅ | N/A | N/A | Jump to the breadcrumb navigation bar | actions.go.breadcrumbsFocus |
 | Find file | ✅ | ✅ | ✅ | ✅ | N/A | Go to file | actions.go.fileFinder |
 | Go to line | ✅ | ✅ | ✅ | ❌ (Use `Cmd+L` to go to line, this keybinding is not configurable) | N/A | Go to Line/Column | actions.go.line |
 | Find symbol | ✅ | ✅ | ✅ | N/A | N/A | Go to symbol in workspace, across files in the workspace | actions.go.symbolFinder |
@@ -336,7 +343,6 @@
 | Stage selected changes | N/A | N/A | N/A | ✅ | N/A | Stage Selected Changes | actions.git.stageSelected |
 | Pull changes | ✅ | ✅ | ✅ | ✅ | N/A | Pull changes | actions.git.sync |
 | Toggle blame | ✅ (toggle blame inline) | ✅ | ❌ (intellij can only toggle blame in actions) | ✅ | N/A | Toggle Blame in left of editor | actions.git.toggleBlame |
-| Toggle blame inline | ✅ | ✅ | N/A | ✅ | N/A | Toggle blame inline, next to editor content | actions.git.toggleBlameInline |
 | Unstage changes | ✅ | ✅ | ✅ | ✅ | N/A | Unstage Changes | actions.git.unstage |
 | Unstage selected changes | N/A | N/A | N/A | ✅ | N/A | Unstage selected changes | actions.git.unstageSelected |
 | Accept current | ✅ | ❌ | ✅ | N/A | N/A | Accept current change (keep left side) | actions.merge.acceptCurrent |
@@ -348,6 +354,7 @@
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID | Featured Reason |
 |--------|--------|-----|----------|-------|-------|-------------|-----------|-----------------|
 | Blame hover | ❌ (vscode support blame inline, see `Toggle blame inline`) | ✅ | N/A | ❌ | N/A | Show blame information on hover | actions.git.blameHover | - |
+| Toggle blame inline | ✅ | ✅ | N/A | ✅ | N/A | Toggle blame inline, next to editor content | actions.git.toggleBlameInline | - |
 | Toggle blame status bar | ✅ | ❌ (not supported yet, see [`Optional Git Blame in status bar instead of inline` discussion](https://github.com/zed-industries/zed/discussions/26127)) | N/A | ❌ | N/A | Toggle blame in status bar | actions.git.toggleBlameStatusBar | - |
 </details>
 

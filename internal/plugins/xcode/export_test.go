@@ -14,7 +14,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
-	mappings2 "github.com/xinnjie/onekeymap-cli/pkg/mappings"
+	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
 
 // newTestAction creates a test Action with given keybindings
@@ -33,15 +33,15 @@ func newTestAction(actionName string, keybindings ...string) keymap.Action {
 	}
 }
 
-func testMappingConfig() *mappings2.MappingConfig {
-	return &mappings2.MappingConfig{
-		Mappings: map[string]mappings2.ActionMappingConfig{
+func testMappingConfig() *mappings.MappingConfig {
+	return &mappings.MappingConfig{
+		Mappings: map[string]mappings.ActionMappingConfig{
 			"actions.navigation.jumpToDefinition": {
 				ID:          "actions.navigation.jumpToDefinition",
 				Description: "Jump to definition",
-				Xcode: []mappings2.XcodeMappingConfig{
+				Xcode: []mappings.XcodeMappingConfig{
 					{
-						MenuAction: mappings2.XcodeMenuAction{
+						MenuAction: mappings.XcodeMenuAction{
 							Action:    "editorContext_jumpToDefinition:",
 							CommandID: "Xcode.IDEKit.CmdDefinition.JumpToDefinition",
 						},
@@ -51,10 +51,10 @@ func testMappingConfig() *mappings2.MappingConfig {
 			"actions.cursor.pageDown": {
 				ID:          "actions.cursor.pageDown",
 				Description: "Page down",
-				Xcode: []mappings2.XcodeMappingConfig{
+				Xcode: []mappings.XcodeMappingConfig{
 					{
-						TextAction: mappings2.XcodeTextAction{
-							TextAction: mappings2.StringOrSlice{Items: []string{"pageDown:"}},
+						TextAction: mappings.XcodeTextAction{
+							TextAction: mappings.StringOrSlice{Items: []string{"pageDown:"}},
 						},
 					},
 				},
@@ -62,10 +62,36 @@ func testMappingConfig() *mappings2.MappingConfig {
 			"actions.edit.insertLineAfter": {
 				ID:          "actions.edit.insertLineAfter",
 				Description: "Insert line after",
-				Xcode: []mappings2.XcodeMappingConfig{
+				Xcode: []mappings.XcodeMappingConfig{
 					{
-						TextAction: mappings2.XcodeTextAction{
-							TextAction: mappings2.StringOrSlice{Items: []string{"moveToEndOfLine:", "insertNewline:"}},
+						TextAction: mappings.XcodeTextAction{
+							TextAction: mappings.StringOrSlice{Items: []string{"moveToEndOfLine:", "insertNewline:"}},
+						},
+					},
+				},
+			},
+			// Test children fallback
+			"actions.test.parentNotSupported": {
+				ID:          "actions.test.parentNotSupported",
+				Description: "Parent action not supported in xcode",
+				Children:    []string{"actions.test.childSupported"},
+				Xcode: []mappings.XcodeMappingConfig{
+					{
+						EditorActionMapping: mappings.EditorActionMapping{
+							NotSupported: true,
+							Note:         "Use child action instead",
+						},
+					},
+				},
+			},
+			"actions.test.childSupported": {
+				ID:          "actions.test.childSupported",
+				Description: "Child action supported in xcode",
+				Xcode: []mappings.XcodeMappingConfig{
+					{
+						MenuAction: mappings.XcodeMenuAction{
+							Action: "Debug.Child.Supported",
+							Title:  "Child Supported Action",
 						},
 					},
 				},
@@ -1107,4 +1133,72 @@ func TestExporter_IdentifyUnmanagedKeybindings(t *testing.T) {
 			assert.Equal(t, tt.expectedConfig, actual)
 		})
 	}
+}
+
+func TestExporter_ChildrenFallback(t *testing.T) {
+	mappingConfig := testMappingConfig()
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	exporter := newExporter(mappingConfig, logger, diff.NewJSONASCIIDiffer())
+
+	t.Run("fallback when only parent in keymap - child not in keymap", func(t *testing.T) {
+		// Only parent action is in keymap, child is NOT in keymap
+		// Parent should fallback to child's xcode action
+		keymapSetting := keymap.Keymap{
+			Actions: []keymap.Action{
+				newTestAction("actions.test.parentNotSupported", "meta+a"),
+			},
+		}
+
+		var out bytes.Buffer
+		report, err := exporter.Export(context.Background(), &out, keymapSetting, pluginapi.PluginExportOption{})
+		require.NoError(t, err)
+		require.NotNil(t, report)
+
+		// Should export to child's xcode action
+		output := out.String()
+		assert.Contains(t, output, "Debug.Child.Supported")
+		assert.Contains(t, output, "@a") // meta+a -> @a
+	})
+
+	t.Run("exact match priority when both parent and child in keymap", func(t *testing.T) {
+		// Both parent and child are in keymap
+		// Parent's fallback should be skipped, only child should be exported
+		keymapSetting := keymap.Keymap{
+			Actions: []keymap.Action{
+				newTestAction("actions.test.parentNotSupported", "meta+a"),
+				newTestAction("actions.test.childSupported", "meta+b"),
+			},
+		}
+
+		var out bytes.Buffer
+		report, err := exporter.Export(context.Background(), &out, keymapSetting, pluginapi.PluginExportOption{})
+		require.NoError(t, err)
+		require.NotNil(t, report)
+
+		// Should only export child's keybinding (meta+b -> @b)
+		output := out.String()
+		assert.Contains(t, output, "Debug.Child.Supported")
+		assert.Contains(t, output, "@b")    // child's keybinding
+		assert.NotContains(t, output, "@a") // parent's keybinding should NOT be exported
+	})
+
+	t.Run("child only in keymap - direct export", func(t *testing.T) {
+		// Only child action is in keymap
+		// Should export directly to child's xcode action
+		keymapSetting := keymap.Keymap{
+			Actions: []keymap.Action{
+				newTestAction("actions.test.childSupported", "meta+c"),
+			},
+		}
+
+		var out bytes.Buffer
+		report, err := exporter.Export(context.Background(), &out, keymapSetting, pluginapi.PluginExportOption{})
+		require.NoError(t, err)
+		require.NotNil(t, report)
+
+		// Should export child's keybinding
+		output := out.String()
+		assert.Contains(t, output, "Debug.Child.Supported")
+		assert.Contains(t, output, "@c") // meta+c -> @c
+	})
 }

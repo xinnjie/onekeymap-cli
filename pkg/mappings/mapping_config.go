@@ -48,6 +48,9 @@ type ActionMappingConfig struct {
 	Vim            VimMappingConfig      `yaml:"vim"`
 	Helix          HelixConfig           `yaml:"helix"`
 	Xcode          XcodeConfigs          `yaml:"xcode"`
+	// Children is a list of child action IDs for hierarchical grouping.
+	// Used for export fallback: if parent is not supported, fallback to first supported child.
+	Children []string `yaml:"children,omitempty"`
 }
 
 const explicitlyNotSupported = "__explicitly_not_supported__"
@@ -260,6 +263,39 @@ func (mc *MappingConfig) Get(actionID string) *ActionMappingConfig {
 func (mc *MappingConfig) IsActionMapped(action string) bool {
 	_, exists := mc.Mappings[action]
 	return exists
+}
+
+// GetExportAction returns the action config to use for export.
+// If the action is supported by the editor, it returns the action itself.
+// If not supported, it falls back to the first supported child action.
+// Returns nil if no suitable action is found.
+// The second return value is true if a fallback was used.
+func (mc *MappingConfig) GetExportAction(
+	actionID string,
+	editorType pluginapi.EditorType,
+) (*ActionMappingConfig, bool) {
+	mapping := mc.Get(actionID)
+	if mapping == nil {
+		return nil, false
+	}
+
+	// Check if the action itself is supported
+	if supported, _ := mapping.IsSupported(editorType); supported {
+		return mapping, false
+	}
+
+	// Fallback to children if present
+	for _, childID := range mapping.Children {
+		childMapping := mc.Get(childID)
+		if childMapping == nil {
+			continue
+		}
+		if supported, _ := childMapping.IsSupported(editorType); supported {
+			return childMapping, true
+		}
+	}
+
+	return nil, false
 }
 
 func checkEditorConfigs(mappings map[string]ActionMappingConfig) error {

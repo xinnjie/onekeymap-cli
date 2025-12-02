@@ -149,6 +149,33 @@ func TestExportHelixKeymap(t *testing.T) {
 "C-c" = "yank"
 `,
 		},
+		// Children fallback tests
+		{
+			name: "falls back to child action when parent not supported",
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newAction("actions.test.parentNotSupported", "meta+shift+h"),
+				},
+			},
+			wantTOML: `
+[keys.normal]
+"M-S-h" = "child_supported_command"
+`,
+		},
+		{
+			name: "both parent and child have keybindings - each exports to child command",
+			setting: keymap.Keymap{
+				Actions: []keymap.Action{
+					newAction("actions.test.parentNotSupported", "meta+shift+h"),
+					newAction("actions.test.childSupported", "meta+shift+j"),
+				},
+			},
+			wantTOML: `
+[keys.normal]
+"M-S-h" = "child_supported_command"
+"M-S-j" = "child_supported_command"
+`,
+		},
 	}
 
 	for _, tt := range tests {

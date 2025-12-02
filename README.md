@@ -142,11 +142,11 @@ editors:
 | **VSCode** | ✅ | ✅ |  |
 | **Zed** | ✅ | ✅ |  |
 | **IntelliJ IDEA** | ✅ | ✅ |  |
-| **Xcode(experimental)** | ✅ | ✅ | shortcut coverage is still limited (see [Action Support Matrix](action-support-matrix.md)) |
-| **Helix(experimental)** | ❌ | ✅ | TOML configuration support; shortcut coverage is still limited (see [Action Support Matrix](action-support-matrix.md)) |
+| **Xcode(experimental)** | ✅ | ✅ | shortcut coverage is still limited (see [Action Support Matrix](docs/action-support-matrix.md)) |
+| **Helix(experimental)** | ❌ | ✅ | TOML configuration support; shortcut coverage is still limited (see [Action Support Matrix](docs/action-support-matrix.md)) |
 | **Vim/Neovim** | 🚧 | 🚧 | Planned |
 
-> See all supported actions: [action-support-matrix.md](action-support-matrix.md)
+> See all supported actions: [docs/action-support-matrix.md](docs/action-support-matrix.md)
 
 ---
 

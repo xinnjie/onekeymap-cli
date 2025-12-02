@@ -16,6 +16,16 @@ type Keymap struct {
 	Actions []Action
 }
 
+// HasAction returns true if the keymap contains an action with the given name.
+func (k *Keymap) HasAction(name string) bool {
+	for _, a := range k.Actions {
+		if a.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
 type Action struct {
 	Name     string
 	Bindings []keybinding.Keybinding
