@@ -4,13 +4,13 @@ import "github.com/charmbracelet/lipgloss"
 
 // Color constants used across TUI components
 const (
-	blue   = lipgloss.Color("12")
-	white  = lipgloss.Color("7")
-	red    = lipgloss.Color("9")
-	yellow = lipgloss.Color("11")
-	cyan   = lipgloss.Color("14")
-	green  = lipgloss.Color("10")
-	gray   = lipgloss.Color("8")
+	blue   = lipgloss.Color("#5F87FF")
+	white  = lipgloss.Color("#E4E4E4")
+	red    = lipgloss.Color("#FF5F5F")
+	yellow = lipgloss.Color("#FFFF5F")
+	cyan   = lipgloss.Color("#5FFFFF")
+	green  = lipgloss.Color("#5FFF5F")
+	gray   = lipgloss.Color("#808080")
 
 	IssuePaddingLeft = 2
 	OptionPadding    = 2
