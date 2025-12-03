@@ -3,7 +3,10 @@ package mappings
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
+	"strings"
 
+	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"gopkg.in/yaml.v3"
 )
 
@@ -20,6 +23,51 @@ type VscodeMappingConfig struct {
 // VscodeConfigs is a slice of VscodeMappingConfig that can be unmarshalled from either
 // a single YAML object or a sequence of objects.
 type VscodeConfigs []VscodeMappingConfig
+
+// GetVSCodeConfigs returns the VSCode configs for the given editor type.
+// Priority: variant-specific config > vscode config (fallback).
+func (am *ActionMappingConfig) GetVSCodeConfigs(editorType pluginapi.EditorType) VscodeConfigs {
+	switch editorType {
+	case pluginapi.EditorTypeWindsurf, pluginapi.EditorTypeWindsurfNext:
+		if len(am.Windsurf) > 0 {
+			return am.Windsurf
+		}
+	case pluginapi.EditorTypeCursor:
+		if len(am.Cursor) > 0 {
+			return am.Cursor
+		}
+	}
+	return am.VSCode // fallback to vscode
+}
+
+// isSupportedVSCodeVariant checks if the action is supported by a VSCode variant editor.
+func (am *ActionMappingConfig) isSupportedVSCodeVariant(editorType pluginapi.EditorType) (bool, string) {
+	configs := am.GetVSCodeConfigs(editorType)
+	return checkVscodeConfigsSupported(configs)
+}
+
+// checkVscodeConfigsSupported checks if the given VSCode configs indicate support.
+func checkVscodeConfigsSupported(configs VscodeConfigs) (bool, string) {
+	if len(configs) == 0 {
+		return false, ""
+	}
+	var notes []string
+	for _, vc := range configs {
+		if vc.NotSupported {
+			if vc.Note == "" {
+				return false, "__explicitly_not_supported__"
+			}
+			return false, vc.Note
+		}
+		if vc.Note != "" {
+			notes = append(notes, vc.Note)
+		}
+	}
+	hasMapping := slices.ContainsFunc(configs, func(vc VscodeMappingConfig) bool {
+		return vc.Command != ""
+	})
+	return hasMapping, strings.Join(notes, ", ")
+}
 
 // UnmarshalYAML implements the yaml.Unmarshaler interface.
 func (v *VscodeConfigs) UnmarshalYAML(node *yaml.Node) error {

@@ -146,11 +146,12 @@ func (i *vscodeImporter) appendMappingCandidates(
 	command, when string,
 	args map[string]interface{},
 ) {
-	if len(mapping.VSCode) == 0 {
+	configs := mapping.GetVSCodeConfigs(i.editorType)
+	if len(configs) == 0 {
 		return
 	}
 
-	for _, vc := range mapping.VSCode {
+	for _, vc := range configs {
 		if vc.Command != command {
 			continue
 		}

@@ -393,3 +393,193 @@ func TestExporter_Export(t *testing.T) {
 		})
 	}
 }
+
+func TestExporter_Export_VSCodeVariant(t *testing.T) {
+	mappingConfig, err := mappings.NewTestMappingConfig()
+	require.NoError(t, err)
+
+	// Inline the variant-specific test actions instead of sourcing them from the YAML fixture.
+	mappingConfig.Mappings["actions.test.variantConfig"] = mappings.ActionMappingConfig{
+		ID:          "actions.test.variantConfig",
+		Description: "Test VSCode variant config priority",
+		Category:    "Testing",
+		VSCode: mappings.VscodeConfigs{
+			{Command: "vscode.default.command", When: "editorTextFocus"},
+		},
+		Windsurf: mappings.VscodeConfigs{
+			{Command: "windsurf.specific.command", When: "windsurf.cascadePanel.focused"},
+		},
+		Cursor: mappings.VscodeConfigs{
+			{Command: "cursor.specific.command", When: "cursorContext"},
+		},
+	}
+
+	mappingConfig.Mappings["actions.test.variantFallback"] = mappings.ActionMappingConfig{
+		ID:          "actions.test.variantFallback",
+		Description: "Test VSCode variant fallback to vscode config",
+		Category:    "Testing",
+		VSCode: mappings.VscodeConfigs{
+			{Command: "vscode.fallback.command", When: "editorTextFocus"},
+		},
+	}
+
+	parseKB := func(s string) keybinding.Keybinding {
+		kb, err := keybinding.NewKeybinding(s, keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"})
+		if err != nil {
+			panic(err)
+		}
+		return kb
+	}
+
+	tests := []struct {
+		name          string
+		editorType    pluginapi.EditorType
+		keymapSetting keymap.Keymap
+		expectedJSON  string
+	}{
+		{
+			name:       "windsurf uses windsurf-specific config",
+			editorType: pluginapi.EditorTypeWindsurf,
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.variantConfig",
+						Bindings: []keybinding.Keybinding{parseKB("meta+m")},
+					},
+				},
+			},
+			expectedJSON: `[
+				{
+					"key": "cmd+m",
+					"command": "windsurf.specific.command",
+					"when": "windsurf.cascadePanel.focused"
+				}
+			]`,
+		},
+		{
+			name:       "cursor uses cursor-specific config",
+			editorType: pluginapi.EditorTypeCursor,
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.variantConfig",
+						Bindings: []keybinding.Keybinding{parseKB("meta+m")},
+					},
+				},
+			},
+			expectedJSON: `[
+				{
+					"key": "cmd+m",
+					"command": "cursor.specific.command",
+					"when": "cursorContext"
+				}
+			]`,
+		},
+		{
+			name:       "vscode uses vscode config (no variant override)",
+			editorType: pluginapi.EditorTypeVSCode,
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.variantConfig",
+						Bindings: []keybinding.Keybinding{parseKB("meta+m")},
+					},
+				},
+			},
+			expectedJSON: `[
+				{
+					"key": "cmd+m",
+					"command": "vscode.default.command",
+					"when": "editorTextFocus"
+				}
+			]`,
+		},
+		{
+			name:       "windsurf falls back to vscode config when no windsurf config",
+			editorType: pluginapi.EditorTypeWindsurf,
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.variantFallback",
+						Bindings: []keybinding.Keybinding{parseKB("meta+f")},
+					},
+				},
+			},
+			expectedJSON: `[
+				{
+					"key": "cmd+f",
+					"command": "vscode.fallback.command",
+					"when": "editorTextFocus"
+				}
+			]`,
+		},
+		{
+			name:       "cursor falls back to vscode config when no cursor config",
+			editorType: pluginapi.EditorTypeCursor,
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.variantFallback",
+						Bindings: []keybinding.Keybinding{parseKB("meta+f")},
+					},
+				},
+			},
+			expectedJSON: `[
+				{
+					"key": "cmd+f",
+					"command": "vscode.fallback.command",
+					"when": "editorTextFocus"
+				}
+			]`,
+		},
+		{
+			name:       "windsurf-next uses windsurf config",
+			editorType: pluginapi.EditorTypeWindsurfNext,
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.test.variantConfig",
+						Bindings: []keybinding.Keybinding{parseKB("meta+m")},
+					},
+				},
+			},
+			expectedJSON: `[
+				{
+					"key": "cmd+m",
+					"command": "windsurf.specific.command",
+					"when": "windsurf.cascadePanel.focused"
+				}
+			]`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+			recorder := metrics.NewNoop()
+
+			var plugin pluginapi.Plugin
+			switch tt.editorType {
+			case pluginapi.EditorTypeWindsurf:
+				plugin = NewWindsurf(mappingConfig, logger, recorder)
+			case pluginapi.EditorTypeWindsurfNext:
+				plugin = NewWindsurfNext(mappingConfig, logger, recorder)
+			case pluginapi.EditorTypeCursor:
+				plugin = NewCursor(mappingConfig, logger, recorder)
+			default:
+				plugin = New(mappingConfig, logger, recorder)
+			}
+
+			exporter, err := plugin.Exporter()
+			require.NoError(t, err)
+
+			var buf bytes.Buffer
+			opts := pluginapi.PluginExportOption{ExistingConfig: nil}
+
+			_, err = exporter.Export(context.Background(), &buf, tt.keymapSetting, opts)
+			require.NoError(t, err)
+
+			assert.JSONEq(t, tt.expectedJSON, buf.String())
+		})
+	}
+}

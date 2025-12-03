@@ -43,6 +43,8 @@ type ActionMappingConfig struct {
 	FeaturedReason string                `yaml:"featuredReason"`
 	Category       string                `yaml:"category"`
 	VSCode         VscodeConfigs         `yaml:"vscode"`
+	Windsurf       VscodeConfigs         `yaml:"windsurf"`
+	Cursor         VscodeConfigs         `yaml:"cursor"`
 	Zed            ZedConfigs            `yaml:"zed"`
 	IntelliJ       IntelliJMappingConfig `yaml:"intellij"`
 	Vim            VimMappingConfig      `yaml:"vim"`
@@ -64,6 +66,8 @@ func (am *ActionMappingConfig) IsSupported(editorType pluginapi.EditorType) (boo
 	switch editorType {
 	case pluginapi.EditorTypeVSCode:
 		return am.isSupportedVSCode()
+	case pluginapi.EditorTypeWindsurf, pluginapi.EditorTypeWindsurfNext, pluginapi.EditorTypeCursor:
+		return am.isSupportedVSCodeVariant(editorType)
 	case pluginapi.EditorTypeIntelliJ:
 		return am.isSupportedIntelliJ()
 	case pluginapi.EditorTypeZed:

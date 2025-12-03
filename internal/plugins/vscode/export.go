@@ -17,11 +17,12 @@ import (
 )
 
 var (
-	_ pluginapi.PluginExporter = (*vscodeExporter)(nil)
+	_ pluginapi.PluginExporter = (*vscodeLikeExporter)(nil)
 )
 
-type vscodeExporter struct {
+type vscodeLikeExporter struct {
 	mappingConfig *mappings.MappingConfig
+	editorType    pluginapi.EditorType
 	logger        *slog.Logger
 	differ        diff.Differ
 }
@@ -69,14 +70,24 @@ func newExporter(
 	logger *slog.Logger,
 	differ diff.Differ,
 ) pluginapi.PluginExporter {
-	return &vscodeExporter{
+	return newExporterWithEditorType(pluginapi.EditorTypeVSCode, mappingConfig, logger, differ)
+}
+
+func newExporterWithEditorType(
+	editorType pluginapi.EditorType,
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	differ diff.Differ,
+) pluginapi.PluginExporter {
+	return &vscodeLikeExporter{
 		mappingConfig: mappingConfig,
+		editorType:    editorType,
 		logger:        logger,
 		differ:        differ,
 	}
 }
 
-func (e *vscodeExporter) Export(
+func (e *vscodeLikeExporter) Export(
 	_ context.Context,
 	destination io.Writer,
 	setting keymap.Keymap,
@@ -94,11 +105,11 @@ func (e *vscodeExporter) Export(
 	}
 
 	marker := export.NewMarker(&setting)
-	managedKeybindings := e.generateManagedKeybindings(&setting, marker)
+	managedKeybindings := e.identifyManagedKeybindings(&setting, marker)
 
-	finalKeybindings := e.mergeKeybindings(managedKeybindings, unmanagedKeybindings)
+	finalKeybindings := e.nonDestructiveMerge(managedKeybindings, unmanagedKeybindings)
 
-	// Reorder according to base command order if provided
+	// Re-order according to base command order if provided
 	finalKeybindings = orderByBaseCommand(finalKeybindings, existingKeybindings)
 
 	// Write JSON without HTML escaping so that '&&', '<', '>' remain as-is
@@ -145,7 +156,7 @@ func parseExistingConfig(reader io.Reader) ([]vscodeKeybinding, error) {
 
 // identifyUnmanagedKeybindings performs reverse lookup to identify keybindings
 // that are not managed by onekeymap.
-func (e *vscodeExporter) identifyUnmanagedKeybindings(existingKeybindings []vscodeKeybinding) []vscodeKeybinding {
+func (e *vscodeLikeExporter) identifyUnmanagedKeybindings(existingKeybindings []vscodeKeybinding) []vscodeKeybinding {
 	unmanaged := make([]vscodeKeybinding, 0)
 
 	for _, kb := range existingKeybindings {
@@ -162,9 +173,9 @@ func (e *vscodeExporter) identifyUnmanagedKeybindings(existingKeybindings []vsco
 
 // findMappingByVSCodeKeybinding performs reverse lookup to find if a VSCode keybinding
 // corresponds to any action in our mappings.
-func (e *vscodeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) *mappings.ActionMappingConfig {
+func (e *vscodeLikeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) *mappings.ActionMappingConfig {
 	for _, mapping := range e.mappingConfig.Mappings {
-		for _, vscodeConfig := range mapping.VSCode {
+		for _, vscodeConfig := range mapping.GetVSCodeConfigs(e.editorType) {
 			if vscodeConfig.Command == kb.Command &&
 				vscodeConfig.When == kb.When &&
 				equalVSCodeArgs(vscodeConfig.Args, kb.Args) {
@@ -175,8 +186,8 @@ func (e *vscodeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) *map
 	return nil
 }
 
-// generateManagedKeybindings generates VSCode keybindings from KeymapSetting.
-func (e *vscodeExporter) generateManagedKeybindings(
+// identifyManagedKeybindings generates VSCode keybindings from KeymapSetting.
+func (e *vscodeLikeExporter) identifyManagedKeybindings(
 	setting *keymap.Keymap,
 	marker *export.Marker,
 ) []vscodeKeybinding {
@@ -184,7 +195,7 @@ func (e *vscodeExporter) generateManagedKeybindings(
 
 	for _, km := range setting.Actions {
 		// Use GetExportAction to support fallback
-		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeVSCode)
+		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, e.editorType)
 		if mapping == nil {
 			for _, b := range km.Bindings {
 				if len(b.KeyChords) > 0 {
@@ -201,7 +212,7 @@ func (e *vscodeExporter) generateManagedKeybindings(
 			)
 		}
 
-		vscodeConfigs := mapping.VSCode
+		vscodeConfigs := mapping.GetVSCodeConfigs(e.editorType)
 		if len(vscodeConfigs) == 0 {
 			for _, b := range km.Bindings {
 				if len(b.KeyChords) > 0 {
@@ -243,8 +254,8 @@ func (e *vscodeExporter) generateManagedKeybindings(
 	return vscodeKeybindings
 }
 
-// mergeKeybindings merges managed and unmanaged keybindings, with managed taking priority.
-func (e *vscodeExporter) mergeKeybindings(managed, unmanaged []vscodeKeybinding) []vscodeKeybinding {
+// nonDestructiveMerge merges managed and unmanaged keybindings, with managed taking priority.
+func (e *vscodeLikeExporter) nonDestructiveMerge(managed, unmanaged []vscodeKeybinding) []vscodeKeybinding {
 	// Create a map to track managed keybindings by their key combination
 	managedKeys := make(map[string]bool)
 	for _, kb := range managed {

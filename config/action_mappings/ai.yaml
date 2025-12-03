@@ -1,0 +1,44 @@
+mappings:
+  - id: "actions.ai.toggleModelSelect"
+    name: "Toggle model select"
+    description: "Toggle model select"
+    category: "AI"
+    vscode:
+      command: "workbench.action.chat.openModelPicker"
+      when: "chatIsEnabled && inChatInput"
+    windsurf:
+      command: "windsurf.cascade.toggleModelSelector"
+      when: "windsurf.cascadePanel.focused && !terminalFocus"
+  - id: "actions.ai.toggleChatAgent"
+    name: "Toggle chat agent"
+    description: "Toggle chat agent"
+    category: "AI"
+    vscode:
+      command: "workbench.panel.chat"
+      when: "workbench.panel.chat.view.copilot.active"
+    windsurf:
+      - command: "windsurf.prioritized.chat.open"
+        when: "!terminalFocus && !windsurf.deepwikiPanel.focused"
+      - command: "windsurf.sendTerminalToChat"
+        when: "terminalFocus && !windsurf.deepwikiPanel.focused"
+      - command: "deepwiki.attachContext"
+        when: "windsurf.deepwikiPanel.focused && activeViewlet == 'workbench.view.deepwiki'"
+  - id: "actions.ai.switchMode"
+    name: "Switch mode"
+    description: "Switch mode between chat and agent"
+    category: "AI"
+    vscode:
+      command: "workbench.action.chat.openModePicker"
+      when: "chatIsEnabled && inChatInput && chatLocation == 'panel'"
+    windsurf:
+      command: "windsurf.cascade.switchToNextModel"
+      when: "!terminalFocus"
+  - id: "actions.ai.history"
+    name: "Chat history"
+    description: "Show chat history"
+    category: "AI"
+    vscode:
+      command: "workbench.action.chat.history"
+    windsurf:
+      command: "windsurf.cascade.openAgentPicker"
+      when: "windsurf.cascadePanel.focused && !terminalFocus"

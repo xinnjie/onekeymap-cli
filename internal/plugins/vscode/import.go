@@ -18,6 +18,7 @@ import (
 // vscodeImporter handles importing keybindings from VSCode.
 type vscodeImporter struct {
 	mappingConfig *mappings.MappingConfig
+	editorType    pluginapi.EditorType
 	logger        *slog.Logger
 	reporter      *metrics.UnknownActionReporter
 }
@@ -27,8 +28,18 @@ func newImporter(
 	logger *slog.Logger,
 	recorder metrics.Recorder,
 ) *vscodeImporter {
+	return newImporterWithEditorType(pluginapi.EditorTypeVSCode, mappingConfig, logger, recorder)
+}
+
+func newImporterWithEditorType(
+	editorType pluginapi.EditorType,
+	mappingConfig *mappings.MappingConfig,
+	logger *slog.Logger,
+	recorder metrics.Recorder,
+) *vscodeImporter {
 	return &vscodeImporter{
 		mappingConfig: mappingConfig,
+		editorType:    editorType,
 		logger:        logger,
 		reporter:      metrics.NewUnknownActionReporter(recorder),
 	}

@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 )
 
 type vsCodeVariantPlugin struct {
-	*vsCodePlugin
-
-	editorType pluginapi.EditorType
+	editorType    pluginapi.EditorType
+	mappingConfig *mappings.MappingConfig
+	importer      pluginapi.PluginImporter
+	exporter      pluginapi.PluginExporter
+	logger        *slog.Logger
 }
 
 func newVSCodeVariantPlugin(
@@ -22,8 +25,11 @@ func newVSCodeVariantPlugin(
 	recorder metrics.Recorder,
 ) pluginapi.Plugin {
 	return &vsCodeVariantPlugin{
-		vsCodePlugin: newVSCodePlugin(mappingConfig, logger, recorder),
-		editorType:   editorType,
+		editorType:    editorType,
+		mappingConfig: mappingConfig,
+		importer:      newImporterWithEditorType(editorType, mappingConfig, logger, recorder),
+		exporter:      newExporterWithEditorType(editorType, mappingConfig, logger, diff.NewJSONASCIIDiffer()),
+		logger:        logger,
 	}
 }
 
@@ -34,12 +40,12 @@ func (p *vsCodeVariantPlugin) EditorType() pluginapi.EditorType {
 
 // Importer implements pluginapi.Plugin.
 func (p *vsCodeVariantPlugin) Importer() (pluginapi.PluginImporter, error) {
-	return p.vsCodePlugin.Importer()
+	return p.importer, nil
 }
 
 // Exporter implements pluginapi.Plugin.
 func (p *vsCodeVariantPlugin) Exporter() (pluginapi.PluginExporter, error) {
-	return p.vsCodePlugin.Exporter()
+	return p.exporter, nil
 }
 
 // ConfigDetect implements pluginapi.Plugin.

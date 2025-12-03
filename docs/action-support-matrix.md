@@ -1,5 +1,14 @@
 # Action Support Matrix
 
+## AI
+
+| Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
+|--------|--------|-----|----------|-------|-------|-------------|-----------|
+| Chat history | ✅ | N/A | N/A | N/A | N/A | Show chat history | actions.ai.history |
+| Switch mode | ✅ | N/A | N/A | N/A | N/A | Switch mode between chat and agent | actions.ai.switchMode |
+| Toggle chat agent | ✅ | N/A | N/A | N/A | N/A | Toggle chat agent | actions.ai.toggleChatAgent |
+| Toggle model select | ✅ | N/A | N/A | N/A | N/A | Toggle model select | actions.ai.toggleModelSelect |
+
 ## Code
 
 | Action | VSCode | Zed | IntelliJ | Xcode | Helix | Description | Action ID |
@@ -32,7 +41,7 @@
 | Peek definition | ✅ | ❌ (Peek is not supported yet, see [`Peek or Preview Definitions Inline` discussion](https://github.com/zed-industries/zed/discussions/28282)) | ✅ | ❌ (Use `Go to definition` instead) | N/A | Peek definition | actions.go.definitionPeek | Use `Go to definition` instead |
 | Go to super | ✅ | ❌ (not supported yet, no issue tracked) | ✅ | ❌ (Use `Type hierarchy` instead) | N/A | Go to super class/super method | actions.go.goToSuper | Use `Type hierarchy` instead |
 | Go to test | ✅ | ❌ (not supported yet, see [`Go to test` discussion](https://github.com/zed-industries/zed/discussions/40859)) | ✅ | ❌ (Not supported) | N/A | Go to test | actions.go.goToTest | - |
-| Jump to next counterpart | N/A | N/A | N/A | ✅ | N/A | Jump to next counterpart, like switching between .cpp file and .h file | actions.go.jumpToNextCounterpart | - |
+| Go to counterpart | N/A | N/A | N/A | ✅ | N/A | Go to counterpart, like switching between .cpp file and .h file | actions.go.jumpToNextCounterpart | - |
 </details>
 
 ## Code.Refactor
