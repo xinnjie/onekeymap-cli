@@ -16,6 +16,8 @@ mappings:
     name: "Delete previous word"
     description: "Delete to the start of the previous word"
     category: "Editor.Word"
+    children:
+      - "actions.edit.deleteWordPartLeft"
     vscode:
       command: "deleteWordLeft"
       when: "textInputFocus && !editorReadonly"
@@ -41,6 +43,8 @@ mappings:
     name: "Delete next word"
     description: "Delete to the end of the next word"
     category: "Editor.Word"
+    children:
+      - "actions.edit.deleteWordPartRight"
     vscode:
       command: "deleteWordRight"
       when: "textInputFocus && !editorReadonly"

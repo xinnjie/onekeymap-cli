@@ -4,6 +4,10 @@ mappings:
     name: "Move to next word"
     description: "Move cursor to the end of the next word"
     category: "Editor.Cursor.Word"
+    children:
+      - "actions.cursor.wordPartRight"
+      - "actions.cursor.wordRightSelect"
+      - "actions.cursor.wordPartRightSelect"
     vscode:
       command: "cursorWordRight"
       when: "editorTextFocus"
@@ -39,6 +43,10 @@ mappings:
     name: "Move to previous word"
     description: "Move cursor to the start of the previous word"
     category: "Editor.Cursor.Word"
+    children:
+      - "actions.cursor.wordPartLeft"
+      - "actions.cursor.wordLeftSelect"
+      - "actions.cursor.wordPartLeftSelect"
     vscode:
       command: "cursorWordLeft"
       when: "textInputFocus"

@@ -53,7 +53,7 @@ mappings:
 - **`category`**: The category of the action, used for grouping and organization.
 - **`featured`**: A boolean indicating if the action is not widely portable across editors. Set to `true` for editor-specific or non-standard actions.
 - **`featuredReason`**: An explanation for why an action is `featured`, or a recommendation to use a more portable alternative.
-- **`children`** (optional): A list of child action IDs (string array).
+- **`children`** (optional): A list of child action IDs (string array). In the UI, child actions will be collapsed under their parent action.
 ### Editor-specific sections (`vscode`, `zed`, `intellij`, `vim`, `helix`, `xcode`):
   - These sections contain the specific implementation details for each editor. For editors that support multiple configurations for a single action (like VSCode), this is a list of mappings.
   - **`disableImport`** (optional): If `true`, this mapping will only be used for exporting keymaps and will be ignored during import.

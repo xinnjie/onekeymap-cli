@@ -3,6 +3,8 @@ mappings:
     name: "Move to top"
     description: "Move caret to text start"
     category: "Editor.Cursor.File"
+    children:
+      - "actions.cursor.moveToTopSelect"
     vscode:
       command: "cursorTop"
       when: "textInputFocus"
@@ -20,6 +22,8 @@ mappings:
     name: "Move to bottom"
     description: "Move caret to text end"
     category: "Editor.Cursor.File"
+    children:
+      - "actions.cursor.moveToBottomSelect"
     vscode:
       command: "cursorBottom"
       when: "textInputFocus"
@@ -67,6 +71,8 @@ mappings:
     name: "Page down"
     description: "Move cursor down by one page"
     category: "Editor.Cursor.File"
+    children:
+      - "actions.cursor.pageDownSelect"
     vscode:
       command: "cursorPageDown"
       when: "textInputFocus"
@@ -98,6 +104,8 @@ mappings:
     name: "Page up"
     description: "Move cursor up by one page"
     category: "Editor.Cursor.File"
+    children:
+      - "actions.cursor.pageUpSelect"
     vscode:
       command: "cursorPageUp"
       when: "textInputFocus"
