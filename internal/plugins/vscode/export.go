@@ -183,7 +183,7 @@ func (e *vscodeExporter) generateManagedKeybindings(
 	var vscodeKeybindings []vscodeKeybinding
 
 	for _, km := range setting.Actions {
-		// Use GetExportAction to support children fallback
+		// Use GetExportAction to support fallback
 		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeVSCode)
 		if mapping == nil {
 			for _, b := range km.Bindings {
@@ -195,7 +195,7 @@ func (e *vscodeExporter) generateManagedKeybindings(
 		}
 
 		if usedFallback {
-			e.logger.Info("Action not directly supported, falling back to child action",
+			e.logger.Info("Action not directly supported, using fallback action",
 				"originalAction", km.Name,
 				"fallbackAction", mapping.ID,
 			)

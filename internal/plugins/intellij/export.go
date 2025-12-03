@@ -111,7 +111,7 @@ func (e *intellijExporter) isManagedAction(actionID string) bool {
 }
 
 // generateManagedActions generates IntelliJ actions from KeymapSetting.
-// Uses GetExportAction to support fallback to children when parent is not supported.
+// Uses GetExportAction to support fallback when parent is not supported.
 func (e *intellijExporter) generateManagedActions(setting *keymap.Keymap, marker *export.Marker) []ActionXML {
 	// Group keybindings by IntelliJ action ID while preserving order of first appearance.
 	actionsMap := make(map[string]*ActionXML)
@@ -121,7 +121,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymap.Keymap, marker
 		if len(km.Bindings) == 0 {
 			continue
 		}
-		// Use GetExportAction to support children fallback
+		// Use GetExportAction to support fallback
 		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeIntelliJ)
 		if mapping == nil || mapping.IntelliJ.Action == "" {
 			e.logger.Info("no mapping found for action", "action", km.Name)
@@ -134,7 +134,7 @@ func (e *intellijExporter) generateManagedActions(setting *keymap.Keymap, marker
 		}
 
 		if usedFallback {
-			e.logger.Info("Action not directly supported, falling back to child action",
+			e.logger.Info("Action not directly supported, using fallback action",
 				"originalAction", km.Name,
 				"fallbackAction", mapping.ID,
 			)

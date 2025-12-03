@@ -70,11 +70,12 @@ func testMappingConfig() *mappings.MappingConfig {
 					},
 				},
 			},
-			// Test children fallback
+			// Test fallback
 			"actions.test.parentNotSupported": {
 				ID:          "actions.test.parentNotSupported",
 				Description: "Parent action not supported in xcode",
 				Children:    []string{"actions.test.childSupported"},
+				Fallbacks:   []string{"actions.test.childSupported"},
 				Xcode: []mappings.XcodeMappingConfig{
 					{
 						EditorActionMapping: mappings.EditorActionMapping{

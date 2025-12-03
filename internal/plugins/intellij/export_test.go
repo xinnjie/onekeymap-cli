@@ -308,9 +308,9 @@ func TestExportIntelliJKeymap(t *testing.T) {
 				}
 			},
 		},
-		// Children fallback tests
+		// Fallback tests
 		{
-			name: "falls back to child action when parent not supported",
+			name: "falls back to fallback action when parent not supported",
 			setting: keymap.Keymap{
 				Actions: []keymap.Action{
 					{
@@ -331,7 +331,7 @@ func TestExportIntelliJKeymap(t *testing.T) {
 					}
 				}
 
-				if assert.NotNil(t, childAction, "expected ChildSupportedAction from child fallback") {
+				if assert.NotNil(t, childAction, "expected ChildSupportedAction from fallback") {
 					assert.Len(t, childAction.KeyboardShortcuts, 1)
 					assert.Equal(t, "meta shift H", childAction.KeyboardShortcuts[0].First)
 				}

@@ -193,7 +193,7 @@ func (e *helixExporter) generateManagedKeybindings(
 		}
 
 		if usedFallback {
-			e.logger.InfoContext(ctx, "Action not directly supported, falling back to child action",
+			e.logger.InfoContext(ctx, "Action not directly supported, using fallback action",
 				"originalAction", km.Name,
 				"fallbackAction", mapping.ID,
 			)

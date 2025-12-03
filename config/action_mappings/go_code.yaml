@@ -84,6 +84,8 @@ mappings:
     category: "Code.Go"
     children:
       - "actions.go.definitionPeek"
+    fallbacks:
+      - "actions.go.definitionPeek"
     vscode:
       command: "editor.action.revealDefinition"
       when: "editorHasDefinitionProvider && editorTextFocus"
@@ -126,6 +128,8 @@ mappings:
     category: "Code.Go"
     children:
       - "actions.go.typeDefinitionPeek"
+    fallbacks:
+      - "actions.go.typeDefinitionPeek"
     vscode:
       command: "editor.action.goToTypeDefinition"
       when: "editorTextFocus"
@@ -157,6 +161,8 @@ mappings:
     description: "Go to references"
     category: "Code.Go"
     children:
+      - "actions.go.referencePeek"
+    fallbacks:
       - "actions.go.referencePeek"
     vscode:
       command: "references-view.findReferences"
@@ -195,6 +201,8 @@ mappings:
     description: "Show call hierarchy"
     category: "Code.Go"
     children:
+      - "actions.go.callHierarchyPeek"
+    fallbacks:
       - "actions.go.callHierarchyPeek"
     vscode:
       command: "references-view.showCallHierarchy"

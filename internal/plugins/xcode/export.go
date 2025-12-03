@@ -185,7 +185,7 @@ func (e *xcodeExporter) generateManagedKeybindings(
 	var xcodeKeybindings []xcodeKeybinding
 
 	for _, km := range setting.Actions {
-		// Use GetExportAction to support children fallback
+		// Use GetExportAction to support fallback
 		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeXcode)
 		if mapping == nil {
 			marker.MarkSkippedForReason(
@@ -206,7 +206,7 @@ func (e *xcodeExporter) generateManagedKeybindings(
 				)
 				continue
 			}
-			e.logger.Info("Action not directly supported, falling back to child action",
+			e.logger.Info("Action not directly supported, using fallback action",
 				"originalAction", km.Name,
 				"fallbackAction", mapping.ID,
 			)
@@ -289,7 +289,7 @@ func (e *xcodeExporter) mergeKeybindings(managed, unmanaged []xcodeKeybinding) [
 
 // generateTextKeyBindings generates Xcode Text Key Bindings from KeymapSetting.
 // It merges managed text bindings with existing ones, with managed taking priority.
-// Uses GetExportAction to support fallback to children when parent is not supported.
+// Uses GetExportAction to support fallback when parent is not supported.
 func (e *xcodeExporter) generateTextKeyBindings(
 	setting *keymap.Keymap,
 	existingTextBindings xcodeTextKeybinding,
@@ -303,7 +303,7 @@ func (e *xcodeExporter) generateTextKeyBindings(
 
 	// Generate managed text bindings
 	for _, km := range setting.Actions {
-		// Use GetExportAction to support children fallback
+		// Use GetExportAction to support fallback
 		mapping, usedFallback := e.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeXcode)
 		if mapping == nil {
 			marker.MarkSkippedForReason(km.Name, nil, pluginapi.ErrActionNotSupported)
@@ -320,7 +320,7 @@ func (e *xcodeExporter) generateTextKeyBindings(
 				)
 				continue
 			}
-			e.logger.Info("Action not directly supported, falling back to child action (text)",
+			e.logger.Info("Action not directly supported, using fallback action (text)",
 				"originalAction", km.Name,
 				"fallbackAction", mapping.ID,
 			)

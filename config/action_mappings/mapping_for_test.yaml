@@ -46,11 +46,13 @@ mappings:
       context: "Editor"
     intellij:
       action: "TestAction"
-  # Test children fallback - parent not supported in vscode/intellij/zed/xcode/helix
+  # Test fallback - parent not supported in vscode/intellij/zed/xcode/helix
   - id: "actions.test.parentNotSupported"
     description: "Parent action not supported in vscode/intellij/zed/xcode/helix"
     category: "Testing"
     children:
+      - "actions.test.childSupported"
+    fallbacks:
       - "actions.test.childSupported"
     vscode:
       notSupported: true

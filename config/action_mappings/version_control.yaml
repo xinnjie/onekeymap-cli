@@ -178,6 +178,10 @@ mappings:
       - "actions.git.blameHover"
       - "actions.git.toggleBlameInline"
       - "actions.git.toggleBlameStatusBar"
+    fallbacks:
+      - "actions.git.blameHover"
+      - "actions.git.toggleBlameInline"
+      - "actions.git.toggleBlameStatusBar"
     vscode:
       command: "git.blame.toggleEditorDecoration"
       note: "toggle blame inline"

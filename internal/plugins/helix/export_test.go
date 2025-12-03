@@ -149,9 +149,9 @@ func TestExportHelixKeymap(t *testing.T) {
 "C-c" = "yank"
 `,
 		},
-		// Children fallback tests
+		// Fallback tests
 		{
-			name: "falls back to child action when parent not supported",
+			name: "falls back to fallback action when parent not supported",
 			setting: keymap.Keymap{
 				Actions: []keymap.Action{
 					newAction("actions.test.parentNotSupported", "meta+shift+h"),

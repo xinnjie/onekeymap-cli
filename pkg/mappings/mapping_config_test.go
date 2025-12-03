@@ -209,13 +209,13 @@ func TestGetExportAction(t *testing.T) {
 		content := `
 mappings:
   - id: "parent.action"
-    children:
-      - "child.action"
+    fallbacks:
+      - "fallback.action"
     vscode:
       command: "parent.cmd"
-  - id: "child.action"
+  - id: "fallback.action"
     vscode:
-      command: "child.cmd"
+      command: "fallback.cmd"
 `
 		reader := strings.NewReader(content)
 		mc, err := load(reader)
@@ -227,63 +227,63 @@ mappings:
 		assert.False(t, fallback)
 	})
 
-	t.Run("falls back to child when parent not supported", func(t *testing.T) {
+	t.Run("falls back to fallback action when parent not supported", func(t *testing.T) {
 		content := `
 mappings:
   - id: "parent.action"
-    children:
-      - "child.action"
+    fallbacks:
+      - "fallback.action"
     vscode:
       notSupported: true
-  - id: "child.action"
+  - id: "fallback.action"
     vscode:
-      command: "child.cmd"
+      command: "fallback.cmd"
 `
 		reader := strings.NewReader(content)
 		mc, err := load(reader)
 		require.NoError(t, err)
 
-		action, fallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
+		action, usedFallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
 		require.NotNil(t, action)
-		assert.Equal(t, "child.action", action.ID)
-		assert.True(t, fallback)
+		assert.Equal(t, "fallback.action", action.ID)
+		assert.True(t, usedFallback)
 	})
 
-	t.Run("falls back to first supported child in order", func(t *testing.T) {
+	t.Run("falls back to first supported fallback in order", func(t *testing.T) {
 		content := `
 mappings:
   - id: "parent.action"
-    children:
-      - "child1.action"
-      - "child2.action"
+    fallbacks:
+      - "fallback1.action"
+      - "fallback2.action"
     vscode:
       notSupported: true
-  - id: "child1.action"
+  - id: "fallback1.action"
     vscode:
       notSupported: true
-  - id: "child2.action"
+  - id: "fallback2.action"
     vscode:
-      command: "child2.cmd"
+      command: "fallback2.cmd"
 `
 		reader := strings.NewReader(content)
 		mc, err := load(reader)
 		require.NoError(t, err)
 
-		action, fallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
+		action, usedFallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
 		require.NotNil(t, action)
-		assert.Equal(t, "child2.action", action.ID)
-		assert.True(t, fallback)
+		assert.Equal(t, "fallback2.action", action.ID)
+		assert.True(t, usedFallback)
 	})
 
-	t.Run("returns nil when no action supported", func(t *testing.T) {
+	t.Run("returns nil when no fallback supported", func(t *testing.T) {
 		content := `
 mappings:
   - id: "parent.action"
-    children:
-      - "child.action"
+    fallbacks:
+      - "fallback.action"
     vscode:
       notSupported: true
-  - id: "child.action"
+  - id: "fallback.action"
     vscode:
       notSupported: true
 `
@@ -291,9 +291,9 @@ mappings:
 		mc, err := load(reader)
 		require.NoError(t, err)
 
-		action, fallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
+		action, usedFallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
 		assert.Nil(t, action)
-		assert.False(t, fallback)
+		assert.False(t, usedFallback)
 	})
 
 	t.Run("returns nil for non-existent action", func(t *testing.T) {
@@ -307,8 +307,30 @@ mappings:
 		mc, err := load(reader)
 		require.NoError(t, err)
 
-		action, fallback := mc.GetExportAction("non.existent", pluginapi.EditorTypeVSCode)
+		action, usedFallback := mc.GetExportAction("non.existent", pluginapi.EditorTypeVSCode)
 		assert.Nil(t, action)
-		assert.False(t, fallback)
+		assert.False(t, usedFallback)
+	})
+
+	t.Run("children does not trigger fallback", func(t *testing.T) {
+		content := `
+mappings:
+  - id: "parent.action"
+    children:
+      - "child.action"
+    vscode:
+      notSupported: true
+  - id: "child.action"
+    vscode:
+      command: "child.cmd"
+`
+		reader := strings.NewReader(content)
+		mc, err := load(reader)
+		require.NoError(t, err)
+
+		// children should NOT trigger fallback - only fallbacks field does
+		action, usedFallback := mc.GetExportAction("parent.action", pluginapi.EditorTypeVSCode)
+		assert.Nil(t, action)
+		assert.False(t, usedFallback)
 	})
 }

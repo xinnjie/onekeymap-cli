@@ -6,6 +6,9 @@ mappings:
     children:
       - "actions.fold.foldRecursively"
       - "actions.fold.foldAll"
+    fallbacks:
+      - "actions.fold.foldRecursively"
+      - "actions.fold.foldAll"
     vscode:
       command: "editor.fold"
       when: "editorTextFocus && foldingEnabled"
@@ -30,6 +33,9 @@ mappings:
     description: "Expand the current code block"
     category: "Editor.Folding"
     children:
+      - "actions.fold.unfoldRecursively"
+      - "actions.fold.unfoldAll"
+    fallbacks:
       - "actions.fold.unfoldRecursively"
       - "actions.fold.unfoldAll"
     vscode:

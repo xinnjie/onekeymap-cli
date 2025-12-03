@@ -148,7 +148,7 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymap.Keymap, marker 
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
 	for _, km := range setting.Actions {
-		// Use GetExportAction to support children fallback
+		// Use GetExportAction to support fallback
 		mapping, usedFallback := p.mappingConfig.GetExportAction(km.Name, pluginapi.EditorTypeZed)
 		if mapping == nil {
 			p.logger.Info("no mapping found for action", "action", km.Name)
@@ -161,7 +161,7 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymap.Keymap, marker 
 		}
 
 		if usedFallback {
-			p.logger.Info("Action not directly supported, falling back to child action",
+			p.logger.Info("Action not directly supported, using fallback action",
 				"originalAction", km.Name,
 				"fallbackAction", mapping.ID,
 			)

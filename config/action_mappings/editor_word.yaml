@@ -3,6 +3,8 @@ mappings:
     name: "Delete next subword"
     description: "Delete to the end of the next subword (hump)"
     category: "Editor.Word"
+    fallbacks:
+      - "actions.edit.deleteWordRight"
     vscode:
       command: "deleteWordPartRight"
       when: "textInputFocus && !editorReadonly"
@@ -18,6 +20,8 @@ mappings:
     category: "Editor.Word"
     children:
       - "actions.edit.deleteWordPartLeft"
+    fallbacks:
+      - "actions.edit.deleteWordPartLeft"
     vscode:
       command: "deleteWordLeft"
       when: "textInputFocus && !editorReadonly"
@@ -30,6 +34,8 @@ mappings:
     name: "Delete previous subword"
     description: "Delete to the start of the previous subword (hump)"
     category: "Editor.Word"
+    fallbacks:
+      - "actions.edit.deleteWordLeft"
     vscode:
       command: "deleteWordPartLeft"
       when: "textInputFocus && !editorReadonly"
@@ -44,6 +50,8 @@ mappings:
     description: "Delete to the end of the next word"
     category: "Editor.Word"
     children:
+      - "actions.edit.deleteWordPartRight"
+    fallbacks:
       - "actions.edit.deleteWordPartRight"
     vscode:
       command: "deleteWordRight"
