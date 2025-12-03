@@ -39,36 +39,38 @@ func (e *helixExporter) Export(
 	var existingKeys helixKeys
 	var existingFullConfig map[string]interface{}
 	if opts.ExistingConfig != nil {
-		existingKeys, existingFullConfig = e.parseExistingConfig(ctx, opts.ExistingConfig)
+		var err error
+		existingKeys, existingFullConfig, err = parseConfig(opts.ExistingConfig)
+		if err != nil {
+			e.logger.WarnContext(
+				ctx,
+				"Failed to parse existing config, proceeding with destructive export",
+				"error",
+				err,
+			)
+		}
 	}
 
-	// Identify unmanaged keybindings from existing config
 	var unmanagedKeys helixKeys
 	if opts.ExistingConfig != nil {
 		unmanagedKeys = e.identifyUnmanagedKeybindings(existingKeys)
 	}
 
-	// Generate managed keybindings from current setting
 	marker := export.NewMarker(&setting)
-	managedKeys := e.generateManagedKeybindings(ctx, &setting, marker)
+	managedKeys := e.identifyManagedKeybindings(ctx, &setting, marker)
 
-	// Merge managed and unmanaged keybindings
-	finalKeys := e.mergeKeybindings(ctx, managedKeys, unmanagedKeys)
+	finalKeys := e.nonDestructiveMerge(ctx, managedKeys, unmanagedKeys)
 
-	// Create final configuration preserving other sections
 	finalConfig := make(map[string]interface{})
 
-	// Copy all existing sections except keys
 	for k, v := range existingFullConfig {
 		if k != "keys" {
 			finalConfig[k] = v
 		}
 	}
 
-	// Add the merged keys section
-	finalConfig["keys"] = e.convertHelixKeysToMap(finalKeys)
+	finalConfig["keys"] = convertHelixKeysToMap(finalKeys)
 
-	// Encode the final configuration
 	if err := toml.NewEncoder(destination).Encode(finalConfig); err != nil {
 		return nil, fmt.Errorf("failed to encode helix toml: %w", err)
 	}
@@ -80,32 +82,23 @@ func (e *helixExporter) Export(
 	}, nil
 }
 
-func (e *helixExporter) parseExistingConfig(
-	ctx context.Context,
-	existingConfig io.Reader,
-) (helixKeys, map[string]interface{}) {
+func parseConfig(existingConfig io.Reader) (helixKeys, map[string]interface{}, error) {
 	var existingKeys helixKeys
 	var existingFullConfig map[string]interface{}
 
 	// Parse as generic map to preserve all sections
 	if err := toml.NewDecoder(existingConfig).Decode(&existingFullConfig); err != nil {
-		e.logger.WarnContext(
-			ctx,
-			"Failed to parse existing config, proceeding with destructive export",
-			"error",
-			err,
-		)
-		return existingKeys, existingFullConfig
+		return existingKeys, existingFullConfig, err
 	}
 
 	// Extract keys section if it exists
 	if keysSection, ok := existingFullConfig["keys"]; ok {
 		if keysMap, ok := keysSection.(map[string]interface{}); ok {
-			existingKeys = e.convertMapToHelixKeys(keysMap)
+			existingKeys = convertMapToHelixKeys(keysMap)
 		}
 	}
 
-	return existingKeys, existingFullConfig
+	return existingKeys, existingFullConfig, nil
 }
 
 // identifyUnmanagedKeybindings performs reverse lookup to identify keybindings
@@ -173,8 +166,8 @@ func (e *helixExporter) isManagedKeybinding(command string, mode Mode) bool {
 	return false
 }
 
-// generateManagedKeybindings generates Helix keybindings from KeymapSetting.
-func (e *helixExporter) generateManagedKeybindings(
+// identifyManagedKeybindings generates Helix keybindings from KeymapSetting.
+func (e *helixExporter) identifyManagedKeybindings(
 	ctx context.Context,
 	setting *keymap.Keymap,
 	marker *export.Marker,
@@ -273,8 +266,8 @@ func (e *helixExporter) generateManagedKeybindings(
 	return keysByMode
 }
 
-// mergeKeybindings merges managed and unmanaged keybindings, with managed taking priority.
-func (e *helixExporter) mergeKeybindings(ctx context.Context, managed, unmanaged helixKeys) helixKeys {
+// nonDestructiveMerge merges managed and unmanaged keybindings, with managed taking priority.
+func (e *helixExporter) nonDestructiveMerge(ctx context.Context, managed, unmanaged helixKeys) helixKeys {
 	result := helixKeys{}
 
 	// Start with managed keybindings
@@ -344,7 +337,7 @@ func (e *helixExporter) mergeKeybindings(ctx context.Context, managed, unmanaged
 }
 
 // convertMapToHelixKeys converts a generic map to helixKeys structure.
-func (e *helixExporter) convertMapToHelixKeys(keysMap map[string]interface{}) helixKeys {
+func convertMapToHelixKeys(keysMap map[string]interface{}) helixKeys {
 	keys := helixKeys{}
 
 	if normalMap, ok := keysMap["normal"].(map[string]interface{}); ok {
@@ -378,7 +371,7 @@ func (e *helixExporter) convertMapToHelixKeys(keysMap map[string]interface{}) he
 }
 
 // convertHelixKeysToMap converts helixKeys structure to a generic map.
-func (e *helixExporter) convertHelixKeysToMap(keys helixKeys) map[string]interface{} {
+func convertHelixKeysToMap(keys helixKeys) map[string]interface{} {
 	result := make(map[string]interface{})
 
 	if len(keys.Normal) > 0 {

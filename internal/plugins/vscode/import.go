@@ -51,7 +51,7 @@ func (i *vscodeImporter) Import(
 	source io.Reader,
 	_ pluginapi.PluginImportOption,
 ) (pluginapi.PluginImportResult, error) {
-	vscodeKeybindings, err := parseExistingConfig(source)
+	vscodeKeybindings, err := parseConfig(source)
 	if err != nil {
 		return pluginapi.PluginImportResult{}, fmt.Errorf("failed to parse existing config: %w", err)
 	}

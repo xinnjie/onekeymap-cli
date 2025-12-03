@@ -38,20 +38,16 @@ func (p *zedExporter) Export(
 	setting keymap.Keymap,
 	opts pluginapi.PluginExportOption,
 ) (*pluginapi.PluginExportReport, error) {
-	// Parse existing configuration if provided
-	existingConfig, err := p.parseExistingConfig(opts.ExistingConfig)
+	existingConfig, err := parseConfig(opts.ExistingConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	// Generate managed keybindings from current setting
 	marker := export.NewMarker(&setting)
-	managedKeymaps := p.generateManagedKeybindings(&setting, marker)
+	managedKeymaps := p.identifyManagedKeybindings(&setting, marker)
 
-	// Merge managed and existing keybindings
-	finalKeymaps := p.mergeKeybindings(managedKeymaps, existingConfig)
+	finalKeymaps := p.nonDestructiveMerge(managedKeymaps, existingConfig)
 
-	// Order contexts by base if provided; otherwise fallback to alphabetical for determinism
 	if len(existingConfig) > 0 {
 		finalKeymaps = orderByBaseContext(finalKeymaps, existingConfig)
 	} else {
@@ -76,8 +72,8 @@ func (p *zedExporter) Export(
 	}, nil
 }
 
-// parseExistingConfig reads and parses the existing configuration from the reader.
-func (p *zedExporter) parseExistingConfig(reader io.Reader) (zedKeymapConfig, error) {
+// parseConfig reads and parses the existing configuration from the reader.
+func parseConfig(reader io.Reader) (zedKeymapConfig, error) {
 	var config zedKeymapConfig
 	if reader == nil {
 		return config, nil
@@ -143,8 +139,8 @@ func orderByBaseContext(final zedKeymapConfig, base zedKeymapConfig) zedKeymapCo
 	return final
 }
 
-// generateManagedKeybindings creates keybindings from the current setting.
-func (p *zedExporter) generateManagedKeybindings(setting *keymap.Keymap, marker *export.Marker) zedKeymapConfig {
+// identifyManagedKeybindings creates keybindings from the current setting.
+func (p *zedExporter) identifyManagedKeybindings(setting *keymap.Keymap, marker *export.Marker) zedKeymapConfig {
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
 	for _, km := range setting.Actions {
@@ -218,8 +214,8 @@ func (p *zedExporter) generateManagedKeybindings(setting *keymap.Keymap, marker 
 	return result
 }
 
-// mergeKeybindings merges managed and existing keybindings, with managed taking priority.
-func (p *zedExporter) mergeKeybindings(managed, existing zedKeymapConfig) zedKeymapConfig {
+// nonDestructiveMerge merges managed and existing keybindings, with managed taking priority.
+func (p *zedExporter) nonDestructiveMerge(managed, existing zedKeymapConfig) zedKeymapConfig {
 	// Create a map for quick lookup of existing contexts
 	existingByContext := make(map[string]map[string]zedActionValue)
 	for _, contextConfig := range existing {

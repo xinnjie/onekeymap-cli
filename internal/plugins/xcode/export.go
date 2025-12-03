@@ -109,9 +109,9 @@ func (e *xcodeExporter) Export(
 	}
 
 	marker := export.NewMarker(&setting)
-	managedKeybindings := e.generateManagedKeybindings(&setting, marker)
+	managedKeybindings := e.identifyManagedKeybindings(&setting, marker)
 
-	finalKeybindings := e.mergeKeybindings(managedKeybindings, unmanagedKeybindings)
+	finalKeybindings := e.nonDestructiveMerge(managedKeybindings, unmanagedKeybindings)
 
 	// Reorder according to base command order if provided
 	finalKeybindings = orderByBaseCommand(finalKeybindings, existingKeybindings)
@@ -177,8 +177,8 @@ func (e *xcodeExporter) findMappingByXcodeKeybinding(kb xcodeKeybinding) *mappin
 	return nil
 }
 
-// generateManagedKeybindings generates Xcode keybindings from KeymapSetting.
-func (e *xcodeExporter) generateManagedKeybindings(
+// identifyManagedKeybindings identify Xcode keybindings from KeymapSetting.
+func (e *xcodeExporter) identifyManagedKeybindings(
 	setting *keymap.Keymap,
 	marker *export.Marker,
 ) []xcodeKeybinding {
@@ -261,8 +261,8 @@ func (e *xcodeExporter) generateManagedKeybindings(
 	return xcodeKeybindings
 }
 
-// mergeKeybindings merges managed and unmanaged keybindings, with managed taking priority.
-func (e *xcodeExporter) mergeKeybindings(managed, unmanaged []xcodeKeybinding) []xcodeKeybinding {
+// nonDestructiveMerge merges managed and unmanaged keybindings, with managed taking priority.
+func (e *xcodeExporter) nonDestructiveMerge(managed, unmanaged []xcodeKeybinding) []xcodeKeybinding {
 	// Create a map to track managed keybindings by their key combination
 	managedKeys := make(map[string]bool)
 	for _, kb := range managed {

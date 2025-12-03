@@ -55,10 +55,10 @@ func (e *intellijExporter) Export(
 
 	// Generate managed actions from current setting
 	marker := export.NewMarker(&setting)
-	managedActions := e.generateManagedActions(&setting, marker)
+	managedActions := e.identifyManagedActions(&setting, marker)
 
 	// Merge managed and unmanaged actions
-	finalActions := e.mergeActions(managedActions, unmanagedActions)
+	finalActions := e.nonDestructiveMerge(managedActions, unmanagedActions)
 
 	doc := KeymapXML{
 		Name:             "Onekeymap",
@@ -110,9 +110,9 @@ func (e *intellijExporter) isManagedAction(actionID string) bool {
 	return false
 }
 
-// generateManagedActions generates IntelliJ actions from KeymapSetting.
+// identifyManagedActions generates IntelliJ actions from KeymapSetting.
 // Uses GetExportAction to support fallback when parent is not supported.
-func (e *intellijExporter) generateManagedActions(setting *keymap.Keymap, marker *export.Marker) []ActionXML {
+func (e *intellijExporter) identifyManagedActions(setting *keymap.Keymap, marker *export.Marker) []ActionXML {
 	// Group keybindings by IntelliJ action ID while preserving order of first appearance.
 	actionsMap := make(map[string]*ActionXML)
 	var actionOrder []string
@@ -197,8 +197,8 @@ func (e *intellijExporter) generateManagedActions(setting *keymap.Keymap, marker
 	return actions
 }
 
-// mergeActions merges managed and unmanaged actions, with managed taking priority.
-func (e *intellijExporter) mergeActions(managed, unmanaged []ActionXML) []ActionXML {
+// nonDestructiveMerge merges managed and unmanaged actions, with managed taking priority.
+func (e *intellijExporter) nonDestructiveMerge(managed, unmanaged []ActionXML) []ActionXML {
 	// Create a map of managed action IDs for quick lookup
 	managedIDs := make(map[string]bool)
 	for _, action := range managed {
