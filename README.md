@@ -135,7 +135,7 @@ editors:
 
 ---
 
-## 🧩 Supported Editors & Actions
+## 🧩 Supported Editors
 
 | Editor | Import | Export | Notes |
 |--------|--------|--------|-------|
@@ -147,6 +147,12 @@ editors:
 | **Vim/Neovim** | 🚧 | 🚧 | Planned |
 
 > See all supported actions: [docs/action-support-matrix.md](docs/action-support-matrix.md)
+
+## Key Features
+
+- Keymap configure once, use everywhere
+- Importing default keybindings of VSCode, Zed, Intellij IDEA, Xcode
+- Non-destructive export: exporting keymaps to editors while **preserving user's existing custom keybindings**
 
 ---
 
