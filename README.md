@@ -144,9 +144,13 @@ editors:
 | **IntelliJ IDEA** | ✅ | ✅ |  |
 | **Xcode(experimental)** | ✅ | ✅ | shortcut coverage is still limited (see [Action Support Matrix](docs/action-support-matrix.md)) |
 | **Helix(experimental)** | ❌ | ✅ | TOML configuration support; shortcut coverage is still limited (see [Action Support Matrix](docs/action-support-matrix.md)) |
-| **Vim/Neovim** | 🚧 | 🚧 | Planned |
+| **Vim/Neovim** | 🚧 | 🚧 | Planned, upvote [this issue](https://github.com/xinnjie/onekeymap-cli/issues/22) |
+| **Emacs** | 🚧 | 🚧 | Planned, upvote [this issue](https://github.com/xinnjie/onekeymap-cli/issues/23) |
 
 > See all supported actions: [docs/action-support-matrix.md](docs/action-support-matrix.md)
+
+Want support for more editors? [Open an issue](https://github.com/xinnjie/onekeymap-cli/issues/new?template=feature_request.yml) and upvote existing requests
+
 
 ## Key Features
 
