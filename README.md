@@ -38,18 +38,18 @@ OneKeymap CLI is a powerful command-line tool that lets you import, export, and 
 
 - **Debian/Ubuntu (.deb)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.7.1/onekeymap-cli_0.7.1_x86_64.deb
-  sudo dpkg -i onekeymap-cli_0.7.1_x86_64.deb
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.7.2/onekeymap-cli_0.7.2_x86_64.deb
+  sudo dpkg -i onekeymap-cli_0.7.2_x86_64.deb
   ```
 - **Fedora/RHEL/CentOS (.rpm)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.7.1/onekeymap-cli_0.7.1_x86_64.rpm
-  sudo rpm -i onekeymap-cli_0.7.1_x86_64.rpm
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.7.2/onekeymap-cli_0.7.2_x86_64.rpm
+  sudo rpm -i onekeymap-cli_0.7.2_x86_64.rpm
   ```
 - **Alpine (.apk)**
   ```bash
-  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.7.1/onekeymap-cli_0.7.1_x86_64.apk
-  sudo apk add --allow-untrusted onekeymap-cli_0.7.1_x86_64.apk
+  wget https://github.com/xinnjie/onekeymap-cli/releases/download/v0.7.2/onekeymap-cli_0.7.2_x86_64.apk
+  sudo apk add --allow-untrusted onekeymap-cli_0.7.2_x86_64.apk
   ```
 
 #### Windows
