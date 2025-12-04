@@ -5,9 +5,14 @@ import (
 	"io"
 
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 type PluginImportOption struct {
+	// SourcePlatform specifies the platform of the source keybindings being imported.
+	// This affects how modifier keys are parsed (e.g., "cmd" for macOS, "win" for Windows).
+	// If empty, defaults to the current runtime platform.
+	SourcePlatform platform.Platform
 }
 
 type PluginImporter interface {

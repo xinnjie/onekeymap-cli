@@ -49,7 +49,7 @@ func newImporterWithEditorType(
 func (i *vscodeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	_ pluginapi.PluginImportOption,
+	opts pluginapi.PluginImportOption,
 ) (pluginapi.PluginImportResult, error) {
 	vscodeKeybindings, err := parseConfig(source)
 	if err != nil {
@@ -79,7 +79,7 @@ func (i *vscodeImporter) Import(
 			continue
 		}
 
-		kb, err := ParseKeybinding(binding.Key)
+		kb, err := ParseKeybinding(binding.Key, opts.SourcePlatform)
 		if err != nil {
 			i.logger.WarnContext(ctx, "Skipping keybinding with unparsable key", "key", binding.Key, "error", err)
 			marker.MarkSkippedForReason(binding.Command, fmt.Errorf("unparsable key '%s': %w", binding.Key, err))

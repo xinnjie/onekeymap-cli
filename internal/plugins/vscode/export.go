@@ -12,6 +12,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	"github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
@@ -105,7 +106,7 @@ func (e *vscodeLikeExporter) Export(
 	}
 
 	marker := export.NewMarker(&setting)
-	managedKeybindings := e.identifyManagedKeybindings(&setting, marker)
+	managedKeybindings := e.identifyManagedKeybindings(&setting, marker, opts.TargetPlatform)
 
 	finalKeybindings := e.nonDestructiveMerge(managedKeybindings, unmanagedKeybindings)
 
@@ -190,6 +191,7 @@ func (e *vscodeLikeExporter) findMappingByVSCodeKeybinding(kb vscodeKeybinding) 
 func (e *vscodeLikeExporter) identifyManagedKeybindings(
 	setting *keymap.Keymap,
 	marker *export.Marker,
+	targetPlatform platform.Platform,
 ) []vscodeKeybinding {
 	var vscodeKeybindings []vscodeKeybinding
 
@@ -226,7 +228,7 @@ func (e *vscodeLikeExporter) identifyManagedKeybindings(
 			if len(b.KeyChords) == 0 {
 				continue
 			}
-			keys, err := FormatKeybinding(&b)
+			keys, err := FormatKeybinding(&b, targetPlatform)
 			if err != nil {
 				e.logger.Warn("Skipping keybinding with un-formattable key", "action", km.Name, "error", err)
 				marker.MarkSkippedForReason(

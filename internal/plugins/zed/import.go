@@ -37,7 +37,7 @@ func newImporter(mappingConfig *mappings.MappingConfig, logger *slog.Logger, rec
 func (p *zedImporter) Import(
 	ctx context.Context,
 	source io.Reader,
-	_ pluginapi.PluginImportOption,
+	opts pluginapi.PluginImportOption,
 ) (pluginapi.PluginImportResult, error) {
 	jsonData, err := io.ReadAll(source)
 	if err != nil {
@@ -65,7 +65,7 @@ func (p *zedImporter) Import(
 		sort.Strings(keys)
 		for _, key := range keys {
 			action := zk.Bindings[key]
-			kb, err := ParseZedKeybind(key)
+			kb, err := ParseZedKeybind(key, opts.SourcePlatform)
 			if err != nil {
 				p.logger.WarnContext(ctx, "failed to parse keychord", "key", key, "error", err)
 				marker.MarkSkippedForReason(action.Action, fmt.Errorf("failed to parse keychord '%s': %w", key, err))

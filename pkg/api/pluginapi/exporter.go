@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
 type PluginExporter interface {
@@ -26,6 +27,11 @@ type PluginExportOption struct {
 	// not managed by onekeymap. If nil, the export will be destructive,
 	// creating a new file from scratch.
 	ExistingConfig io.Reader
+
+	// TargetPlatform specifies the target platform for the exported keybindings.
+	// This affects how modifier keys are formatted (e.g., "cmd" for macOS, "win" for Windows).
+	// If empty, defaults to the current runtime platform.
+	TargetPlatform platform.Platform
 }
 
 // PluginExportReport details issues encountered during an export operation.

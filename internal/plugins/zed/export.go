@@ -12,6 +12,7 @@ import (
 	"github.com/xinnjie/onekeymap-cli/internal/diff"
 	"github.com/xinnjie/onekeymap-cli/internal/export"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 	mappings2 "github.com/xinnjie/onekeymap-cli/pkg/mappings"
 )
@@ -44,7 +45,7 @@ func (p *zedExporter) Export(
 	}
 
 	marker := export.NewMarker(&setting)
-	managedKeymaps := p.identifyManagedKeybindings(&setting, marker)
+	managedKeymaps := p.identifyManagedKeybindings(&setting, marker, opts.TargetPlatform)
 
 	finalKeymaps := p.nonDestructiveMerge(managedKeymaps, existingConfig)
 
@@ -140,7 +141,11 @@ func orderByBaseContext(final zedKeymapConfig, base zedKeymapConfig) zedKeymapCo
 }
 
 // identifyManagedKeybindings creates keybindings from the current setting.
-func (p *zedExporter) identifyManagedKeybindings(setting *keymap.Keymap, marker *export.Marker) zedKeymapConfig {
+func (p *zedExporter) identifyManagedKeybindings(
+	setting *keymap.Keymap,
+	marker *export.Marker,
+	targetPlatform platform.Platform,
+) zedKeymapConfig {
 	keymapsByContext := make(map[string]map[string]zedActionValue)
 
 	for _, km := range setting.Actions {
@@ -167,7 +172,7 @@ func (p *zedExporter) identifyManagedKeybindings(setting *keymap.Keymap, marker 
 			if len(b.KeyChords) == 0 {
 				continue
 			}
-			keys, err := FormatZedKeybind(b)
+			keys, err := FormatZedKeybind(b, targetPlatform)
 			if err != nil {
 				p.logger.Warn("failed to format key binding", "error", err)
 				marker.MarkSkippedForReason(
