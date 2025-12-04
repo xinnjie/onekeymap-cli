@@ -145,7 +145,10 @@ func TestExportZedKeymap(t *testing.T) {
 				context.Background(),
 				&buf,
 				tt.setting,
-				pluginapi.PluginExportOption{ExistingConfig: nil},
+				pluginapi.PluginExportOption{
+					ExistingConfig: nil,
+					TargetPlatform: platform.PlatformMacOS, // Use macOS for consistent test results across platforms
+				},
 			)
 
 			if tt.wantErr {
@@ -403,7 +406,10 @@ func TestExportZedKeymap_NonDestructive(t *testing.T) {
 			require.NoError(t, err)
 
 			var buf bytes.Buffer
-			opts := pluginapi.PluginExportOption{ExistingConfig: nil}
+			opts := pluginapi.PluginExportOption{
+				ExistingConfig: nil,
+				TargetPlatform: platform.PlatformMacOS, // Use macOS for consistent test results across platforms
+			}
 
 			if tt.existingConfig != "" {
 				opts.ExistingConfig = strings.NewReader(tt.existingConfig)
@@ -462,6 +468,7 @@ func TestExportZedKeymap_OrderByBaseContext(t *testing.T) {
 	var buf bytes.Buffer
 	_, err = exporter.Export(context.Background(), &buf, setting, pluginapi.PluginExportOption{
 		ExistingConfig: strings.NewReader(existingConfig),
+		TargetPlatform: platform.PlatformMacOS, // Use macOS for consistent test results across platforms
 	})
 	require.NoError(t, err)
 

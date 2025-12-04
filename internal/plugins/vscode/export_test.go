@@ -380,7 +380,10 @@ func TestExporter_Export(t *testing.T) {
 			require.NoError(t, err)
 
 			var buf bytes.Buffer
-			opts := pluginapi.PluginExportOption{ExistingConfig: nil}
+			opts := pluginapi.PluginExportOption{
+				ExistingConfig: nil,
+				TargetPlatform: platform.PlatformMacOS, // Use macOS for consistent test results across platforms
+			}
 
 			if tt.existingConfig != "" {
 				opts.ExistingConfig = strings.NewReader(tt.existingConfig)
@@ -574,7 +577,10 @@ func TestExporter_Export_VSCodeVariant(t *testing.T) {
 			require.NoError(t, err)
 
 			var buf bytes.Buffer
-			opts := pluginapi.PluginExportOption{ExistingConfig: nil}
+			opts := pluginapi.PluginExportOption{
+				ExistingConfig: nil,
+				TargetPlatform: platform.PlatformMacOS, // Use macOS for consistent test results across platforms
+			}
 
 			_, err = exporter.Export(context.Background(), &buf, tt.keymapSetting, opts)
 			require.NoError(t, err)

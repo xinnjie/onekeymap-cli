@@ -26,7 +26,7 @@ jobs:
           cache: true
 
       - name: Run unit tests
-        run: go test ./...
+        run: go test -v -race ./...
 
       - name: Release with GoReleaser
         uses: goreleaser/goreleaser-action@v6
