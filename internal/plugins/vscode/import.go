@@ -15,8 +15,8 @@ import (
 	"github.com/xinnjie/onekeymap-cli/pkg/metrics"
 )
 
-// vscodeImporter handles importing keybindings from VSCode.
-type vscodeImporter struct {
+// vscodeLikeImporter handles importing keybindings from VSCode.
+type vscodeLikeImporter struct {
 	mappingConfig *mappings.MappingConfig
 	editorType    pluginapi.EditorType
 	logger        *slog.Logger
@@ -27,7 +27,7 @@ func newImporter(
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,
-) *vscodeImporter {
+) *vscodeLikeImporter {
 	return newImporterWithEditorType(pluginapi.EditorTypeVSCode, mappingConfig, logger, recorder)
 }
 
@@ -36,8 +36,8 @@ func newImporterWithEditorType(
 	mappingConfig *mappings.MappingConfig,
 	logger *slog.Logger,
 	recorder metrics.Recorder,
-) *vscodeImporter {
-	return &vscodeImporter{
+) *vscodeLikeImporter {
+	return &vscodeLikeImporter{
 		mappingConfig: mappingConfig,
 		editorType:    editorType,
 		logger:        logger,
@@ -46,7 +46,7 @@ func newImporterWithEditorType(
 }
 
 // Import reads a VSCode keybindings.json file and converts it to a universal KeymapSetting.
-func (i *vscodeImporter) Import(
+func (i *vscodeLikeImporter) Import(
 	ctx context.Context,
 	source io.Reader,
 	opts pluginapi.PluginImportOption,

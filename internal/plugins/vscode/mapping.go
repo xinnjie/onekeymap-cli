@@ -11,7 +11,7 @@ import (
 // FindByVSCodeActionWithArgs searches for a mapping by VSCode command, when clause, and args.
 // strict exact matching for both `command` and `when` clauses.
 // If strict matching fails, fall back progressively to wildcard `when`, mismatched `when`, and command-only matches.
-func (i *vscodeImporter) FindByVSCodeActionWithArgs(
+func (i *vscodeLikeImporter) FindByVSCodeActionWithArgs(
 	command, when string,
 	args map[string]interface{},
 ) *mappings2.ActionMappingConfig {
@@ -140,7 +140,7 @@ func pickCandidate(cands []*candidate) *mappings2.ActionMappingConfig {
 	return chooseFrom[0].mapping
 }
 
-func (i *vscodeImporter) appendMappingCandidates(
+func (i *vscodeLikeImporter) appendMappingCandidates(
 	buckets *candidateBuckets,
 	mapping mappings2.ActionMappingConfig,
 	command, when string,

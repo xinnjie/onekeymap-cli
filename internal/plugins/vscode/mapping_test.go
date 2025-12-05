@@ -14,7 +14,7 @@ func TestVscodeImporter_FindByVSCodeActionWithArgs(t *testing.T) {
 	mappingConfig, err := mappings.NewTestMappingConfig()
 	require.NoError(t, err)
 
-	i := &vscodeImporter{
+	i := &vscodeLikeImporter{
 		mappingConfig: mappingConfig,
 		logger:        slog.New(slog.NewTextHandler(os.Stdout, nil)),
 	}
