@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -104,7 +105,7 @@ func exportRun(
 			// Non-ENOENT error opening base file; log and continue without base
 			logger.Warn("Failed to open existing output as base", "error", err)
 		}
-		opts.Base = base
+		opts.OriginalConfig = base
 		opts.DiffType = exporterapi.DiffTypeASCII
 		opts.FilePath = f.output
 
@@ -116,15 +117,6 @@ func exportRun(
 			return err
 		}
 
-		// Show skipped actions in interactive mode for visibility
-		if f.interactive && report != nil && len(report.SkipActions) > 0 {
-			vm := views.NewSkipReportViewModel(report.SkipActions)
-			p := tea.NewProgram(vm)
-			if _, err := p.Run(); err != nil {
-				logger.Error("could not start program", "error", err)
-			}
-		}
-
 		// Show diff preview
 		cmd.Println("================ Export Diff Preview ================")
 		if report != nil && strings.TrimSpace(report.Diff) != "" {
@@ -133,6 +125,10 @@ func exportRun(
 			cmd.Println("(no diff available)")
 		}
 		cmd.Println("=====================================================")
+
+		if report != nil {
+			printExportSummary(cmd, report)
+		}
 
 		// TODO(xinnjie): optimize skip writing when output is the same. Whether same or not should not rely on report.Diff
 
@@ -171,6 +167,61 @@ func exportRun(
 
 		logger.Info("Successfully exported keymap", "to", f.to, "output", f.output)
 		return nil
+	}
+}
+
+func printExportSummary(cmd *cobra.Command, report *exporterapi.ExportReport) {
+	cov := report.Coverage
+	cmd.Println()
+	cmd.Println("Export Summary:")
+	cmd.Printf("  \u2713 %d/%d actions fully exported\n", cov.FullyExported, cov.TotalActions)
+
+	partialCount := len(cov.PartiallyExported)
+	if partialCount > 0 {
+		cmd.Printf("  \u25b3 %d actions partially exported:\n", partialCount)
+		for _, pa := range cov.PartiallyExported {
+			wanted := len(pa.Requested)
+			got := len(pa.Exported)
+			line := fmt.Sprintf("    - %s: wanted %d keybindings, got %d", pa.Action, wanted, got)
+			if strings.TrimSpace(pa.Reason) != "" {
+				line = fmt.Sprintf("%s (%s)", line, pa.Reason)
+			}
+			cmd.Println(line)
+		}
+	} else {
+		cmd.Println("  \u25b3 0 actions partially exported")
+	}
+
+	// Group skipped actions by action name with first error message
+	skippedByAction := make(map[string]string)
+	for _, sk := range report.SkipActions {
+		if _, exists := skippedByAction[sk.Action]; !exists {
+			if sk.Error != nil {
+				skippedByAction[sk.Action] = sk.Error.Error()
+			} else {
+				skippedByAction[sk.Action] = ""
+			}
+		}
+	}
+
+	skippedNames := make([]string, 0, len(skippedByAction))
+	for name := range skippedByAction {
+		skippedNames = append(skippedNames, name)
+	}
+	sort.Strings(skippedNames)
+
+	if len(skippedNames) > 0 {
+		cmd.Printf("  \u2717 %d actions skipped:\n", len(skippedNames))
+		for _, name := range skippedNames {
+			reason := skippedByAction[name]
+			if strings.TrimSpace(reason) == "" {
+				cmd.Printf("    - %s\n", name)
+			} else {
+				cmd.Printf("    - %s: %s\n", name, reason)
+			}
+		}
+	} else {
+		cmd.Println("  \u2717 0 actions skipped")
 	}
 }
 

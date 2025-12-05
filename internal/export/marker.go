@@ -117,3 +117,75 @@ func (m *Marker) Report() pluginapi.ExportSkipReport {
 	}
 	return pluginapi.ExportSkipReport{SkipActions: result}
 }
+
+// ExportedReport generates a report of what was requested vs what was exported for each action.
+func (m *Marker) ExportedReport() pluginapi.ExportedReport {
+	actions := m.keymap.Actions
+	// ensure stable order by sorting action IDs for determinism in tests
+	ids := make([]string, 0, len(actions))
+	for _, a := range actions {
+		ids = append(ids, a.Name)
+	}
+	slices.Sort(ids)
+
+	var results []pluginapi.ActionExportResult
+	for _, id := range ids {
+		// Find the action in the original slice to access its bindings
+		var act *keymap.Action
+		for i := range actions {
+			if actions[i].Name == id {
+				act = &actions[i]
+				break
+			}
+		}
+		if act == nil {
+			continue
+		}
+
+		result := pluginapi.ActionExportResult{
+			Action: id,
+		}
+
+		// Collect requested and exported keybindings
+		for _, kb := range act.Bindings {
+			if len(kb.KeyChords) == 0 {
+				continue
+			}
+			result.Requested = append(result.Requested, kb)
+
+			key := kb.String(keybinding.FormatOption{Platform: platform.PlatformMacOS, Separator: " "})
+			if expForAct, ok := m.exported[id]; ok {
+				if expForAct[key] {
+					result.Exported = append(result.Exported, kb)
+				}
+			}
+		}
+
+		// Build reason from skip reasons if any keybindings were not exported
+		if len(result.Exported) < len(result.Requested) {
+			result.Reason = m.buildSkipReason(id)
+		}
+
+		// Only include actions that have keybindings
+		if len(result.Requested) > 0 {
+			results = append(results, result)
+		}
+	}
+
+	return pluginapi.ExportedReport{Actions: results}
+}
+
+// buildSkipReason builds a reason string from skip reasons for an action.
+func (m *Marker) buildSkipReason(action string) string {
+	// Check action-level skip reason first
+	if err, ok := m.skippedAction[action]; ok {
+		return err.Error()
+	}
+	// Check per-key skip reasons
+	if perKey, ok := m.skippedKeys[action]; ok {
+		for _, err := range perKey {
+			return err.Error() // Return first reason found
+		}
+	}
+	return ""
+}

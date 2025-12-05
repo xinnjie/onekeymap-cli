@@ -126,6 +126,7 @@ func (e *vscodeLikeExporter) Export(
 		BaseEditorConfig:   existingKeybindings,
 		ExportEditorConfig: finalKeybindings,
 		SkipReport:         marker.Report(),
+		ExportedReport:     marker.ExportedReport(),
 	}, nil
 }
 

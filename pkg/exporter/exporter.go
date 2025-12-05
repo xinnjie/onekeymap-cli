@@ -68,8 +68,8 @@ func (s *exporter) Export(
 	// affecting our diff generation.
 	var baseReadForPlugin io.Reader
 	var baseBuf bytes.Buffer
-	if opts.Base != nil {
-		baseReadForPlugin = io.TeeReader(opts.Base, &baseBuf)
+	if opts.OriginalConfig != nil {
+		baseReadForPlugin = io.TeeReader(opts.OriginalConfig, &baseBuf)
 	}
 
 	report, err := exporter.Export(
@@ -98,14 +98,22 @@ func (s *exporter) Export(
 	}
 	// Now that we've fully buffered the base, create a fresh reader for diffing
 	var baseReadForDiff io.Reader
-	if opts.Base != nil {
+	if opts.OriginalConfig != nil {
 		baseReadForDiff = bytes.NewReader(baseBuf.Bytes())
 	}
 	diffStr, err := s.computeDiff(opts, baseReadForDiff, &newConfigBuf, report)
 	if err != nil {
 		return nil, err
 	}
-	return &exporterapi.ExportReport{Diff: diffStr, SkipActions: report.SkipReport.SkipActions}, nil
+
+	// Build export coverage from plugin report
+	coverage := s.buildCoverage(setting, report)
+
+	return &exporterapi.ExportReport{
+		Diff:        diffStr,
+		Coverage:    coverage,
+		SkipActions: report.SkipReport.SkipActions,
+	}, nil
 }
 
 // computeDiff centralizes diff generation for export results based on requested options.
@@ -144,4 +152,59 @@ func (s *exporter) computeDiff(
 	default:
 		return "", nil
 	}
+}
+
+// buildCoverage computes export coverage by comparing requested actions with plugin export results.
+func (s *exporter) buildCoverage(
+	input keymap.Keymap,
+	report *pluginapi.PluginExportReport,
+) exporterapi.ExportCoverage {
+	coverage := exporterapi.ExportCoverage{
+		TotalActions: len(input.Actions),
+	}
+
+	if report == nil {
+		return coverage
+	}
+
+	// Build a map of action results from plugin report
+	resultMap := make(map[string]pluginapi.ActionExportResult)
+	for _, r := range report.ExportedReport.Actions {
+		resultMap[r.Action] = r
+	}
+
+	// Track which actions were skipped
+	skippedActions := make(map[string]bool)
+	for _, skip := range report.SkipReport.SkipActions {
+		skippedActions[skip.Action] = true
+	}
+
+	for _, action := range input.Actions {
+		// Skip actions that were completely skipped
+		if skippedActions[action.Name] {
+			continue
+		}
+
+		result, hasResult := resultMap[action.Name]
+		if !hasResult {
+			// Action was exported but plugin didn't report details
+			// Assume fully exported
+			coverage.FullyExported++
+			continue
+		}
+
+		// Compare requested vs exported keybindings
+		if len(result.Exported) >= len(result.Requested) {
+			coverage.FullyExported++
+		} else {
+			coverage.PartiallyExported = append(coverage.PartiallyExported, exporterapi.PartialExportedAction{
+				Action:    action.Name,
+				Requested: result.Requested,
+				Exported:  result.Exported,
+				Reason:    result.Reason,
+			})
+		}
+	}
+
+	return coverage
 }

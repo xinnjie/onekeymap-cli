@@ -106,10 +106,10 @@ func TestExportService_Diff_Unified(t *testing.T) {
 
 	var out bytes.Buffer
 	report, err := service.Export(context.Background(), &out, keymap.Keymap{}, exporterapi.ExportOptions{
-		EditorType: pluginapi.EditorType("test"),
-		Base:       strings.NewReader(before),
-		DiffType:   exporterapi.DiffTypeUnified,
-		FilePath:   "test.txt",
+		EditorType:     pluginapi.EditorType("test"),
+		OriginalConfig: strings.NewReader(before),
+		DiffType:       exporterapi.DiffTypeUnified,
+		FilePath:       "test.txt",
 	})
 	require.NoError(t, err)
 	assert.Equal(t, after, out.String())

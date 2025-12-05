@@ -141,7 +141,7 @@ func migrateRun(
 
 		// Export to memory buffer first for preview, optional confirmation, and then write
 		var mem bytes.Buffer
-		exportOpts := exporterapi.ExportOptions{EditorType: pluginapi.EditorType(f.to), Base: base}
+		exportOpts := exporterapi.ExportOptions{EditorType: pluginapi.EditorType(f.to), OriginalConfig: base}
 		exportReport, err := exportService.Export(ctx, &mem, importResult.Setting, exportOpts)
 		if err != nil {
 			logger.Error("migrate failed during export step", "error", err)

@@ -70,6 +70,7 @@ func (p *zedExporter) Export(
 		BaseEditorConfig:   existingConfig,
 		ExportEditorConfig: finalKeymaps,
 		SkipReport:         marker.Report(),
+		ExportedReport:     marker.ExportedReport(),
 	}, nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/pluginapi"
 )
 
@@ -51,9 +52,9 @@ func (d DiffType) String() string {
 type ExportOptions struct {
 	// Editor type
 	EditorType pluginapi.EditorType
-	// Optional, existing base keymap for specific editor
-	Base io.Reader
-	// TODO(xinnjie): export api level enum is not a good idea
+	// Optional, existing original keymap for specific editor before export
+	OriginalConfig io.Reader
+	// Use diff type to generate ascii diff text or unified diff text
 	DiffType DiffType
 	// file path for the keymap config
 	FilePath string
@@ -61,9 +62,34 @@ type ExportOptions struct {
 
 // ExportReport details issues encountered during an export operation.
 type ExportReport struct {
-	// The diff between the base and the exported keymap.
+	// The diff text between the original keymap and keymap after export.
 	Diff string
+
+	// Coverage reports how many actions were successfully exported.
+	Coverage ExportCoverage
 
 	// SkipActions reports actions that were not exported and why.
 	SkipActions []pluginapi.ExportSkipAction
+}
+
+// ExportCoverage summarizes export success rate.
+type ExportCoverage struct {
+	// TotalActions is the number of actions requested for export.
+	TotalActions int
+	// FullyExported is the number of actions where all keybindings were exported.
+	FullyExported int
+	// PartiallyExported lists actions where some keybindings could not be exported.
+	PartiallyExported []PartialExportedAction
+}
+
+// PartialExportedAction describes an action that was only partially exported.
+type PartialExportedAction struct {
+	// Action name, e.g. "actions.clipboard.copy"
+	Action string
+	// Requested keybindings that were requested to be exported
+	Requested []keybinding.Keybinding
+	// Exported keybindings that were actually exported
+	Exported []keybinding.Keybinding
+	// Reason explains why some keybindings were not exported
+	Reason string
 }

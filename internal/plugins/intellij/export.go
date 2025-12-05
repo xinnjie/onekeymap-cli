@@ -83,6 +83,7 @@ func (e *intellijExporter) Export(
 		BaseEditorConfig:   existingDoc,
 		ExportEditorConfig: doc,
 		SkipReport:         marker.Report(),
+		ExportedReport:     marker.ExportedReport(),
 	}, nil
 }
 

@@ -397,6 +397,120 @@ func TestExporter_Export(t *testing.T) {
 	}
 }
 
+// TODO(xinnjie): expectedPartialActions not tested
+func TestExporter_Export_ExportedReport(t *testing.T) {
+	mappingConfig, err := mappings.NewTestMappingConfig()
+	require.NoError(t, err)
+
+	parseKB := func(s string) keybinding.Keybinding {
+		kb, err := keybinding.NewKeybinding(s, keybinding.ParseOption{Platform: platform.PlatformMacOS, Separator: "+"})
+		if err != nil {
+			panic(err)
+		}
+		return kb
+	}
+
+	tests := []struct {
+		name                   string
+		keymapSetting          keymap.Keymap
+		expectedTotalActions   int
+		expectedFullyExported  int
+		expectedPartialActions []string // action names that should be partially exported
+	}{
+		{
+			name: "all keybindings exported",
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
+				},
+			},
+			expectedTotalActions:  1,
+			expectedFullyExported: 1,
+		},
+		{
+			name: "multiple actions all exported",
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
+					{
+						Name:     "actions.test.mutipleActions",
+						Bindings: []keybinding.Keybinding{parseKB("alt+3")},
+					},
+				},
+			},
+			expectedTotalActions:  2,
+			expectedFullyExported: 2,
+		},
+		{
+			name: "action not supported is not in exported report",
+			keymapSetting: keymap.Keymap{
+				Actions: []keymap.Action{
+					{
+						Name:     "actions.edit.copy",
+						Bindings: []keybinding.Keybinding{parseKB("meta+c")},
+					},
+					{
+						Name:     "actions.nonexistent.action",
+						Bindings: []keybinding.Keybinding{parseKB("meta+x")},
+					},
+				},
+			},
+			expectedTotalActions:  2,
+			expectedFullyExported: 1, // Only copy is exported
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			plugin := New(mappingConfig, slog.New(slog.NewTextHandler(os.Stdout, nil)), metrics.NewNoop())
+			exporter, err := plugin.Exporter()
+			require.NoError(t, err)
+
+			var buf bytes.Buffer
+			opts := pluginapi.PluginExportOption{
+				ExistingConfig: nil,
+				TargetPlatform: platform.PlatformMacOS,
+			}
+
+			report, err := exporter.Export(context.Background(), &buf, tt.keymapSetting, opts)
+			require.NoError(t, err)
+
+			// Verify ExportedReport is populated
+			assert.NotNil(t, report.ExportedReport)
+			assert.Len(t, report.ExportedReport.Actions, tt.expectedTotalActions)
+
+			// Count fully exported actions
+			fullyExported := 0
+			for _, action := range report.ExportedReport.Actions {
+				if len(action.Exported) == len(action.Requested) {
+					fullyExported++
+				}
+			}
+			assert.Equal(t, tt.expectedFullyExported, fullyExported)
+
+			// Verify partial actions if specified
+			for _, partialAction := range tt.expectedPartialActions {
+				found := false
+				for _, action := range report.ExportedReport.Actions {
+					if action.Action == partialAction {
+						found = true
+						assert.Less(t, len(action.Exported), len(action.Requested),
+							"action %s should be partially exported", partialAction)
+						break
+					}
+				}
+				assert.True(t, found, "action %s should be in exported report", partialAction)
+			}
+		})
+	}
+}
+
 func TestExporter_Export_VSCodeVariant(t *testing.T) {
 	mappingConfig, err := mappings.NewTestMappingConfig()
 	require.NoError(t, err)

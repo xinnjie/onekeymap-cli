@@ -79,6 +79,7 @@ func (e *helixExporter) Export(
 		BaseEditorConfig:   existingKeys,
 		ExportEditorConfig: finalKeys,
 		SkipReport:         marker.Report(),
+		ExportedReport:     marker.ExportedReport(),
 	}, nil
 }
 

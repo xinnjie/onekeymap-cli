@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	keybinding "github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
@@ -50,6 +51,8 @@ type PluginExportReport struct {
 
 	// SkipReport reports actions that were not exported and why.
 	SkipReport ExportSkipReport
+
+	ExportedReport ExportedReport
 }
 
 type ExportSkipReport struct {
@@ -61,4 +64,22 @@ type ExportSkipAction struct {
 	Action string
 	// Error description about why this action is skipped
 	Error error
+}
+
+// ExportedReport contains detailed export results for each action.
+// This is used by the exporter service to compute ExportCoverage.
+type ExportedReport struct {
+	Actions []ActionExportResult
+}
+
+// ActionExportResult describes the export outcome for a single action.
+type ActionExportResult struct {
+	// Action name, e.g. "actions.clipboard.copy"
+	Action string
+	// Requested keybindings that were requested to be exported
+	Requested []keybinding.Keybinding
+	// Exported keybindings that were actually exported (may be fewer due to editor limitations)
+	Exported []keybinding.Keybinding
+	// Reason explains why some keybindings were not exported (optional)
+	Reason string
 }
