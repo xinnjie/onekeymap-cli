@@ -50,6 +50,13 @@ type KeymapChanges struct {
 	Update []KeymapDiff
 }
 
+func (kc *KeymapChanges) HasChanges() bool {
+	if kc == nil {
+		return false
+	}
+	return len(kc.Add) > 0 || len(kc.Remove) > 0 || len(kc.Update) > 0
+}
+
 type KeymapDiff struct {
 	Before keymap.Action
 	After  keymap.Action

@@ -57,20 +57,20 @@ func (i *demoImporter) Import(
 	marker := imports.NewMarker()
 	for _, b := range bindings {
 		if b.Keys == "" || b.Action == "" {
-			marker.MarkSkippedForReason(b.Action, errors.New("missing keys or action"))
+			marker.MarkSkipped(b.Action, nil, errors.New("missing keys or action"))
 			continue
 		}
 		kb, err := keybinding.NewKeybinding(b.Keys, keybinding.ParseOption{Separator: "+"})
 		if err != nil {
 			i.logger.WarnContext(ctx, "Skipping unparsable keybinding", "keys", b.Keys, "error", err)
-			marker.MarkSkippedForReason(b.Action, fmt.Errorf("unparsable key '%s': %w", b.Keys, err))
+			marker.MarkSkipped(b.Action, nil, fmt.Errorf("unparsable key '%s': %w", b.Keys, err))
 			continue
 		}
 		setting.Actions = append(
 			setting.Actions,
 			keymap.Action{Name: b.Action, Bindings: []keybinding.Keybinding{kb}},
 		)
-		marker.MarkImported(b.Action)
+		marker.MarkImported(b.Action, b.Action, kb, kb)
 	}
 	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()

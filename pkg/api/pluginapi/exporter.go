@@ -52,6 +52,7 @@ type PluginExportReport struct {
 	// SkipReport reports actions that were not exported and why.
 	SkipReport ExportSkipReport
 
+	// More about export, see docs/export_report.md
 	ExportedReport ExportedReport
 }
 

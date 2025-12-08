@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
@@ -145,25 +147,11 @@ func executeImportInteractive(
 		return err
 	}
 
-	if result != nil && len(result.SkipReport.SkipActions) > 0 {
-		vm := views.NewImportSkipReportViewModel(result.SkipReport)
-		p := tea.NewProgram(vm)
-		if _, err := p.Run(); err != nil {
-			logger.Error("could not start program", "error", err)
-		}
+	if result != nil {
+		printImportSummary(cmd, result)
 	}
 
-	// Show validation report if there are issues
-	if result != nil && result.Report != nil &&
-		(len(result.Report.Issues) > 0 || len(result.Report.Warnings) > 0) {
-		logger.Info("Validation found issues. Displaying report...")
-		if err := runValidationReportPreview(result.Report); err != nil {
-			logger.Warn("Failed to display validation report", "error", err)
-		}
-	}
-
-	// Show changes preview and get user confirmation
-	if result != nil && result.Changes != nil {
+	if result.Changes.HasChanges() {
 		confirmed, err := runImportChangesPreview(result.Changes)
 		if err != nil {
 			logger.Warn("failed to render changes preview", "error", err)
@@ -172,6 +160,8 @@ func executeImportInteractive(
 			logger.Info("User cancelled applying changes; no file will be written")
 			return nil
 		}
+	} else {
+		cmd.Println("No changes to import - file will not be updated")
 	}
 
 	return saveImportResult(f.output, result, logger)
@@ -215,6 +205,10 @@ func executeImportNonInteractive(
 	if err != nil {
 		logger.Error("import failed", "error", err)
 		return err
+	}
+
+	if result != nil {
+		printImportSummary(cmd, result)
 	}
 
 	return saveImportResult(f.output, result, logger)
@@ -276,6 +270,163 @@ func saveImportResult(outputPath string, result *importerapi.ImportResult, logge
 		logger.Debug("Import report", "report", result.Report)
 	}
 	return nil
+}
+
+type importSkippedView struct {
+	Action          string
+	KeybindingCount int
+	Reason          string
+}
+
+type importSummaryView struct {
+	TotalImported     int
+	Skipped           []importSkippedView
+	HasValidation     bool
+	ValidationSource  string
+	MappingsProcessed int
+	MappingsSucceeded int
+	Issues            []string
+	Warnings          []string
+}
+
+// nolint: gochecknoglobals
+var importSummaryTemplate = template.Must(template.New("importSummary").Parse(`
+Import Summary:
+  ✓ {{ .TotalImported }} actions imported into onekeymap
+{{- $skippedCount := len .Skipped }}
+{{- if eq $skippedCount 0 }}
+  ✗ 0 editor actions skipped
+{{- else }}
+  ✗ {{ $skippedCount }} editor actions skipped:
+{{- range .Skipped }}
+    - {{ .Action }}{{ if gt .KeybindingCount 0 }} ({{ .KeybindingCount }} keybindings){{ end }}{{ if .Reason }}: {{ .Reason }}{{ end }}
+{{- end }}
+{{- end }}
+{{- if .HasValidation }}
+
+Validation Summary:
+  Source: {{ .ValidationSource }} | Mappings Processed: {{ .MappingsProcessed }} | Succeeded: {{ .MappingsSucceeded }}
+  Issues: {{ len .Issues }}, Warnings: {{ len .Warnings }}
+{{- if gt (len .Issues) 0 }}
+  Issues ({{ len .Issues }}):
+{{- range .Issues }}
+    - {{ . }}
+{{- end }}
+{{- end }}
+{{- if gt (len .Warnings) 0 }}
+  Warnings ({{ len .Warnings }}):
+{{- range .Warnings }}
+    - {{ . }}
+{{- end }}
+{{- end }}
+{{- end }}
+`))
+
+func printImportSummary(cmd *cobra.Command, result *importerapi.ImportResult) {
+	view := importSummaryView{
+		TotalImported: len(result.Setting.Actions),
+	}
+
+	for _, sk := range result.SkipReport.SkipActions {
+		item := importSkippedView{
+			Action:          sk.EditorSpecificAction,
+			KeybindingCount: len(sk.Keybindings),
+		}
+		if sk.Error != nil {
+			item.Reason = sk.Error.Error()
+		}
+		view.Skipped = append(view.Skipped, item)
+	}
+
+	if result.Report != nil {
+		rep := result.Report
+		view.HasValidation = true
+		view.ValidationSource = rep.SourceEditor
+		view.MappingsProcessed = rep.Summary.MappingsProcessed
+		view.MappingsSucceeded = rep.Summary.MappingsSucceeded
+		for _, issue := range rep.Issues {
+			view.Issues = append(view.Issues, renderValidationIssueInline(issue))
+		}
+		for _, warning := range rep.Warnings {
+			view.Warnings = append(view.Warnings, renderValidationIssueInline(warning))
+		}
+	}
+
+	var buf bytes.Buffer
+	if err := importSummaryTemplate.Execute(&buf, view); err != nil {
+		// Fallback to minimal output if template rendering fails
+		cmd.Println()
+		cmd.Println("Import Summary:")
+		cmd.Printf("  ✓ %d actions imported into onekeymap\n", view.TotalImported)
+		return
+	}
+
+	cmd.Println()
+	cmd.Print(buf.String())
+}
+
+// renderValidationIssueInline renders a single validation issue in a compact textual form,
+// mirroring the semantics of views.renderIssue but without TUI styling.
+func renderValidationIssueInline(issue validateapi.ValidationIssue) string {
+	switch issue.Type {
+	case validateapi.IssueTypeKeybindConflict:
+		if c, ok := issue.Details.(validateapi.KeybindConflict); ok {
+			var actionLines []string
+			for _, action := range c.Actions {
+				if action.Context != "" {
+					actionLines = append(actionLines, fmt.Sprintf("%s (%s)", action.Context, action.ActionID))
+				} else {
+					actionLines = append(actionLines, action.ActionID)
+				}
+			}
+			return fmt.Sprintf(
+				"Keybind Conflict: %s is mapped to multiple actions:\n      - %s",
+				c.Keybinding,
+				strings.Join(actionLines, "\n      - "),
+			)
+		}
+	case validateapi.IssueTypeDanglingAction:
+		if d, ok := issue.Details.(validateapi.DanglingAction); ok {
+			suggestion := ""
+			if d.Suggestion != "" {
+				suggestion = fmt.Sprintf(" (%s)", d.Suggestion)
+			}
+			return fmt.Sprintf(
+				"Dangling Action: %s does not exist in target %s.%s",
+				d.Action,
+				d.TargetEditor,
+				suggestion,
+			)
+		}
+	case validateapi.IssueTypeUnsupportedAction:
+		if u, ok := issue.Details.(validateapi.UnsupportedAction); ok {
+			return fmt.Sprintf(
+				"Unsupported Action: %s (on key %s) is not supported for target %s.",
+				u.Action,
+				u.Keybinding,
+				u.TargetEditor,
+			)
+		}
+	case validateapi.IssueTypeDuplicateMapping:
+		if d, ok := issue.Details.(validateapi.DuplicateMapping); ok {
+			return fmt.Sprintf(
+				"Duplicate Mapping: Action %s with key %s is defined multiple times.",
+				d.Action,
+				d.Keybinding,
+			)
+		}
+	case validateapi.IssueTypePotentialShadowing:
+		if p, ok := issue.Details.(validateapi.PotentialShadowing); ok {
+			return fmt.Sprintf(
+				"Potential Shadowing: Key %s (for action %s). %s",
+				p.Keybinding,
+				p.Action,
+				p.CriticalShortcutDescription,
+			)
+		}
+	}
+
+	return "Unknown issue type."
 }
 
 func handleInteractiveImportFlags(
@@ -411,16 +562,6 @@ func runImportForm(
 		if errors.Is(err, tea.ErrProgramKilled) {
 			os.Exit(0)
 		}
-		return err
-	}
-	return nil
-}
-
-// run the validation report TUI ---.
-func runValidationReportPreview(report *validateapi.ValidationReport) error {
-	m := views.NewValidationReportModel(report)
-	p := tea.NewProgram(m)
-	if _, err := p.Run(); err != nil {
 		return err
 	}
 	return nil

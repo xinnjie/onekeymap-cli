@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/xinnjie/onekeymap-cli/pkg/api/keymap"
+	keybinding "github.com/xinnjie/onekeymap-cli/pkg/api/keymap/keybinding"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/platform"
 )
 
@@ -38,6 +39,10 @@ type PluginImportResult struct {
 type PluginImportReport struct {
 	// SkipReport contains details about actions that were skipped during the import operation.
 	SkipReport ImportSkipReport
+
+	// ImportedReport contains detailed import results for each editor keybinding.
+	// This is used by the importer service to compute ImportCoverage.
+	ImportedReport ImportedReport
 }
 
 type ImportSkipReport struct {
@@ -47,5 +52,35 @@ type ImportSkipReport struct {
 type ImportSkipAction struct {
 	// EditorSpecificAction is the action name in the editor-specific format
 	EditorSpecificAction string
-	Error                error
+	// Keybindings are the keybindings found in the editor config.
+	Keybindings []keybinding.Keybinding
+	// Reason why this action is skipped during importing
+	Error error
+}
+
+// ImportedReport contains detailed import results for editor keybindings.
+type ImportedReport struct {
+	// Results contains import outcome for each editor keybinding group
+	Results []KeybindingImportResult
+}
+
+// KeybindingImportResult describes the import outcome for editor keybindings.
+type KeybindingImportResult struct {
+	// MappedAction is the universal action this keybinding was mapped to.
+	// e.g., "actions.editor.copy"
+	MappedAction string
+
+	// EditorSpecificAction is the original editor-specific command.
+	// e.g., "editor.action.clipboardCopyAction" (VSCode)
+	EditorSpecificAction string
+
+	// OriginalKeybindings are the keybindings found in the editor config.
+	OriginalKeybindings []keybinding.Keybinding
+
+	// ImportedKeybindings are the keybindings that were actually imported.
+	// May differ from Original due editor constraint, e.g. Xcode can only configure one keybinding per action.
+	ImportedKeybindings []keybinding.Keybinding
+
+	// Reason explains any discrepancy (optional)
+	Reason string
 }

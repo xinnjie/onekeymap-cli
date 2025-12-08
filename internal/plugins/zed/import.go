@@ -68,7 +68,7 @@ func (p *zedImporter) Import(
 			kb, err := ParseZedKeybind(key, opts.SourcePlatform)
 			if err != nil {
 				p.logger.WarnContext(ctx, "failed to parse keychord", "key", key, "error", err)
-				marker.MarkSkippedForReason(action.Action, fmt.Errorf("failed to parse keychord '%s': %w", key, err))
+				marker.MarkSkipped(action.Action, nil, fmt.Errorf("failed to parse keychord '%s': %w", key, err))
 				continue
 			}
 
@@ -98,7 +98,7 @@ func (p *zedImporter) Import(
 					err,
 				)
 				p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeZed, actionStr)
-				marker.MarkSkippedForReason(actionStr, err)
+				marker.MarkSkipped(actionStr, &kb, err)
 				continue
 			}
 			keymapEntry := keymap.Action{
@@ -109,11 +109,12 @@ func (p *zedImporter) Import(
 			}
 
 			setting.Actions = append(setting.Actions, keymapEntry)
-			marker.MarkImported(actionStr)
+			marker.MarkImported(actionID, actionStr, kb, kb)
 		}
 	}
 	setting.Actions = dedup.Actions(setting.Actions)
 	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
+	result.Report.ImportedReport = marker.ImportedReport()
 	return result, nil
 }

@@ -59,6 +59,13 @@ func (i *vscodeLikeImporter) Import(
 	setting := keymap.Keymap{}
 	marker := imports.NewMarker()
 	for _, binding := range vscodeKeybindings {
+		kb, err := ParseKeybinding(binding.Key, opts.SourcePlatform)
+		if err != nil {
+			i.logger.WarnContext(ctx, "Skipping keybinding with unparsable key", "key", binding.Key, "error", err)
+			marker.MarkSkipped(binding.Command, nil, fmt.Errorf("unparsable key '%s': %w", binding.Key, err))
+			continue
+		}
+
 		mapping := i.FindByVSCodeActionWithArgs(binding.Command, binding.When, binding.Args)
 		if mapping == nil {
 			i.logger.DebugContext(
@@ -75,14 +82,7 @@ func (i *vscodeLikeImporter) Import(
 			if i.reporter != nil {
 				i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeVSCode, binding.Command)
 			}
-			marker.MarkSkippedForReason(binding.Command, pluginapi.ErrActionNotSupported)
-			continue
-		}
-
-		kb, err := ParseKeybinding(binding.Key, opts.SourcePlatform)
-		if err != nil {
-			i.logger.WarnContext(ctx, "Skipping keybinding with unparsable key", "key", binding.Key, "error", err)
-			marker.MarkSkippedForReason(binding.Command, fmt.Errorf("unparsable key '%s': %w", binding.Key, err))
+			marker.MarkSkipped(binding.Command, kb, pluginapi.ErrActionNotSupported)
 			continue
 		}
 
@@ -94,12 +94,13 @@ func (i *vscodeLikeImporter) Import(
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
 
-		marker.MarkImported(binding.Command)
+		marker.MarkImported(mapping.ID, binding.Command, *kb, *kb)
 	}
 
 	setting.Actions = dedup.Actions(setting.Actions)
 
 	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
+	result.Report.ImportedReport = marker.ImportedReport()
 	return result, nil
 }

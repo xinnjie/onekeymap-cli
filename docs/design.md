@@ -7,20 +7,8 @@ The `OneKeymap` app is a cross-platform desktop application that enables users t
 ### Supported Editors
 
 **VSCode Family:**
-- VSCode
-- Windsurf
-- Windsurf Next
-- Cursor
 
 **IntelliJ Family:**
-- IntelliJ IDEA (Ultimate & Community)
-- PyCharm
-- WebStorm
-- CLion
-- PhpStorm
-- RubyMine
-- GoLand
-- RustRover
 
 **Other Editors:**
 - Zed

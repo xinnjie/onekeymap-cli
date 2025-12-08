@@ -62,6 +62,24 @@ func (i *xcodeImporter) Import(
 			continue
 		}
 
+		kb, err := ParseKeybinding(binding.KeyboardShortcut)
+		if err != nil {
+			i.logger.WarnContext(
+				ctx,
+				"Skipping keybinding with unparsable key",
+				"key",
+				binding.KeyboardShortcut,
+				"error",
+				err,
+			)
+			marker.MarkSkipped(
+				binding.Action,
+				nil,
+				fmt.Errorf("unparsable key '%s': %w", binding.KeyboardShortcut, err),
+			)
+			continue
+		}
+
 		mapping := i.FindByXcodeAction(binding.Action)
 		if mapping == nil {
 			i.logger.DebugContext(
@@ -73,24 +91,7 @@ func (i *xcodeImporter) Import(
 				binding.CommandID,
 			)
 			i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeXcode, binding.Action)
-			marker.MarkSkippedForReason(binding.Action, errors.New("unknown action mapping"))
-			continue
-		}
-
-		kb, err := ParseKeybinding(binding.KeyboardShortcut)
-		if err != nil {
-			i.logger.WarnContext(
-				ctx,
-				"Skipping keybinding with unparsable key",
-				"key",
-				binding.KeyboardShortcut,
-				"error",
-				err,
-			)
-			marker.MarkSkippedForReason(
-				binding.Action,
-				fmt.Errorf("unparsable key '%s': %w", binding.KeyboardShortcut, err),
-			)
+			marker.MarkSkipped(binding.Action, &kb, errors.New("unknown action mapping"))
 			continue
 		}
 
@@ -101,7 +102,7 @@ func (i *xcodeImporter) Import(
 			},
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
-		marker.MarkImported(binding.Action)
+		marker.MarkImported(mapping.ID, binding.Action, kb, kb)
 	}
 
 	// Process Text Key Bindings
@@ -112,19 +113,7 @@ func (i *xcodeImporter) Import(
 		}
 		textAction := val.Items[0]
 
-		mapping := i.FindByXcodeTextAction(textAction)
-		if mapping == nil {
-			i.logger.DebugContext(
-				ctx,
-				"Skipping text keybinding with unknown action",
-				"textAction",
-				textAction,
-			)
-			i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeXcode, textAction)
-			marker.MarkSkippedForReason(textAction, errors.New("unknown action mapping"))
-			continue
-		}
-
+		// First, parse the keybinding so we can attach it to skip reports where possible.
 		kb, err := ParseKeybinding(key)
 		if err != nil {
 			i.logger.WarnContext(
@@ -135,7 +124,20 @@ func (i *xcodeImporter) Import(
 				"error",
 				err,
 			)
-			marker.MarkSkippedForReason(textAction, fmt.Errorf("unparsable key '%s': %w", key, err))
+			marker.MarkSkipped(textAction, nil, fmt.Errorf("unparsable key '%s': %w", key, err))
+			continue
+		}
+
+		mapping := i.FindByXcodeTextAction(textAction)
+		if mapping == nil {
+			i.logger.DebugContext(
+				ctx,
+				"Skipping text keybinding with unknown action",
+				"textAction",
+				textAction,
+			)
+			i.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeXcode, textAction)
+			marker.MarkSkipped(textAction, &kb, errors.New("unknown action mapping"))
 			continue
 		}
 
@@ -146,13 +148,14 @@ func (i *xcodeImporter) Import(
 			},
 		}
 		setting.Actions = append(setting.Actions, newKeymap)
-		marker.MarkImported(textAction)
+		marker.MarkImported(mapping.ID, textAction, kb, kb)
 	}
 
 	setting.Actions = dedup.Actions(setting.Actions)
 
 	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
+	result.Report.ImportedReport = marker.ImportedReport()
 	return result, nil
 }
 

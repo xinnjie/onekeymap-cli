@@ -56,15 +56,6 @@ func (p *intellijImporter) Import(
 	setting := keymap.Keymap{}
 	marker := imports.NewMarker()
 	for _, act := range doc.Actions {
-		actionID, err := p.ActionIDFromIntelliJ(act.ID)
-		if err != nil {
-			// Not found in mapping, skip quietly
-			p.logger.DebugContext(ctx, "no universal mapping for intellij action", "action", act.ID)
-			p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeIntelliJ, act.ID)
-			marker.MarkSkippedForReason(act.ID, err)
-			continue
-		}
-
 		for _, ks := range act.KeyboardShortcuts {
 			if ks.First == "" {
 				continue
@@ -72,7 +63,16 @@ func (p *intellijImporter) Import(
 			kb, err := ParseKeyBinding(ks)
 			if err != nil {
 				p.logger.WarnContext(ctx, "failed to parse key binding", "binding", ks, "error", err)
-				marker.MarkSkippedForReason(act.ID, fmt.Errorf("failed to parse key binding %v: %w", ks, err))
+				marker.MarkSkipped(act.ID, nil, fmt.Errorf("failed to parse key binding %v: %w", ks, err))
+				continue
+			}
+
+			actionID, actionErr := p.ActionIDFromIntelliJ(act.ID)
+			if actionErr != nil {
+				// Not found in mapping, skip quietly but record the keybinding for coverage
+				p.logger.DebugContext(ctx, "no universal mapping for intellij action", "action", act.ID)
+				p.reporter.ReportUnknownCommand(ctx, pluginapi.EditorTypeIntelliJ, act.ID)
+				marker.MarkSkipped(act.ID, &kb, actionErr)
 				continue
 			}
 			newBinding := keymap.Action{
@@ -82,13 +82,14 @@ func (p *intellijImporter) Import(
 				},
 			}
 			setting.Actions = append(setting.Actions, newBinding)
-			marker.MarkImported(act.ID)
+			marker.MarkImported(actionID, act.ID, kb, kb)
 		}
 	}
 
 	setting.Actions = dedup.Actions(setting.Actions)
 	result := pluginapi.PluginImportResult{Keymap: setting}
 	result.Report.SkipReport = marker.Report()
+	result.Report.ImportedReport = marker.ImportedReport()
 	return result, nil
 }
 
