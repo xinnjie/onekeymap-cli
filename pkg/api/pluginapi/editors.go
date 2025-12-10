@@ -69,9 +69,9 @@ func (e EditorType) AppName() string {
 	case EditorTypeVim:
 		return "Vim"
 	case EditorTypeHelix:
-		return "Helix"
+		return "Helix (Experimental)"
 	case EditorTypeXcode:
-		return "Xcode"
+		return "Xcode (Experimental)"
 	case EditorTypeBasekeymap:
 		return "Base Keymap - Import default keymap from intellij/vscode/zed..."
 	default:
