@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sort"
+	"strings"
 
 	"github.com/xinnjie/onekeymap-cli/internal/dedup"
 	"github.com/xinnjie/onekeymap-cli/pkg/api/importerapi" // Only for ValidationReport
@@ -265,9 +266,11 @@ func pairKey(action keymap.Action) string {
 	}
 	// Join with NUL to avoid ambiguity
 	sig := action.Name + "\x00"
+	var sigSb268 strings.Builder
 	for _, p := range parts {
-		sig += p + "\x00"
+		sigSb268.WriteString(p + "\x00")
 	}
+	sig += sigSb268.String()
 	return sig
 }
 
