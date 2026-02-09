@@ -1,0 +1,18 @@
+name: Dispatch Update to Watchbeats
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch update event
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.WATCHBEATS_DISPATCH_TOKEN }}
+          repository: xinnjie/watchbeats
+          event-type: submodule_update
