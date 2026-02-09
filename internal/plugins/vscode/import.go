@@ -45,7 +45,14 @@ func newImporterWithEditorType(
 	}
 }
 
-// Import reads a VSCode keybindings.json file and converts it to a universal KeymapSetting.
+// Import (AnalyzeEditorConfig) reads a VSCode keybindings.json file and converts it to a universal KeymapSetting.
+//
+// Handling Existing Configurations:
+// It parses the VSCode JSON configuration from the source, handling comments and trailing commas.
+//
+// Conflict Resolution:
+// - Unknown commands or unparsable keys are skipped and tracked in the validation report.
+// - Duplicate actions resulting from the import are deduplicated to ensure a clean result.
 func (i *vscodeLikeImporter) Import(
 	ctx context.Context,
 	source io.Reader,

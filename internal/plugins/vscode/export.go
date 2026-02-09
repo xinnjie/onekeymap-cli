@@ -88,6 +88,20 @@ func newExporterWithEditorType(
 	}
 }
 
+// Export (GenerateEditorConfig) generates VSCode keybindings from the keymap setting.
+//
+// Handling Existing Configurations:
+// It reads the existing VSCode configuration (if provided via opts.ExistingConfig) to identify
+// "unmanaged" keybindings—those not maintained by OneKeymap. These are preserved to support
+// a non-destructive export/update process.
+//
+// Conflict Resolution:
+//   - Managed keybindings (generated from KeymapSetting) take precedence over conflicting
+//     unmanaged keybindings from the existing configuration.
+//   - If a keybinding in the existing configuration uses the same key combination as a
+//     managed one, the managed one overwrites it.
+//   - The final list is re-ordered to respect the command order of the existing configuration,
+//     preserving the user's preferred organization where possible.
 func (e *vscodeLikeExporter) Export(
 	_ context.Context,
 	destination io.Writer,

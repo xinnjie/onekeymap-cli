@@ -12,8 +12,16 @@ import (
 // Importer defines the interface for the import service, which handles the
 // conversion of editor-specific keymaps into the universal format.
 type Importer interface {
-	// Import converts keymaps from a source stream. It returns the converted
-	// settings and a report detailing any conflicts or unmapped actions.
+	// Import (corresponding to AnalyzeEditorConfig logic) converts keymaps from a source stream.
+	//
+	// Handling Existing Configurations:
+	// It reads configuration from the input stream (e.g., editor specific config like keybindings.json)
+	// and analyzes it to map keybindings to the universal format.
+	//
+	// Conflict Resolution:
+	// - Conflicts during conversion (e.g., multiple keybindings mapping to the same action)
+	//   are resolved by the implementation, typically by deduplicating actions.
+	// - Any unmapped actions or ambiguities are reported in the ImportResult.
 	Import(ctx context.Context, opts ImportOptions) (*ImportResult, error)
 }
 

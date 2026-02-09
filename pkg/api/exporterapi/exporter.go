@@ -13,7 +13,17 @@ import (
 // into an editor-specific format.
 type Exporter interface {
 	// Export converts a KeymapSetting and writes it to a destination stream.
-	// It returns a report detailing any issues encountered during the conversion.
+	//
+	// Handling Existing Configurations:
+	// It reads existing configuration from the input stream (if provided via opts.OriginalConfig)
+	// to identify user-defined or unmanaged keybindings that should be preserved.
+	//
+	// Conflict Resolution:
+	// - Managed keybindings (generated from KeymapSetting) take precedence over conflicting
+	//   unmanaged keybindings from the existing configuration.
+	// - The final output attempts to respect the structure or order of the existing configuration
+	//   where applicable.
+	// - A report is returned detailing the changes (diff) and any issues encountered.
 	Export(
 		ctx context.Context,
 		destination io.Writer,
